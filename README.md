@@ -25,8 +25,25 @@ idea: if we have the ability to go both ways for having the ability to both:
 
 and generated code for the data passing into and out of proto messages, then we can book-end the controllers and estimators. 
 
-## TODO
+### release planning
+alpha feature set:
+- [ ] basic controller (first pass I want to try out different types of regen handling)
+- [ ] UART MCU driver
+- [ ] UDP port comms from the controller manager to data acq
+- [ ] some sort of live parameter server
 
+beta feature set (includes alhpa):
+- [ ] vectornav UART driver 
+- [ ] CASE integrated into controller manager
+- [ ] driver bus with UDP port comms to data acq
+
+v1 feature set:
+- [ ] CASE protobuf status output over UDP 
+- [ ] basic controller integrated
+- [ ] live param interface working fully integrated with foxglove websocket comms
+
+
+### TODOs
 - [ ] make a controller manager for switching between controllers
 - [ ] implement simple controller to use for testing
     - end to end test of the controller?
@@ -44,3 +61,26 @@ and generated code for the data passing into and out of proto messages, then we 
 (potential) for CAN interaction: https://github.com/SimonCahill/libsockcanpp
 
 for CAN parsing: https://github.com/xR3b0rn/dbcppp
+
+## what we want from the drivebrain driver bus
+
+how much do we want to tie in protobuf?
+    - do we want each driver to have to deal with protobufs or do we want them to output something else?
+        - we need a way to unify each driver's output to the driver bus 
+            - I think it would be fine to have each driver be able to define their own protobuf message for output
+                - we cant have a single message type that we compose from the driver messages
+                - we will need some sort of registration for each message type
+            - each driver can act as an adapter to protobuf messages
+            - do we want to be able to have N messages be returned from each driver? or does each driver have to only output one message?
+                - we still want to be able to have a single message per topic in foxglove / mcap
+                - we can have named channels in each driver 
+                - protobuf introspection for the data acq
+
+what about a json based message struct generator for setting what each driver can output?
+    - we can generate the json with matlab too and so we can hook into the code gen 
+    - we can generate protos and adapter code between the struct and the resulting protobuf message to 
+output requirements:
+- needs to be composed directly from drivers it is composed of
+    - the drivers being used are known at compile time
+- parameter interface
+    - the drivers have to a parameter update function that can be used outside of initialization 
