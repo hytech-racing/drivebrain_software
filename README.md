@@ -1,3 +1,6 @@
+## design
+
+[wiki link](https://wiki.hytechracing.org/books/software/page/drivebrain-architecture-rev1)
 
 ## first pass
 ideas:
