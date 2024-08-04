@@ -19,10 +19,10 @@ namespace common
         // Initialize the configuration from a JSON file
         bool init(const std::string &configFile)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> lock(_mutex);
             try
             {
-                boost::property_tree::read_json(configFile, configTree_);
+                boost::property_tree::read_json(configFile, _configTree);
                 return true;
             }
             catch (const boost::property_tree::json_parser_error &e)
@@ -40,7 +40,7 @@ namespace common
         // Update configuration from a JSON string (not from a file)
         bool updateConfigFromJson(const std::string& jsonString)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> lock(_mutex);
             try
             {
                 std::istringstream jsonStream(jsonString);
@@ -49,7 +49,7 @@ namespace common
 
                 for (const auto& item : updatedTree)
                 {
-                    configTree_.put(item.first, item.second.data());
+                    _configTree.put(item.first, item.second.data());
                     notifyObservers(item.first);
                 }
                 return true;
@@ -62,7 +62,7 @@ namespace common
         }
         
     protected:
-        boost::property_tree::ptree configTree_;
-        std::mutex mutex_;
+        boost::property_tree::ptree _configTree;
+        std::mutex _mutex;
     };
 }
