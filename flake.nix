@@ -73,6 +73,7 @@
               ];
               packages = [
                 pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
+                pkgs.gcc
               ];
               packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };
