@@ -36,3 +36,7 @@ https://github.com/djarek/canary/tree/master
 https://elinux.org/Bringing_CAN_interface_up
 
 https://www.kernel.org/doc/html/next/networking/can.html
+
+[example version of our generated `.proto`](https://github.com/hytech-racing/data_acq/releases/download/2024-04-27T00_26_50/hytech.proto)
+
+[most recent `hytech.dbc`](https://github.com/hytech-racing/HT_CAN/releases/download/109/hytech.dbc)
