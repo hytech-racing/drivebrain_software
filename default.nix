@@ -4,5 +4,5 @@ stdenv.mkDerivation {
   name = "drivebrain_software";
   src = ./.;
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ easy_cmake foxglove-ws-protocol-cpp protobuf foxglove-schemas_proto_cpp ];
+  propagatedBuildInputs = [ easy_cmake foxglove-ws-protocol-cpp protobuf foxglove-schemas_proto_cpp ];
 }

@@ -2,11 +2,22 @@
   description = "my packages. im tired of making new repos for nix packages and im too lazy to push em up to nixpkgs";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    
     flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    
     devshell.url = "github:numtide/devshell";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
+
     nebs-packages.url = "github:RCMast3r/nebs_packages";
+    nebs-packages.inputs.nixpkgs.follows = "nixpkgs";
+
     easy_cmake.url = "github:RCMast3r/easy_cmake";
-    nix-proto.url = "github:notalltim/nix-proto";
+    easy_cmake.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-proto.url = "github:RCMast3r/nix-proto";
+    nix-proto.inputs.nixpkgs.follows = "nixpkgs";
+
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
       flake = false;
@@ -31,7 +42,10 @@
               foxglove-schemas = nix-proto.mkProtoDerivation {
                 name = "foxglove-schemas";
                 version = "1.0.1";
-                src = "${foxglove-schemas-src}/schemas/proto";
+                src = nix-proto.lib.srcFromNamespace {
+                  root = "${foxglove-schemas-src}/schemas/proto";
+                  namespace = "foxglove";
+                };
               };
             };
           in
@@ -51,25 +65,18 @@
 
             devshells.default = {
               env = [ ];
-
               commands = [
-
                 {
                   name = "b";
                   command = "cd $PRJ_ROOT && rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd $PRJ_ROOT";
                 }
               ];
               packages = [
-                pkgs.cmake
+                pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
               ];
-
-              packagesFrom = [ drivebrain_software ];
+              packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };
-            # legacyPackages =
-            #   import nixpkgs {
-            #     inherit system;
-            #     overlays = [ (final: _: { flow-ipc = final.callPackage ./flow-ipc.nix { src = flow-ipc-src; }; }) ];
-            #   };
+            
           };
       };
 

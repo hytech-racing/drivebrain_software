@@ -86,4 +86,25 @@ output requirements:
 - needs to be composed directly from drivers it is composed of
     - the drivers being used are known at compile time
 - parameter interface
-    - the drivers have to a parameter update function that can be used outside of initialization 
+    - the drivers have to a parameter update function that can be used outside of initialization
+
+## development
+
+`nix develop` enters you into the devshell for building with cmake
+
+example `c_cpp_properties.json` file to be placed in your `.vscode/`:
+```json
+{
+    "configurations": [
+        {
+            "name": "dev",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
+```

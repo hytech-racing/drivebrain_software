@@ -1,8 +1,8 @@
 project(drivebrain_software)
-
+cmake_minimum_required(VERSION 3.24)
 
 find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED)
-# find_package(foxglove-websocket REQUIRED) this is where this would be, IF WE HAD ONE ...
+find_package(foxglove_websocket REQUIRED)
 
 # add_library(hytech_param_server SHARED)
 
@@ -13,6 +13,5 @@ find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED)
 
 add_executable(test_param_server test/test_param_server.cpp)
 
-# TODO(ben) get / package the foxglove websocket boi properly
-
-target_link_libraries(test_param_server PUBLIC foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp)
+target_link_libraries(test_param_server PUBLIC foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp foxglove_websocket::foxglove_websocket)
+install(TARGETS test_param_server)
