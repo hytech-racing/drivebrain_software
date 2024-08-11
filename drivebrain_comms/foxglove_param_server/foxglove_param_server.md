@@ -28,7 +28,6 @@ why dont we handle the mcap recording within our software here?:
 ##### pros:
 - I wouldnt have to broadcast or handle deserialization / serialization of the protobuf messages out of the drivebrain core
 
-- I wouldnt have to implement a protocol to handle handshaking with an external 
 -------
 ##### cons:  
 - I would have to then handle all the meta data handling stuff here too tho which would require alot more integration with foxglove studio since we would need request-response (service calls) that is already mostly implemented in the `data_acq` service. 
