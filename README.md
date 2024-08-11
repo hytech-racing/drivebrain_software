@@ -32,8 +32,8 @@ and generated code for the data passing into and out of proto messages, then we 
 alpha feature set:
 - [ ] basic controller (first pass I want to try out different types of regen handling)
 - [ ] UART MCU driver
-- [ ] UDP port comms from the controller manager to data acq
-- [ ] some sort of live parameter server
+- [ ] UDP port comms from the controller manager to data acq for live telem
+- [ ] foxglove live parameter server integration that gets constructed from the registered configurable objects
 
 beta feature set (includes alhpa):
 - [ ] vectornav UART driver 
