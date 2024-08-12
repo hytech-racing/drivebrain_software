@@ -48,7 +48,7 @@ namespace core
             /// @param default_value the default value for the parameter. if the key is not in this component's configuration block this value will get written into the parameter file
             /// @return the config value
             template <typename ParamType>
-            ParamType get_parameter_value(const std::string &key, const T &default_value)
+            ParamType get_parameter_value(const std::string &key, const ParamType &default_value)
             {
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
                 auto &config = _json_file_handler.get_config();
@@ -65,25 +65,27 @@ namespace core
                     config[_component_name][key] = default_value;
                 }
 
-                return config[_component_name][key].get<T>();
+                return config[_component_name][key].get<ParamType>();
             }
 
             // TODO virtual handler for config being updated. this will be called by the parameter server but implemented by each component
 
-            
+            template<typename ParamType>
             bool handle_update_parameter(const std::string &key, ParamType parameter_val)
             {
                 auto &config = _json_file_handler.get_config();
                 if (config[_component_name].contains(key))
                 {
-                    config[_component_name][key] =
-                        set_parameter(key, parameter_value);
+                    // config[_component_name][key] =
+                        // set_parameter(key, parameter_value);
+                    return true;
                 }
+                return false;
             }
 
             // this is the handler that each component must implement that can take in the parameter ID
-            template <typename ParamType>
-            virtual bool set_parameter(const std::string &key, ParamType param_value) = 0;
+            // template <typename ParamType>
+            // virtual bool set_parameter(const std::string &key, ParamType param_value);
 
         private:
             std::string _component_name;

@@ -4,7 +4,7 @@ void core::JsonFileHandler::save_config() {
     std::ofstream configFile(_configFilePath);
     if (configFile.is_open())
     {
-        configFile << config.dump(4); // Pretty print with an indent of 4 spaces
+        configFile << _config.dump(4); // Pretty print with an indent of 4 spaces
     }
     else
     {
