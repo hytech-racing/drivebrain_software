@@ -12,6 +12,6 @@ namespace control
     class Controller : common::Configurable
     {
     public:
-        virtual ControllerResult stepController(const ControllerInput &in) = 0;
+        virtual ControllerResult step_controller(const ControllerInput &in) = 0;
     };
 }

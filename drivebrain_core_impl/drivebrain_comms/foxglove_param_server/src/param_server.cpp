@@ -14,11 +14,7 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::array<core::common::
     _server = foxglove::ServerFactory::createServer<websocketpp::connection_hdl>(
         "beep boop", _log_handler, _server_options);
 
-
-
-
     foxglove::ServerHandlers<foxglove::ConnHandle> hdlrs;
-
 
     hdlrs.parameterRequestHandler = [this](const std::vector<std::string> &param_names, const std::optional<std::string> &request_id,
                                         foxglove::ConnHandle clientHandle)

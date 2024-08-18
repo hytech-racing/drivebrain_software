@@ -7,10 +7,13 @@
 #include <functional>
 #include <mutex>
 #include <unordered_map>
+#include <optional>
+#include <variant>
 
 // STORY:
 
-// what I want to be able to have this do is be able to be part of every software component and it exposes functionality for handling ptree passed in parameters in a smart way.
+// what I want to be able to have this do is be able to be part of every software component and
+// it exposes functionality for handling ptree passed in parameters in a smart way.
 
 // NOTES:
 
@@ -21,7 +24,7 @@
 // - [ ] configuration should be nested in the following way:
 // 1. each component has its own single layer scope
 // 2. each scope doesnt have any further scope (one layer deep only)
-
+// - [ ] all parameter value getting has to return
 // - [ ] there will only be ONE config file being edited by ONE thing at a time
 // this is pertinent to the parameter server for saving the parameters, for accessing at init time we will initialize before kicking off threads
 
@@ -29,6 +32,9 @@
 
 // need to force each configurable instance to have a handler for the runtime-updating of each parameter? or have a run-time callable config access function
 // -> this would be hard to police and ensure that the runtime calling only gets called during runtime
+
+// what if we made all the parameter handling be within a specific function for each component
+    // then the initial init can call the same set param function that gets called at init time 
 
 namespace core
 {
@@ -42,13 +48,14 @@ namespace core
                 : _json_file_handler(json_file_handler), _component_name(component_name) {}
 
         protected:
+
+            using ParamTypes = std::variant<bool, int, float, std::string>;
             /// @brief Gets a parameter value within the component's scope, ensuring it exists with a default value and if it doesnt it will created it
             /// @tparam ParamType parameter type
             /// @param key the id of the parameter being requested
-            /// @param default_value the default value for the parameter. if the key is not in this component's configuration block this value will get written into the parameter file
-            /// @return the config value
+            /// @return the optional config value
             template <typename ParamType>
-            ParamType get_parameter_value(const std::string &key, const ParamType &default_value)
+            ParamType get_parameter_value(const std::string &key)
             {
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
                 auto &config = _json_file_handler.get_config();
@@ -56,36 +63,40 @@ namespace core
                 // Ensure the component's section exists and if it doesnt we created it
                 if (!config.contains(_component_name))
                 {
-                    config[_component_name] = nlohmann::json::object();
+                    std::cout << "WARNING: config file does not contain config for component: " << _component_name << std::endl;
+                    return std::nullopt;
                 }
 
                 // Access the specific key within the component's section
                 if (!config[_component_name].contains(key))
                 {
-                    config[_component_name][key] = default_value;
+                    std::cout << "WARNING: config file does not contain config: "<< key << " for component: " << _component_name << std::endl;
+                    return std::nullopt;
                 }
-
                 return config[_component_name][key].get<ParamType>();
             }
 
-            // TODO virtual handler for config being updated. this will be called by the parameter server but implemented by each component
-
-            template<typename ParamType>
-            bool handle_update_parameter(const std::string &key, ParamType parameter_val)
+            /// @brief TODO: component-scoped parameter setting call. this will be getting called by the parameter server within drivebrain
+            /// @param key 
+            /// @param parameter_val 
+            /// @return true or false depending on if the key exists or not
+            bool handle_update_parameter(const std::string &key, std::variant<bool, int, float, std::string> parameter_val)
             {
                 auto &config = _json_file_handler.get_config();
                 if (config[_component_name].contains(key))
                 {
-                    // config[_component_name][key] =
-                        // set_parameter(key, parameter_value);
+                    // config[_component_name][key] = parameter_val;
+                    // set_parameter(key, parameter_value);
                     return true;
                 }
                 return false;
             }
 
-            // this is the handler that each component must implement that can take in the parameter ID
-            // template <typename ParamType>
-            // virtual bool set_parameter(const std::string &key, ParamType param_value);
+            // /// @brief TODO: this is the handler that each component must implement that can take in the parameter ID
+            // /// @tparam ParamType 
+            // /// @param key 
+            // /// @param param_value 
+            // virtual void set_parameter(const std::string &key, std::variant<bool, int, float, std::string> param_value) = 0;
 
         private:
             std::string _component_name;
