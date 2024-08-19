@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.24)
 find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(nlohmann_json REQUIRED)
-
+find_package(Boost REQUIRED COMPONENTS system)
 add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
@@ -12,7 +12,7 @@ target_include_directories(drivebrain_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_base/include>    
 )
 
-target_link_libraries(drivebrain_core PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(drivebrain_core PRIVATE nlohmann_json::nlohmann_json Boost::boost Boost::system)
 
 add_library(foxglove_param_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_param_server/src/param_server.cpp)
 

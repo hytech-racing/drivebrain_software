@@ -2,10 +2,10 @@
   description = "my packages. im tired of making new repos for nix packages and im too lazy to push em up to nixpkgs";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-    
+
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-    
+
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -47,15 +47,15 @@
                   namespace = "foxglove";
                 };
               };
-            };
-            drivebrain_core_msgs = nix-proto.mkProtoDerivation {
-              name = "drivebrain_core_msgs";
-              version = "0.0.1";
-              src = nix-proto.lib.srcFromNamespace {
-                root = ./proto;
-                namespace = "drivebrain_core_msgs/v1";
+              drivebrain_core_msgs = nix-proto.mkProtoDerivation {
+                name = "drivebrain_core_msgs";
+                version = "0.0.1";
+                src = nix-proto.lib.srcFromNamespace {
+                  root = ./proto;
+                  namespace = "drivebrain_core_msgs/v1";
+                };
+                # protoDeps = [base_api]; TODO add in the generated protos
               };
-              # protoDeps = [base_api]; TODO add in the generated protos
             };
           in
           {
@@ -86,7 +86,7 @@
               ];
               packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };
-            
+
           };
       };
 
