@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package mcu_driver;
+
+message mcu_pedals {
+    float accel_percent = 1;
+    float brake_percent = 2;
+}

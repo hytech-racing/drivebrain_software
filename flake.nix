@@ -15,7 +15,7 @@
     easy_cmake.url = "github:RCMast3r/easy_cmake";
     easy_cmake.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-proto.url = "github:RCMast3r/nix-proto";
+    nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
     foxglove-schemas-src = {
@@ -47,6 +47,15 @@
                   namespace = "foxglove";
                 };
               };
+            };
+            drivebrain_core_msgs = nix-proto.mkProtoDerivation {
+              name = "drivebrain_core_msgs";
+              version = "0.0.1";
+              src = nix-proto.lib.srcFromNamespace {
+                root = ./proto;
+                namespace = "drivebrain_core_msgs/v1";
+              };
+              # protoDeps = [base_api]; TODO add in the generated protos
             };
           in
           {

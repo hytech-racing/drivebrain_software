@@ -7,8 +7,6 @@
 namespace control
 {
 
-// 
-
 class SimpleController : Controller<SpeedControlOut, SpeedControlIn>
 {
 
