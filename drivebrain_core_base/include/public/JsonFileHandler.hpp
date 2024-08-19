@@ -5,8 +5,6 @@
 #include <iostream>
 #include <string>
 
-
-
 namespace core
 {
 /// @brief file handler singleton class. no component should directly write json files with this, we only ever want to have one json file for all parameters. 

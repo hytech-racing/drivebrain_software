@@ -1,8 +1,7 @@
 #include <SimpleController.h>
 
-void TorqueControllerSimple::tick(const PedalsSystemData_s &pedalsData)
+void SimpleController::tick(const PedalsSystemData_s &pedalsData)
 {
-
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
     float accelRequest = pedalsData.accelPercent - pedalsData.regenPercent;
@@ -40,7 +39,7 @@ void TorqueControllerSimple::tick(const PedalsSystemData_s &pedalsData)
     }
 }
 
-TorqueControllerOutput_s TorqueControllerSimple::evaluate(const SharedCarState_s &state)
+TorqueControllerOutput_s SimpleController::evaluate(const SharedCarState_s &state)
 {
     tick(state.pedals_data);
     return writeout_;

@@ -2,8 +2,7 @@
 
 // ABOUT: this controller is an implementation of mode 0
 
-
-
+// this controller will be reactionary 
 namespace control
 {
 
