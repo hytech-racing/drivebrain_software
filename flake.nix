@@ -81,6 +81,7 @@
                 }
               ];
               packages = [
+                pkgs.openssl
                 pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
                 pkgs.gcc # this has to be specified because otherwise it uses the system's compiler and that can screw with things :eyes:
               ];

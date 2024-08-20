@@ -1,4 +1,4 @@
-{ pkgs, stdenv, cmake, boost, protobuf, foxglove-ws-protocol-cpp, easy_cmake, foxglove-schemas_proto_cpp, drivebrain_core_msgs_proto_cpp, ...}:
+{ pkgs, stdenv, cmake, boost, pkg-config,protobuf, foxglove-ws-protocol-cpp, easy_cmake, foxglove-schemas_proto_cpp, drivebrain_core_msgs_proto_cpp, ...}:
 
 stdenv.mkDerivation {
   name = "drivebrain_software";

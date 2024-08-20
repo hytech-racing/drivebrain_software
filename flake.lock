@@ -195,6 +195,22 @@
         "type": "github"
       }
     },
+    "libsocketcanpp-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722186873,
+        "narHash": "sha256-/E8ADpod/1sgCO4cfJLkn5meTew9VnUnlh2hTMyU0BU=",
+        "owner": "SimonCahill",
+        "repo": "libsockcanpp",
+        "rev": "bff1c8a2238580d82056dbb41e17a0feda18f00a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "SimonCahill",
+        "repo": "libsockcanpp",
+        "type": "github"
+      }
+    },
     "nebs-packages": {
       "inputs": {
         "commsdsl-src": "commsdsl-src",
@@ -203,17 +219,18 @@
         "flake-parts": "flake-parts_3",
         "flow-ipc-src": "flow-ipc-src",
         "foxglove-ws-protocol-src": "foxglove-ws-protocol-src",
+        "libsocketcanpp-src": "libsocketcanpp-src",
         "nix-proto": "nix-proto",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1723343047,
-        "narHash": "sha256-ZcfIBv5F0v9XgFAyNgANWR0lgySrXAx0f3Y73bGxN50=",
+        "lastModified": 1724157492,
+        "narHash": "sha256-w4NmTcXPjt4HQK5yVT9p/CZAs0qYDI2FvTXmD2odS2c=",
         "owner": "RCMast3r",
         "repo": "nebs_packages",
-        "rev": "914b58d2803ac2e13214123cbe17ce7d283c9034",
+        "rev": "217124e7f05ab3b53eeb7843b015dfe00efaf4da",
         "type": "github"
       },
       "original": {
