@@ -49,14 +49,14 @@ namespace core
                 : _json_file_handler(json_file_handler), _component_name(component_name) {}
 
         protected:
-
+            virtual bool init() = 0;
             using ParamTypes = std::variant<bool, int, float, std::string>;
             /// @brief Gets a parameter value within the component's scope, ensuring it exists with a default value and if it doesnt it will created it
             /// @tparam ParamType parameter type
             /// @param key the id of the parameter being requested
             /// @return the optional config value
             template <typename ParamType>
-            ParamType get_parameter_value(const std::string &key)
+            std::optional<ParamType> get_parameter_value(const std::string &key)
             {
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
                 auto &config = _json_file_handler.get_config();
@@ -98,7 +98,7 @@ namespace core
             // /// @param key 
             // /// @param param_value 
             // virtual void set_parameter(const std::string &key, std::variant<bool, int, float, std::string> param_value) = 0;
-
+            
         private:
             std::string _component_name;
             core::JsonFileHandler &_json_file_handler;

@@ -22,8 +22,16 @@
       url = "github:foxglove/schemas";
       flake = false;
     };
+    
+    ht_can.url = "github:hytech-racing/ht_can";
+    ht_can.inputs.nixpkgs.follows = "nixpkgs";
+    
+    data_acq.url = "github:hytech-racing/data_acq/master";
+    data_acq.inputs.ht_can_pkg_flake.follows = "ht_can";
+    data_acq.inputs.nix-proto.follows = "nix-proto";
+    # data_acq.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = { self, nixpkgs, flake-parts, devshell, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, devshell, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, ... }@inputs:
 
     flake-parts.lib.mkFlake { inherit inputs; }
       {
@@ -64,7 +72,8 @@
               overlays = [
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
-              ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+                
+              ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               config = { };
             };
             packages.default = drivebrain_software;
@@ -84,6 +93,9 @@
                 pkgs.openssl
                 pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
                 pkgs.gcc # this has to be specified because otherwise it uses the system's compiler and that can screw with things :eyes:
+                pkgs.nlohmann_json
+                pkgs.boost
+                pkgs.protobuf
               ];
               packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };

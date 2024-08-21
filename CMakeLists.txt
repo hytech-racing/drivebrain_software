@@ -20,7 +20,7 @@ target_include_directories(drivebrain_core PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_base/include/private>    
 )
 
-target_link_libraries(drivebrain_core PRIVATE nlohmann_json::nlohmann_json Boost::boost Boost::system)
+target_link_libraries(drivebrain_core PUBLIC nlohmann_json::nlohmann_json Boost::boost Boost::system)
 
 
 # impl libraries
@@ -39,14 +39,15 @@ target_link_libraries(foxglove_param_server PUBLIC
 
 
 add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
+
 target_include_directories(CAN_driver PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>    
 )
+
 target_link_libraries(CAN_driver PUBLIC 
     drivebrain_core 
 )
-
 
 add_executable(test_param_server test/test_param_server.cpp)
 
