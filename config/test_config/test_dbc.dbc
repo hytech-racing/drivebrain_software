@@ -1,0 +1,1233 @@
+VERSION "6.0"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: 
+
+
+BO_ 222 BMS_BALANCING_STATUS: 8 ECU
+ SG_ cell_60_balancing_status : 63|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_59_balancing_status : 62|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_58_balancing_status : 61|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_57_balancing_status : 60|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_56_balancing_status : 59|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_55_balancing_status : 58|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_54_balancing_status : 57|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_53_balancing_status : 56|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_52_balancing_status : 55|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_51_balancing_status : 54|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_50_balancing_status : 53|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_49_balancing_status : 52|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_48_balancing_status : 51|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_47_balancing_status : 50|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_46_balancing_status : 49|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_45_balancing_status : 48|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_44_balancing_status : 47|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_43_balancing_status : 46|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_42_balancing_status : 45|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_41_balancing_status : 44|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_40_balancing_status : 43|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_39_balancing_status : 42|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_38_balancing_status : 41|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_37_balancing_status : 40|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_36_balancing_status : 39|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_35_balancing_status : 38|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_34_balancing_status : 37|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_33_balancing_status : 36|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_32_balancing_status : 35|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_31_balancing_status : 34|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_30_balancing_status : 33|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_29_balancing_status : 32|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_28_balancing_status : 31|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_27_balancing_status : 30|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_26_balancing_status : 29|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_25_balancing_status : 28|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_24_balancing_status : 27|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_23_balancing_status : 26|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_22_balancing_status : 25|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_21_balancing_status : 24|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_20_balancing_status : 23|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_19_balancing_status : 22|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_18_balancing_status : 21|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_17_balancing_status : 20|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_16_balancing_status : 19|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_15_balancing_status : 18|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_14_balancing_status : 17|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_13_balancing_status : 16|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_12_balancing_status : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_11_balancing_status : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_10_balancing_status : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_9_balancing_status : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_8_balancing_status : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_7_balancing_status : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_6_balancing_status : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_5_balancing_status : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_4_balancing_status : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_3_balancing_status : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_2_balancing_status : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cell_1_balancing_status : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ group_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 226 BMS_COULOMB_COUNTS: 8 ECU
+ SG_ total_discharge : 32|32@1+ (0.0001,0) [0|0] "Coulombs" Vector__XXX
+ SG_ total_charge : 0|32@1+ (0.0001,0) [0|0] "Coulombs" Vector__XXX
+
+BO_ 218 BMS_DETAILED_TEMPS: 7 ECU
+ SG_ thermistor_id_2 : 40|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ thermistor_id_1 : 24|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ thermistor_id_0 : 8|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ ic_id : 4|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ group_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 216 BMS_DETAILED_VOLTAGES: 7 ECU
+ SG_ voltage_2 : 40|16@1+ (0.0001,0) [0|0] "" Vector__XXX
+ SG_ voltage_1 : 24|16@1+ (0.0001,0) [0|0] "" Vector__XXX
+ SG_ voltage_0 : 8|16@1+ (0.0001,0) [0|0] "" Vector__XXX
+ SG_ ic_id : 4|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ group_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 214 BMS_ONBOARD_DETAILED_TEMPS: 5 ECU
+ SG_ temp_1 : 24|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ temp_0 : 8|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ ic_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 213 BMS_ONBOARD_TEMPS: 6 ECU
+ SG_ high_temp : 32|16@1- (0.01,0) [0|0] "deg C" Vector__XXX
+ SG_ low_temp : 16|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ average_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+
+BO_ 219 BMS_STATUS: 6 ECU
+ SG_ shutdown_h_above_threshold_error : 41|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_g_above_threshold_error : 40|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ current : 24|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ overtemp_error : 16|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ undertemp_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ charge_overtemp_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ discharge_overtemp_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ charge_overcurrent_error : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ discharge_overcurrent_error : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ total_voltage_high_error : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ undervoltage_error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ overvoltage_error : 8|1@1+ (1,0) [0|0] "none" Vector__XXX
+ SG_ state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 217 BMS_TEMPS: 6 ECU
+ SG_ high_temp : 32|16@1- (0.01,0) [0|0] "deg C" Vector__XXX
+ SG_ low_temp : 16|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ average_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+
+BO_ 215 BMS_VOLTAGES: 8 ECU
+ SG_ total_voltage : 48|16@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ high_voltage : 32|16@1+ (0.0001,0) [0|0] "V" Vector__XXX
+ SG_ low_voltage : 16|16@1+ (0.0001,0) [0|0] "" Vector__XXX
+ SG_ average_voltage : 0|16@1+ (0.0001,0) [0|0] "V" Vector__XXX
+
+BO_ 221 CCU_STATUS: 1 ECU
+ SG_ charger_enabled : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2550588916 CHARGER_CONTROL: 5 ECU
+ SG_ control : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ max_charging_current_low : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ max_charging_current_high : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ max_charging_voltage_low : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ max_charging_voltage_high : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566869221 CHARGER_DATA: 7 ECU
+ SG_ input_ac_voltage_low : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ input_ac_voltage_high : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ flags : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ output_current_low : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ output_current_high : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ output_dc_voltage_low : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ output_dc_voltage_high : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 256 EM_MEASUREMENT: 8 ECU
+ SG_ em_voltage : 39|32@0- (1.52590219e-05,0) [0|0] "Volts" Vector__XXX
+ SG_ em_current : 7|32@0- (1.52590219e-05,0) [0|0] "Coulombs" Vector__XXX
+
+BO_ 1024 EM_STATUS: 2 ECU
+ SG_ logging : 10|1@1+ (1,0) [0|0] "none" Vector__XXX
+ SG_ overpower_error : 9|1@1+ (1,0) [0|0] "none" Vector__XXX
+ SG_ overvoltage_error : 8|1@1+ (1,0) [0|0] "none" Vector__XXX
+ SG_ current_gain : 4|4@1+ (1,0) [0|0] "none" Vector__XXX
+ SG_ voltage_gain : 0|4@1+ (1,0) [0|0] "none" Vector__XXX
+
+BO_ 184 MC1_ENERGY: 8 ECU
+ SG_ feedback_torque : 48|16@1- (1,0) [0|0] "Mn" Vector__XXX
+ SG_ motor_power : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_bus_voltage : 0|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 160 MC1_SETPOINTS_COMMAND: 8 ECU
+ SG_ negative_torque_limit : 48|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ positive_torque_limit : 32|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ speed_setpoint_rpm : 16|16@1- (1,0) [0|0] "rpm" Vector__XXX
+ SG_ remove_error : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ driver_enable : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hv_enable : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_enable : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 176 MC1_STATUS: 8 ECU
+ SG_ magnetizing_current : 48|16@1- (1,0) [0|0] "A" Vector__XXX
+ SG_ torque_current : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ speed_rpm : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ derating_on : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_on : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_inverter_on : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_on : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_dc_on : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ warning : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_ready : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 180 MC1_TEMPS: 8 ECU
+ SG_ igbt_temp : 48|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ diagnostic_number : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_temp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ motor_temp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
+
+BO_ 164 MC1_TORQUE_COMMAND: 2 ECU
+ SG_ torque_command : 0|16@1- (0.1,0) [0|0] "% Mn" Vector__XXX
+
+BO_ 185 MC2_ENERGY: 8 ECU
+ SG_ feedback_torque : 48|16@1- (1,0) [0|0] "Mn" Vector__XXX
+ SG_ motor_power : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_bus_voltage : 0|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 161 MC2_SETPOINTS_COMMAND: 8 ECU
+ SG_ negative_torque_limit : 48|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ positive_torque_limit : 32|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ speed_setpoint_rpm : 16|16@1- (1,0) [0|0] "rpm" Vector__XXX
+ SG_ remove_error : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ driver_enable : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hv_enable : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_enable : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 177 MC2_STATUS: 8 ECU
+ SG_ magnetizing_current : 48|16@1- (1,0) [0|0] "A" Vector__XXX
+ SG_ torque_current : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ speed_rpm : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ derating_on : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_on : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_inverter_on : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_on : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_dc_on : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ warning : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_ready : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 181 MC2_TEMPS: 8 ECU
+ SG_ igbt_temp : 48|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ diagnostic_number : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_temp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ motor_temp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
+
+BO_ 165 MC2_TORQUE_COMMAND: 2 ECU
+ SG_ torque_command : 0|16@1- (0.1,0) [0|0] "% Mn" Vector__XXX
+
+BO_ 186 MC3_ENERGY: 8 ECU
+ SG_ feedback_torque : 48|16@1- (1,0) [0|0] "Mn" Vector__XXX
+ SG_ motor_power : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_bus_voltage : 0|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 162 MC3_SETPOINTS_COMMAND: 8 ECU
+ SG_ negative_torque_limit : 48|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ positive_torque_limit : 32|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ speed_setpoint_rpm : 16|16@1- (1,0) [0|0] "rpm" Vector__XXX
+ SG_ remove_error : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ driver_enable : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hv_enable : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_enable : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 178 MC3_STATUS: 8 ECU
+ SG_ magnetizing_current : 48|16@1- (1,0) [0|0] "A" Vector__XXX
+ SG_ torque_current : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ speed_rpm : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ derating_on : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_on : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_inverter_on : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_on : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_dc_on : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ warning : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_ready : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 182 MC3_TEMPS: 8 ECU
+ SG_ igbt_temp : 48|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ diagnostic_number : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_temp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ motor_temp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
+
+BO_ 166 MC3_TORQUE_COMMAND: 2 ECU
+ SG_ torque_command : 0|16@1- (0.1,0) [0|0] "% Mn" Vector__XXX
+
+BO_ 187 MC4_ENERGY: 8 ECU
+ SG_ feedback_torque : 48|16@1- (1,0) [0|0] "Mn" Vector__XXX
+ SG_ motor_power : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_bus_voltage : 0|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 163 MC4_SETPOINTS_COMMAND: 8 ECU
+ SG_ negative_torque_limit : 48|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ positive_torque_limit : 32|16@1- (0.01,0) [0|0] "Mn" Vector__XXX
+ SG_ speed_setpoint_rpm : 16|16@1- (1,0) [0|0] "rpm" Vector__XXX
+ SG_ remove_error : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ driver_enable : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hv_enable : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_enable : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 179 MC4_STATUS: 8 ECU
+ SG_ magnetizing_current : 48|16@1- (1,0) [0|0] "A" Vector__XXX
+ SG_ torque_current : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ speed_rpm : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ derating_on : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_on : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_inverter_on : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dc_on : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ quit_dc_on : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ warning : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_ready : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 183 MC4_TEMPS: 8 ECU
+ SG_ igbt_temp : 48|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ diagnostic_number : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_temp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
+ SG_ motor_temp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
+
+BO_ 167 MC4_TORQUE_COMMAND: 2 ECU
+ SG_ torque_command : 0|16@1- (0.1,0) [0|0] "% Mn" Vector__XXX
+
+BO_ 204 MCU_ANALOG_READINGS: 8 ECU
+ SG_ glv_battery_voltage : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hall_effect_current : 32|16@1- (1,0) [0|0] "N/A" Vector__XXX
+ SG_ steering_2 : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ steering_1 : 0|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 198 MCU_FRONT_POTS: 4 ECU
+ SG_ potentiometer_fr : 16|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_fl : 0|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 197 MCU_LOAD_CELLS: 4 ECU
+ SG_ load_cell_fr : 16|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ load_cell_fl : 0|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 196 MCU_PEDAL_READINGS: 8 ECU
+ SG_ mechanical_brake_percent_float : 16|8@1+ (0.39215686275,0) [0|0] "percent" Vector__XXX
+ SG_ brake_percent_float : 8|8@1+ (0.39215686275,0) [0|0] "percent" Vector__XXX
+ SG_ accel_percent_float : 0|8@1+ (0.39215686275,0) [0|0] "percent" Vector__XXX
+
+BO_ 199 MCU_REAR_POTS: 4 ECU
+ SG_ potentiometer_rr : 16|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_rl : 0|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 195 MCU_STATUS: 8 ECU
+ SG_ distance_traveled_m : 48|16@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ torque_mode : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ max_torque : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ drive_mode : 28|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pack_charge_critical : 24|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ launch_control_active : 23|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ software_ok : 22|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ energy_meter_present : 20|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_error : 19|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ecu_state : 16|3@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ drive_buzzer : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ no_accel_or_brake_implausibility : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bspd_brake_high : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bspd_current_high : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_pedal_active : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ no_brake_implausibility : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ no_accel_implausibility : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mechanical_brake_active : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_e_above_threshold : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ software_ok_high : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_d_above_threshold : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bspd_ok_high : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_c_above_threshold : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bms_ok_high : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_b_above_threshold : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ imd_ok_high : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 236 DASHBOARD_STATE: 3 ECU
+ SG_ dial_state : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ tcu_recording_state : 12|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ drive_buzzer : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ssok_above_threshold : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_h_above_threshold : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ right_shifter_button : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ left_shifter_button : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ led_dimmer_button : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ torque_mode_button : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ launch_ctrl_button : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ motor_controller_cycle_button : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mode_button : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mark_button : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ start_button : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 235 DASHBOARD_MCU_STATE: 6 ECU
+ SG_ dial_state : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pack_charge_led : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ glv_led : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ drive_buzzer : 20|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ams_led : 18|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ imd_led : 16|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ motor_controller_error_led : 14|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ start_status_led : 12|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inertia_status_led : 10|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cockpit_brb_led : 8|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mechanical_brake_led : 6|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mode_led : 4|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ launch_control_led : 2|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bots_led : 0|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 149 TCU_LAP_TIMES: 8 ECU
+ SG_ lap_clock_state : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ prev_lap_time : 24|24@1+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ best_lap_time : 0|24@1+ (1,0) [0|0] "ms" Vector__XXX
+
+BO_ 148 TCU_DRIVER_MSG: 8 ECU
+ SG_ target_lap_time : 40|24@1+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ driver_msg_var_2 : 24|16@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ driver_msg_var_1 : 8|16@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ driver_message : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1060 LF_TTPMS_1: 8 ECU
+ SG_ LF_TTPMS_P_GAUGE : 55|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ LF_TTPMS_P : 39|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ LF_TTPMS_BAT_V : 23|16@0+ (1,0) [0|0] "mV" Vector__XXX
+ SG_ LF_TTPMS_SN : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1061 LF_TTPMS_2: 8 ECU
+ SG_ LF_TTPMS_T4 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T3 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T2 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T1 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1062 LF_TTPMS_3: 8 ECU
+ SG_ LF_TTPMS_T8 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T7 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T6 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T5 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1063 LF_TTPMS_4: 8 ECU
+ SG_ LF_TTPMS_T12 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T11 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T10 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T9 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1064 LF_TTPMS_5: 8 ECU
+ SG_ LF_TTPMS_T16 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T15 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T14 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_T13 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1065 LF_TTPMS_6: 8 ECU
+ SG_ LF_TTPMS_NODE_ID : 55|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LF_TTPMS_T : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LF_TTPMS_RSSI : 23|16@0- (1,0) [0|0] "dBm" Vector__XXX
+ SG_ LF_TTPMS_TC : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1066 LR_TTPMS_1: 8 ECU
+ SG_ LR_TTPMS_P_GAUGE : 55|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ LR_TTPMS_P : 39|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ LR_TTPMS_BAT_V : 23|16@0+ (1,0) [0|0] "mV" Vector__XXX
+ SG_ LR_TTPMS_SN : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1067 LR_TTPMS_2: 8 ECU
+ SG_ LR_TTPMS_T4 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T3 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T2 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T1 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1068 LR_TTPMS_3: 8 ECU
+ SG_ LR_TTPMS_T8 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T7 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T6 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T5 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1069 LR_TTPMS_4: 8 ECU
+ SG_ LR_TTPMS_T12 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T11 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T10 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T9 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1070 LR_TTPMS_5: 8 ECU
+ SG_ LR_TTPMS_T16 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T15 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T14 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_T13 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1071 LR_TTPMS_6: 8 ECU
+ SG_ LR_TTPMS_NODE_ID : 55|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LR_TTPMS_T : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ LR_TTPMS_RSSI : 23|16@0- (1,0) [0|0] "dBm" Vector__XXX
+ SG_ LR_TTPMS_TC : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1072 RF_TTPMS_1: 8 ECU
+ SG_ RF_TTPMS_P_GAUGE : 55|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ RF_TTPMS_P : 39|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ RF_TTPMS_BAT_V : 23|16@0+ (1,0) [0|0] "mV" Vector__XXX
+ SG_ RF_TTPMS_SN : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1073 RF_TTPMS_2: 8 ECU
+ SG_ RF_TTPMS_T4 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T3 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T2 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T1 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1074 RF_TTPMS_3: 8 ECU
+ SG_ RF_TTPMS_T8 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T7 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T6 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T5 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1075 RF_TTPMS_4: 8 ECU
+ SG_ RF_TTPMS_T12 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T11 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T10 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T9 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1076 RF_TTPMS_5: 8 ECU
+ SG_ RF_TTPMS_T16 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T15 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T14 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_T13 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1077 RF_TTPMS_6: 8 ECU
+ SG_ RF_TTPMS_NODE_ID : 55|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ RF_TTPMS_T : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RF_TTPMS_RSSI : 23|16@0- (1,0) [0|0] "dBm" Vector__XXX
+ SG_ RF_TTPMS_TC : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1078 RR_TTPMS_1: 8 ECU
+ SG_ RR_TTPMS_P_GAUGE : 55|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ RR_TTPMS_P : 39|16@0+ (1,0) [0|0] "mbar" Vector__XXX
+ SG_ RR_TTPMS_BAT_V : 23|16@0+ (1,0) [0|0] "mV" Vector__XXX
+ SG_ RR_TTPMS_SN : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1079 RR_TTPMS_2: 8 ECU
+ SG_ RR_TTPMS_T4 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T3 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T2 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T1 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1080 RR_TTPMS_3: 8 ECU
+ SG_ RR_TTPMS_T8 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T7 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T6 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T5 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1081 RR_TTPMS_4: 8 ECU
+ SG_ RR_TTPMS_T12 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T11 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T10 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T9 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1082 RR_TTPMS_5: 8 ECU
+ SG_ RR_TTPMS_T16 : 55|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T15 : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T14 : 23|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_T13 : 7|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+
+BO_ 1083 RR_TTPMS_6: 8 ECU
+ SG_ RR_TTPMS_NODE_ID : 55|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ RR_TTPMS_T : 39|16@0+ (0.1,-100) [0|0] "°C" Vector__XXX
+ SG_ RR_TTPMS_RSSI : 23|16@0- (1,0) [0|0] "dBm" Vector__XXX
+ SG_ RR_TTPMS_TC : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1025 ACU_SHUNT_MEASUREMENTS: 6 ECU
+ SG_ ts_out_filtered_read : 32|16@1+ (0.169047463702246,0) [0|0] "volts" Vector__XXX
+ SG_ pack_filtered_read : 16|16@1+ (0.16869351172632,0) [0|0] "volts" Vector__XXX
+ SG_ current_shunt_read : 0|16@1+ (0.291373985492,-666) [0|0] "amps" Vector__XXX
+
+BO_ 1054 STATE_OF_CHARGE: 8 ECU
+ SG_ charge_coulombs : 39|32@0+ (0.0001,0) [0|0] "Coulombs" Vector__XXX
+ SG_ min_cell_voltage_est : 16|16@1+ (0.0001,0) [0|0] "volts" Vector__XXX
+ SG_ charge_percentage : 7|16@0+ (0.01,0) [0|0] "percent" Vector__XXX
+
+BO_ 223 PENTHOUSE_ACCUM_MSG: 8 ECU
+ SG_ hall_curr_signal : 16|16@1+ (1,0) [0|0] "mV" Vector__XXX
+ SG_ hall_curr_ref : 0|16@1+ (1,0) [0|0] "mV" Vector__XXX
+
+BO_ 512 DRIVETRAIN_RPMS_TELEM: 8 ECU
+ SG_ rl_motor_rpm : 48|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ rr_motor_rpm : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ fl_motor_rpm : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ fr_motor_rpm : 0|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 513 DRIVETRAIN_ERR_STATUS_TELEM: 8 ECU
+ SG_ mc4_diagnostic_number : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_diagnostic_number : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_diagnostic_number : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_diagnostic_number : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 514 DRIVETRAIN_STATUS_TELEM: 8 ECU
+ SG_ accel_percent : 48|8@1+ (1,0) [0|100] "" Vector__XXX
+ SG_ brake_percent : 40|8@1+ (1,0) [0|100] "" Vector__XXX
+ SG_ brake_implausible : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ accel_implausible : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ mc4_warning : 31|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_system_ready : 30|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_quit_inverter_on : 29|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_quit_dc : 28|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_inverter_on : 27|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_error : 26|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_derating_on : 25|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc4_dc_on : 24|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_warning : 23|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_system_ready : 22|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_quit_inverter_on : 21|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_quit_dc : 20|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_inverter_on : 19|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_error : 18|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_derating_on : 17|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc3_dc_on : 16|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_warning : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_system_ready : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_quit_inverter_on : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_quit_dc : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_inverter_on : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_error : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_derating_on : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc2_dc_on : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_warning : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_system_ready : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_quit_inverter_on : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_quit_dc : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_inverter_on : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_error : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_derating_on : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mc1_dc_on : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 229 SAB_THERMISTORS_1: 8 ECU
+ SG_ thermistor_acc2 : 48|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_acc1 : 32|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_inv2 : 16|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_inv1 : 0|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+
+BO_ 230 SAB_THERMISTORS_2: 6 ECU
+ SG_ thermistor_pump : 32|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_motor_rr : 16|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_motor_rl : 0|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+
+BO_ 228 SAB_SUSPENSION: 8 ECU
+ SG_ load_cell_rr : 48|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ load_cell_rl : 32|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_rr : 16|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_rl : 0|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 232 TCU_STATUS: 3 ECU
+ SG_ tcu_recording_state : 16|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_status : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 208 VN_VEL: 8 ECU
+ SG_ vn_vel_uncertainty : 48|16@1+ (0.0005,0) [0|0] "m/s" Vector__XXX
+ SG_ vn_body_vel_z : 32|16@1- (0.002,0) [0|0] "m/s" Vector__XXX
+ SG_ vn_body_vel_y : 16|16@1- (0.002,0) [0|0] "m/s" Vector__XXX
+ SG_ vn_body_vel_x : 0|16@1- (0.002,0) [0|0] "m/s" Vector__XXX
+
+BO_ 209 VN_LINEAR_ACCEL: 8 ECU
+ SG_ vn_lin_ins_accel_z : 32|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+ SG_ vn_lin_ins_accel_y : 16|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+ SG_ vn_lin_ins_accel_x : 0|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+
+BO_ 210 VN_LINEAR_ACCEL_UNCOMP: 8 ECU
+ SG_ vn_lin_uncomp_accel_z : 32|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+ SG_ vn_lin_uncomp_accel_y : 16|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+ SG_ vn_lin_uncomp_accel_x : 0|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
+
+BO_ 211 VN_YPR: 8 ECU
+ SG_ vn_roll : 32|16@1- (0.01,0) [0|0] "deg" Vector__XXX
+ SG_ vn_pitch : 16|16@1- (0.01,0) [0|0] "deg" Vector__XXX
+ SG_ vn_yaw : 0|16@1- (0.01,0) [0|0] "deg" Vector__XXX
+
+BO_ 212 VN_LAT_LON: 8 ECU
+ SG_ vn_gps_lon : 32|32@1- (1e-06,0) [0|0] "deg" Vector__XXX
+ SG_ vn_gps_lat : 0|32@1- (1e-06,0) [0|0] "deg" Vector__XXX
+
+BO_ 224 VN_GPS_TIME_MSG: 8 ECU
+ SG_ vn_gps_time : 0|64@1+ (1,0) [0|0] "ns" Vector__XXX
+
+BO_ 225 VN_STATUS: 8 ECU
+ SG_ vn_gps_status : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 515 DRIVETRAIN_TORQUE_TELEM: 8 ECU
+ SG_ rr_motor_torque : 48|16@1- (0.01,0) [0|0] "nm" Vector__XXX
+ SG_ rl_motor_torque : 32|16@1- (0.01,0) [0|0] "nm" Vector__XXX
+ SG_ fr_motor_torque : 16|16@1- (0.01,0) [0|0] "nm" Vector__XXX
+ SG_ fl_motor_torque : 0|16@1- (0.01,0) [0|0] "nm" Vector__XXX
+
+BO_ 200 MCU_SUSPENSION: 8 ECU
+ SG_ load_cell_fr : 48|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ load_cell_fl : 32|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_fr : 16|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+ SG_ potentiometer_fl : 0|16@1+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 227 VN_ANGULAR_RATE: 8 ECU
+ SG_ angular_rate_z : 32|16@1- (0.001,0) [0|0] "rad/s" Vector__XXX
+ SG_ angular_rate_y : 16|16@1- (0.001,0) [0|0] "rad/s" Vector__XXX
+ SG_ angular_rate_x : 0|16@1- (0.001,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 231 VN_ECEF_POS_XY: 8 ECU
+ SG_ vn_ecef_pos_y : 32|32@1- (0.005,0) [0|0] "m" Vector__XXX
+ SG_ vn_ecef_pos_x : 0|32@1- (0.005,0) [0|0] "m" Vector__XXX
+
+BO_ 233 VN_ECEF_POS_Z_MSG: 8 ECU
+ SG_ vn_ecef_pos_z : 0|32@1- (0.005,0) [0|0] "m" Vector__XXX
+
+BO_ 205 MCU_PEDAL_RAW: 8 ECU
+ SG_ brake_2_raw : 36|12@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_1_raw : 24|12@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ accel_2_raw : 12|12@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ accel_1_raw : 0|12@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1263 CONTROLLER_PID_TV_DATA: 8 ECU
+ SG_ controller_output : 20|20@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_input : 0|20@1- (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 1264 CONTROLLER_PID_TV_DELTA_DATA: 8 ECU
+ SG_ pid_tv_rr_delta : 30|10@1- (0.1,0) [0|0] "" Vector__XXX
+ SG_ pid_tv_rl_delta : 20|10@1- (0.1,0) [0|0] "" Vector__XXX
+ SG_ pid_tv_fr_delta : 10|10@1- (0.1,0) [0|0] "" Vector__XXX
+ SG_ pid_tv_fl_delta : 0|10@1- (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 201 TC_SIMPLE: 8 ECU
+ SG_ accel_request_state : 48|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ rear_regen_scale : 40|8@1- (0.00787402,0) [0|0] "" Vector__XXX
+ SG_ front_regen_scale : 32|8@1- (0.00787402,0) [0|0] "" Vector__XXX
+ SG_ rear_torque_scale : 24|8@1- (0.00787402,0) [0|0] "" Vector__XXX
+ SG_ front_torque_scale : 16|8@1- (0.00787402,0) [0|0] "" Vector__XXX
+ SG_ torque_request : 0|16@1- (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 202 TC_SIMPLE_LAUNCH: 8 ECU
+ SG_ speed_setpoint_rpm : 24|16@1- (1,0) [0|0] "rpm" Vector__XXX
+ SG_ initial_launch_target : 8|16@1+ (1,0) [0|0] "rpm" Vector__XXX
+ SG_ algo_active : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ launch_control_state : 0|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2047 VEHM_ALPHA: 8 ECU
+ SG_ vehm_alpha_deg_rr : 48|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+ SG_ vehm_alpha_deg_rl : 32|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+ SG_ vehm_alpha_deg_fr : 16|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+ SG_ vehm_alpha_deg_fl : 0|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+
+BO_ 2031 VEHM_BETA: 8 ECU
+ SG_ vehm_beta_deg : 0|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+
+BO_ 1998 VEHM_LONG_CORNER_VEL: 8 ECU
+ SG_ vehm_long_corner_vel_rr : 48|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_long_corner_vel_rl : 32|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_long_corner_vel_fr : 16|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_long_corner_vel_fl : 0|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+
+BO_ 1999 VEHM_SL: 8 ECU
+ SG_ vehm_sl_rr : 48|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ vehm_sl_rl : 32|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ vehm_sl_fr : 16|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ vehm_sl_fl : 0|16@1- (0.0001,0) [0|0] "" Vector__XXX
+
+BO_ 1994 VEHM_WHEEL_STEER_AVG_DEG_MSG: 8 ECU
+ SG_ vehm_wheel_steer_avg_deg : 0|16@1- (0.001,0) [0|0] "deg" Vector__XXX
+
+BO_ 1995 VEHM_KIN_DES_YAW_RATE_RAD_S_MSG: 8 ECU
+ SG_ vehm_kin_desired_yaw_rate_rad_s : 0|16@1- (0.0001,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 1997 CONTROLLER_PID_YAW: 8 ECU
+ SG_ controller_yaw_pid_output : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_yaw_rate_error : 16|16@1- (0.0001,0) [0|0] "rad/s" Vector__XXX
+ SG_ vehm_kin_desired_yaw_rate_rad_s : 0|16@1- (0.0001,0) [0|0] "rad/s" Vector__XXX
+
+BO_ 2010 CONTROLLER_PID_YAW_TORQUE: 8 ECU
+ SG_ controller_yaw_torque_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_yaw_torque_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_yaw_torque_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_yaw_torque_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2011 CONTROLLER_NORMAL_DIST: 8 ECU
+ SG_ controller_normal_percent_rr : 48|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ controller_normal_percent_rl : 32|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ controller_normal_percent_fr : 16|16@1- (0.0001,0) [0|0] "" Vector__XXX
+ SG_ controller_normal_percent_fl : 0|16@1- (0.0001,0) [0|0] "" Vector__XXX
+
+BO_ 2012 CONTROLLER_NORMAL_TORQUE: 8 ECU
+ SG_ controller_normal_torque_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_normal_torque_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_normal_torque_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_normal_torque_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2014 CONTROLLER_POWER_LIM: 8 ECU
+ SG_ controller_power_lim_torque_adj : 20|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_power_lim_error : 4|16@1- (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_power_lim_status : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2026 CONTROLLER_POWER_LIM_CORNER_POW: 8 ECU
+ SG_ controller_power_lim_cornerp_rr : 48|16@1- (0.01,0) [0|0] "kW" Vector__XXX
+ SG_ controller_power_lim_cornerp_rl : 32|16@1- (0.01,0) [0|0] "kW" Vector__XXX
+ SG_ controller_power_lim_cornerp_fr : 16|16@1- (0.01,0) [0|0] "kW" Vector__XXX
+ SG_ controller_power_lim_cornerp_fl : 0|16@1- (0.01,0) [0|0] "kW" Vector__XXX
+
+BO_ 2027 CONTROLLER_POWER_LIM_TORQUE: 8 ECU
+ SG_ controller_power_lim_torque_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_power_lim_torque_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_power_lim_torque_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_power_lim_torque_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2028 CONTROLLER_BOOLEAN: 8 ECU
+ SG_ controller_use_nl_tcs_slipschedu : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_rpm_tcs_gain_sche : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_nl_tcs_gain_sche : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_torque_bias : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_no_regen_5kph : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_discontin_brakes : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_dec_yaw_pid_brake : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_tcs_lim_yaw_pid : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_tcs : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_power_limit : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_pid_power_limit : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_normal_force : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_pid_tv : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_use_launch : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2042 CONTROLLER_TORQUE_SETUP: 8 ECU
+ SG_ controller_max_nl_brake_sc_front : 56|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_max_yaw_nl_accel_perc : 52|4@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ controller_torque_mode : 44|8@1+ (0.1,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_regen_limit : 32|12@1- (0.01,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_constrained_torq_req : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_initial_torque_req : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2043 CONTROLLER_TCS_CONFIG: 8 ECU
+ SG_ controller_tcs_sl_nlperc_star_rr : 46|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_sl_nlperc_end_rr : 38|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_sl_nlperc_end_fr : 30|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_sl_nlperc_star_fr : 22|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_vel_thresh : 14|8@1+ (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ controller_tcs_launch_vel_thresh : 8|6@1+ (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ controller_tcs_launch_dead_zone : 0|8@1+ (0.1,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2044 CONTROLLER_TCS_TORQUE: 8 ECU
+ SG_ controller_tcs_torque_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_torque_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_torque_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_torque_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 2045 CONTROLLER_TCS_STATUS: 8 ECU
+ SG_ controller_tcs_status_rr : 6|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_status_rl : 4|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_status_fr : 2|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_status_fl : 0|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2046 CONTROLLER_TCS_PID_INPUT: 8 ECU
+ SG_ controller_tcs_pid_input_rr : 48|16@1- (0.0001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_input_rl : 32|16@1- (0.0001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_input_fr : 16|16@1- (0.0001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_input_fl : 0|16@1- (0.0001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 1962 CONTROLLER_TCS_PID_OUTPUT: 8 ECU
+ SG_ controller_tcs_pid_output_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_output_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_output_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_pid_output_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 1963 VEHM_WHEEL_LIN_VEL: 8 ECU
+ SG_ vehm_wheel_lin_vel_rr : 48|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_wheel_lin_vel_rl : 32|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_wheel_lin_vel_fr : 16|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+ SG_ vehm_wheel_lin_vel_fl : 0|16@1- (0.01,0) [0|0] "m/s" Vector__XXX
+
+BO_ 1964 CONTROLLER_TORQUE_BIAS: 8 ECU
+ SG_ controller_bias_torq_avg_rear : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_bias_torq_avg_front : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 1965 CONTROLLER_REGEN_5KPH_TORQUE: 8 ECU
+ SG_ controller_regen_5kph_torq_rr : 48|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_regen_5kph_torq_rl : 32|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_regen_5kph_torq_fr : 16|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_regen_5kph_torq_fl : 0|16@1- (0.001,0) [0|0] "Nm" Vector__XXX
+
+BO_ 1966 CONTROLLER_REGEN_5KPH_STATUS: 8 ECU
+ SG_ controller_regen_5kph_status_rr : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_regen_5kph_status_rl : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_regen_5kph_status_fr : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ controller_regen_5kph_status_fl : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1978 CONTROLLER_YAW_PID_CONFIG: 8 ECU
+ SG_ controller_yaw_pid_brakes_d : 54|10@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_yaw_pid_brakes_i : 44|10@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_yaw_pid_brakes_p : 33|11@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_yaw_pid_d : 23|10@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_yaw_pid_i : 13|10@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_yaw_pid_p : 0|13@1+ (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 1967 CONTROLLER_TCS_PID_CONFIG: 8 ECU
+ SG_ controller_tcs_pid_p_rr : 48|16@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_pid_p_rl : 32|16@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_pid_p_fr : 16|16@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_pid_p_fl : 0|16@1+ (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 245 FRONT_THERMISTORS: 8 ECU
+ SG_ thermistor_motor_fr : 16|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+ SG_ thermistor_motor_fl : 0|16@1+ (0.005,0) [0|0] "deg C" Vector__XXX
+
+BO_ 1979 CONTROLLER_TCS_SATURATION_CONFIG: 8 ECU
+ SG_ controller_tcs_saturation_rear : 12|12@1+ (0.01,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_saturation_front : 0|12@1+ (0.01,0) [0|0] "Nm" Vector__XXX
+
+BO_ 1981 CONTROLLER_TCS_DIFF_CONFIG: 8 ECU
+ SG_ controller_tcs_launch_LRdiff : 51|13@1+ (0.01,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_w_steer_upper_b : 39|12@1+ (0.01,0) [0|0] "deg" Vector__XXX
+ SG_ controller_tcs_w_steer_lower_b : 27|12@1+ (0.01,0) [0|0] "deg" Vector__XXX
+ SG_ controller_tcs_gen_LRdiff_upperB : 13|14@1+ (0.01,0) [0|0] "Nm" Vector__XXX
+ SG_ controller_tcs_gen_LRdiff_lowerB : 0|13@1+ (0.01,0) [0|0] "Nm" Vector__XXX
+
+BO_ 257 MCU_ERROR_STATES: 8 ECU
+ SG_ torque_controller_mux_status : 0|3@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1055 STEERING_SYSTEM_REPORT: 8 ECU
+ SG_ steering_analog_status : 52|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ steering_encoder_status : 50|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ steering_system_status : 48|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ steering_analog_angle : 32|16@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ steering_encoder_angle : 16|16@1- (0.01,0) [0|0] "deg" Vector__XXX
+ SG_ steering_system_angle : 0|16@1- (0.01,0) [0|0] "deg" Vector__XXX
+
+BO_ 1982 CONTROLLER_TCS_RPM_SCHE_CONFIG: 8 ECU
+ SG_ controller_tcs_upper_rpm_rear : 45|15@1+ (1,0) [0|0] "RPM" Vector__XXX
+ SG_ controller_tcs_upper_rpm_front : 30|15@1+ (1,0) [0|0] "RPM" Vector__XXX
+ SG_ controller_tcs_lower_rpm_rear : 15|15@1+ (1,0) [0|0] "RPM" Vector__XXX
+ SG_ controller_tcs_lower_rpm_front : 0|15@1+ (1,0) [0|0] "RPM" Vector__XXX
+
+BO_ 1996 CONTROLLER_TCS_NL_SCHE_CONFIG: 8 ECU
+ SG_ controller_tcs_startper_nl_rear : 24|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_startper_nl_front : 16|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_endper_nl_rear : 8|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_endper_nl_front : 0|8@1+ (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 1980 CONTROLLER_TCS_CONFIG_CONT: 8 ECU
+ SG_ controller_tcs_SL_end_rear : 56|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_SL_start_rear : 48|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_SL_end_front : 40|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_SL_start_front : 32|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_lauSL_end_rear : 24|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_lauSL_start_rear : 16|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_lauSL_end_front : 8|8@1+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_lauSL_start_front : 0|8@1+ (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 1983 CONTROLLER_TCS_SLIP_TARGETS: 8 ECU
+ SG_ controller_tcs_slip_target_rear : 12|12@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ controller_tcs_slip_target_front : 0|12@1+ (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 1265 TCMUX_STATUS_REPORT: 8 ECU
+ SG_ torque_limit : 36|16@1+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ torque_mode : 28|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ dash_dial_mode : 20|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mode_actual : 12|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mode_intended : 4|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ steering_system_has_err : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ tc_not_ready : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ torque_delta_above_thresh : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ speed_above_thresh : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 234 VN_GNSS_COMP_SIG_HEALTH: 8 ECU
+ SG_ num_com_sats_rtk : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ num_com_sats_pvt : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ highest_cn0_2 : 40|8@1+ (0.5,0) [0|0] "dBHz" Vector__XXX
+ SG_ num_sats_rtk_2 : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ num_sats_pvt_2 : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ highest_cn0_1 : 16|8@1+ (0.5,0) [0|0] "dBHz" Vector__XXX
+ SG_ num_sats_rtk_1 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ num_sats_pvt_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_TX_BU_ 222 : ECU,Peripherals;
+BO_TX_BU_ 226 : ECU,Peripherals;
+BO_TX_BU_ 218 : ECU,Peripherals;
+BO_TX_BU_ 216 : ECU,Peripherals;
+BO_TX_BU_ 214 : ECU,Peripherals;
+BO_TX_BU_ 213 : ECU,Peripherals;
+BO_TX_BU_ 219 : ECU,Peripherals;
+BO_TX_BU_ 217 : ECU,Peripherals;
+BO_TX_BU_ 215 : ECU,Peripherals;
+BO_TX_BU_ 221 : ECU,Peripherals;
+BO_TX_BU_ 2550588916 : ECU,Peripherals;
+BO_TX_BU_ 2566869221 : ECU,Peripherals;
+BO_TX_BU_ 256 : ECU,Peripherals;
+BO_TX_BU_ 1024 : ECU,Peripherals;
+BO_TX_BU_ 184 : ECU,Peripherals;
+BO_TX_BU_ 160 : ECU,Peripherals;
+BO_TX_BU_ 176 : ECU,Peripherals;
+BO_TX_BU_ 180 : ECU,Peripherals;
+BO_TX_BU_ 164 : ECU,Peripherals;
+BO_TX_BU_ 185 : ECU,Peripherals;
+BO_TX_BU_ 161 : ECU,Peripherals;
+BO_TX_BU_ 177 : ECU,Peripherals;
+BO_TX_BU_ 181 : ECU,Peripherals;
+BO_TX_BU_ 165 : ECU,Peripherals;
+BO_TX_BU_ 186 : ECU,Peripherals;
+BO_TX_BU_ 162 : ECU,Peripherals;
+BO_TX_BU_ 178 : ECU,Peripherals;
+BO_TX_BU_ 182 : ECU,Peripherals;
+BO_TX_BU_ 166 : ECU,Peripherals;
+BO_TX_BU_ 187 : ECU,Peripherals;
+BO_TX_BU_ 163 : ECU,Peripherals;
+BO_TX_BU_ 179 : ECU,Peripherals;
+BO_TX_BU_ 183 : ECU,Peripherals;
+BO_TX_BU_ 167 : ECU,Peripherals;
+BO_TX_BU_ 204 : ECU,Peripherals;
+BO_TX_BU_ 198 : ECU,Peripherals;
+BO_TX_BU_ 197 : ECU,Peripherals;
+BO_TX_BU_ 196 : ECU,Peripherals;
+BO_TX_BU_ 199 : ECU,Peripherals;
+BO_TX_BU_ 195 : ECU,Peripherals;
+BO_TX_BU_ 236 : ECU,Peripherals;
+BO_TX_BU_ 235 : ECU,Peripherals;
+BO_TX_BU_ 149 : ECU,Peripherals;
+BO_TX_BU_ 148 : ECU,Peripherals;
+BO_TX_BU_ 1060 : ECU,Peripherals;
+BO_TX_BU_ 1061 : ECU,Peripherals;
+BO_TX_BU_ 1062 : ECU,Peripherals;
+BO_TX_BU_ 1063 : ECU,Peripherals;
+BO_TX_BU_ 1064 : ECU,Peripherals;
+BO_TX_BU_ 1065 : ECU,Peripherals;
+BO_TX_BU_ 1066 : ECU,Peripherals;
+BO_TX_BU_ 1067 : ECU,Peripherals;
+BO_TX_BU_ 1068 : ECU,Peripherals;
+BO_TX_BU_ 1069 : ECU,Peripherals;
+BO_TX_BU_ 1070 : ECU,Peripherals;
+BO_TX_BU_ 1071 : ECU,Peripherals;
+BO_TX_BU_ 1072 : ECU,Peripherals;
+BO_TX_BU_ 1073 : ECU,Peripherals;
+BO_TX_BU_ 1074 : ECU,Peripherals;
+BO_TX_BU_ 1075 : ECU,Peripherals;
+BO_TX_BU_ 1076 : ECU,Peripherals;
+BO_TX_BU_ 1077 : ECU,Peripherals;
+BO_TX_BU_ 1078 : ECU,Peripherals;
+BO_TX_BU_ 1079 : ECU,Peripherals;
+BO_TX_BU_ 1080 : ECU,Peripherals;
+BO_TX_BU_ 1081 : ECU,Peripherals;
+BO_TX_BU_ 1082 : ECU,Peripherals;
+BO_TX_BU_ 1083 : ECU,Peripherals;
+BO_TX_BU_ 1025 : ECU,Peripherals;
+BO_TX_BU_ 1054 : ECU,Peripherals;
+BO_TX_BU_ 223 : ECU,Peripherals;
+BO_TX_BU_ 512 : ECU,Peripherals;
+BO_TX_BU_ 513 : ECU,Peripherals;
+BO_TX_BU_ 514 : ECU,Peripherals;
+BO_TX_BU_ 229 : ECU,Peripherals;
+BO_TX_BU_ 230 : ECU,Peripherals;
+BO_TX_BU_ 228 : ECU,Peripherals;
+BO_TX_BU_ 232 : ECU,Peripherals;
+BO_TX_BU_ 208 : ECU,Peripherals;
+BO_TX_BU_ 209 : ECU,Peripherals;
+BO_TX_BU_ 210 : ECU,Peripherals;
+BO_TX_BU_ 211 : ECU,Peripherals;
+BO_TX_BU_ 212 : ECU,Peripherals;
+BO_TX_BU_ 224 : ECU,Peripherals;
+BO_TX_BU_ 225 : ECU,Peripherals;
+BO_TX_BU_ 515 : ECU,Peripherals;
+BO_TX_BU_ 200 : ECU,Peripherals;
+BO_TX_BU_ 227 : ECU,Peripherals;
+BO_TX_BU_ 231 : ECU,Peripherals;
+BO_TX_BU_ 233 : ECU,Peripherals;
+BO_TX_BU_ 205 : ECU,Peripherals;
+BO_TX_BU_ 1263 : ECU,Peripherals;
+BO_TX_BU_ 1264 : ECU,Peripherals;
+BO_TX_BU_ 201 : ECU,Peripherals;
+BO_TX_BU_ 202 : ECU,Peripherals;
+BO_TX_BU_ 2047 : ECU,Peripherals;
+BO_TX_BU_ 2031 : ECU,Peripherals;
+BO_TX_BU_ 1998 : ECU,Peripherals;
+BO_TX_BU_ 1999 : ECU,Peripherals;
+BO_TX_BU_ 1994 : ECU,Peripherals;
+BO_TX_BU_ 1995 : ECU,Peripherals;
+BO_TX_BU_ 1997 : ECU,Peripherals;
+BO_TX_BU_ 2010 : ECU,Peripherals;
+BO_TX_BU_ 2011 : ECU,Peripherals;
+BO_TX_BU_ 2012 : ECU,Peripherals;
+BO_TX_BU_ 2014 : ECU,Peripherals;
+BO_TX_BU_ 2026 : ECU,Peripherals;
+BO_TX_BU_ 2027 : ECU,Peripherals;
+BO_TX_BU_ 2028 : ECU,Peripherals;
+BO_TX_BU_ 2042 : ECU,Peripherals;
+BO_TX_BU_ 2043 : ECU,Peripherals;
+BO_TX_BU_ 2044 : ECU,Peripherals;
+BO_TX_BU_ 2045 : ECU,Peripherals;
+BO_TX_BU_ 2046 : ECU,Peripherals;
+BO_TX_BU_ 1962 : ECU,Peripherals;
+BO_TX_BU_ 1963 : ECU,Peripherals;
+BO_TX_BU_ 1964 : ECU,Peripherals;
+BO_TX_BU_ 1965 : ECU,Peripherals;
+BO_TX_BU_ 1966 : ECU,Peripherals;
+BO_TX_BU_ 1978 : ECU,Peripherals;
+BO_TX_BU_ 1967 : ECU,Peripherals;
+BO_TX_BU_ 245 : ECU,Peripherals;
+BO_TX_BU_ 1979 : ECU,Peripherals;
+BO_TX_BU_ 1981 : ECU,Peripherals;
+BO_TX_BU_ 257 : ECU,Peripherals;
+BO_TX_BU_ 1055 : ECU,Peripherals;
+BO_TX_BU_ 1982 : ECU,Peripherals;
+BO_TX_BU_ 1996 : ECU,Peripherals;
+BO_TX_BU_ 1980 : ECU,Peripherals;
+BO_TX_BU_ 1983 : ECU,Peripherals;
+BO_TX_BU_ 1265 : ECU,Peripherals;
+BO_TX_BU_ 234 : ECU,Peripherals;
+
+
+CM_ BO_ 226 "UNUSED message to send data on the BMS current draw.";
+CM_ SG_ 226 total_discharge "UNUSED SIGNAL. See legacy AMS firmware (code-2024) for usage.";
+CM_ SG_ 226 total_charge "UNUSED SIGNAL. See legacy AMS firmware (code-2024) for usage.";
+CM_ SG_ 219 overvoltage_error "Whether or not the energy meter is reading an over-voltage error.";
+CM_ SG_ 2550588916 max_charging_current_low "Unused for any PCAN stuff only for Elcon Charger";
+CM_ SG_ 2550588916 max_charging_current_high "Unused for any PCAN stuff only for Elcon Charger";
+CM_ SG_ 2550588916 max_charging_voltage_low "Unused for any PCAN stuff only for Elcon Charger";
+CM_ SG_ 2550588916 max_charging_voltage_high "Unused for any PCAN stuff only for Elcon Charger";
+CM_ BO_ 256 "Contains the voltage and current readings from the Energy Meter. Sent by the AMS.";
+CM_ SG_ 256 em_voltage "The voltage, in Volts, measured by the Energy Meter.";
+CM_ SG_ 256 em_current "The current draw, in amps, measured by the Energy Meter.";
+CM_ BO_ 1024 "Forwarded directly from the Energy Meter with no modifications. See datasheet for more specifications.";
+CM_ SG_ 1024 logging "Whether or not the energy meter is currently logging data.";
+CM_ SG_ 1024 overpower_error "Whether or not the Energy Meter is reading an over-power error.";
+CM_ SG_ 1024 overvoltage_error "Whether or not the energy meter is reading an over-voltage error.";
+CM_ SG_ 1024 current_gain "This selects the \"gain\" mode for the EM current measurements. The specific multipliers for each gain mode are configured with the EMD Tool.";
+CM_ SG_ 1024 voltage_gain "This selects the \"gain\" mode for the EM voltage measurements. The specific multipliers for each gain mode are configured with the EMD Tool.";
+CM_ SG_ 184 feedback_torque "random made up AMK units";
+CM_ SG_ 184 motor_power "Made up units from AMK";
+CM_ SG_ 160 negative_torque_limit "AMK made up unit";
+CM_ SG_ 160 positive_torque_limit "Made up units from AMK";
+CM_ SG_ 164 torque_command "Made up unit by AMK (consult Shayan)";
+CM_ SG_ 185 feedback_torque "random made up AMK units";
+CM_ SG_ 185 motor_power "Made up units from AMK";
+CM_ SG_ 161 negative_torque_limit "AMK made up unit";
+CM_ SG_ 161 positive_torque_limit "Made up units from AMK";
+CM_ SG_ 165 torque_command "Made up unit by AMK (consult Shayan)";
+CM_ SG_ 186 feedback_torque "random made up AMK units";
+CM_ SG_ 186 motor_power "Made up units from AMK";
+CM_ SG_ 162 negative_torque_limit "AMK made up unit";
+CM_ SG_ 162 positive_torque_limit "Made up units from AMK";
+CM_ SG_ 166 torque_command "Made up unit by AMK (consult Shayan)";
+CM_ SG_ 187 feedback_torque "random made up AMK units";
+CM_ SG_ 187 motor_power "Made up units from AMK";
+CM_ SG_ 163 negative_torque_limit "AMK made up unit";
+CM_ SG_ 163 positive_torque_limit "Made up units from AMK";
+CM_ SG_ 167 torque_command "Made up unit by AMK (consult Shayan)";
+CM_ SG_ 196 mechanical_brake_percent_float "The percentage at which mechanical brake activates represented by an unsigned float";
+CM_ SG_ 196 brake_percent_float "The percentage of accel pedal travel represented by an unsigned float";
+CM_ SG_ 196 accel_percent_float "The percentage of accel pedal travel represented by an unsigned float";
+CM_ SG_ 195 torque_mode "torque mode";
+CM_ SG_ 195 drive_mode "The current drive mode on the ECU irrespective of dial mapping";
+CM_ SG_ 236 tcu_recording_state "The current state of TCU data recording (off, requested,on,saving)";
+CM_ SG_ 235 pack_charge_led "pack charge led has a value from 0 to 255 representing a percentage that can be displayed on dashboard as a gradient between two colors";
+CM_ SG_ 235 glv_led "glv led has a value from 0 to 255 representing a percentage that can be displayed on dashboard as a gradient between two colors";
+CM_ BO_ 149 "The TCU_LAP_TIMES message contains the best and previous lap times to the dashboard as calculated by the TCU or manually input by the pit crew. It also relays the current state of the TCU's clock to the dashboard so that it can run an approximate stopwatc";
+CM_ BO_ 148 "TCU_DRIVER_MSG contains a signal that corresponds to a preset list of messages on the dashboard. It also includes two variables to customize the contents of the message with numerical values. It also includes the target lap time which is determined by the";
+CM_ SG_ 148 target_lap_time "target lap time is the time determined by the pit crew that the driver should aim for. mostly useful for guiding the driver in endurance races.";
+CM_ SG_ 148 driver_message "corresponds to a pre-set list of driver messages on the dashboard that the TCU can request to be displayed in event of comms failure";
+CM_ SG_ 1066 LR_TTPMS_SN "Serial Number";
+CM_ SG_ 1025 ts_out_filtered_read "Voltage across tractive system";
+CM_ SG_ 1025 pack_filtered_read "Filtered pack voltage";
+CM_ SG_ 1025 current_shunt_read "The shunt in penthouse; Measures current that goes through the whole tractive system -- used for coulumb counting";
+CM_ SG_ 1054 charge_coulombs "The charge in the accumulator, in Coulombs";
+CM_ SG_ 1054 min_cell_voltage_est "Lowest-cell-voltage estimate based on the state of charge, according to VOLTAGE_LOOKUP_TABLE. Ex: 87% SoC would display 3.798V.";
+CM_ SG_ 1054 charge_percentage "The charge in the accumulator, as a percentage.";
+CM_ SG_ 229 thermistor_acc2 "acculum cooling loop temp";
+CM_ SG_ 229 thermistor_acc1 "acculum cooling loop temp";
+CM_ SG_ 229 thermistor_inv2 "invertor cooling loop tmep";
+CM_ SG_ 229 thermistor_inv1 "inverter cooling loop temp";
+CM_ SG_ 230 thermistor_pump "temp of the pump";
+CM_ SG_ 230 thermistor_motor_rr "Motor cooling loop temperature";
+CM_ SG_ 230 thermistor_motor_rl "Motor cooling loop temperature";
+CM_ SG_ 232 tcu_recording_state "The current state of TCU data recording (off, requested,on,saving)";
+CM_ BO_ 208 "Vehicle body velocity measured by VN-300";
+CM_ SG_ 208 vn_vel_uncertainty "how much error there might be";
+CM_ SG_ 209 vn_lin_ins_accel_z "estimated acceleration of INS";
+CM_ SG_ 209 vn_lin_ins_accel_y "estimated acceleration of INS";
+CM_ SG_ 209 vn_lin_ins_accel_x "estimated acceleration of INS";
+CM_ SG_ 210 vn_lin_uncomp_accel_z "IMU acceleration";
+CM_ SG_ 210 vn_lin_uncomp_accel_y "IMU acceleration";
+CM_ SG_ 210 vn_lin_uncomp_accel_x "IMU acceleration";
+CM_ SG_ 224 vn_gps_time "time since start of epoch 1980";
+CM_ SG_ 225 vn_gps_status "GPS fix status";
+CM_ SG_ 231 vn_ecef_pos_y "earth centered earth fixed";
+CM_ SG_ 231 vn_ecef_pos_x "earth centered earth fixed";
+CM_ SG_ 233 vn_ecef_pos_z "earth centered earth fixed";
+CM_ BO_ 201 "MCU's simple torque controller";
+CM_ SG_ 201 accel_request_state "The current state of the acceleration request (0 = decelerating, 1 = accelerating)";
+CM_ SG_ 201 rear_regen_scale "the front/rear torque scaling";
+CM_ SG_ 201 front_regen_scale "the front/rear torque scaling";
+CM_ SG_ 201 rear_torque_scale "the front/rear torque scaling";
+CM_ SG_ 201 front_torque_scale "the front/rear torque scaling";
+CM_ SG_ 201 torque_request "The torque request calculated from the accelleration request and the maximum torque";
+CM_ SG_ 202 initial_launch_target "The initial launch speed target requested by the launch controller";
+CM_ SG_ 202 algo_active "State of whether the launch algorithm has taken over control from the initial launch target";
+CM_ SG_ 202 launch_control_state "The current state of the launch controller (LAUNCH_NOT_READY, LAUNCH_READY, LAUNCHING)";
+CM_ SG_ 245 thermistor_motor_fr "Motor cooling loop temperature";
+CM_ SG_ 245 thermistor_motor_fl "Motor cooling loop temperature";
+CM_ BO_ 257 "this message will have states internal to the MCU code";
+CM_ BO_ 1055 "Steering reading; system and sensor status";
+CM_ SG_ 1055 steering_analog_status "0 : good; 1 : clamped";
+CM_ SG_ 1055 steering_encoder_status "0 : nominal; 1 : marginal; 2 : error";
+CM_ SG_ 1055 steering_system_status "0 : nominal; 1 : marginal; 2 : degraded; 3 : error";
+CM_ SG_ 1055 steering_analog_angle "Angle measured by bottom steering analog sensor";
+CM_ SG_ 1055 steering_encoder_angle "Angle measured by upper steering encoder";
+CM_ SG_ 1055 steering_system_angle "Angle reported by steering system";
+CM_ SG_ 1265 torque_limit "AMK inverter torque limit in use";
+CM_ SG_ 1265 torque_mode "torque mode";
+CM_ SG_ 1265 dash_dial_mode "Dashboard dial position";
+CM_ SG_ 1265 mode_actual "actual mode in tcmux";
+CM_ SG_ 1265 mode_intended "TC mode selected by driver";
+CM_ SG_ 1265 steering_system_has_err "Steering system data in ERROR state";
+CM_ SG_ 1265 tc_not_ready "Selected TC not in ready state";
+CM_ SG_ 1265 torque_delta_above_thresh "Torque delta between old and new controllers is < 0.5Nm on every wheel";
+CM_ SG_ 1265 speed_above_thresh "Vehicle speed is above 5 m/s, TCMux does not allow driver to switch mode";
+CM_ SG_ 234 num_com_sats_rtk "num of common satelites that are used in the RTK solution on both receivers";
+CM_ SG_ 234 num_com_sats_pvt "num of common satelites that are used in the PVT solution on both receivers";
+CM_ SG_ 234 highest_cn0_2 "Highest CN0 reported on receiver B";
+CM_ SG_ 234 num_sats_rtk_2 "num of common satelites that are used in the RTK solution on receiver B";
+CM_ SG_ 234 num_sats_pvt_2 "num of common satelites that are used in the PVT solution on receiver B";
+CM_ SG_ 234 highest_cn0_1 "Highest CN0 reported on receiver A";
+CM_ SG_ 234 num_sats_rtk_1 "num of common satelites that are used in the RTK solution on receiver A";
+CM_ SG_ 234 num_sats_pvt_1 "num of common satelites that are used in the PVT solution on receiver A";
+
+
+
+VAL_ 256 em_voltage 0 "" 1 "" 2 "" 3 "" ;
+VAL_ 195 ecu_state 0 "STARTUP" 1 "TRACTIVE_SYSTEM_NOT_ACTIVE" 2 "TRACTIVE_SYSTEM_ACTIVE" 3 "ENABLING_INVERTER" 4 "WAITING_READY_TO_DRIVE_SOUND" 5 "READY_TO_DRIVE" ;
+VAL_ 236 dial_state 0 "MODE_0" 1 "MODE_1" 2 "MODE_2" 3 "MODE_3" 4 "MODE_4" 5 "MODE_5" ;
+VAL_ 235 dial_state 0 "MODE_0" 1 "MODE_1" 2 "MODE_2" 3 "MODE_3" 4 "MODE_4" 5 "MODE_5" ;
+VAL_ 225 vn_gps_status 0 "NO_FIX" 1 "TIME_ONLY" 2 "FIX_2D" 3 "FIX_3D" ;
+VAL_ 257 torque_controller_mux_status 0 "NO_ERROR" 1 "ERROR_SPEED_DIFF_TOO_HIGH" 2 "ERROR_TORQUE_DIFF_TOO_HIGH" ;
+VAL_ 1055 steering_analog_status 0 "" 1 "" ;
+VAL_ 1055 steering_encoder_status 0 "" 1 "" 2 "" ;
+VAL_ 1055 steering_system_status 0 "" 1 "" 2 "" 3 "" ;
+
+
+

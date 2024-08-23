@@ -11,6 +11,6 @@ class SimpleController : Controller<SpeedControlOut, SpeedControlIn>
 
 public:
     SpeedControlOut step_controller(const SpeedControlIn& in);
-
+    
 };
 }

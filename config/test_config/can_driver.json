@@ -1,0 +1,6 @@
+{
+    "CANDriver": {
+        "canbus_device": "vcan0",
+        "path_to_dbc": "config/test_config/test_dbc.dbc"
+    }
+}
