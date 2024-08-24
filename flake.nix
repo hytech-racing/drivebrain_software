@@ -87,6 +87,10 @@
                   name = "b";
                   command = "cd $PRJ_ROOT && rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd $PRJ_ROOT";
                 }
+                {
+                  name = "bd";
+                  command = "cd $PRJ_ROOT && rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug && make -j && cd $PRJ_ROOT";
+                }
               ];
               packages = [
                 pkgs.openssl

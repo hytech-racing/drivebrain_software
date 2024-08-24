@@ -24,6 +24,7 @@ namespace control
     class Controller : common::Configurable
     {
     public:
+        
         virtual ControllerResult step_controller(const ControllerInput &in) = 0;
     };
 }

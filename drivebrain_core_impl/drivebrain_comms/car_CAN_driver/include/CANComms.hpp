@@ -17,17 +17,18 @@
 #include <memory>
 #include <variant>
 // TODO
-// - [ ] implement functions to be able to deserialize a CAN message from the bus 
-// - [ ] function to create a protobuf message from a de-serialized CAN message
+// - [ ] be able to hook into the driver bus tx and rx queues to send and receive multiple messages
 
-// - [ ] be able to hook into the driver bus tx and tx queues
+// - [x] implement functions to be able to deserialize a CAN message from the bus 
+// - [x] function to create a protobuf message from a de-serialized CAN message
 // - [x] implement functions to be able to create a CAN message from the protobuf message
 // - [x] needs to be able to take in an abstract pb message
 // - [x] get all fields and the message name
 // - [x] for each field get their values
 // - [x] align the message name and message fields to a CAN message
 // - [x] populate the fields of the CAN message with the data gotten from the pb message
-// - [ ] implement function to send can message
+
+// - [ ] implement function to send can message 
 
 // https://docs.kernel.org/networking/can.html
 
@@ -57,7 +58,7 @@ namespace comms
         /// @return variant of types 
         FieldVariant get_field_value(std::shared_ptr<google::protobuf::Message> message, const std::string& field_name);
 
-        std::shared_ptr<google::protobuf::Message> _get_pb_msg_by_name(const std::string &msg_name);
+        std::shared_ptr<google::protobuf::Message> _get_pb_msg_by_name(const std::string &name);
 
         // private:
         can_frame _get_CAN_msg(std::shared_ptr<google::protobuf::Message> msg);

@@ -44,7 +44,6 @@ TEST(CANDriver, test_construction) {
     core::JsonFileHandler test_file("config/test_config/can_driver.json");
     comms::CANDriver driver(test_file);
     EXPECT_TRUE(driver.init());
-
 }
 
 TEST(CANDriver, test_CAN_creation) {
@@ -79,9 +78,10 @@ TEST(CANDriver, test_CAN_recv)
     auto res = driver._get_CAN_msg(ht_pb_test);
     EXPECT_TRUE((res.data[0] |= res.data[1])== motor_rpm);
     
-    auto __ = driver.pb_msg_recv(res);
+    auto msg_res = driver.pb_msg_recv(res);
+
+    auto msg_res_cast = std::dynamic_pointer_cast<drivetrain_rpms_telem>(msg_res);
+    EXPECT_EQ(msg_res_cast->fl_motor_rpm(), 100);
 }
-
-
 
 // TEST(CANDriver, )
