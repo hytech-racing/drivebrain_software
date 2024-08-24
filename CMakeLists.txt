@@ -66,6 +66,12 @@ target_link_libraries(test_CAN_driver PUBLIC
     GTest::gtest_main
 )
 
+add_executable(test_boost_asio_CAN drivebrain_app/example_boost_asio_can.cpp)
+
+target_link_libraries(test_boost_asio_CAN PUBLIC
+    Boost::boost
+)
+
 
 add_executable(test_param_server test/test_param_server.cpp)
 

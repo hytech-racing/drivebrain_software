@@ -17,7 +17,6 @@ class TestCAN : public comms::CANDriver
     }
 };
 
-
 void print_can_frame(const struct can_frame &frame) {
     // Print the CAN ID
     printf("CAN ID: 0x%08X ", frame.can_id & CAN_EFF_MASK);
