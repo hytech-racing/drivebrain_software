@@ -16,19 +16,21 @@
 
 // https://docs.kernel.org/networking/can.html
 
+std::string comms::CANDriver::_to_lowercase(std::string s)
+{
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c)
+                   { return std::tolower(c); } // correct
+    );
+    return s;
+}
+
 bool comms::CANDriver::init()
 {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
     auto dbc_file_path = get_parameter_value<std::string>("path_to_dbc");
 
-    auto to_lower = [](std::string s)
-    {
-        std::transform(s.begin(), s.end(), s.begin(),
-                       [](unsigned char c)
-                       { return std::tolower(c); } // correct
-        );
-        return s;
-    };
+    
 
     if (!(canbus_device && dbc_file_path))
     {
@@ -43,7 +45,7 @@ bool comms::CANDriver::init()
     for (const auto &msg : net->Messages())
     {
         _messages.insert(std::make_pair(msg.Id(), msg.Clone()));
-        _messages_names_and_ids.insert(std::make_pair(to_lower(msg.Name()), msg.Id()));
+        _messages_names_and_ids.insert(std::make_pair(_to_lowercase(msg.Name()), msg.Id()));
         std::cout << msg.Name() << std::endl;
     }
 
@@ -85,9 +87,31 @@ void comms::CANDriver::handle_output_msg_from_queue(core::common::ThreadSafeDequ
 {
 }
 
+can_frame comms::CANDriver::handle_recv_CAN_frame()
+{
+    return {};
+}
+
+// gets a protobuf message from just the name of it
+std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name(const std::string &msg_name)
+{
+
+    const google::protobuf::Descriptor *descriptor = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(msg_name);
+
+    // Create a dynamic message factory
+    google::protobuf::DynamicMessageFactory dynamic_factory;
+    std::shared_ptr<google::protobuf::Message> prototype_message (dynamic_factory.GetPrototype(descriptor)->New());
+    if (!prototype_message)
+    {
+        std::cerr << "Failed to create prototype message for type: " << msg_name << std::endl;
+        return {};
+    }
+
+    return prototype_message;
+}
 
 // Function to set fields dynamically using reflection
-void comms::CANDriver::set_field_values_of_pb_msg(std::shared_ptr<google::protobuf::Message> message, const std::unordered_map<std::string, std::variant<float, bool, double, int, uint32_t, std::string>> &field_values)
+void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::string, comms::CANDriver::FieldVariant> &field_values, std::shared_ptr<google::protobuf::Message> message)
 {
     const google::protobuf::Descriptor *descriptor = message->GetDescriptor();
     const google::protobuf::Reflection *reflection = message->GetReflection();
@@ -129,25 +153,31 @@ void comms::CANDriver::set_field_values_of_pb_msg(std::shared_ptr<google::protob
     }
 }
 
-std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name(const std::string &msg_name)
+std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const can_frame &frame)
 {
-
-    const google::protobuf::Descriptor *descriptor = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(msg_name);
-
-    // Create a dynamic message factory
-    google::protobuf::DynamicMessageFactory dynamic_factory;
-    const google::protobuf::Message *prototype_message = dynamic_factory.GetPrototype(descriptor);
-    if (!prototype_message)
+    auto iter = _messages.find(frame.can_id);
+    if (iter != _messages.end())
     {
-        std::cerr << "Failed to create prototype message for type: " << msg_name << std::endl;
-        return {};
+        auto msg = iter->second->Clone();
+        std::cout << "Received Message: " << msg->Name() << "\n";
+        auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
+
+
+        for (const dbcppp::ISignal &sig : msg->Signals())
+        {
+            // sig.Decode(frame.data);
+            std::cout << "sig name " << sig.Name() << std::endl;
+            const dbcppp::ISignal *mux_sig = msg->MuxSignal();
+            if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
+                (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
+            {
+
+                std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+            }
+        }
     }
 
-    std::shared_ptr<google::protobuf::Message> p(prototype_message->New());
-    delete prototype_message;
-    delete descriptor;
-
-    return p;
+    return {};
 }
 
 comms::CANDriver::FieldVariant comms::CANDriver::get_field_value(std::shared_ptr<google::protobuf::Message> message, const std::string &field_name)
@@ -201,7 +231,7 @@ can_frame comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Messa
 {
     // - [x] get an associated CAN message based on the name of the input message
 
-    can_frame frame {};
+    can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
     std::cout << "got message type name of " << messageTypeName << std::endl;
@@ -241,7 +271,7 @@ can_frame comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Messa
             sig.Encode(val, frame.data);
         } else {
             std::cout <<"uh not supported yet" <<std::endl;
-        }},
+        } },
                    field_value);
     }
     return frame;

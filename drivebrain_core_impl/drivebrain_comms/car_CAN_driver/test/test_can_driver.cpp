@@ -64,7 +64,24 @@ TEST(CANDriver, test_CAN_creation) {
   ht_pb_bool_test->set_mc1_dc_on(true);
   auto res2 = driver._get_CAN_msg(ht_pb_bool_test);
   print_can_frame(res2);
-
 }
+
+TEST(CANDriver, test_CAN_recv)
+{
+    core::JsonFileHandler test_file("config/test_config/can_driver.json");
+    comms::CANDriver driver(test_file);
+    auto _ = driver.init();
+    auto ht_pb_test = std::make_shared<drivetrain_rpms_telem>();
+
+    auto motor_rpm = 100;
+    ht_pb_test->set_fr_motor_rpm(motor_rpm);
+    ht_pb_test->set_fl_motor_rpm(motor_rpm);
+    auto res = driver._get_CAN_msg(ht_pb_test);
+    EXPECT_TRUE((res.data[0] |= res.data[1])== motor_rpm);
+    
+    auto __ = driver.pb_msg_recv(res);
+}
+
+
 
 // TEST(CANDriver, )
