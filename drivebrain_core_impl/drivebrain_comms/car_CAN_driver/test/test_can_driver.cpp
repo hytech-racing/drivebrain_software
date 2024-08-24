@@ -2,17 +2,69 @@
 
 #include <CANComms.hpp>
 #include <JsonFileHandler.hpp>
+#include <hytech.pb.h>
+#include <variant>
+#include <memory>
+
+
+
+void print_can_frame(const struct can_frame &frame) {
+    // Print the CAN ID
+    printf("CAN ID: 0x%08X ", frame.can_id & CAN_EFF_MASK);
+
+    // Print frame flags
+    if (frame.can_id & CAN_EFF_FLAG) {
+        printf("(Extended Frame Format) ");
+    } else {
+        printf("(Standard Frame Format) ");
+    }
+
+    if (frame.can_id & CAN_RTR_FLAG) {
+        printf("(Remote Transmission Request) ");
+    }
+
+    if (frame.can_id & CAN_ERR_FLAG) {
+        printf("(Error Frame) ");
+    }
+
+    printf("\n");
+
+    // Print Data Length Code (DLC)
+    printf("DLC: %d\n", frame.can_dlc);
+
+    // Print data bytes
+    printf("Data: ");
+    for (int i = 0; i < frame.can_dlc; ++i) {
+        printf("%02X ", frame.data[i]);
+    }
+    printf("\n");
+}
 
 TEST(CANDriver, test_construction) {
     core::JsonFileHandler test_file("config/test_config/can_driver.json");
     comms::CANDriver driver(test_file);
     EXPECT_TRUE(driver.init());
-    auto msg = driver._get_pb_msg_by_name("acu_shunt_measurements");
-    std::cout << "Packed Any Message: " << msg.DebugString() << std::endl;
-
-  // Expect two strings not to be equal.
-//   EXPECT_STRNE("hello", "world");
-  // Expect equality.
-//   EXPECT_EQ(7 * 6, 42);
 
 }
+
+TEST(CANDriver, test_CAN_creation) {
+  core::JsonFileHandler test_file("config/test_config/can_driver.json");
+  comms::CANDriver driver(test_file);
+  auto _ = driver.init();
+  auto ht_pb_test = std::make_shared<drivetrain_rpms_telem>();
+
+  auto motor_rpm = 100;
+  ht_pb_test->set_fr_motor_rpm(motor_rpm);
+  ht_pb_test->set_fl_motor_rpm(motor_rpm);
+  auto res = driver._get_CAN_msg(ht_pb_test);
+  EXPECT_TRUE((res.data[0] |= res.data[1])== motor_rpm);
+  print_can_frame(res);
+
+  auto ht_pb_bool_test = std::make_shared<drivetrain_status_telem>();
+  ht_pb_bool_test->set_mc1_dc_on(true);
+  auto res2 = driver._get_CAN_msg(ht_pb_bool_test);
+  print_can_frame(res2);
+
+}
+
+// TEST(CANDriver, )
