@@ -58,11 +58,13 @@ namespace comms
         /// @return variant of types 
         FieldVariant get_field_value(std::shared_ptr<google::protobuf::Message> message, const std::string& field_name);
 
+
+    // for exposing to the test framework directly
+    protected:
         std::shared_ptr<google::protobuf::Message> _get_pb_msg_by_name(const std::string &name);
-
-        // private:
         can_frame _get_CAN_msg(std::shared_ptr<google::protobuf::Message> msg);
-
+    
+    private: 
         static std::string _to_lowercase(std::string s);
     private:
         std::unordered_map<uint64_t, std::unique_ptr<dbcppp::IMessage>> _messages;

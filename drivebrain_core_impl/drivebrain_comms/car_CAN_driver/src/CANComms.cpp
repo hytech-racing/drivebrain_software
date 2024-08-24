@@ -30,8 +30,6 @@ bool comms::CANDriver::init()
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
     auto dbc_file_path = get_parameter_value<std::string>("path_to_dbc");
 
-    
-
     if (!(canbus_device && dbc_file_path))
     {
         return false;
