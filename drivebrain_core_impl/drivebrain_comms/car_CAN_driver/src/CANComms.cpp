@@ -81,13 +81,51 @@ bool comms::CANDriver::init()
     return true;
 }
 
-void comms::CANDriver::handle_output_msg_from_queue(core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &output_deque)
+bool comms::CANDriver::_open_socket(const std::string& interface_name)
 {
+    int raw_socket = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if (raw_socket < 0) {
+        std::cerr << "Error creating CAN socket: " << strerror(errno) << std::endl;
+        return;
+    }
+
+    struct ifreq ifr;
+    std::strcpy(ifr.ifr_name, interface_name.c_str());
+    ioctl(raw_socket, SIOCGIFINDEX, &ifr);
+
+    struct sockaddr_can addr;
+    addr.can_family = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    if (::bind(raw_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+        std::cerr << "Error binding CAN socket: " << strerror(errno) << std::endl;
+        ::close(raw_socket);
+        return;
+    }
+
+    _socket.assign(raw_socket);  // Assign the native socket to Boost.Asio descriptor
 }
 
-can_frame comms::CANDriver::handle_recv_CAN_frame()
+void comms::CANDriver::_do_read()
 {
-    return {};
+    boost::asio::async_read(_socket, boost::asio::buffer(&_frame, sizeof(_frame)),
+            [this](boost::system::error_code ec, std::size_t bytes_transferred) {
+                if (!ec && bytes_transferred == sizeof(_frame)) {
+                    _handle_recv_CAN_frame(_frame);
+                    _do_read();  // Continue reading for the next frame
+                } else if (ec) {
+                    std::cerr << "Error receiving CAN message: " << ec.message() << std::endl;
+                }
+            });
+}
+
+void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame& frame)
+{
+    auto msg = pb_msg_recv(frame);
+    {
+        std::unique_lock lk(_output_deque_ref.mtx);
+        _output_deque_ref.deque.push_back(msg);
+    }
 }
 
 // gets a protobuf message from just the name of it
@@ -281,25 +319,25 @@ can_frame comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Messa
     return frame;
 }
 
-void comms::CANDriver::handle_send_msg_from_queue(core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &input_deque)
-{
-    // we will assume that this queue only has messages that we want to send
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-    {
-        std::unique_lock lk(input_deque.mtx);
+// void comms::CANDriver::handle_send_msg_from_queue(core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &input_deque)
+// {
+//     // we will assume that this queue only has messages that we want to send
+//     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
+//     {
+//         std::unique_lock lk(input_deque.mtx);
 
-        if (input_deque.deque.empty())
-        {
-            return;
-        }
+//         if (input_deque.deque.empty())
+//         {
+//             return;
+//         }
 
-        q.deque = input_deque.deque;
-        input_deque.deque.clear();
-    }
+//         q.deque = input_deque.deque;
+//         input_deque.deque.clear();
+//     }
 
-    for (const auto &msg : q.deque)
-    {
-        // TODO send the messages
-        auto can_msg = _get_CAN_msg(msg);
-    }
-}
+//     for (const auto &msg : q.deque)
+//     {
+//         // TODO send the messages
+//         auto can_msg = _get_CAN_msg(msg);
+//     }
+// }
