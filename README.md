@@ -29,22 +29,31 @@ idea: if we have the ability to go both ways for having the ability to both:
 and generated code for the data passing into and out of proto messages, then we can book-end the controllers and estimators. 
 
 ### release planning
-alpha feature set:
-- [ ] basic controller (first pass I want to try out different types of regen handling)
-- [ ] UART MCU driver
-- [ ] UDP port comms from the controller manager to data acq for live telem
-- [ ] foxglove live parameter server integration that gets constructed from the registered configurable objects
+alpha feature set (~2 weeks, 16 days):
+- [ ] basic controller library (9 days) (first pass I want to try out different types of regen handling)
+    - [ ] generic controller (2 days)
+    - [ ] live parameter controller interface (2 days, 50%)
+    - [ ] controller manager structure (2 days)
+    - [ ] controller manager runtime (2 days)
+    - [ ] controller business logic (1 day)
+- [ ] CAN MCU driver library (4 days)
+    - [x] DBC based parsing 
+    - [ ] async receiving and transmitting with Boost.Asio (2 days)
+    - [ ] protobuf message packing (2 days, 50% done, 1 day left)
+    - [ ] simple internal communication with basic controller (1 day)
+- [ ] application runtime (1 day)
+- [ ] live telem integration with foxglove websocket (1 day)
+- [ ] foxglove live parameter server and websocket integration (1 day)
 
-beta feature set (includes alhpa):
-- [ ] vectornav UART driver 
-- [ ] CASE integrated into controller manager
-- [ ] driver bus with UDP port comms to data acq
+beta feature set (1 week):
+- [ ] vectornav UART driver integration
+- [ ] CASE integrated into controller manager with existing integration methods (1 day)
+- [ ] driver bus with UDP port comms to data acq 
 
-v1 feature set:
+v1 feature set (1 week):
 - [ ] CASE protobuf status output over UDP 
 - [ ] basic controller integrated
 - [ ] live param interface working fully integrated with foxglove websocket comms
-
 
 ### TODOs
 - [ ] make a controller manager for switching between controllers
