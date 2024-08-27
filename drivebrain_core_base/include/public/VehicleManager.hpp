@@ -13,18 +13,20 @@
 // vehicle manager shall handle stepping of each controller at their desired rates and be able to switch between
 // vehicle manager shall be able to change the mode of the drivetrain dependent on what mode the desired controller wants the drivetrain to be in (speed / torque)
 
-namespace control
-{
-    template <size_t NumControllers>
-    class VehicleManager : common::Configurable
-    {
-    public:
-        VehicleManager(std::array<std::unique_ptr<Controller>, NumControllers> controllers): _controllers(std::move(controllers)) {}
-        ~VehicleManager() = default;
+// namespace control
+// {
+//     template <size_t NumControllers>
+//     class VehicleManager : public core::common::Configurable
+//     {
+//     public:
+//         VehicleManager(core::JsonFileHandler &json_file_handler, std::array<std::unique_ptr<control::Controller>, NumControllers> controllers): 
+//         Configurable(json_file_handler, "VehicleManager"),
+//         _controllers(std::move(controllers)) {}
+//         ~VehicleManager() = default;
 
-        // void stepActiveController();
+//         void start_vehicle();
 
-    private:
-        std::array<Controller, NumControllers> _controllers;
-    };
-}
+//     private:
+//         std::array<std::unique_ptr<control::Controller>, NumControllers> _controllers;
+//     };
+// }

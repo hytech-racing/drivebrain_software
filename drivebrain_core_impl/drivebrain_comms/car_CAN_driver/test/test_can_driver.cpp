@@ -11,7 +11,6 @@ class TestCAN : public comms::CANDriver
 {
     public:
     TestCAN(core::JsonFileHandler &fh) : CANDriver(fh){};
-
     can_frame get_CAN_msg(std::shared_ptr<google::protobuf::Message> msg) {
         return _get_CAN_msg(msg);
     }

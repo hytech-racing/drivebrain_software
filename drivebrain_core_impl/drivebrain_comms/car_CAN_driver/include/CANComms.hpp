@@ -27,6 +27,12 @@
 #include <memory>
 #include <deque>
 #include <variant>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <functional>
+#include <optional>
+
 #include <unistd.h>
 #include <cstring>
 
@@ -54,15 +60,22 @@ namespace comms
     public:
         using FieldVariant = std::variant<int32_t, int64_t, uint32_t, uint64_t, float, double, bool, std::string, std::monostate>;
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
+        
+        /// @brief constructur
+        /// @param json_file_handler the file handler 
+        /// @param in_deq tx queue
+        /// @param out_deq receive queue
+        /// @param io_context boost asio required context
         CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context) : 
-            Configurable(json_file_handler, "CANDriver"), 
-            _input_deque_ref(in_deq), 
+            Configurable(json_file_handler, "CANDriver"),
+            _input_deque_ref(in_deq),
             _output_deque_ref(out_deq), 
             _socket(io_context)
         {
+            _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
         }
         bool init();
-
+        void _handle_send_msg_from_queue();
         std::shared_ptr<google::protobuf::Message> pb_msg_recv(const can_frame &in_frame);
         void set_field_values_of_pb_msg(const std::unordered_map<std::string, FieldVariant> &field_values, std::shared_ptr<google::protobuf::Message> message);
 
@@ -79,11 +92,12 @@ namespace comms
         // socket operations
         bool _open_socket(const std::string& interface_name);
         void _do_read();
+        void _send_message(const struct can_frame& frame);
 
         void _handle_recv_CAN_frame(const struct can_frame& frame);
 
         std::shared_ptr<google::protobuf::Message> _get_pb_msg_by_name(const std::string &name);
-        can_frame _get_CAN_msg(std::shared_ptr<google::protobuf::Message> msg);
+        std::optional<can_frame> _get_CAN_msg(std::shared_ptr<google::protobuf::Message> msg);
 
     private:
         static std::string _to_lowercase(std::string s);
@@ -91,6 +105,10 @@ namespace comms
     private:
         deqtype &_input_deque_ref;
         deqtype &_output_deque_ref;
+
+        std::condition_variable _cv;
+        std::thread _output_thread;
+
         struct can_frame _frame;
 
         boost::asio::posix::stream_descriptor _socket;

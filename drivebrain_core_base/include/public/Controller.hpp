@@ -21,10 +21,11 @@
 namespace control
 {
     template <typename ControllerResult, typename ControllerInput>
-    class Controller : common::Configurable
+    class Controller
     {
-    public:
         
-        virtual ControllerResult step_controller(const ControllerInput &in) = 0;
+    public:
+        Controller() = default;
+        virtual ControllerResult step_controller(const ControllerInput& in) = 0;
     };
 }

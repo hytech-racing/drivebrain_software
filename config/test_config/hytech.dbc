@@ -968,6 +968,12 @@ BO_ 234 VN_GNSS_COMP_SIG_HEALTH: 8 ECU
  SG_ num_sats_rtk_1 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ num_sats_pvt_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
+BO_ 303 DRIVETRAIN_COMMAND: 8 ECU
+ SG_ drivetrain_traj_torque_lim_rr : 48|16@1- (0.001,0) [0|0] "" Vector__XXX
+ SG_ drivetrain_traj_torque_lim_rl : 32|16@1- (0.001,0) [0|0] "" Vector__XXX
+ SG_ drivetrain_traj_torque_lim_fr : 16|16@1- (0.001,0) [0|0] "" Vector__XXX
+ SG_ drivetrain_traj_torque_lim_fl : 0|16@1- (0.001,0) [0|0] "" Vector__XXX
+
 BO_TX_BU_ 222 : ECU,Peripherals;
 BO_TX_BU_ 226 : ECU,Peripherals;
 BO_TX_BU_ 218 : ECU,Peripherals;
@@ -1100,6 +1106,7 @@ BO_TX_BU_ 1980 : ECU,Peripherals;
 BO_TX_BU_ 1983 : ECU,Peripherals;
 BO_TX_BU_ 1265 : ECU,Peripherals;
 BO_TX_BU_ 234 : ECU,Peripherals;
+BO_TX_BU_ 303 : ECU,Peripherals;
 
 
 CM_ BO_ 226 "UNUSED message to send data on the BMS current draw.";

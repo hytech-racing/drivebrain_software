@@ -1,46 +1,50 @@
-#include <SimpleController.h>
+#include <SimpleController.hpp>
 
-void SimpleController::tick(const PedalsSystemData_s &pedalsData)
+bool control::SimpleController::init()
+{
+    auto max_torque = get_parameter_value<float>("max_torque");
+    auto max_regen_torque = get_parameter_value<float>("max_regen_torque");
+    // auto torque_balance = get_parameter_value<float>("torque_balance");
+    if(! (max_torque && max_regen_torque))
+    {
+        return false;
+    }
+
+    _config= {*max_torque, *max_regen_torque};
+    return true;
+}
+
+drivetrain_command control::SimpleController::step_controller(const mcu_pedal_readings& in)
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
-    float accelRequest = pedalsData.accelPercent - pedalsData.regenPercent;
+    float accelRequest = in.accel_percent_float() - in.brake_percent_float();
+    // std::cout <<accelRequest <<std::endl;
     float torqueRequest;
 
+    
+    drivetrain_command cmd_out;
     if (accelRequest >= 0.0)
     {
         // Positive torque request
-        torqueRequest = accelRequest * PhysicalParameters::AMK_MAX_TORQUE;
+        torqueRequest = accelRequest * _config.max_torque;
 
-        writeout_.command.speeds_rpm[FL] = PhysicalParameters::AMK_MAX_RPM;
-        writeout_.command.speeds_rpm[FR] = PhysicalParameters::AMK_MAX_RPM;
-        writeout_.command.speeds_rpm[RL] = PhysicalParameters::AMK_MAX_RPM;
-        writeout_.command.speeds_rpm[RR] = PhysicalParameters::AMK_MAX_RPM;
 
-        writeout_.command.torqueSetpoints[FL] = torqueRequest * frontTorqueScale_;
-        writeout_.command.torqueSetpoints[FR] = torqueRequest * frontTorqueScale_;
-        writeout_.command.torqueSetpoints[RL] = torqueRequest * rearTorqueScale_;
-        writeout_.command.torqueSetpoints[RR] = torqueRequest * rearTorqueScale_;
+        cmd_out.set_drivetrain_traj_torque_lim_fl(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_fr(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_rl(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_rr(torqueRequest);
+
     }
     else
     {
         // Negative torque request
-        torqueRequest = PhysicalParameters::MAX_REGEN_TORQUE * accelRequest * -1.0;
-
-        writeout_.command.speeds_rpm[FL] = 0.0;
-        writeout_.command.speeds_rpm[FR] = 0.0;
-        writeout_.command.speeds_rpm[RL] = 0.0;
-        writeout_.command.speeds_rpm[RR] = 0.0;
-
-        writeout_.command.torqueSetpoints[FL] = torqueRequest * frontRegenTorqueScale_;
-        writeout_.command.torqueSetpoints[FR] = torqueRequest * frontRegenTorqueScale_;
-        writeout_.command.torqueSetpoints[RL] = torqueRequest * rearRegenTorqueScale_;
-        writeout_.command.torqueSetpoints[RR] = torqueRequest * rearRegenTorqueScale_;
+        torqueRequest = _config.max_reg_torque * accelRequest * -1.0;
+        cmd_out.set_drivetrain_traj_torque_lim_fl(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_fr(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_rl(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_rr(torqueRequest);
     }
-}
-
-TorqueControllerOutput_s SimpleController::evaluate(const SharedCarState_s &state)
-{
-    tick(state.pedals_data);
-    return writeout_;
+    // std::cout << "tq req "<<torqueRequest <<std::endl;
+    return cmd_out;
 }

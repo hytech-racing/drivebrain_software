@@ -47,46 +47,22 @@ bool comms::CANDriver::init()
         std::cout << msg.Name() << std::endl;
     }
 
-    struct sockaddr_can addr;
-    struct ifreq ifr;
-    struct can_frame frame;
-
-    _CAN_socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    if (_CAN_socket < 0)
-    {
-        std::cerr << "Error while opening socket: " << strerror(errno) << std::endl;
-        return false;
-    }
-
-    if (canbus_device)
-    {
-        std::strcpy(ifr.ifr_name, (*canbus_device).c_str());
-    }
-    else
+    if (!_open_socket(*canbus_device))
     {
         return false;
     }
-    ioctl(_CAN_socket, SIOCGIFINDEX, &ifr); // get the interface index for can0
 
-    // Bind the socket to the can0 interface
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-    if (bind(_CAN_socket, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-        std::cerr << "Error in socket bind: " << strerror(errno) << std::endl;
-        return false;
-    }
-
-    std::cout << "Listening on " << *canbus_device << "..." << std::endl;
+    _do_read();
     return true;
 }
 
-bool comms::CANDriver::_open_socket(const std::string& interface_name)
+bool comms::CANDriver::_open_socket(const std::string &interface_name)
 {
     int raw_socket = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    if (raw_socket < 0) {
+    if (raw_socket < 0)
+    {
         std::cerr << "Error creating CAN socket: " << strerror(errno) << std::endl;
-        return;
+        return false;
     }
 
     struct ifreq ifr;
@@ -97,34 +73,54 @@ bool comms::CANDriver::_open_socket(const std::string& interface_name)
     addr.can_family = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 
-    if (::bind(raw_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+    if (::bind(raw_socket, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
+    {
         std::cerr << "Error binding CAN socket: " << strerror(errno) << std::endl;
         ::close(raw_socket);
-        return;
+        return false;
     }
 
-    _socket.assign(raw_socket);  // Assign the native socket to Boost.Asio descriptor
+    _socket.assign(raw_socket); // Assign the native socket to Boost.Asio descriptor
+    return true;
 }
 
 void comms::CANDriver::_do_read()
 {
     boost::asio::async_read(_socket, boost::asio::buffer(&_frame, sizeof(_frame)),
-            [this](boost::system::error_code ec, std::size_t bytes_transferred) {
-                if (!ec && bytes_transferred == sizeof(_frame)) {
-                    _handle_recv_CAN_frame(_frame);
-                    _do_read();  // Continue reading for the next frame
-                } else if (ec) {
-                    std::cerr << "Error receiving CAN message: " << ec.message() << std::endl;
-                }
-            });
+                            [this](boost::system::error_code ec, std::size_t bytes_transferred)
+                            {
+                                if (!ec && bytes_transferred == sizeof(_frame))
+                                {
+                                    // std::cout << "recvd" <<std::endl;
+                                    _handle_recv_CAN_frame(_frame);
+                                    _do_read(); // Continue reading for the next frame
+                                }
+                                else if (ec)
+                                {
+                                    std::cerr << "Error receiving CAN message: " << ec.message() << std::endl;
+                                }
+                            });
 }
 
-void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame& frame)
+void comms::CANDriver::_send_message(const struct can_frame &frame)
+{
+    boost::asio::async_write(_socket, boost::asio::buffer(&frame, sizeof(frame)),
+                             [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/)
+                             {
+                                 if(ec)
+                                 {
+                                     std::cerr << "Error sending CAN message: " << ec.message() << std::endl;
+                                 }
+                             });
+}
+
+void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 {
     auto msg = pb_msg_recv(frame);
     {
         std::unique_lock lk(_output_deque_ref.mtx);
         _output_deque_ref.deque.push_back(msg);
+        _output_deque_ref.cv.notify_all();
     }
 }
 
@@ -132,7 +128,7 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame& frame)
 std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name(const std::string &name)
 {
     // Create a dynamic message factory
-    
+
     std::shared_ptr<google::protobuf::Message> prototype_message;
     const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
     prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
@@ -169,19 +165,20 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             switch (field->type())
             {
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-                reflection->SetFloat(message.get(), field, std::get<double>(it->second));
-                std::cout << "Set float field: " << field_name << " = " << std::get<float>(it->second) << std::endl;
+                // std::cout << "uh yo " << it->second.index() <<std::endl;
+                reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
+                // std::cout << "Set float field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
-                reflection->SetBool(message.get(), field, std::get<double>(it->second));
-                std::cout << "Set bool field: " << field_name << " = " << std::get<bool>(it->second) << std::endl;
+                reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
+//                std::cout << "Set bool field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
-                std::cout << "Set double field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
+                // std::cout << "Set double field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_INT32:
-                reflection->SetInt32(message.get(), field, std::get<double>(it->second));
+                reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
                 break;
             default:
                 std::cout << "warning, no valid type detected" << std::endl;
@@ -196,22 +193,22 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     if (iter != _messages.end())
     {
         auto msg = iter->second->Clone();
-        std::cout << "Received Message: " << msg->Name() << "\n";
+        // std::cout << "Received Message: " << msg->Name() << "\n";
         auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
         {
             // sig.Decode(frame.data);
-            std::cout << "sig name " << sig.Name() << std::endl;
+            // std::cout << "sig name " << sig.Name() << std::endl;
             const dbcppp::ISignal *mux_sig = msg->MuxSignal();
-            
+
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
                 (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
             {
                 // TODO get correct type from raw signal and store it in the map. right now they are all doubles
                 msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
-                std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+                // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
             }
         }
 
@@ -269,75 +266,94 @@ comms::CANDriver::FieldVariant comms::CANDriver::get_field_value(std::shared_ptr
     }
 }
 
-can_frame comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg)
+std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg)
 {
     // - [x] get an associated CAN message based on the name of the input message
 
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
-    std::cout << "got message type name of " << messageTypeName << std::endl;
-    auto id = _messages_names_and_ids[messageTypeName];
-    std::cout << id << std::endl;
-    auto msg = _messages[id]->Clone();
-    frame.can_id = id;
-    frame.len = msg->MessageSize();
-    for (const auto &sig : msg->Signals())
-    {
-        std::cout << sig.Name() << std::endl;
-        auto field_value = get_field_value(pb_msg, sig.Name());
+    // std::cout << "got message type name of " << messageTypeName << std::endl;
 
-        std::visit([&sig, &frame](const FieldVariant &arg)
-                   {
-        if (std::holds_alternative<std::monostate>(arg)) {
-            std::cout << "No value found or unsupported field" << std::endl;
-        } else if (std::holds_alternative<float>(arg)){
-            std::cout << "Field value: " << std::get<float>(arg) << std::endl;
-            auto val = std::get<float>(arg);
-            sig.Encode(sig.PhysToRaw(val), frame.data);
-        } else if(std::holds_alternative<int32_t>(arg)){
-            std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
-            auto val = std::get<int32_t>(arg);
-            sig.Encode(sig.PhysToRaw(val), frame.data);
-        } else if(std::holds_alternative<int64_t>(arg)){
-            std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
-            auto val = std::get<int64_t>(arg);
-            sig.Encode(sig.PhysToRaw(val), frame.data);
-        } else if(std::holds_alternative<uint64_t>(arg)){
-            std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
-            auto val = std::get<uint64_t>(arg);
-            sig.Encode(sig.PhysToRaw(val), frame.data);
-        } else if(std::holds_alternative<bool>(arg)){
-            std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
-            auto val = std::get<bool>(arg);
-            sig.Encode(val, frame.data);
-        } else {
-            std::cout <<"uh not supported yet" <<std::endl;
-        } },
-                   field_value);
+    if(_messages_names_and_ids.find(messageTypeName) !=_messages_names_and_ids.end())
+    {
+        auto id = _messages_names_and_ids[messageTypeName];
+        auto msg = _messages[id]->Clone();
+        frame.can_id = id;
+        frame.len = msg->MessageSize();
+        for (const auto &sig : msg->Signals())
+        {
+            // std::cout << sig.Name() << std::endl;
+            auto field_value = get_field_value(pb_msg, sig.Name());
+
+            std::visit([&sig, &frame](const FieldVariant &arg)
+                    {
+            if (std::holds_alternative<std::monostate>(arg)) {
+                std::cout << "No value found or unsupported field" << std::endl;
+            } else if (std::holds_alternative<float>(arg)){
+                // std::cout << "float Field value: " << std::get<float>(arg) << std::endl;
+                auto val = std::get<float>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<int32_t>(arg)){
+                // std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
+                auto val = std::get<int32_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<int64_t>(arg)){
+                // std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
+                auto val = std::get<int64_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<uint64_t>(arg)){
+                // std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
+                auto val = std::get<uint64_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<bool>(arg)){
+                // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
+                auto val = std::get<bool>(arg);
+                sig.Encode(val, frame.data);
+            } else {
+                std::cout <<"uh not supported yet" <<std::endl;
+            } },
+                    field_value);
+        }
     }
+    else {
+        std::cout <<"WARNING: not creating a frame to send due to not finding frame name"<<std::endl;
+        return std::nullopt;
+    }
+    
     return frame;
 }
 
-// void comms::CANDriver::handle_send_msg_from_queue(core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &input_deque)
-// {
-//     // we will assume that this queue only has messages that we want to send
-//     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-//     {
-//         std::unique_lock lk(input_deque.mtx);
+void comms::CANDriver::_handle_send_msg_from_queue()
+{
+    // we will assume that this queue only has messages that we want to send
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
+    while (true)
+    {
+        {
+            std::unique_lock lk(_input_deque_ref.mtx);
+            // TODO unfuck this, queue management shouldnt live within the queue itself
+            _input_deque_ref.cv.wait(lk, [this]()
+                                      { return !_input_deque_ref.deque.empty(); });
 
-//         if (input_deque.deque.empty())
-//         {
-//             return;
-//         }
+            if (_input_deque_ref.deque.empty())
+            {
+                return;
+            }
 
-//         q.deque = input_deque.deque;
-//         input_deque.deque.clear();
-//     }
+            q.deque = _input_deque_ref.deque;
+            _input_deque_ref.deque.clear();
+        }
 
-//     for (const auto &msg : q.deque)
-//     {
-//         // TODO send the messages
-//         auto can_msg = _get_CAN_msg(msg);
-//     }
-// }
+        for (const auto &msg : q.deque)
+        {
+            auto can_msg = _get_CAN_msg(msg);
+            if(can_msg)
+            {
+                _send_message(*can_msg);
+            }
+            
+        }
+        q.deque.clear();
+    }
+}

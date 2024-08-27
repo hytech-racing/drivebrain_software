@@ -2,6 +2,8 @@
 
 #include <deque>
 #include <mutex>
+#include <condition_variable>
+
 
 // what this should do:
 // should contain the instances of the thread-safe deques, contain the thread(s) 
@@ -19,6 +21,9 @@ namespace core
         {
             std::deque<MsgType> deque;
             std::mutex mtx;
+            std::condition_variable cv;
         };
+
+        
     }
 }

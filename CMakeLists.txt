@@ -1,20 +1,31 @@
 cmake_minimum_required(VERSION 3.24)
 project(drivebrain_software LANGUAGES CXX C)
 
+### just like "include what you use" and do "find what you use"
 
-# just like "include what you use" and do "find what you use"
+## hytech's upstream libraries
 
+### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
-find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED)
 
+### this one is generated from nix-proto but using foxglove's 
+find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+
+### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
+# custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 
+#####################
+# created libraries #
+#####################
+
+# drivebrain core library
 add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
@@ -24,6 +35,7 @@ target_include_directories(drivebrain_core PUBLIC
 
 # right now we dont want to expose the json file handler directly to all of the 
 # components of drivebrain
+
 target_include_directories(drivebrain_core PRIVATE 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/private>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_base/include/private>    
@@ -31,8 +43,7 @@ target_include_directories(drivebrain_core PRIVATE
 
 target_link_libraries(drivebrain_core PUBLIC nlohmann_json::nlohmann_json Boost::boost Boost::system)
 
-
-# impl libraries
+# foxglove parameter server interface
 add_library(foxglove_param_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_param_server/src/param_server.cpp)
 
 target_include_directories(foxglove_param_server PUBLIC 
@@ -46,6 +57,7 @@ target_link_libraries(foxglove_param_server PUBLIC
     foxglove_websocket::foxglove_websocket    
 )
 
+# CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
 add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
 
 target_include_directories(CAN_driver PUBLIC
@@ -60,18 +72,38 @@ target_link_libraries(CAN_driver PUBLIC
     dbcppp::dbcppp
 )
 
-add_executable(test_CAN_driver drivebrain_core_impl/drivebrain_comms/car_CAN_driver/test/test_can_driver.cpp)
-target_link_libraries(test_CAN_driver PUBLIC
-    CAN_driver
-    GTest::gtest_main
+add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
+# drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
+target_include_directories(drivebrain_control PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_control/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_control/include>    
 )
 
-add_executable(test_boost_asio_CAN drivebrain_app/example_boost_asio_can.cpp)
-
-target_link_libraries(test_boost_asio_CAN PUBLIC
-    Boost::boost
+target_link_libraries(drivebrain_control PUBLIC 
+    drivebrain_core
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    protobuf::libprotobuf
 )
 
+###############
+# executables #
+###############
+
+###                     ###
+### testing executables ###
+###                     ###
+
+# add_executable(test_CAN_driver drivebrain_core_impl/drivebrain_comms/car_CAN_driver/test/test_can_driver.cpp)
+# target_link_libraries(test_CAN_driver PUBLIC
+#     CAN_driver
+#     GTest::gtest_main
+# )
+
+# add_executable(test_boost_asio_CAN drivebrain_app/example_boost_asio_can.cpp)
+
+# target_link_libraries(test_boost_asio_CAN PUBLIC
+#     Boost::boost
+# )
 
 add_executable(test_param_server test/test_param_server.cpp)
 
@@ -80,3 +112,15 @@ target_link_libraries(test_param_server PUBLIC
     foxglove_websocket::foxglove_websocket)
 
 install(TARGETS test_param_server)
+
+###                   ###
+### system executable ###
+###                   ###
+add_executable(alpha_build drivebrain_app/main.cpp)
+
+target_link_libraries(alpha_build PUBLIC
+    Boost::boost
+    drivebrain_core
+    drivebrain_control
+    CAN_driver
+)
