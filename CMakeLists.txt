@@ -20,6 +20,8 @@ find_package(GTest REQUIRED)
 # custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
+find_package(cmake_macros REQUIRED)
+include(create_package)
 
 #####################
 # created libraries #
@@ -42,6 +44,7 @@ target_include_directories(drivebrain_core PRIVATE
 )
 
 target_link_libraries(drivebrain_core PUBLIC nlohmann_json::nlohmann_json Boost::boost Boost::system)
+make_cmake_package(drivebrain_core drivebrain)
 
 # foxglove parameter server interface
 add_library(foxglove_param_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_param_server/src/param_server.cpp)
@@ -56,6 +59,7 @@ target_link_libraries(foxglove_param_server PUBLIC
     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
     foxglove_websocket::foxglove_websocket    
 )
+make_cmake_package(foxglove_param_server drivebrain)
 
 # CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
 add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
@@ -71,6 +75,7 @@ target_link_libraries(CAN_driver PUBLIC
     protobuf::libprotobuf
     dbcppp::dbcppp
 )
+make_cmake_package(CAN_driver drivebrain)
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
@@ -84,6 +89,7 @@ target_link_libraries(drivebrain_control PUBLIC
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
 )
+make_cmake_package(drivebrain_control drivebrain)
 
 ###############
 # executables #
@@ -111,8 +117,6 @@ target_link_libraries(test_param_server PUBLIC
     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
     foxglove_websocket::foxglove_websocket)
 
-install(TARGETS test_param_server)
-
 ###                   ###
 ### system executable ###
 ###                   ###
@@ -124,3 +128,10 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     CAN_driver
 )
+
+include(GNUInstallDirs)
+install(TARGETS 
+        test_param_server
+        alpha_build
+    RUNTIME 
+        DESTINATION ${CMAKE_INSTALL_BINDIR})

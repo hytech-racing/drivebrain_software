@@ -12,7 +12,7 @@
     nebs-packages.url = "github:RCMast3r/nebs_packages";
     nebs-packages.inputs.nixpkgs.follows = "nixpkgs";
 
-    easy_cmake.url = "github:RCMast3r/easy_cmake";
+    easy_cmake.url = "github:RCMast3r/easy_cmake/5be1d78ff8383590a3cf5ed3680554d8e619489e";
     easy_cmake.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-proto.url = "github:notalltim/nix-proto";
@@ -22,10 +22,10 @@
       url = "github:foxglove/schemas";
       flake = false;
     };
-    
+
     ht_can.url = "github:hytech-racing/ht_can";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
-    
+
     data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";
     data_acq.inputs.ht_can_pkg_flake.follows = "ht_can";
     data_acq.inputs.nix-proto.follows = "nix-proto";
@@ -102,6 +102,18 @@
               ];
               packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };
+
+            legacyPackages =
+              import nixpkgs {
+                inherit system;
+                overlays = [ 
+                  nebs-packages.overlays.default 
+                  easy_cmake.overlays.default 
+                  (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
+                ]
+                ++ data_acq.overlays.x86_64-linux
+                ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+              };
 
           };
       };

@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/CAN_driverTargets.cmake")
+
+check_required_components(CAN_driver)
