@@ -18,7 +18,7 @@ drivetrain_command control::SimpleController::step_controller(const mcu_pedal_re
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
-    float accelRequest = in.accel_percent_float() - in.brake_percent_float();
+    float accelRequest = (in.accel_percent_float() / 100.0) - (in.brake_percent_float()/100.0);
     // std::cout <<accelRequest <<std::endl;
     float torqueRequest;
 
@@ -27,7 +27,7 @@ drivetrain_command control::SimpleController::step_controller(const mcu_pedal_re
     if (accelRequest >= 0.0)
     {
         // Positive torque request
-        torqueRequest = accelRequest * _config.max_torque;
+        torqueRequest = ((float)accelRequest) * _config.max_torque;
 
 
         cmd_out.set_drivetrain_traj_torque_lim_fl(torqueRequest);

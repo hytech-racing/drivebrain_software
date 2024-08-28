@@ -32,6 +32,7 @@ bool comms::CANDriver::init()
 
     if (!(canbus_device && dbc_file_path))
     {
+        std::cout << "ERROR: couldnt get params" <<std::endl;
         return false;
     }
     std::shared_ptr<dbcppp::INetwork> net;
@@ -49,9 +50,10 @@ bool comms::CANDriver::init()
 
     if (!_open_socket(*canbus_device))
     {
+        std::cout << "ERROR: couldnt open socket"<<std::endl; 
         return false;
     }
-
+    std::cout <<"inited, started read" <<std::endl;
     _do_read();
     return true;
 }
