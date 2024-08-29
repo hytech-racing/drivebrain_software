@@ -10,18 +10,14 @@
 
 #include <cassert>
 
-#define assertm(exp, msg) assert(((void)msg, exp))
-
 #include <boost/asio.hpp>
 #include <memory>
 // TODO first application will have
 
-// - [ ] driver bus message queue https://chatgpt.com/share/03297278-0346-40ba-8ce7-7a75e919ee5c
-// - [ ] CAN driver
+// - [x] message queue that can send messages between the CAN driver and the controller
+// - [x] CAN driver that can receive the pedals messages
+    // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
-
-// - [ ] message queue manager for ensuring that everything is getting the data it needs
-// - [ ] foxglove live telem and parameter server
 
 int main()
 {
@@ -31,18 +27,15 @@ int main()
     core::JsonFileHandler config("config/test_config/can_driver.json");
     comms::CANDriver driver(config, tx_queue, rx_queue, io_context);
 
-    // assertm(driver.init(), "ERROR: driver did not initialize");
-
-    std::cout <<"driver init "<< driver.init() << std::endl;
+    std::cout << "driver init "<< driver.init() << std::endl;
 
     control::SimpleController controller(config);
     auto _ = controller.init();
-    // assertm(controller.init(), "ERROR: controler did not initialize");
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue
     std::thread io_context_thread([&io_context]()
-                                  { 
+                                  {
                                     std::cout <<"started io context thread" <<std::endl;
                                     io_context.run(); });
     std::thread receive_thread([&rx_queue, &tx_queue, &controller]()
@@ -81,7 +74,6 @@ int main()
             
         } });
 
-    // io_context.run();
     while (true)
     {
         // std::cout <<"started main thread" <<std::endl;

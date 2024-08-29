@@ -1,7 +1,9 @@
 #pragma once
 
-// TODO make this private 
+// TODO make this private
 #include <JsonFileHandler.hpp>
+
+#include <boost/signals2.hpp>
 
 #include <string>
 #include <iostream>
@@ -10,6 +12,7 @@
 #include <unordered_map>
 #include <optional>
 #include <variant>
+#include <mutex>
 
 // STORY:
 
@@ -22,11 +25,11 @@
 
 // REQUIREMENTS:
 
-// - [ ] configuration should be nested in the following way:
+// - [x] configuration should be nested in the following way:
 // 1. each component has its own single layer scope
 // 2. each scope doesnt have any further scope (one layer deep only)
-// - [ ] all parameter value getting has to return
-// - [ ] there will only be ONE config file being edited by ONE thing at a time
+// - [x] all parameter value getting has to return
+// - [x] there will only be ONE config file being edited by ONE thing at a time
 // this is pertinent to the parameter server for saving the parameters, for accessing at init time we will initialize before kicking off threads
 
 // this is also pertinent to construction of the core of drivebrain since we want the components to be able to update the in-memory version of the json, but only one thing should be able to write it out to the json file once updated
@@ -35,8 +38,13 @@
 // -> this would be hard to police and ensure that the runtime calling only gets called during runtime
 
 // what if we made all the parameter handling be within a specific function for each component
-    // then the initial init can call the same set param function that gets called at init time 
+// then the initial init can call the same set param function that gets called at init time
 
+// live parameters:
+// - [ ] add live parameter handling through use of boost signals
+
+// the live parameter settings will be handled by having a true or false flag within the get_parameter.
+// if this flag is set, the is gotten from the config file and then the map of live parameters gets it's
 namespace core
 {
     namespace common
@@ -44,13 +52,44 @@ namespace core
         /// @brief this is the class that configurable components inherit from to get parameter access to the top-level ptree
         class Configurable
         {
+
         public:
+            using ParamTypes = std::variant<bool, int, float, std::string>;
             Configurable(core::JsonFileHandler &json_file_handler, const std::string &component_name)
                 : _json_file_handler(json_file_handler), _component_name(component_name) {}
 
+            std::string get_name();
+            std::vector<std::string> get_param_names();
+
+            std::unordered_map<std::string, ParamTypes> get_params_map();
+
+            // void handle_live_param_update(const std::string &key, ParamType param_val)
+            // {
+            //     {
+            //         std::unique_lock lk(_live_params.mtx)
+            //         {
+            //             std::unique_lock lk(_live_params.mtx)
+            //                 _live_params.param_vals[key] = param_val;
+            //         }
+            //         param_update_handler_sig(_live_params);
+            //     }
+            // }
+
         protected:
+            boost::signals2::signal<void(const std::unordered_map<std::string, ParamTypes> &)> param_update_handler_sig;
             virtual bool init() = 0;
-            using ParamTypes = std::variant<bool, int, float, std::string>;
+
+            template <typename ParamType>
+            void _handle_assert()
+            {
+                static_assert(
+                    std::is_same_v<ParamType, bool> ||
+                        std::is_same_v<ParamType, int> ||
+                        std::is_same_v<ParamType, double> ||
+                        std::is_same_v<ParamType, float> ||
+                        std::is_same_v<ParamType, std::string>,
+                    "ParamType must be bool, int, double, float, or std::string");
+            }
             /// @brief Gets a parameter value within the component's scope, ensuring it exists with a default value and if it doesnt it will created it
             /// @tparam ParamType parameter type
             /// @param key the id of the parameter being requested
@@ -58,6 +97,8 @@ namespace core
             template <typename ParamType>
             std::optional<ParamType> get_parameter_value(const std::string &key)
             {
+                _handle_assert<ParamType>();
+
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
                 auto &config = _json_file_handler.get_config();
 
@@ -71,37 +112,41 @@ namespace core
                 // Access the specific key within the component's section
                 if (!config[_component_name].contains(key))
                 {
-                    std::cout << "WARNING: config file does not contain config: "<< key << " for component: " << _component_name << std::endl;
+                    std::cout << "WARNING: config file does not contain config: " << key << " for component: " << _component_name << std::endl;
                     return std::nullopt;
                 }
                 return config[_component_name][key].get<ParamType>();
             }
 
-            /// @brief TODO: component-scoped parameter setting call. this will be getting called by the parameter server within drivebrain
-            /// @param key 
-            /// @param parameter_val 
-            /// @return true or false depending on if the key exists or not
-            bool handle_update_parameter(const std::string &key, std::variant<bool, int, float, std::string> parameter_val)
+            template <typename ParamType>
+            std::optional<ParamType> get_live_parameter(const std::string &key)
             {
-                auto &config = _json_file_handler.get_config();
-                if (config[_component_name].contains(key))
+                _handle_assert<ParamType>();
+                auto res = get_parameter_value<ParamType>(key);
+
+                if (!res)
                 {
-                    // config[_component_name][key] = parameter_val;
-                    // set_parameter(key, parameter_value);
-                    return true;
+                    return std::nullopt;
                 }
-                return false;
+                else
+                {
+                    {
+                        std::unique_lock lk(_live_params.mtx);
+                        _live_params.param_vals[key] = *res;
+                    }
+                }
+                return res;
             }
 
-            // /// @brief TODO: this is the handler that each component must implement that can take in the parameter ID
-            // /// @tparam ParamType 
-            // /// @param key 
-            // /// @param param_value 
-            // virtual void set_parameter(const std::string &key, std::variant<bool, int, float, std::string> param_value) = 0;
-            
         private:
             std::string _component_name;
             core::JsonFileHandler &_json_file_handler;
+
+            struct
+            {
+                std::unordered_map<std::string, ParamTypes> param_vals;
+                std::mutex mtx;
+            } _live_params;
         };
 
     }

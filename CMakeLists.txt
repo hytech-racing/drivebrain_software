@@ -28,7 +28,7 @@ include(create_package)
 #####################
 
 # drivebrain core library
-add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp)
+add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/public>
@@ -123,7 +123,6 @@ target_link_libraries(test_param_server PUBLIC
 add_executable(alpha_build drivebrain_app/main.cpp)
 
 target_link_libraries(alpha_build PUBLIC
-    Boost::boost
     drivebrain_core
     drivebrain_control
     CAN_driver

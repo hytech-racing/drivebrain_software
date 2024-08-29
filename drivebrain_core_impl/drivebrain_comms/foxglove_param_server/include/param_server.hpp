@@ -1,5 +1,7 @@
 #pragma once
 #include <array>
+#include <vector>
+#include <functional>
 
 // from drivebrain_core
 #include <Configurable.hpp> 
@@ -16,14 +18,15 @@ namespace core
     public:
         FoxgloveParameterServer() = delete;
         
-        template<size_t N>
-        FoxgloveParameterServer(std::array<core::common::Configurable*, N> configurable_components);
+        
+        FoxgloveParameterServer(std::vector<core::common::Configurable*> configurable_components);
         ~FoxgloveParameterServer() = default;
 
     private:
-        std::vector<foxglove::Parameter> _get_current_params(const std::vector<std::string>& param_names);
+        std::vector<foxglove::Parameter> _get_current_params();
     private:
-
+        
+        std::vector<core::common::Configurable*> _components;
         std::unique_ptr<foxglove::ServerInterface<websocketpp::connection_hdl>> _server;
         std::function<void(foxglove::WebSocketLogLevel, char const*)> _log_handler;
         foxglove::ServerOptions _server_options;
