@@ -54,7 +54,7 @@ namespace core
         {
 
         public:
-            using ParamTypes = std::variant<bool, int, float, std::string>;
+            using ParamTypes = std::variant<bool, int, float, double, std::string, std::monostate>;
             Configurable(core::JsonFileHandler &json_file_handler, const std::string &component_name)
                 : _json_file_handler(json_file_handler), _component_name(component_name) {}
 
@@ -63,17 +63,7 @@ namespace core
 
             std::unordered_map<std::string, ParamTypes> get_params_map();
 
-            // void handle_live_param_update(const std::string &key, ParamType param_val)
-            // {
-            //     {
-            //         std::unique_lock lk(_live_params.mtx)
-            //         {
-            //             std::unique_lock lk(_live_params.mtx)
-            //                 _live_params.param_vals[key] = param_val;
-            //         }
-            //         param_update_handler_sig(_live_params);
-            //     }
-            // }
+            void handle_live_param_update(const std::string &key, ParamTypes param_val);
 
         protected:
             boost::signals2::signal<void(const std::unordered_map<std::string, ParamTypes> &)> param_update_handler_sig;

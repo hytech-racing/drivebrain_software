@@ -25,3 +25,15 @@ std::unordered_map<std::string, Configurable::ParamTypes> Configurable::get_para
     std::unique_lock lk(_live_params.mtx);
     return _live_params.param_vals;
 }
+
+void Configurable::handle_live_param_update(const std::string &key, Configurable::ParamTypes param_val)
+{
+    
+    // TODO may want to handle this a little bit differently so we arent locking so much
+    {
+        std::unique_lock lk(_live_params.mtx);
+        _live_params.param_vals[key] = param_val;
+        param_update_handler_sig(_live_params.param_vals);
+    }
+    
+}

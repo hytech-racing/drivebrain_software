@@ -30,6 +30,7 @@ public:
     bool init();
     drivetrain_command step_controller(const mcu_pedal_readings& in) override;
 private:
+    void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
     config _config;
 };
 }

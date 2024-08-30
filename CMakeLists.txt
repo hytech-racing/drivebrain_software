@@ -59,6 +59,7 @@ target_link_libraries(foxglove_param_server PUBLIC
     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
     foxglove_websocket::foxglove_websocket    
 )
+target_compile_features(foxglove_param_server PUBLIC cxx_std_17) 
 make_cmake_package(foxglove_param_server drivebrain)
 
 # CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
@@ -126,6 +127,7 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
     CAN_driver
+    foxglove_param_server
 )
 
 include(GNUInstallDirs)

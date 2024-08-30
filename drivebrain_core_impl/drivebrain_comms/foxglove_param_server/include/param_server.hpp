@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include <functional>
+#include <variant>
 
 // from drivebrain_core
 #include <Configurable.hpp> 
@@ -18,12 +19,16 @@ namespace core
     public:
         FoxgloveParameterServer() = delete;
         
-        
         FoxgloveParameterServer(std::vector<core::common::Configurable*> configurable_components);
-        ~FoxgloveParameterServer() = default;
+        ~FoxgloveParameterServer(){
+            _server->stop();
+        }
 
     private:
         std::vector<foxglove::Parameter> _get_current_params();
+        foxglove::Parameter _get_foxglove_param(const std::string& set_name, core::common::Configurable::ParamTypes param);
+        core::common::Configurable::ParamTypes _get_db_param(foxglove::Parameter param_update);
+        void _set_db_param(foxglove::Parameter param_update);
     private:
         
         std::vector<core::common::Configurable*> _components;

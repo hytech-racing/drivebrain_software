@@ -3,12 +3,14 @@
 #include <SimpleController.hpp>
 
 #include <DrivebrainBase.hpp>
+#include <param_server.hpp>
 
 #include <thread> // std::this_thread::sleep_for
 #include <chrono> // std::chrono::seconds
 #include <condition_variable>
 
 #include <cassert>
+
 
 #include <boost/asio.hpp>
 #include <memory>
@@ -21,15 +23,24 @@
 
 int main()
 {
+
     boost::asio::io_context io_context;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
+    std::vector<core::common::Configurable*> configurable_components;
+
+    
     core::JsonFileHandler config("config/test_config/can_driver.json");
+    
     comms::CANDriver driver(config, tx_queue, rx_queue, io_context);
-
     std::cout << "driver init "<< driver.init() << std::endl;
-
+    configurable_components.push_back(&driver);
+    
     control::SimpleController controller(config);
+    configurable_components.push_back(&controller);
+    
+    auto param_server = core::FoxgloveParameterServer(configurable_components);
+
     auto _ = controller.init();
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
@@ -76,7 +87,6 @@ int main()
 
     while (true)
     {
-        // std::cout <<"started main thread" <<std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
