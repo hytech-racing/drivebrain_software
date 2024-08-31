@@ -7,11 +7,8 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     if(auto pval = std::get_if<float>(&new_param_map.at("max_regen_torque")))
     {
         _config.max_reg_torque = *pval;
-    } else if(auto pval = std::get_if<int>(&new_param_map.at("max_regen_torque")))
-    {
-        _config.max_reg_torque = *pval;
+        std::cout << "setting new max regen torque " << _config.max_reg_torque <<std::endl;
     }
-     
 }
 
 bool control::SimpleController::init()

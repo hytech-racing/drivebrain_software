@@ -9,7 +9,6 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
     };
 
     _server_options.capabilities.push_back("parameters");
-    _server_options.capabilities.push_back("parametersSubscribe");
 
     _server = foxglove::ServerFactory::createServer<websocketpp::connection_hdl>(
         "beep boop", _log_handler, _server_options);
