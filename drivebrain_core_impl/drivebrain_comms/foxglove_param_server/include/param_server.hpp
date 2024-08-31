@@ -29,6 +29,7 @@ namespace core
         foxglove::Parameter _get_foxglove_param(const std::string& set_name, core::common::Configurable::ParamTypes param);
         core::common::Configurable::ParamTypes _get_db_param(foxglove::Parameter param_update);
         void _set_db_param(foxglove::Parameter param_update);
+        std::optional<foxglove::Parameter> _convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param);
     private:
         
         std::vector<core::common::Configurable*> _components;

@@ -26,10 +26,11 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
         // loop through all of the params we are trying to change
-        for(const auto & param_to_change : params)
+        // auto name_type_map = _get_current_type_map();
+
+        for (const auto &param_to_change : params)
         {
             // sets the drivebrain parameters
-            
             _set_db_param(param_to_change);
         }
         // get the updated params
@@ -78,7 +79,7 @@ foxglove::Parameter core::FoxgloveParameterServer::_get_foxglove_param(const std
 
 core::common::Configurable::ParamTypes core::FoxgloveParameterServer::_get_db_param(foxglove::Parameter param)
 {
-    
+
     if (param.getValue().getType() == foxglove::ParameterType::PARAMETER_BOOL)
     {
         return param.getValue().getValue<bool>();
@@ -87,12 +88,11 @@ core::common::Configurable::ParamTypes core::FoxgloveParameterServer::_get_db_pa
     {
         return ((int)param.getValue().getValue<int64_t>());
     }
-    else if (param.getValue().getType()== foxglove::ParameterType::PARAMETER_DOUBLE)
+    else if (param.getValue().getType() == foxglove::ParameterType::PARAMETER_DOUBLE)
     {
-        
         return ((float)param.getValue().getValue<double>());
     }
-    else if (param.getValue().getType()== foxglove::ParameterType::PARAMETER_STRING)
+    else if (param.getValue().getType() == foxglove::ParameterType::PARAMETER_STRING)
     {
         return param.getValue().getValue<std::string>();
     }
@@ -104,6 +104,29 @@ core::common::Configurable::ParamTypes core::FoxgloveParameterServer::_get_db_pa
     return std::monostate();
 }
 
+std::optional<foxglove::Parameter> core::FoxgloveParameterServer::_convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param)
+{
+    auto current_param_type = _get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType();
+    auto type = incoming_param.getValue().getType();
+
+    using fpt = foxglove::ParameterType;
+    if (_get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType() == incoming_param.getValue().getType())
+    {
+        return incoming_param;
+    }
+    else if (current_param_type == fpt::PARAMETER_DOUBLE && type == fpt::PARAMETER_INTEGER)
+    {
+        return foxglove::Parameter(incoming_param.getName(), static_cast<double>(incoming_param.getValue().getValue<int64_t>()));
+    }
+    else if (current_param_type == fpt::PARAMETER_INTEGER && type == fpt::PARAMETER_DOUBLE)
+    {
+        return foxglove::Parameter(incoming_param.getName(), static_cast<int64_t>(incoming_param.getValue().getValue<double>()));
+    }
+    else {
+        std::cout <<"WARNING: unsupported type input, not setting" << std::endl;
+        return std::nullopt;
+    }
+}
 
 void core::FoxgloveParameterServer::_set_db_param(foxglove::Parameter param_update)
 {
@@ -112,17 +135,22 @@ void core::FoxgloveParameterServer::_set_db_param(foxglove::Parameter param_upda
     auto param_name = param_update.getName().substr(split_pos + 1);
     auto component_name = param_update.getName().substr(0, split_pos);
 
-    for(const auto component : _components)
+    for (const auto component : _components)
     {
-        if(component->get_name() == component_name)
+        if (component->get_name() == component_name)
         {
-            
-            auto val = _get_db_param(param_update);
-            component->handle_live_param_update(param_name, val);
+
+            auto curr_param_val = component->get_cached_param(param_name);
+            auto converted_type = _convert_foxglove_param(curr_param_val, param_update);
+            if(converted_type)
+            {
+                auto val = _get_db_param(*converted_type);
+                component->handle_live_param_update(param_name, val);
+            }
             return;
         }
     }
-    std::cout <<"WARNING: could not find component " << component_name << std::endl;
+    std::cout << "WARNING: could not find component " << component_name << std::endl;
 }
 
 std::vector<foxglove::Parameter> core::FoxgloveParameterServer::_get_current_params()

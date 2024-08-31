@@ -1,22 +1,6 @@
 #include <SimpleController.hpp>
 #include <variant>
 
-template <typename DesiredType>
-std::optional<DesiredType> type_helper(core::common::Configurable::ParamTypes param_val)
-{
-    if(std::is_arithmetic_v<DesiredType>)
-    {
-        
-    } else if(std::is_same_v<DesiredType, std::string>)
-    {   
-        
-    } else {
-        std::cout << "WARNING: returning nullopt since the type is not a valid param type that we can cast to" << std::endl;
-    }
-
-    return std::nullopt;
-}
-
 void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
     // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache

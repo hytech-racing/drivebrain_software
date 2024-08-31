@@ -1,5 +1,5 @@
 {
-  description = "my packages. im tired of making new repos for nix packages and im too lazy to push em up to nixpkgs";
+  description = "drivebrain flake";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 

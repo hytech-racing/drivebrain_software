@@ -20,6 +20,17 @@ std::vector<std::string> Configurable::get_param_names()
     return names;
 }
 
+Configurable::ParamTypes Configurable::get_cached_param(std::string id)
+{
+    std::unique_lock lk(_live_params.mtx);
+    if(_live_params.param_vals.find(id) != _live_params.param_vals.end())
+    {
+        return _live_params.param_vals[id]; 
+    } else {
+        return std::monostate();
+    }
+}
+
 std::unordered_map<std::string, Configurable::ParamTypes> Configurable::get_params_map()
 {
     std::unique_lock lk(_live_params.mtx);
@@ -32,6 +43,9 @@ void Configurable::handle_live_param_update(const std::string &key, Configurable
     // TODO may want to handle this a little bit differently so we arent locking so much
     {
         std::unique_lock lk(_live_params.mtx);
+
+
+
         _live_params.param_vals[key] = param_val;
         param_update_handler_sig(_live_params.param_vals);
     }

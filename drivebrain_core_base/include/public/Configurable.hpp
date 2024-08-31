@@ -65,6 +65,8 @@ namespace core
 
             void handle_live_param_update(const std::string &key, ParamTypes param_val);
 
+            Configurable::ParamTypes get_cached_param(std::string id);
+
         protected:
             boost::signals2::signal<void(const std::unordered_map<std::string, ParamTypes> &)> param_update_handler_sig;
             virtual bool init() = 0;
