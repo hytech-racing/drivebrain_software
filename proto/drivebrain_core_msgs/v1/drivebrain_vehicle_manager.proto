@@ -1,5 +1,5 @@
 syntax = "proto3";
-package drivebrain_control;
+package ;
 
 message SpeedControlOut {
     float pos_torque_limit_nm = 1;

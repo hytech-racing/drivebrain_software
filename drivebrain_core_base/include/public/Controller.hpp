@@ -23,7 +23,6 @@ namespace control
     template <typename ControllerResult, typename ControllerInput>
     class Controller
     {
-        
     public:
         Controller() = default;
         virtual ControllerResult step_controller(const ControllerInput& in) = 0;
