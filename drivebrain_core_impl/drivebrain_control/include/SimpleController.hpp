@@ -26,7 +26,7 @@ public:
         float regen_torque_scale; 
     };
     SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
-
+    
     bool init();
     drivetrain_command step_controller(const mcu_pedal_readings& in) override;
 private:
