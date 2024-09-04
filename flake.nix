@@ -6,9 +6,6 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    devshell.url = "github:numtide/devshell";
-    devshell.inputs.nixpkgs.follows = "nixpkgs";
-
     nebs-packages.url = "github:RCMast3r/nebs_packages";
     nebs-packages.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -31,7 +28,7 @@
     data_acq.inputs.nix-proto.follows = "nix-proto";
     data_acq.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = { self, nixpkgs, flake-parts, devshell, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, ... }@inputs:
 
     flake-parts.lib.mkFlake { inherit inputs; }
       {
@@ -41,7 +38,6 @@
         ];
         imports = [
           inputs.flake-parts.flakeModules.easyOverlay
-          inputs.devshell.flakeModule
         ];
         perSystem = { config, pkgs, system, ... }:
           let
@@ -80,29 +76,12 @@
               inherit (config.packages) drivebrain_software;
             };
 
-            devshells.default = {
-              env = [ ];
-              commands = [
-                {
-                  name = "b";
-                  command = "cd $PRJ_ROOT && rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd $PRJ_ROOT";
-                }
-                {
-                  name = "bd";
-                  command = "cd $PRJ_ROOT && rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug && make -j && cd $PRJ_ROOT";
-                }
+            devShells.default = pkgs.mkShell rec {
+              name = "nix-devshell";
+              inputsFrom = [
+                drivebrain_software
               ];
-              packages = [
-                pkgs.openssl
-                pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
-                pkgs.gcc # this has to be specified because otherwise it uses the system's compiler and that can screw with things :eyes:
-                pkgs.nlohmann_json
-                pkgs.boost
-                pkgs.protobuf
-              ];
-              packagesFrom = [ drivebrain_software pkgs.foxglove-ws-protocol-cpp ];
             };
-
           };
       };
 
