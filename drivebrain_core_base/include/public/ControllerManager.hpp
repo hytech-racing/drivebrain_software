@@ -122,6 +122,8 @@ namespace control
     private:
         std::array<control::Controller *>, NumControllers > _controllers;
         size_t _current_controller_index = 0;
+        
+        float _max_switch_rpm, _max_torque_diff, _max_accel_switch_req;
     };
 }
 #include "TorqueControllerMux.tpp"
