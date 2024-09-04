@@ -38,8 +38,8 @@
 //   on what mode the desired controller wants the drivetrain to be in (speed / torque)
 
 // TODOs:
-// - [ ] implement handling for switching between controllers
-// - [ ] implement ability to switch between controllers
+// - [ ] implement handling for switching between controllers -> yoink logic from new tcmux
+// - [ ] implement function to pass in vehicle state to the active controller 
 
 
 // What I want to be able to do with the vehicle manager is be general about what controllers we are swapping between and evaluating during runtime.
