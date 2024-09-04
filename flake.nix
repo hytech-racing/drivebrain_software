@@ -82,6 +82,17 @@
                 drivebrain_software
               ];
             };
+            legacyPackages =
+              import nixpkgs {
+                inherit system;
+                overlays = [ 
+                  nebs-packages.overlays.default 
+                  easy_cmake.overlays.default 
+                  (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
+                ]
+                ++ data_acq.overlays.x86_64-linux
+                ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+              };
           };
       };
 
