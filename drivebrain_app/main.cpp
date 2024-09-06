@@ -74,7 +74,6 @@ int main()
                     tx_queue.deque.push_back(to_send);
                     tx_queue.cv.notify_all();
                 }
-
             } else {
                 std::cout << input_msg->GetTypeName() <<std::endl;
             }
