@@ -25,6 +25,8 @@ I think for q2, we can go with keeping the state estimation monolithic?
 - keep CASE, just new wrapper code for v1? 
 
 ## prototyping
+
+### ideas about manually implemented controllers vs generated controllers
 idea: if we have the ability to go both ways for having the ability to both:
  
 1. define/add inputs for a simulink model based on a .proto message
@@ -32,6 +34,7 @@ idea: if we have the ability to go both ways for having the ability to both:
 2. generate a .proto message from either inputs OR outputs of a simulink model
 
 and generated code for the data passing into and out of proto messages, then we can book-end the controllers and estimators. 
+
 
 ### release planning
 
@@ -43,10 +46,11 @@ alpha feature set ((start: 8/19) ~2 weeks, 16 days): -> basic control of car wit
 - [ ] basic controller library (7 days) (first pass I want to try out different types of regen handling)
     - [x] live parameter controller interface (2 days, 50%)
     - [x] simple controller business logic (1 day)
-    - [ ] vehicle manager structure (2 days)
-    - [ ] vehicle manager runtime (2 days)
+    - [ ] controller manager implementation (1 day)
+
+    - [ ] basic state estimator that can be sampled and manages state asynchronously (2 days)
     - [ ] hook in vehicle manager into the grpc server (1 day)
-    - [ ] grpc server interface for switching between controllers (1 day)
+    
 - [ ] CAN MCU driver library (4 days)
     - [x] DBC based parsing 
     - [x] async receiving and transmitting with Boost.Asio (2 days)
@@ -59,6 +63,8 @@ alpha feature set ((start: 8/19) ~2 weeks, 16 days): -> basic control of car wit
     - tied to making the DBC parser also able to handle enums
 
 beta feature set (1 week): -> existing controller on TCU with telemetry and recording 
+
+- [ ] grpc server interface for switching between controllers (1 day)
 - [ ] create the state estimation system that can hold multiple state estimators (2 days)
     - [ ] create a state of the car that can be updated by each of the drivers (1 day)
     - [ ] integrate the driver inputs into state estimator for creating a shared state (2 days)
