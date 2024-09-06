@@ -1,7 +1,8 @@
 
 #include <ControllerManager.hpp>
 
-bool controll::ControllerManager::init()
+template <typename ControllerType, size_t NumControllers>
+bool control::ControllerManager<ControllerType, NumControllers>::init()
 {
     auto max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
     auto max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
@@ -25,12 +26,14 @@ bool controll::ControllerManager::init()
     return true;
 }
 
-template <size_t NumControllers>
-control::ControllerManager::ControllerManagerStatus control::ControllerManager<NumControllers>::_can_switch_controller(const VehicleState &current_state,
-                                                                                                                       const ControllerOutput &previous_output,
-                                                                                                                       const ControllerOutput &next_controller_output)
+
+
+template <typename ControllerType, size_t NumControllers>
+core::control::ControllerManagerStatus control::ControllerManager<ControllerType, NumControllers>::_can_switch_controller(const core::VehicleState &current_state,
+                                                                                                                       const core::ControllerOutput &previous_output,
+                                                                                                                       const core::ControllerOutput &next_controller_output)
 {
-    using status_type = control::ControllerManager::ControllerManagerStatus;
+    using status_type = core::control::ControllerManagerStatus;
 
     bool speedPreventsChange = true;
     // Check if torque delta permits mode change
@@ -54,14 +57,14 @@ control::ControllerManager::ControllerManagerStatus control::ControllerManager<N
         }
     };
 
-    if (check_veh_vec_abs(current_state.current_rpms, _max_switch_rpm, true))
+    if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
         return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
     }
 
-    auto verify_controller_output = [this](const ControllerOutput &controller_output) -> bool
+    auto verify_controller_output = [this, &](const core::ControllerOutput &controller_output) -> bool
     {
-        if (const SpeedControlOut *pval = std::get_if<SpeedControlOut>(&previous_output.out))
+        if (const core::SpeedControlOut *pval = std::get_if<core::SpeedControlOut>(&controller_output.out))
         {
             if (check_veh_vec(pval->desired_rpms, _max_switch_rpm, true))
             {
@@ -75,7 +78,7 @@ control::ControllerManager::ControllerManagerStatus control::ControllerManager<N
                 return false;
             }
         }
-        else if (const TorqueControlOut *pval = std::get_if<TorqueControlOut>(&previous_output.out))
+        else if (const core::TorqueControlOut *pval = std::get_if<core::TorqueControlOut>(&controller_output.out))
         {
             if (check_veh_vec(pval->desired_torques_nm, _max_torque_switch, false))
             {

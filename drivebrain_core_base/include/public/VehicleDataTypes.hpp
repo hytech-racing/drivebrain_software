@@ -3,7 +3,7 @@
 #include <Utils.hpp>
 #include <variant>
 
-// TODO this will need a one-to-one protobuf message  
+// TODO this will need a one-to-one protobuf message
 namespace core
 {
 
@@ -19,7 +19,6 @@ namespace core
         DriverInput input;
         veh_vec<float> current_rpms;
         xyz_vec<float> current_body_vel_ms;
-        
     };
 
     struct SpeedControlOut
@@ -35,10 +34,22 @@ namespace core
     };
 
     // we will have both speed and torque control output controllers
-    struct ControllerOutput 
+    struct ControllerOutput
     {
         std::variant<SpeedControlOut, TorqueControlOut, std::monostate> out;
     };
+
+    namespace control
+    {
+        enum class ControllerManagerStatus
+        {
+            NO_ERROR = 0,
+            ERROR_CONTROLLER_INDEX_OUT_OF_RANGE = 1,
+            ERROR_SPEED_DIFF_TOO_HIGH = 2,
+            ERROR_TORQUE_DIFF_TOO_HIGH = 3,
+            ERROR_DRIVER_ON_PEDAL = 3
+        };
+    }
 
 }
 #endif // __VEHICLESTATE_H__

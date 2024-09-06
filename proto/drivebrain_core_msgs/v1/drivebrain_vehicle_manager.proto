@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ;
+package drivebrain_core_msgs;
 
 message SpeedControlOut {
     float pos_torque_limit_nm = 1;
