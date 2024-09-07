@@ -38,7 +38,7 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
     };
 
     _server->setHandlers(std::move(hdlrs));
-    _server->start("0.0.0.0", 8765);
+    _server->start("0.0.0.0", 5555);
 }
 
 foxglove::Parameter core::FoxgloveParameterServer::_get_foxglove_param(const std::string &set_name, core::common::Configurable::ParamTypes param)

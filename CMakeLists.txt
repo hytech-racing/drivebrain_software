@@ -28,7 +28,7 @@ include(create_package)
 #####################
 
 # drivebrain core library
-add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp)
+add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp drivebrain_core_base/src/StateEstimator.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/public>

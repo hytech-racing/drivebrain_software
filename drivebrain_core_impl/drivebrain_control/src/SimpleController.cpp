@@ -1,5 +1,6 @@
 #include <SimpleController.hpp>
 #include <variant>
+#include <VehicleDataTypes.hpp>
 
 void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
@@ -30,11 +31,11 @@ bool control::SimpleController::init()
     return true;
 }
 
-drivetrain_command control::SimpleController::step_controller(const mcu_pedal_readings &in)
+drivetrain_command control::SimpleController::step_controller(const core::VehicleState &in)
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
-    float accelRequest = (in.accel_percent_float() / 100.0) - (in.brake_percent_float() / 100.0);
+    float accelRequest = (in.input.requested_accel) - (in.input.requested_brake);
 
     float torqueRequest;
 

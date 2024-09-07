@@ -62,7 +62,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
     }
 
-    auto verify_controller_output = [this, &](const core::ControllerOutput &controller_output) -> bool
+    auto verify_controller_output = [this, &check_veh_vec](const core::ControllerOutput &controller_output) -> bool
     {
         if (const core::SpeedControlOut *pval = std::get_if<core::SpeedControlOut>(&controller_output.out))
         {
@@ -70,7 +70,6 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
             {
                 return true;
             }
-
             else if (check_veh_vec(pval->positive_torque_lim_nm, _max_torque_switch, false))
             {
                 return true;
@@ -92,7 +91,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     };
 
     bool currentControllerOutputPreventingSwitch = verify_controller_output(previous_output);
-    bool proposedControllerOutputPreventingSwitch = verify_controller_output(previous_output);
+    bool proposedControllerOutputPreventingSwitch = verify_controller_output(next_controller_output);
 
     // TODO add checking for both controller types and if we are switching between controller output types what that looks like
 
@@ -106,15 +105,15 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // check: make sure the torque setpoint is low enough
 
     // only if the torque delta is positive do we not want to switch to the new one
-    torqueDeltaPreventsModeChange = (desired_controller_out.torqueSetpoints[i] - previous_controller_command.torqueSetpoints[i]) > max_torque_pos_change_delta_;
-    if (speedPreventsChange)
-    {
-        return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
-    }
-    if (torqueDeltaPreventsModeChange)
-    {
-        return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
-    }
+    // torqueDeltaPreventsModeChange = (desired_controller_out.torqueSetpoints[i] - previous_controller_command.torqueSetpoints[i]) > max_torque_pos_change_delta_;
+    // if (speedPreventsChange)
+    // {
+    //     return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+    // }
+    // if (torqueDeltaPreventsModeChange)
+    // {
+    //     return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
+    // }
 
     return status_type::NO_ERROR;
 }

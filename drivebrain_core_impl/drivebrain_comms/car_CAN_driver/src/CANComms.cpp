@@ -352,6 +352,7 @@ void comms::CANDriver::_handle_send_msg_from_queue()
             auto can_msg = _get_CAN_msg(msg);
             if(can_msg)
             {
+                // std::cout << "sending" <<std::endl;
                 _send_message(*can_msg);
             }
             
