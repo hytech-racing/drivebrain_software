@@ -5,11 +5,28 @@
 void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
     // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache
+    if(auto pval = std::get_if<float>(&new_param_map.at("max_torque")))
+    {
+        _config.max_torque = *pval;
+        std::cout << "setting new max torque " << _config.max_torque <<std::endl;
+    }
+    
     if(auto pval = std::get_if<float>(&new_param_map.at("max_regen_torque")))
     {
         _config.max_reg_torque = *pval;
         std::cout << "setting new max regen torque " << _config.max_reg_torque <<std::endl;
     }
+    if(auto pval = std::get_if<float>(&new_param_map.at("rear_torque_scale")))
+    {
+        _config.rear_torque_scale = *pval;
+        std::cout << "setting new rear_torque_scale " << _config.rear_torque_scale <<std::endl;
+    }
+    if(auto pval = std::get_if<float>(&new_param_map.at("regen_torque_scale")))
+    {
+        _config.regen_torque_scale = *pval;
+        std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale <<std::endl;
+    }
+    
 }
 
 bool control::SimpleController::init()
@@ -31,7 +48,7 @@ bool control::SimpleController::init()
     return true;
 }
 
-drivetrain_command control::SimpleController::step_controller(const core::VehicleState &in)
+std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> control::SimpleController::step_controller(const core::VehicleState &in)
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
@@ -39,26 +56,37 @@ drivetrain_command control::SimpleController::step_controller(const core::Vehicl
 
     float torqueRequest;
 
-    drivetrain_command cmd_out;
+    drivebrain_torque_lim_input torque_cmd_out;
+    drivebrain_speed_set_input speed_cmd_out;
     if (accelRequest >= 0.0)
     {
         // Positive torque request
         torqueRequest = ((float)accelRequest) * _config.max_torque;
+        
+        speed_cmd_out.set_drivebrain_set_rpm_fl(20000);
+        speed_cmd_out.set_drivebrain_set_rpm_fr(20000);
+        speed_cmd_out.set_drivebrain_set_rpm_rl(20000);
+        speed_cmd_out.set_drivebrain_set_rpm_rr(20000);
 
-        cmd_out.set_drivetrain_traj_torque_lim_fl((torqueRequest * (2.0 - _config.rear_torque_scale)));
-        cmd_out.set_drivetrain_traj_torque_lim_fr((torqueRequest * (2.0 - _config.rear_torque_scale)));
-        cmd_out.set_drivetrain_traj_torque_lim_rl((torqueRequest * _config.rear_torque_scale));
-        cmd_out.set_drivetrain_traj_torque_lim_rr((torqueRequest * _config.rear_torque_scale));
+        torque_cmd_out.set_drivebrain_torque_fl((torqueRequest * (2.0 - _config.rear_torque_scale)));
+        torque_cmd_out.set_drivebrain_torque_fr((torqueRequest * (2.0 - _config.rear_torque_scale)));
+        torque_cmd_out.set_drivebrain_torque_rl((torqueRequest * _config.rear_torque_scale));
+        torque_cmd_out.set_drivebrain_torque_rr((torqueRequest * _config.rear_torque_scale));
     }
     else
     {
         // Negative torque request
         torqueRequest = _config.max_reg_torque * accelRequest * -1.0;
-        cmd_out.set_drivetrain_traj_torque_lim_fl((torqueRequest * (2.0 - _config.regen_torque_scale)));
-        cmd_out.set_drivetrain_traj_torque_lim_fr((torqueRequest * (2.0 - _config.regen_torque_scale)));
-        cmd_out.set_drivetrain_traj_torque_lim_rl((torqueRequest * _config.regen_torque_scale));
-        cmd_out.set_drivetrain_traj_torque_lim_rr((torqueRequest * _config.regen_torque_scale));
+        speed_cmd_out.set_drivebrain_set_rpm_fl(0);
+        speed_cmd_out.set_drivebrain_set_rpm_fr(0);
+        speed_cmd_out.set_drivebrain_set_rpm_rl(0);
+        speed_cmd_out.set_drivebrain_set_rpm_rr(0);
+
+        torque_cmd_out.set_drivebrain_torque_fl((torqueRequest * (2.0 - _config.regen_torque_scale)));
+        torque_cmd_out.set_drivebrain_torque_fr((torqueRequest * (2.0 - _config.regen_torque_scale)));
+        torque_cmd_out.set_drivebrain_torque_rl((torqueRequest * _config.regen_torque_scale));
+        torque_cmd_out.set_drivebrain_torque_rr((torqueRequest * _config.regen_torque_scale));
     }
 
-    return cmd_out;
+    return {torque_cmd_out, speed_cmd_out};
 }

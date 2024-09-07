@@ -3,6 +3,7 @@
 #include <Configurable.hpp>
 #include <hytech.pb.h>
 #include <VehicleDataTypes.hpp>
+#include <utility>
 // ABOUT: this controller is an implementation of mode 0
 
 // this controller will be reactionary for now 
@@ -10,7 +11,7 @@ namespace control
 {
 
 // TODO make the output CAN message for the drivetrain, rpms telem is just a standin for now
-class SimpleController : Controller<drivetrain_command, core::VehicleState>, public core::common::Configurable
+class SimpleController : Controller<std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input>, core::VehicleState>, public core::common::Configurable
 {
 public:
     
@@ -27,9 +28,9 @@ public:
         float regen_torque_scale; 
     };
     SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
-    float get_dt_sec() {return 0.025;} 
+    float get_dt_sec() {return 0.01;} 
     bool init();
-    drivetrain_command step_controller(const core::VehicleState &in) override;
+    std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> step_controller(const core::VehicleState &in) override;
 private:
     void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
     config _config;

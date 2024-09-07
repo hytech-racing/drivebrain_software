@@ -28,7 +28,8 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
 bool comms::CANDriver::init()
 {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
-    auto dbc_file_path = get_parameter_value<std::string>("path_to_dbc");
+    
+    auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
 
     if (!(canbus_device && dbc_file_path))
     {
@@ -183,7 +184,8 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
                 reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
                 break;
             default:
-                std::cout << "warning, no valid type detected" << std::endl;
+                break;
+                // std::cout << "warning, no valid type detected" << std::endl;
             }
         }
     }

@@ -15,6 +15,7 @@
 
 #include <boost/asio.hpp>
 #include <memory>
+#include <optional>
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -22,7 +23,7 @@
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
 
-int main()
+int main(int argc, char* argv[])
 {
 
     boost::asio::io_context io_context;
@@ -30,9 +31,15 @@ int main()
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
     std::vector<core::common::Configurable *> configurable_components;
 
-    core::JsonFileHandler config("config/test_config/can_driver.json");
-
-    comms::CANDriver driver(config, tx_queue, rx_queue, io_context);
+    std::string param_path = "config/test_config/can_driver.json";
+    std::optional<std::string> dbc_path = std::nullopt;
+    if(argc == 3)
+    {
+        param_path = argv[1];
+        dbc_path = argv[2];
+    }
+    core::JsonFileHandler config(param_path);
+    comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
     core::StateEstimator state_estimator(rx_queue);
 
     std::cout << "driver init " << driver.init() << std::endl;
@@ -55,7 +62,9 @@ int main()
 
     std::thread process_thread([&rx_queue, &tx_queue, &controller, &state_estimator]()
                                {
-        auto to_send = std::make_shared<drivetrain_command>();
+        auto torque_to_send = std::make_shared<drivebrain_torque_lim_input>();
+        auto speed_to_send = std::make_shared<drivebrain_speed_set_input>();
+
         auto loop_time = controller.get_dt_sec();
         auto loop_time_micros = (int)(loop_time*1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
@@ -65,12 +74,17 @@ int main()
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
             if(state_and_validity.second)
             {
-                std::cout <<"valid" <<std::endl;
                 auto out = controller.step_controller(state_and_validity.first);
-                to_send->CopyFrom(out);
+                torque_to_send->CopyFrom(out.first);
                 {
                     std::unique_lock lk(tx_queue.mtx);
-                    tx_queue.deque.push_back(to_send);
+                    tx_queue.deque.push_back(torque_to_send);
+                    tx_queue.cv.notify_all();
+                }
+                speed_to_send->CopyFrom(out.second);
+                {
+                    std::unique_lock lk(tx_queue.mtx);
+                    tx_queue.deque.push_back(speed_to_send);
                     tx_queue.cv.notify_all();
                 }
             }
@@ -81,35 +95,6 @@ int main()
 
             std::this_thread::sleep_for(loop_chrono_time - elapsed);
         } });
-    // std::thread receive_thread([&rx_queue, &tx_queue, &controller]()
-    // {
-    //     auto to_send = std::make_shared<drivetrain_command>();
-    //     while(true)
-    //     {
-    //         std::shared_ptr<google::protobuf::Message> input_msg;
-    //         {
-    //             std::unique_lock lk(rx_queue.mtx);
-    //             rx_queue.cv.wait(lk, [&rx_queue]()
-    //                                     { return !rx_queue.deque.empty(); });
-
-    //             auto m = rx_queue.deque.back();
-    //             input_msg = m;
-    //             rx_queue.deque.pop_back();
-    //         }
-    //         if(input_msg->GetTypeName() == "mcu_pedal_readings")
-    //         {
-    //             auto in_msg = std::static_pointer_cast<mcu_pedal_readings>(input_msg);
-    //             to_send->CopyFrom(controller.step_controller(*in_msg));
-    //             {
-    //                 std::unique_lock lk(tx_queue.mtx);
-    //                 tx_queue.deque.push_back(to_send);
-    //                 tx_queue.cv.notify_all();
-    //             }
-    //         } else {
-    //             std::cout << input_msg->GetTypeName() <<std::endl;
-    //         }
-    //     }
-    // });
 
     while (true)
     {
