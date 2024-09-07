@@ -29,7 +29,7 @@
     data_acq.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, ... }@inputs:
-
+    
     flake-parts.lib.mkFlake { inherit inputs; }
       {
         systems = [
@@ -72,10 +72,10 @@
               config = { };
             };
             packages.default = drivebrain_software;
+            packages.drivebrain_software = drivebrain_software;
             overlayAttrs = {
               inherit (config.packages) drivebrain_software;
             };
-
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
               shellHook =
