@@ -42,39 +42,38 @@ and generated code for the data passing into and out of proto messages, then we 
 - verified that we can have both drivebrain and the data_acq bound to the same CAN device and receiving / talking over it
     - due to this, we dont need to have the live telem in the alpha since we will only be using CAN still for this release for all comms
 
-alpha feature set ((start: 8/19) ~2 weeks, 16 days): -> basic control of car with TCU
-- [ ] basic controller library (7 days) (first pass I want to try out different types of regen handling)
+- [x] alpha feature set ((start: 8/19) ~2 weeks, 16 days): -> basic control of car with TCU
+- [x] basic controller library (7 days) (first pass I want to try out different types of regen handling)
     - [x] live parameter controller interface (2 days, 50%)
     - [x] simple controller business logic (1 day)
-    - [ ] controller manager implementation (1 day)
-
-    - [ ] basic state estimator that can be sampled and manages state asynchronously (2 days)
-    - [ ] hook in vehicle manager into the grpc server (1 day)
-    
-- [ ] CAN MCU driver library (4 days)
+    - [x] basic state estimator that can be sampled and manages state (2 days)
+- [x] create the state estimation system that can hold multiple state estimators (2 days)
+    - [x] create a state of the car that can be updated by each of the drivers (1 day)
+    - [x] integrate the driver inputs into state estimator for creating a shared state (2 days)
+- [x] CAN MCU driver library (4 days)
     - [x] DBC based parsing 
     - [x] async receiving and transmitting with Boost.Asio (2 days)
     - [x] protobuf message packing (2 days)
     - [x] simple internal communication with basic controller (1 day)
-    - [ ] make the DBC parser also be able to handle enums
 - [x] application runtime (1 day)
 - [x] foxglove live parameter server and websocket integration (1 day)
+
+beta feature set (1 week): -> existing controller on TCU with telemetry and recording
 - [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
     - tied to making the DBC parser also able to handle enums
-
-beta feature set (1 week): -> existing controller on TCU with telemetry and recording 
-
+- [ ] CAN driver improvements (1 day)
+    - [ ] make the DBC parser also be able to handle enums
+- [ ] controller manager implementation (2 days)
+    - [ ] be able to switch between controllers in a safe manor while driving (2 days, 50%)
+    - [ ] hook into the grpc server through some method for handling the switch
 - [ ] grpc server interface for switching between controllers (1 day)
-- [ ] create the state estimation system that can hold multiple state estimators (2 days)
-    - [ ] create a state of the car that can be updated by each of the drivers (1 day)
-    - [ ] integrate the driver inputs into state estimator for creating a shared state (2 days)
 - [ ] vectornav UART driver integration that adds new messages to the message bus (1 week)
-- [ ] CASE integrated into controller manager with existing integration methods (2 weeks)
-    - [ ] break up CASE into controller and state estimation systems (1 week)
+- [ ] add CASE to controllers available to switch to (3 days)
 - [ ] implement MCAP recording of all messages between components ()
     - [ ] driver inputs into state estimator
     - [ ] state estimation output
     - [ ] controller output to the car
+- [ ] implement live telemetry of all messages 
 
 v1 feature set (3 weeks): -> 
 - [ ] LQR based controller integrated onto car for torque vectoring (2 weeks)
