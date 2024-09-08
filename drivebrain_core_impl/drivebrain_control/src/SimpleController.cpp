@@ -26,6 +26,11 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
         _config.regen_torque_scale = *pval;
         std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale <<std::endl;
     }
+    if(auto pval = std::get_if<float>(&new_param_map.at("positive_speed_set")))
+    {
+        _config.positive_speed_set = *pval;
+        std::cout << "setting new positive_speed_set " << _config.positive_speed_set <<std::endl;
+    }
     
 }
 
@@ -35,13 +40,13 @@ bool control::SimpleController::init()
     auto max_regen_torque = get_live_parameter<float>("max_regen_torque");
     auto rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
     auto regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
-
-    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale))
+    auto positive_speed_set = get_live_parameter<float>("positive_speed_set");
+    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
     {
         return false;
     }
 
-    _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale};
+    _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set};
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this,  std::placeholders::_1));
     
@@ -58,15 +63,17 @@ std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> control::Simp
 
     drivebrain_torque_lim_input torque_cmd_out;
     drivebrain_speed_set_input speed_cmd_out;
+    
     if (accelRequest >= 0.0)
     {
         // Positive torque request
         torqueRequest = ((float)accelRequest) * _config.max_torque;
         
-        speed_cmd_out.set_drivebrain_set_rpm_fl(20000);
-        speed_cmd_out.set_drivebrain_set_rpm_fr(20000);
-        speed_cmd_out.set_drivebrain_set_rpm_rl(20000);
-        speed_cmd_out.set_drivebrain_set_rpm_rr(20000);
+        auto max_rpm = _config.positive_speed_set * constants::METERS_PER_SECOND_TO_RPM;
+        speed_cmd_out.set_drivebrain_set_rpm_fl(max_rpm);
+        speed_cmd_out.set_drivebrain_set_rpm_fr(max_rpm);
+        speed_cmd_out.set_drivebrain_set_rpm_rl(max_rpm);
+        speed_cmd_out.set_drivebrain_set_rpm_rr(max_rpm);
 
         torque_cmd_out.set_drivebrain_torque_fl((torqueRequest * (2.0 - _config.rear_torque_scale)));
         torque_cmd_out.set_drivebrain_torque_fr((torqueRequest * (2.0 - _config.rear_torque_scale)));

@@ -26,6 +26,7 @@ public:
         float max_reg_torque;
         float rear_torque_scale;  
         float regen_torque_scale; 
+        float positive_speed_set;
     };
     SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
     float get_dt_sec() {return 0.01;} 
