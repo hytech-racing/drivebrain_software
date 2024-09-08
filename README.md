@@ -58,7 +58,7 @@ and generated code for the data passing into and out of proto messages, then we 
 - [x] application runtime (1 day)
 - [x] foxglove live parameter server and websocket integration (1 day)
 
-beta feature set (): -> existing controller on TCU with telemetry and recording
+beta feature set (4 weeks): -> existing controller on TCU with telemetry and recording
 
 (WEEK 1):
 - [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
