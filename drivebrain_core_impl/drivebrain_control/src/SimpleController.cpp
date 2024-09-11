@@ -1,50 +1,63 @@
 #include <SimpleController.hpp>
+#include <variant>
+
+void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
+{
+    // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache
+    if(auto pval = std::get_if<float>(&new_param_map.at("max_regen_torque")))
+    {
+        _config.max_reg_torque = *pval;
+        std::cout << "setting new max regen torque " << _config.max_reg_torque <<std::endl;
+    }
+}
 
 bool control::SimpleController::init()
 {
-    auto max_torque = get_parameter_value<float>("max_torque");
-    auto max_regen_torque = get_parameter_value<float>("max_regen_torque");
-    // auto torque_balance = get_parameter_value<float>("torque_balance");
-    if(! (max_torque && max_regen_torque))
+    auto max_torque = get_live_parameter<float>("max_torque");
+    auto max_regen_torque = get_live_parameter<float>("max_regen_torque");
+    auto rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
+    auto regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
+
+    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale))
     {
         return false;
     }
 
-    _config= {*max_torque, *max_regen_torque};
+    _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale};
+
+    param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this,  std::placeholders::_1));
+    
     return true;
 }
 
-drivetrain_command control::SimpleController::step_controller(const mcu_pedal_readings& in)
+drivetrain_command control::SimpleController::step_controller(const mcu_pedal_readings &in)
 {
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
-    float accelRequest = (in.accel_percent_float() / 100.0) - (in.brake_percent_float()/100.0);
-    // std::cout <<accelRequest <<std::endl;
+    float accelRequest = (in.accel_percent_float() / 100.0) - (in.brake_percent_float() / 100.0);
+
     float torqueRequest;
 
-    
     drivetrain_command cmd_out;
     if (accelRequest >= 0.0)
     {
         // Positive torque request
         torqueRequest = ((float)accelRequest) * _config.max_torque;
 
-
-        cmd_out.set_drivetrain_traj_torque_lim_fl(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_fr(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_rl(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_rr(torqueRequest);
-
+        cmd_out.set_drivetrain_traj_torque_lim_fl((torqueRequest * (2.0 - _config.rear_torque_scale)));
+        cmd_out.set_drivetrain_traj_torque_lim_fr((torqueRequest * (2.0 - _config.rear_torque_scale)));
+        cmd_out.set_drivetrain_traj_torque_lim_rl((torqueRequest * _config.rear_torque_scale));
+        cmd_out.set_drivetrain_traj_torque_lim_rr((torqueRequest * _config.rear_torque_scale));
     }
     else
     {
         // Negative torque request
         torqueRequest = _config.max_reg_torque * accelRequest * -1.0;
-        cmd_out.set_drivetrain_traj_torque_lim_fl(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_fr(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_rl(torqueRequest);
-        cmd_out.set_drivetrain_traj_torque_lim_rr(torqueRequest);
+        cmd_out.set_drivetrain_traj_torque_lim_fl((torqueRequest * (2.0 - _config.regen_torque_scale)));
+        cmd_out.set_drivetrain_traj_torque_lim_fr((torqueRequest * (2.0 - _config.regen_torque_scale)));
+        cmd_out.set_drivetrain_traj_torque_lim_rl((torqueRequest * _config.regen_torque_scale));
+        cmd_out.set_drivetrain_traj_torque_lim_rr((torqueRequest * _config.regen_torque_scale));
     }
-    // std::cout << "tq req "<<torqueRequest <<std::endl;
+
     return cmd_out;
 }

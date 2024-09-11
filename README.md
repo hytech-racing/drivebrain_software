@@ -29,22 +29,27 @@ idea: if we have the ability to go both ways for having the ability to both:
 and generated code for the data passing into and out of proto messages, then we can book-end the controllers and estimators. 
 
 ### release planning
+
+#### release notes:
+- verified that we can have both drivebrain and the data_acq bound to the same CAN device and receiving / talking over it
+    - due to this, we dont need to have the live telem in the alpha since we will only be using CAN still for this release for all comms
+
 alpha feature set (~2 weeks, 16 days):
-- [ ] basic controller library (9 days) (first pass I want to try out different types of regen handling)
-    - [ ] generic controller (2 days)
-    - [ ] live parameter controller interface (2 days, 50%)
+- [ ] basic controller library (7 days) (first pass I want to try out different types of regen handling)
+    - [x] live parameter controller interface (2 days, 50%)
+    - [x] simple controller business logic (1 day)
     - [ ] controller manager structure (2 days)
     - [ ] controller manager runtime (2 days)
-    - [ ] controller business logic (1 day)
 - [ ] CAN MCU driver library (4 days)
     - [x] DBC based parsing 
-    - [ ] async receiving and transmitting with Boost.Asio (2 days)
-    - [ ] protobuf message packing (2 days, 50% done, 1 day left)
-    - [ ] simple internal communication with basic controller (1 day)
-- [ ] application runtime (1 day)
-- [ ] live telem integration with foxglove websocket (1 day)
-- [ ] foxglove live parameter server and websocket integration (1 day)
-
+    - [x] async receiving and transmitting with Boost.Asio (2 days)
+    - [x] protobuf message packing (2 days)
+    - [x] simple internal communication with basic controller (1 day)
+    - [ ] make the DBC parser also be able to handle enums 
+- [x] application runtime (1 day)
+- [x] foxglove live parameter server and websocket integration (1 day)
+- [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
+    - tied to making the DBC parser also able to handle enums
 beta feature set (1 week):
 - [ ] vectornav UART driver integration
 - [ ] CASE integrated into controller manager with existing integration methods (1 day)

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -35,6 +36,10 @@ int main()
     hdlrs.parameterRequestHandler = [&](const std::vector<std::string> &param_names, const std::optional<std::string> &request_id,
                                         foxglove::ConnHandle clientHandle)
     {
+        for (const auto &name : param_names)
+        {
+            std::cout << name <<std::endl;
+        }
         server->publishParameterValues(clientHandle, {test_param}, request_id);
     };
 

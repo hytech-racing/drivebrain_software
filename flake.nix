@@ -1,5 +1,5 @@
 {
-  description = "my packages. im tired of making new repos for nix packages and im too lazy to push em up to nixpkgs";
+  description = "drivebrain flake";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 
@@ -96,6 +96,7 @@
                 pkgs.openssl
                 pkgs.abseil-cpp # idk wtf is going on but for some reason this is not propagating from protobuf, maybe its my nix version ? (2.20)
                 pkgs.gcc # this has to be specified because otherwise it uses the system's compiler and that can screw with things :eyes:
+                pkgs.glibc
                 pkgs.nlohmann_json
                 pkgs.boost
                 pkgs.protobuf
