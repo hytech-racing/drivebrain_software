@@ -61,26 +61,29 @@ and generated code for the data passing into and out of proto messages, then we 
 beta feature set (4 weeks): -> existing controller on TCU with telemetry and recording
 
 (WEEK 1):
+- [ ] switch to using ethernet comms for comms between drivebrain and teensy (2 days)
 - [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
     - tied to making the DBC parser also able to handle enums
 - [ ] CAN driver improvements (1 day)
     - [ ] make the DBC parser also be able to handle enums
+
+(WEEK 2):
+- [ ] grpc server interface for switching between controllers (1 day)
 - [ ] controller manager implementation (4 days)
     - [ ] be able to switch between controllers in a safe manor while driving (2 days, 50% done)
     - [ ] hook into the grpc server through some method for handling the switch (2 days)
-- [ ] grpc server interface for switching between controllers (1 day)
 
-(WEEK 2)
+(WEEK 3)
 - [ ] vectornav UART driver integration that adds new messages to the message bus (1 week)
 
-(WEEK 3):
+(WEEK 4):
 - [ ] implement MCAP recording of all messages between components (1 week)
     - [ ] implement MCAP recording componenet (3 days) 
     - [ ] driver inputs into state estimator (1 day)
     - [ ] state estimation output (1 day)
     - [ ] controller output to the car (1 day)
 
-(WEEK 4):
+(WEEK 5):
 - [ ] add CASE to controllers available to switch to (3 days)
 - [ ] implement live telemetry of all messages (4 days)
     - [ ] add to the foxglove server interface the ability to live output protobuf messages (2 days)

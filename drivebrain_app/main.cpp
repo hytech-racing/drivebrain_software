@@ -2,6 +2,7 @@
 #include <CANComms.hpp>
 #include <SimpleController.hpp>
 #include <StateEstimator.hpp>
+#include <MCUETHComms.hpp>
 
 #include <DrivebrainBase.hpp>
 #include <param_server.hpp>
@@ -23,29 +24,32 @@
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 
     boost::asio::io_context io_context;
+    auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
     std::vector<core::common::Configurable *> configurable_components;
 
     std::string param_path = "config/test_config/can_driver.json";
     std::optional<std::string> dbc_path = std::nullopt;
-    if(argc == 3)
+    if (argc == 3)
     {
         param_path = argv[1];
         dbc_path = argv[2];
     }
     core::JsonFileHandler config(param_path);
-    comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
-    core::StateEstimator state_estimator(rx_queue);
+    comms::CANDriver driver(config, logger,tx_queue, rx_queue, io_context, dbc_path);
+    comms::MCUETHComms eth_driver(io_context, 12411, 12412);
+
+    core::StateEstimator state_estimator(logger);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
 
-    control::SimpleController controller(config);
+    control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
 
     auto param_server = core::FoxgloveParameterServer(configurable_components);
@@ -87,6 +91,7 @@ int main(int argc, char* argv[])
                     tx_queue.deque.push_back(speed_to_send);
                     tx_queue.cv.notify_all();
                 }
+                
             }
             auto end_time = std::chrono::high_resolution_clock::now();
 
@@ -94,6 +99,7 @@ int main(int argc, char* argv[])
                 std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 
             std::this_thread::sleep_for(loop_chrono_time - elapsed);
+            
         } });
 
     while (true)

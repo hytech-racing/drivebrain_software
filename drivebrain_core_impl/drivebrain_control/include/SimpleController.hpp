@@ -1,6 +1,7 @@
 #pragma once
 #include <Controller.hpp>
 #include <Configurable.hpp>
+#include <Logger.hpp>
 #include <hytech.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
@@ -28,7 +29,7 @@ public:
         float regen_torque_scale; 
         float positive_speed_set;
     };
-    SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
+    SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
     float get_dt_sec() {return 0.01;} 
     bool init();
     std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> step_controller(const core::VehicleState &in) override;

@@ -2,6 +2,7 @@
 // drivebrain includes
 #include <Configurable.hpp>
 #include <DriverBus.hpp>
+#include <Logger.hpp>
 
 #include <hytech.pb.h>
 
@@ -64,10 +65,11 @@ namespace comms
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path) : 
-            Configurable(json_file_handler, "CANDriver"),
+        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path) : 
+            Configurable(logger, json_file_handler, "CANDriver"),
+            _logger(logger),
             _input_deque_ref(in_deq),
-            _output_deque_ref(out_deq), 
+            _output_deque_ref(out_deq),
             _socket(io_context),
             _dbc_path(dbc_path)
         {
@@ -102,6 +104,7 @@ namespace comms
         static std::string _to_lowercase(std::string s);
 
     private:
+        core::Logger& _logger;
         deqtype &_input_deque_ref;
         deqtype &_output_deque_ref;
 

@@ -28,7 +28,11 @@ include(create_package)
 #####################
 
 # drivebrain core library
-add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp drivebrain_core_base/src/StateEstimator.cpp)
+add_library(drivebrain_core SHARED 
+    drivebrain_core_base/src/JsonFileHandler.cpp 
+    drivebrain_core_base/src/Configurable.cpp 
+    drivebrain_core_base/src/StateEstimator.cpp
+    drivebrain_core_base/src/Logger.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/public>
@@ -76,6 +80,19 @@ target_link_libraries(CAN_driver PUBLIC
     dbcppp::dbcppp
 )
 make_cmake_package(CAN_driver drivebrain)
+
+add_library(ETH_driver SHARED drivebrain_core_impl/drivebrain_comms/car_ETH_driver/src/MCUETHComms.cpp)
+target_include_directories(ETH_driver PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>    
+)
+
+target_link_libraries(ETH_driver PUBLIC 
+    drivebrain_core
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    protobuf::libprotobuf
+)
+make_cmake_package(ETH_driver drivebrain)
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
@@ -127,6 +144,7 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     CAN_driver
     foxglove_param_server
+    ETH_driver
 )
 
 include(GNUInstallDirs)
