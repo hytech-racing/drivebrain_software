@@ -62,10 +62,7 @@ beta feature set (4 weeks): -> existing controller on TCU with telemetry and rec
 
 (WEEK 1):
 - [ ] switch to using ethernet comms for comms between drivebrain and teensy (2 days)
-- [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
-    - tied to making the DBC parser also able to handle enums
-- [ ] CAN driver improvements (1 day)
-    - [ ] make the DBC parser also be able to handle enums
+- [ ] vectornav UART driver integration that adds new messages to the message bus (1 week)
 
 (WEEK 2):
 - [ ] grpc server interface for switching between controllers (1 day)
@@ -74,7 +71,10 @@ beta feature set (4 weeks): -> existing controller on TCU with telemetry and rec
     - [ ] hook into the grpc server through some method for handling the switch (2 days)
 
 (WEEK 3)
-- [ ] vectornav UART driver integration that adds new messages to the message bus (1 week)
+- [ ] improve protobuf generation from DBC by supporting enums properly (1 day)
+    - tied to making the DBC parser also able to handle enums
+- [ ] CAN driver improvements (1 day)
+    - [ ] make the DBC parser also be able to handle enums
 
 (WEEK 4):
 - [ ] implement MCAP recording of all messages between components (1 week)
