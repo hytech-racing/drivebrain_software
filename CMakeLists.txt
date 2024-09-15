@@ -7,7 +7,7 @@ project(drivebrain_software LANGUAGES CXX C)
 
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
-
+find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
@@ -16,6 +16,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
+
 
 # custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
@@ -47,7 +48,14 @@ target_include_directories(drivebrain_core PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_base/include/private>    
 )
 
-target_link_libraries(drivebrain_core PUBLIC nlohmann_json::nlohmann_json Boost::boost Boost::system)
+target_link_libraries(drivebrain_core PUBLIC 
+    nlohmann_json::nlohmann_json 
+    Boost::boost 
+    Boost::system 
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+)
+
 make_cmake_package(drivebrain_core drivebrain)
 
 # foxglove parameter server interface
@@ -90,6 +98,7 @@ target_include_directories(ETH_driver PUBLIC
 target_link_libraries(ETH_driver PUBLIC 
     drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
 )
 make_cmake_package(ETH_driver drivebrain)
@@ -137,6 +146,8 @@ make_cmake_package(drivebrain_control drivebrain)
 ###                   ###
 ### system executable ###
 ###                   ###
+
+add_executable(mcu_standin test/test_mcu.cpp)
 add_executable(alpha_build drivebrain_app/main.cpp)
 
 target_link_libraries(alpha_build PUBLIC
@@ -145,6 +156,11 @@ target_link_libraries(alpha_build PUBLIC
     CAN_driver
     foxglove_param_server
     ETH_driver
+)
+
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
 )
 
 include(GNUInstallDirs)

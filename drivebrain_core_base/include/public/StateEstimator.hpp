@@ -46,7 +46,6 @@ namespace core
         StateEstimator(core::Logger &shared_logger) : _logger(shared_logger)
         {
             _vehicle_state = {};
-
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
             _timestamp_array = {zero_start_time, zero_start_time, zero_start_time};

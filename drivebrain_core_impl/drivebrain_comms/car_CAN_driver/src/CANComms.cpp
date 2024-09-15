@@ -220,7 +220,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
                 // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
             }
         }
-
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
         return msg_to_populate;
     }

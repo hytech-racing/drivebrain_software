@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
         dbc_path = argv[2];
     }
     core::JsonFileHandler config(param_path);
-    comms::CANDriver driver(config, logger,tx_queue, rx_queue, io_context, dbc_path);
-    comms::MCUETHComms eth_driver(io_context, 12411, 12412);
-
+    comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
+    
     core::StateEstimator state_estimator(logger);
+    comms::MCUETHComms eth_driver(logger, state_estimator, io_context, 12411, 12412);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         auto speed_to_send = std::make_shared<drivebrain_speed_set_input>();
 
         auto loop_time = controller.get_dt_sec();
-        auto loop_time_micros = (int)(loop_time*1000000.0f);
+        auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(true)
         {
