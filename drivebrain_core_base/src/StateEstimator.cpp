@@ -18,40 +18,6 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_rpms = rpms;
         }
     }
-    // if( message->GetTypeName() == "mcu_pedal_readings")
-    // {
-    //     auto in_msg = std::static_pointer_cast<mcu_pedal_readings>(message);
-    //     core::DriverInput input = { (in_msg->accel_percent_float() / 100.0f), (in_msg->brake_percent_float() / 100.0f)};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.input = input;
-    //     }
-    // }
-
-    // else if(message->GetTypeName() == "vn_vel")
-    // {
-    //     auto in_msg = std::static_pointer_cast<vn_vel>(message);
-    //     xyz_vec<float> body_vel = {in_msg->vn_body_vel_x(), in_msg->vn_body_vel_y(), in_msg->vn_body_vel_z()};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[1] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.current_body_vel_ms = body_vel;
-    //     }
-    // }
-
-    // else if(message->GetTypeName() == "drivetrain_rpms_telem")
-    // {
-    //     auto in_msg = std::static_pointer_cast<drivetrain_rpms_telem>(message);
-    //     veh_vec<float> rpms = {(float)in_msg->fl_motor_rpm(), (float)in_msg->fr_motor_rpm(), (float)in_msg->rl_motor_rpm(), (float)in_msg->rr_motor_rpm()};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[2] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.current_rpms = rpms;
-    //     }
-    // } else {
-    //     return;
-    // }
 }
 
 // TODO parameterize the timeout threshold
