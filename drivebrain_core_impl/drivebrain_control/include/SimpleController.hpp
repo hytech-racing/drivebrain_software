@@ -2,7 +2,7 @@
 #include <Controller.hpp>
 #include <Configurable.hpp>
 #include <Logger.hpp>
-#include <hytech.pb.h>
+#include <hytech_msgs.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
 // ABOUT: this controller is an implementation of mode 0
@@ -12,7 +12,7 @@ namespace control
 {
 
 // TODO make the output CAN message for the drivetrain, rpms telem is just a standin for now
-class SimpleController : Controller<std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input>, core::VehicleState>, public core::common::Configurable
+class SimpleController : Controller<hytech_msgs::MCUCommandData, core::VehicleState>, public core::common::Configurable
 {
 public:
     
@@ -32,7 +32,7 @@ public:
     SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
     float get_dt_sec() {return 0.01;} 
     bool init();
-    std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> step_controller(const core::VehicleState &in) override;
+    hytech_msgs::MCUCommandData step_controller(const core::VehicleState &in) override;
 private:
     void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
     config _config;

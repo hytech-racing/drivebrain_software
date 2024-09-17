@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
 project(drivebrain_software LANGUAGES CXX C)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
+
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
@@ -148,6 +152,8 @@ make_cmake_package(drivebrain_control drivebrain)
 ###                   ###
 
 add_executable(mcu_standin test/test_mcu.cpp)
+add_executable(mcu_test test/test_mcu_send.cpp)
+
 add_executable(alpha_build drivebrain_app/main.cpp)
 
 target_link_libraries(alpha_build PUBLIC
@@ -159,6 +165,10 @@ target_link_libraries(alpha_build PUBLIC
 )
 
 target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+target_link_libraries(mcu_test PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
 )

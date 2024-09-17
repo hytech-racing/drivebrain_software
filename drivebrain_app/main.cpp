@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> eth_tx_queue;
+
     std::vector<core::common::Configurable *> configurable_components;
 
     std::string param_path = "config/test_config/can_driver.json";
@@ -42,9 +44,9 @@ int main(int argc, char *argv[])
     }
     core::JsonFileHandler config(param_path);
     comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
-    
+
     core::StateEstimator state_estimator(logger);
-    comms::MCUETHComms eth_driver(logger, state_estimator, io_context, 12411, 12412);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
@@ -64,10 +66,9 @@ int main(int argc, char *argv[])
         std::cout <<"started io context thread" <<std::endl;
         io_context.run(); });
 
-    std::thread process_thread([&rx_queue, &tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
                                {
-        auto torque_to_send = std::make_shared<drivebrain_torque_lim_input>();
-        auto speed_to_send = std::make_shared<drivebrain_speed_set_input>();
+        auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
         auto loop_time = controller.get_dt_sec();
         auto loop_time_micros = (int)(loop_time * 1000000.0f);
@@ -78,20 +79,15 @@ int main(int argc, char *argv[])
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
             if(state_and_validity.second)
             {
+                // std::cout << state_and_validity.first.input.requested_accel <<std::endl;
                 auto out = controller.step_controller(state_and_validity.first);
-                torque_to_send->CopyFrom(out.first);
+                out_msg->CopyFrom(out);
                 {
-                    std::unique_lock lk(tx_queue.mtx);
-                    tx_queue.deque.push_back(torque_to_send);
-                    tx_queue.cv.notify_all();
+                    std::unique_lock lk(eth_tx_queue.mtx);
+                    eth_tx_queue.deque.push_back(out_msg);
+                    eth_tx_queue.cv.notify_all();
                 }
-                speed_to_send->CopyFrom(out.second);
-                {
-                    std::unique_lock lk(tx_queue.mtx);
-                    tx_queue.deque.push_back(speed_to_send);
-                    tx_queue.cv.notify_all();
-                }
-                
+            } else {
             }
             auto end_time = std::chrono::high_resolution_clock::now();
 

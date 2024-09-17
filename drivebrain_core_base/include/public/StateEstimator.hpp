@@ -48,7 +48,7 @@ namespace core
             _vehicle_state = {};
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
-            _timestamp_array = {zero_start_time, zero_start_time, zero_start_time};
+            _timestamp_array = {zero_start_time};
         }
         ~StateEstimator()  =default;
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
@@ -64,7 +64,7 @@ namespace core
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;
-        std::array<std::chrono::microseconds, 3> _timestamp_array;
+        std::array<std::chrono::microseconds, 1> _timestamp_array;
 
     };
 }

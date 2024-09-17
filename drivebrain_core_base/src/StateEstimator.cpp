@@ -1,19 +1,19 @@
 #include <StateEstimator.hpp>
 #include <chrono>
 #include <algorithm>
-#include <drivebrain_core_msgs/v1/drivebrain_vehicle_manager.pb.h>
-
+#include "hytech_msgs.pb.h"
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
-    if (message->GetTypeName() == "MCUData")
+    if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
     {
-        auto in_msg = std::static_pointer_cast<drivebrain_core_msgs::MCUData>(message);
-        core::DriverInput input = {(in_msg->accel_percent() / 100.0f), (in_msg->brake_percent() / 100.0f)};
+        auto in_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(message);
+        core::DriverInput input = {(in_msg->accel_percent()), (in_msg->brake_percent())};
         veh_vec<float> rpms = {in_msg->rpm_data().fl(), in_msg->rpm_data().fr(), in_msg->rpm_data().rl(), in_msg->rpm_data().rr()};
         {
             std::unique_lock lk(_state_mutex);
+            _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
             _vehicle_state.input = input;
             _vehicle_state.current_rpms = rpms;
         }
@@ -85,7 +85,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_is_valid = _validate_stamps(_timestamp_array);
     {
         std::unique_lock lk(_state_mutex);
-
+        
         return {_vehicle_state, state_is_valid};
     }
 }

@@ -10,23 +10,30 @@
 #include <boost/bind/bind.hpp>
 
 #include <google/protobuf/message.h>
-#include <drivebrain_core_msgs/v1/drivebrain_vehicle_manager.pb.h>
-
+#include "hytech_msgs.pb.h"
 #include <memory>
 
-// - [ ] boost asio socket for udp port comms
-// - [ ] handle receiving UDP messages on a specific port
-// - [ ] handle parsing of UDP message as protobuf message on the port
+// - [x] boost asio socket for udp port comms
+// - [x] handle receiving UDP messages on a specific port
+// - [x] handle parsing of UDP message as protobuf message on the port
+// TODO:
+// figure out if we want to keep the queue work flow for sending or if we want to 
+// instead use just a direct pointer / ref to a generic driver interface that we 
+// can give to the estimation / control thread to handle the sending of the control msgs
+
 namespace comms
 {
     class MCUETHComms
     {
     public:
+        using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
+
         MCUETHComms() = delete;
-        MCUETHComms(core::Logger &logger, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, uint16_t recv_port, uint16_t send_port);
-        void send_message(std::shared_ptr<google::protobuf::Message> msg_out);
+        MCUETHComms(core::Logger &logger, deqtype &in_deq, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
 
     private:
+        void _handle_send_msg_from_queue();
+        void _send_message(std::shared_ptr<google::protobuf::Message> msg_out);
         void _handle_receive(const boost::system::error_code &error, std::size_t size);
         void _start_receive();
         void _handle_send(std::array<uint8_t, 2048> /*message*/,
@@ -40,10 +47,13 @@ namespace comms
         std::array<uint8_t, 2048> _send_buffer;
 
         uint16_t _send_port;
+        std::string _send_ip;
         boost::asio::ip::udp::socket _socket;
-        boost::asio::ip::udp::socket _send_socket;
         boost::asio::ip::udp::endpoint _remote_endpoint;
-        std::shared_ptr<drivebrain_core_msgs::MCUData> _mcu_msg;
+        std::shared_ptr<hytech_msgs::MCUOutputData> _mcu_msg;
+        deqtype &_input_deque_ref; // "input" = the messages that get input to the ethernet comms driver to send out
+        std::thread _output_thread;
+
     };
 
 }

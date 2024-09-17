@@ -14,7 +14,10 @@
 
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
-
+    
+    HT_proto.url = "github:hytech-racing/HT_proto";
+    HT_proto.flake = false;
+    
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
       flake = false;
@@ -28,7 +31,7 @@
     data_acq.inputs.nix-proto.follows = "nix-proto";
     data_acq.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, ... }@inputs:
     
     flake-parts.lib.mkFlake { inherit inputs; }
       {
@@ -54,10 +57,8 @@
               drivebrain_core_msgs = nix-proto.mkProtoDerivation {
                 name = "drivebrain_core_msgs";
                 version = "0.0.1";
-                src = nix-proto.lib.srcFromNamespace {
-                  root = ./proto;
-                  namespace = "drivebrain_core_msgs/v1";
-                };
+                src = "${HT_proto}/proto";
+                
                 # protoDeps = [base_api]; TODO add in the generated protos
               };
             };
@@ -86,6 +87,8 @@
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
+              nativeBuildInputs = [pkgs.drivebrain_core_msgs_proto_cpp];
+              # packages = [];
               inputsFrom = [
                 drivebrain_software
               ];
