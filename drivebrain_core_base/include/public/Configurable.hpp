@@ -56,6 +56,10 @@ namespace core
 
         public:
             using ParamTypes = std::variant<bool, int, float, double, std::string, std::monostate>;
+            /// @brief 
+            /// @param logger 
+            /// @param json_file_handler 
+            /// @param component_name 
             Configurable(core::Logger &logger, core::JsonFileHandler &json_file_handler, const std::string &component_name)
                 : _logger(logger), _json_file_handler(json_file_handler), _component_name(component_name) {}
 

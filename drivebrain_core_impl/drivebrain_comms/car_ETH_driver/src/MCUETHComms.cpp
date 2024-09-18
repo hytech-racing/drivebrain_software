@@ -3,7 +3,6 @@
 using boost::asio::ip::udp;
 namespace comms
 {
-
     MCUETHComms::MCUETHComms(core::Logger &logger,
                              deqtype &in_deq,
                              core::StateEstimator &state_estimator,
