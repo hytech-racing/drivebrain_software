@@ -17,6 +17,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     if ((*max_accel_switch_request) > 1.0)
     {
         std::cout << "ERROR: max accel switch float is greater than max value possible (1.0)" << std::endl;
+        return false;
     }
 
     _max_switch_rpm = ((*max_switch_speed) * constants::METERS_PER_SECOND_TO_RPM);
