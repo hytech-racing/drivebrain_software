@@ -91,19 +91,32 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         const auto clientStr = _server->remoteEndpointString(clientHandle);
         std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
     };
-    // TODO add all channels from the hytech_msgs.proto file https://chatgpt.com/share/66eb6d62-5ac0-8000-afb2-f2f0b00c1ede
-    foxglove::ChannelWithoutId test_channel;
-    test_channel.topic = hytech_msgs::MCUOutputData::descriptor()->name();
-    hytech_msgs::MCUOutputData test;
-    std::cout << hytech_msgs::MCUOutputData::descriptor()->name() << std::endl;
-    std::cout << test.GetTypeName() << std::endl;
+    
+    // TODO make the .proto file name a parameter 
+    const google::protobuf::FileDescriptor* file_descriptor = 
+        google::protobuf::DescriptorPool::generated_pool()->FindFileByName("hytech_msgs.proto");
 
-    test_channel.encoding = "protobuf";
-    test_channel.schemaName = hytech_msgs::MCUOutputData::descriptor()->full_name();
-    test_channel.schema = foxglove::base64Encode(SerializeFdSet(hytech_msgs::MCUOutputData::descriptor()));
+    if (!file_descriptor) {
+        std::cerr << "File descriptor not found!" << std::endl;
+        return;
+    }
 
+    std::vector<std::string> message_names;
     std::vector<foxglove::ChannelWithoutId> channels;
-    channels.push_back(test_channel);
+
+    for (int i = 0; i < file_descriptor->message_type_count(); ++i) {
+        const google::protobuf::Descriptor* message_descriptor = file_descriptor->message_type(i);
+        foxglove::ChannelWithoutId server_channel;
+        server_channel.topic = message_descriptor->name();
+
+        server_channel.encoding = "protobuf";
+        server_channel.schemaName = message_descriptor->full_name();
+        server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
+        channels.push_back(server_channel);
+        message_names.push_back(message_descriptor->name());
+    }
+
+    
     auto res_ids = _server->addChannels(channels);
 
     std::vector<std::pair<std::string, foxglove::ChannelId>> zipped_channels;
@@ -116,7 +129,6 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
 
     for (const auto &id_map_pair : zipped_channels)
     {
-        // first = channel def, second = id
         _id_name_map[id_map_pair.first] = id_map_pair.second;
     }
     _send_thread = std::thread(&core::FoxgloveWSServer::_handle_foxglove_send, this);

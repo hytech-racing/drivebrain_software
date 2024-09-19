@@ -18,6 +18,19 @@
 
 int main(int argc, char** argv) {
 
+  const google::protobuf::FileDescriptor* file_descriptor = 
+        google::protobuf::DescriptorPool::generated_pool()->FindFileByName("hytech_msgs.proto");
+
+    if (!file_descriptor) {
+        std::cerr << "File descriptor not found!" << std::endl;
+        return -1;
+    }
+
+    // Iterate through all the message types in the file
+    for (int i = 0; i < file_descriptor->message_type_count(); ++i) {
+        const google::protobuf::Descriptor* message_descriptor = file_descriptor->message_type(i);
+        std::cout << "Message: " << message_descriptor->name() << std::endl;
+    }
 
   hytech_msgs::MCUOutputData out_data;
   out_data.mutable_rpm_data()->set_fl(6969.0);
