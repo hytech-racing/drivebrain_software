@@ -20,7 +20,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
-
+find_package(mcap REQUIRED)
 
 # custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
@@ -71,7 +71,10 @@ target_include_directories(foxglove_param_server PUBLIC
 )
 
 target_link_libraries(foxglove_param_server PUBLIC 
-    drivebrain_core 
+    drivebrain_core
+    protobuf::libprotobuf
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    hytech_np_proto_cpp::hytech_np_proto_cpp
     foxglove_websocket::foxglove_websocket    
 )
 target_compile_features(foxglove_param_server PUBLIC cxx_std_17) 
@@ -147,12 +150,33 @@ make_cmake_package(drivebrain_control drivebrain)
 #     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
 #     foxglove_websocket::foxglove_websocket)
 
+add_executable(mcu_standin test/test_mcu.cpp)
+
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+
+add_executable(mcu_test test/test_mcu_send.cpp)
+
+
+target_link_libraries(mcu_test PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+
+add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+target_link_libraries(test_mcap PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+    mcap::mcap
+)
+
+
+
 ###                   ###
 ### system executable ###
 ###                   ###
-
-add_executable(mcu_standin test/test_mcu.cpp)
-add_executable(mcu_test test/test_mcu_send.cpp)
 
 add_executable(alpha_build drivebrain_app/main.cpp)
 
@@ -163,16 +187,6 @@ target_link_libraries(alpha_build PUBLIC
     foxglove_param_server
     ETH_driver
 )
-
-target_link_libraries(mcu_standin PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
-target_link_libraries(mcu_test PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
-
 include(GNUInstallDirs)
 install(TARGETS 
         # test_param_server

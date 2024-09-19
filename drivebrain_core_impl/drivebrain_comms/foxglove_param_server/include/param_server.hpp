@@ -6,11 +6,10 @@
 
 // from drivebrain_core
 #include <Configurable.hpp> 
-
-#include <foxglove/websocket/base64.hpp>
-#include <foxglove/websocket/server_factory.hpp>
-#include <foxglove/websocket/websocket_notls.hpp>
-#include <foxglove/websocket/websocket_server.hpp>
+#include <websocket/base64.hpp>
+#include <websocket/server_factory.hpp>
+#include <websocket/websocket_notls.hpp>
+#include <websocket/websocket_server.hpp>
 
 namespace core
 {

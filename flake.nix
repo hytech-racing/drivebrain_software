@@ -33,7 +33,7 @@
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, ... }@inputs:
     let
-      
+
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
@@ -47,12 +47,9 @@
           name = "drivebrain_core_msgs";
           version = "0.0.1";
           src = "${HT_proto}/proto";
-
-          # protoDeps = [base_api]; TODO add in the generated protos
         };
       };
-
-      # my_overlays = [db_overlay] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+      
     in
     flake-parts.lib.mkFlake { inherit inputs; }
 
@@ -66,13 +63,12 @@
         ];
 
 
-
         flake.overlays = {
           db_overlay = final: prev: {
             drivebrain_software = final.callPackage ./default.nix { };
           };
           inherit nix-proto-foxglove-overlays;
-          
+
         };
 
         perSystem = { config, pkgs, system, ... }:
@@ -112,10 +108,9 @@
                 overlays = [
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
-                  (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
+                  self.overlays.db_overlay
                 ]
-                ++ data_acq.overlays.x86_64-linux
-                ++ self.flake.overlays;
+                ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };
       };

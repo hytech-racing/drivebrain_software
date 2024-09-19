@@ -1,5 +1,41 @@
 #include <param_server.hpp>
 #include <variant>
+#include <hytech_msgs.pb.h>
+
+#include <queue>
+#include <unordered_set>
+
+#include <string>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+
+static uint64_t nanosecondsSinceEpoch() {
+  return uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::system_clock::now().time_since_epoch())
+                    .count());
+}
+
+/// Builds a FileDescriptorSet of this descriptor and all transitive dependencies, for use as a
+/// channel schema.
+static std::string SerializeFdSet(const google::protobuf::Descriptor* toplevelDescriptor) {
+  google::protobuf::FileDescriptorSet fdSet;
+  std::queue<const google::protobuf::FileDescriptor*> toAdd;
+  toAdd.push(toplevelDescriptor->file());
+  std::unordered_set<std::string> seenDependencies;
+  while (!toAdd.empty()) {
+    const google::protobuf::FileDescriptor* next = toAdd.front();
+    toAdd.pop();
+    next->CopyTo(fdSet.add_file());
+    for (int i = 0; i < next->dependency_count(); ++i) {
+      const auto& dep = next->dependency(i);
+      if (seenDependencies.find(dep->name()) == seenDependencies.end()) {
+        seenDependencies.insert(dep->name());
+        toAdd.push(dep);
+      }
+    }
+  }
+  return fdSet.SerializeAsString();
+}
 
 core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
 {
@@ -36,6 +72,26 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
         auto fxglove_params_vec = _get_current_params();
         _server->publishParameterValues(clientHandle, fxglove_params_vec, request_id);
     };
+
+    hdlrs.subscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle) {
+        const auto clientStr = server->remoteEndpointString(clientHandle);
+        std::cout << "Client " << clientStr << " subscribed to " << chanId << std::endl;
+    };
+    
+    hdlrs.unsubscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle) {
+        const auto clientStr = server->remoteEndpointString(clientHandle);
+        std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
+    };
+    
+    foxglove::ChannelWithoutId test_channel;
+    test_channel.topic = "test_topic";
+    test_channel.encoding = "protobuf";
+    test_channel.schemaName = hytech_msgs::MCUOutputData::descriptor()->full_name(); 
+    test_channel.schema = foxglove::base64Encode(SerializeFdSet(hytech_msgs::MCUOutputData::descriptor()));
+
+    std::vector<foxglove::ChannelWithoutId> channels;
+    channels.push_back(test_channel);
+    auto res = _server->addChannels(channels);
 
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);
