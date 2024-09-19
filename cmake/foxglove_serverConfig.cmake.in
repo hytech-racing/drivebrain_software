@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/foxglove_serverTargets.cmake")
+
+check_required_components(foxglove_server)

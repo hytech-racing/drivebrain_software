@@ -63,22 +63,22 @@ target_link_libraries(drivebrain_core PUBLIC
 make_cmake_package(drivebrain_core drivebrain)
 
 # foxglove parameter server interface
-add_library(foxglove_param_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_param_server/src/param_server.cpp)
+add_library(foxglove_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_server/src/foxglove_server.cpp)
 
-target_include_directories(foxglove_param_server PUBLIC 
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/foxglove_param_server/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/foxglove_param_server/include>    
+target_include_directories(foxglove_server PUBLIC 
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/foxglove_server/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/foxglove_server/include>    
 )
 
-target_link_libraries(foxglove_param_server PUBLIC 
+target_link_libraries(foxglove_server PUBLIC 
     drivebrain_core
     protobuf::libprotobuf
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
     foxglove_websocket::foxglove_websocket    
 )
-target_compile_features(foxglove_param_server PUBLIC cxx_std_17) 
-make_cmake_package(foxglove_param_server drivebrain)
+target_compile_features(foxglove_server PUBLIC cxx_std_17) 
+make_cmake_package(foxglove_server drivebrain)
 
 # CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
 add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
@@ -144,9 +144,9 @@ make_cmake_package(drivebrain_control drivebrain)
 #     Boost::boost
 # )
 
-# add_executable(test_param_server test/test_param_server.cpp)
+# add_executable(test_foxglove_server test/test_foxglove_server.cpp)
 
-# target_link_libraries(test_param_server PUBLIC 
+# target_link_libraries(test_foxglove_server PUBLIC 
 #     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
 #     foxglove_websocket::foxglove_websocket)
 
@@ -184,12 +184,12 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
     CAN_driver
-    foxglove_param_server
+    foxglove_server
     ETH_driver
 )
 include(GNUInstallDirs)
 install(TARGETS 
-        # test_param_server
+        # test_foxglove_server
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

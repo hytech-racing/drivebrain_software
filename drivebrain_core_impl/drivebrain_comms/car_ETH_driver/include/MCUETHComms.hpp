@@ -29,7 +29,7 @@ namespace comms
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
 
         MCUETHComms() = delete;
-        MCUETHComms(core::Logger &logger, deqtype &in_deq, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
+        MCUETHComms(core::Logger &logger, deqtype &in_deq, deqtype &telem_deq, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
 
     private:
         void _handle_send_msg_from_queue();
@@ -52,6 +52,7 @@ namespace comms
         boost::asio::ip::udp::endpoint _remote_endpoint;
         std::shared_ptr<hytech_msgs::MCUOutputData> _mcu_msg;
         deqtype &_input_deque_ref; // "input" = the messages that get input to the ethernet comms driver to send out
+        deqtype &_telem_deque_ref; // "input" = the messages that get input to the ethernet comms driver to send out
         std::thread _output_thread;
 
     };
