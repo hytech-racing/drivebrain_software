@@ -74,17 +74,17 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
     };
 
     hdlrs.subscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle) {
-        const auto clientStr = server->remoteEndpointString(clientHandle);
+        const auto clientStr = _server->remoteEndpointString(clientHandle);
         std::cout << "Client " << clientStr << " subscribed to " << chanId << std::endl;
     };
     
     hdlrs.unsubscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle) {
-        const auto clientStr = server->remoteEndpointString(clientHandle);
+        const auto clientStr = _server->remoteEndpointString(clientHandle);
         std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
     };
-    
+    // TODO add all channels from the hytech_msgs.proto file https://chatgpt.com/share/66eb6d62-5ac0-8000-afb2-f2f0b00c1ede
     foxglove::ChannelWithoutId test_channel;
-    test_channel.topic = "test_topic";
+    test_channel.topic = hytech_msgs::MCUOutputData::descriptor()->name();
     test_channel.encoding = "protobuf";
     test_channel.schemaName = hytech_msgs::MCUOutputData::descriptor()->full_name(); 
     test_channel.schema = foxglove::base64Encode(SerializeFdSet(hytech_msgs::MCUOutputData::descriptor()));
