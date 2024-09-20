@@ -91,12 +91,13 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         const auto clientStr = _server->remoteEndpointString(clientHandle);
         std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
     };
-    
-    // TODO make the .proto file name a parameter 
-    const google::protobuf::FileDescriptor* file_descriptor = 
+
+    // TODO make the .proto file name a parameter
+    const google::protobuf::FileDescriptor *file_descriptor =
         google::protobuf::DescriptorPool::generated_pool()->FindFileByName("hytech_msgs.proto");
 
-    if (!file_descriptor) {
+    if (!file_descriptor)
+    {
         std::cerr << "File descriptor not found!" << std::endl;
         return;
     }
@@ -104,11 +105,11 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
     std::vector<std::string> message_names;
     std::vector<foxglove::ChannelWithoutId> channels;
 
-    for (int i = 0; i < file_descriptor->message_type_count(); ++i) {
-        const google::protobuf::Descriptor* message_descriptor = file_descriptor->message_type(i);
+    for (int i = 0; i < file_descriptor->message_type_count(); ++i)
+    {
+        const google::protobuf::Descriptor *message_descriptor = file_descriptor->message_type(i);
         foxglove::ChannelWithoutId server_channel;
         server_channel.topic = message_descriptor->name();
-
         server_channel.encoding = "protobuf";
         server_channel.schemaName = message_descriptor->full_name();
         server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
@@ -116,7 +117,6 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         message_names.push_back(message_descriptor->name());
     }
 
-    
     auto res_ids = _server->addChannels(channels);
 
     std::vector<std::pair<std::string, foxglove::ChannelId>> zipped_channels;
@@ -162,12 +162,14 @@ void core::FoxgloveWSServer::_handle_foxglove_send()
         {
             // auto can_msg = _get_msg(msg);
             // TODO check if the name exists within the map
-            std::cout << "msg" << std::endl;
-            auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
-            const auto serializedMsg = msg->SerializeAsString();
-            const auto now = nanosecondsSinceEpoch();
-            _server->broadcastMessage(msg_chan_id, now, reinterpret_cast<const uint8_t *>(serializedMsg.data()),
-                                      serializedMsg.size());
+            if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
+            {
+                auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
+                const auto serializedMsg = msg->SerializeAsString();
+                const auto now = nanosecondsSinceEpoch();
+                _server->broadcastMessage(msg_chan_id, now, reinterpret_cast<const uint8_t *>(serializedMsg.data()),
+                                          serializedMsg.size());
+            }
         }
         q.deque.clear();
     }

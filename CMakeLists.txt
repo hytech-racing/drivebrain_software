@@ -65,6 +65,8 @@ make_cmake_package(drivebrain_core drivebrain)
 # foxglove parameter server interface
 add_library(foxglove_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_server/src/foxglove_server.cpp)
 
+target_compile_features(foxglove_server PUBLIC cxx_std_17)
+
 target_include_directories(foxglove_server PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/foxglove_server/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/foxglove_server/include>    

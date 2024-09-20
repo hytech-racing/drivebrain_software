@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> live_telem_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> mcap_log_queue;
+
 
     std::vector<core::common::Configurable *> configurable_components;
 
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
     comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
 
     core::StateEstimator state_estimator(logger);
-    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, mcap_log_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);

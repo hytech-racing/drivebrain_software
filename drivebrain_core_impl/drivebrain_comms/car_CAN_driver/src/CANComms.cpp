@@ -202,7 +202,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     if (iter != _messages.end())
     {
         auto msg = iter->second->Clone();
-        // std::cout << "Received Message: " << msg->Name() << "\n";
         auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
