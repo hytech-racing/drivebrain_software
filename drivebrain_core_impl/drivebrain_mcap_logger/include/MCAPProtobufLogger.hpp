@@ -5,17 +5,23 @@
 
 #include <MsgLogger.hpp>
 
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace common
 {
     class MCAPProtobufLogger : public MsgLogger<google::protobuf::Message>
     {
     public:
-        MCAPProtobufLogger(const std::string &file_name) : MsgLogger<google::protobuf::Message>(file_name);
+        MCAPProtobufLogger(const std::string &base_dir) : MsgLogger<google::protobuf::Message>(file_name);
         void log_msg(std::shared_ptr<google::protobuf::Message> out_msg);
+        void open_new_mcap(const std::string &name);
+        void close_current_mcap();
     private:
-          mcap::McapWriter _writer;
+        mcap::McapWriterOptions _options;
+        mcap::McapWriter _writer;
+        std::unordered_map<std::string, uint32_t> _msg_name_id_map
 
     };
 }

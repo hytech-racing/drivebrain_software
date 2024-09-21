@@ -3,6 +3,7 @@
 #include <SimpleController.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
+#include <MsgLogger.hpp>
 
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
@@ -18,8 +19,8 @@
 #include <memory>
 #include <optional>
 
-#include <thread>  // For std::this_thread::sleep_for
-#include <chrono>  // For std::chrono::seconds
+#include <thread> // For std::this_thread::sleep_for
+#include <chrono> // For std::chrono::seconds
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -36,8 +37,6 @@ int main(int argc, char *argv[])
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> live_telem_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> mcap_log_queue;
-
 
     std::vector<core::common::Configurable *> configurable_components;
 
@@ -52,7 +51,6 @@ int main(int argc, char *argv[])
     comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
 
     core::StateEstimator state_estimator(logger);
-    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
@@ -60,7 +58,19 @@ int main(int argc, char *argv[])
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
 
-    auto foxglove_server = core::FoxgloveWSServer(configurable_components, live_telem_queue);
+    auto foxglove_server = core::FoxgloveWSServer(configurable_components);
+
+    std::function<void(std::shared_ptr<google::protobuf::Message>)> temp_mcap_log_func = [&](std::shared_ptr<google::protobuf::Message> n)
+    { std::cout << "rec out " << std::endl; };
+    std::function<void(void)> close_file_temp = []() {};
+    std::function<void(const std::string &)> open_file_temp = [](const std::string &) {};
+
+    auto message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(".mcap", true,
+                                                                               temp_mcap_log_func,
+                                                                               close_file_temp,
+                                                                               open_file_temp,
+                                                                               std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     auto _ = controller.init();
 

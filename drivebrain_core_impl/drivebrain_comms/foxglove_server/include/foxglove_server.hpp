@@ -21,8 +21,8 @@ namespace core
     public:
         FoxgloveWSServer() = delete;
 
-        using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components, deqtype& out_queue);
+        FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components);
+        void send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg);
         ~FoxgloveWSServer()
         {
             _server->stop();
@@ -37,12 +37,10 @@ namespace core
         void _handle_foxglove_send();
     private:
         std::vector<core::common::Configurable *> _components;
-        deqtype& _out_queue;
         std::unique_ptr<foxglove::ServerInterface<websocketpp::connection_hdl>> _server;
         std::function<void(foxglove::WebSocketLogLevel, char const *)> _log_handler;
         foxglove::ServerOptions _server_options;
         std::unordered_map<std::string, foxglove::ChannelId> _id_name_map;
-        std::thread _send_thread;
 
     };
 }

@@ -6,14 +6,14 @@ namespace comms
 {
     MCUETHComms::MCUETHComms(core::Logger &logger,
                              deqtype &in_deq,
-                             deqtype &telem_deq,
+                             std::shared_ptr<loggertype> message_logger,
                              core::StateEstimator &state_estimator,
                              boost::asio::io_context &io_context,
                              const std::string &send_ip,
                              uint16_t recv_port,
                              uint16_t send_port) : _logger(logger),
                                                    _input_deque_ref(in_deq),
-                                                   _telem_deque_ref(telem_deq),
+                                                   _message_logger(message_logger),
                                                    _state_estimator(state_estimator),
                                                    _socket(io_context, udp::endpoint(udp::v4(), recv_port)),
                                                    _send_port(send_port),
@@ -74,14 +74,9 @@ namespace comms
         if (!error)
         {
             _mcu_msg->ParseFromArray(_recv_buffer.data(), size);
-            _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg));
-            
-            {
-                std::unique_lock lk(_telem_deque_ref.mtx);
-                _telem_deque_ref.deque.push_back(static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg));
-                _telem_deque_ref.cv.notify_all();
-            }
-            
+            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
+            _state_estimator.handle_recv_process(out_msg);
+            _message_logger->log_msg(out_msg);
             _start_receive();
         }
     }

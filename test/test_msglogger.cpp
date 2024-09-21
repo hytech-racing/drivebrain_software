@@ -69,7 +69,7 @@ int main()
 
     std::function<void(int)> live_telem_func = [&](int n) { std::cout << "live out " << n <<std::endl; };
     IntegerFileWriter fw;
-    core::MsgLogger<int> logger_test(std::string("."), std::string(".txt"), true,
+    core::MsgLogger<int> logger_test(std::string(".txt"), true,
                                std::bind(&IntegerFileWriter::writeInteger, std::ref(fw), std::placeholders::_1),
                                std::bind(&IntegerFileWriter::closeFile, std::ref(fw)),
                                std::bind(&IntegerFileWriter::openFile, std::ref(fw), std::placeholders::_1),

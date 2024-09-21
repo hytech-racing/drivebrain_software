@@ -25,14 +25,12 @@ namespace core
             std::deque<MsgType> deque;
         };
 
-        MsgLogger(const std::string &log_output_file_dir,
-                  const std::string &log_file_extension,
+        MsgLogger(const std::string &log_file_extension,
                   bool init_logging,
                   std::function<void(MsgType)> logger_msg_func,
                   std::function<void()> stop_log_func,
                   std::function<void(const std::string &)> open_log_func,
                   std::function<void(MsgType)> live_msg_output_func) : _log_file_extension(log_file_extension),
-                                                                       _output_file_dir(log_output_file_dir),
                                                                        _stop_log_function(stop_log_func),
                                                                        _open_log_function(open_log_func)
         {
@@ -71,7 +69,8 @@ namespace core
             _add_msg_to_queue(_thread_safe_live_output, msg);
         }
 
-        void start_logging_to_file()
+        // will only open a new file for logging if we are not currently logging
+        void start_logging_to_new_file()
         {
             if (!_logging)
             {
@@ -128,6 +127,7 @@ namespace core
             // Return the generated filename
             return ss.str();
         }
+
         void _add_msg_to_queue(ThreadSafeOutput &queue, MsgType msg)
         {
             {
@@ -139,7 +139,6 @@ namespace core
 
         void _handle_output_messages(ThreadSafeOutput &queue, std::function<void(MsgType)> output_function, bool is_logger)
         {
-
             while (_running)
             {
                 std::deque<MsgType> local_q;
@@ -172,7 +171,6 @@ namespace core
         std::string _log_file_extension;
         std::function<void()> _stop_log_function;
         std::function<void(const std::string &)> _open_log_function;
-        std::string _output_file_dir;
         std::thread _logger_thread;
         std::thread _live_telem_thread;
     };

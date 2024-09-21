@@ -3,6 +3,7 @@
 
 #include <Logger.hpp>
 #include <StateEstimator.hpp>
+#include <MsgLogger.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -27,9 +28,9 @@ namespace comms
     {
     public:
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-
+        using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         MCUETHComms() = delete;
-        MCUETHComms(core::Logger &logger, deqtype &in_deq, deqtype &telem_deq, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
+        MCUETHComms(core::Logger &logger, deqtype &in_deq, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
 
     private:
         void _handle_send_msg_from_queue();
@@ -42,6 +43,7 @@ namespace comms
 
     private:
         core::Logger &_logger;
+        std::shared_ptr<loggertype> _message_logger;
         core::StateEstimator &_state_estimator;
         std::array<uint8_t, 2048> _recv_buffer;
         std::array<uint8_t, 2048> _send_buffer;

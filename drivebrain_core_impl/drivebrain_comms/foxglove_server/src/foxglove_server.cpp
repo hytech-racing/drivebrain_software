@@ -1,9 +1,10 @@
 #include <foxglove_server.hpp>
 #include <variant>
 #include <hytech_msgs.pb.h>
+#include <ProtobufUtils.hpp>
 
 #include <queue>
-#include <unordered_set>
+#include <unordered_map>
 
 #include <string>
 #include <google/protobuf/descriptor.h>
@@ -93,8 +94,9 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
     };
 
     // TODO make the .proto file name a parameter
+    std::string proto_name = "hytech_msgs.proto";
     const google::protobuf::FileDescriptor *file_descriptor =
-        google::protobuf::DescriptorPool::generated_pool()->FindFileByName("hytech_msgs.proto");
+        google::protobuf::DescriptorPool::generated_pool()->FindFileByName(proto_name);
 
     if (!file_descriptor)
     {
@@ -102,7 +104,8 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         return;
     }
 
-    std::vector<std::string> message_names;
+    _id_name_map = util::generate_name_to_id_map(proto_name);
+
     std::vector<foxglove::ChannelWithoutId> channels;
 
     for (int i = 0; i < file_descriptor->message_type_count(); ++i)
@@ -114,64 +117,24 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         server_channel.schemaName = message_descriptor->full_name();
         server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
         channels.push_back(server_channel);
-        message_names.push_back(message_descriptor->name());
     }
 
     auto res_ids = _server->addChannels(channels);
-
-    std::vector<std::pair<std::string, foxglove::ChannelId>> zipped_channels;
-    zipped_channels.reserve(channels.size()); // Reserve space to avoid reallocations
-
-    std::transform(channels.begin(), channels.end(), res_ids.begin(),
-                   std::back_inserter(zipped_channels),
-                   [](foxglove::ChannelWithoutId a, foxglove::ChannelId b)
-                   { return std::make_pair(a.topic, b); });
-
-    for (const auto &id_map_pair : zipped_channels)
-    {
-        _id_name_map[id_map_pair.first] = id_map_pair.second;
-    }
-    _send_thread = std::thread(&core::FoxgloveWSServer::_handle_foxglove_send, this);
-
+    
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);
 }
 
-void core::FoxgloveWSServer::_handle_foxglove_send()
+void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg)
 {
-    // we will assume that this queue only has messages that we want to send
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-    while (true)
+
+    if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
     {
-        {
-            std::unique_lock lk(_out_queue.mtx);
-            // TODO unfuck this, queue management shouldnt live within the queue itself
-            _out_queue.cv.wait(lk, [this]()
-                               { return !_out_queue.deque.empty(); });
-
-            if (_out_queue.deque.empty())
-            {
-                return;
-            }
-
-            q.deque = _out_queue.deque;
-            _out_queue.deque.clear();
-        }
-
-        for (const auto &msg : q.deque)
-        {
-            // auto can_msg = _get_msg(msg);
-            // TODO check if the name exists within the map
-            if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
-            {
-                auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
-                const auto serializedMsg = msg->SerializeAsString();
-                const auto now = nanosecondsSinceEpoch();
-                _server->broadcastMessage(msg_chan_id, now, reinterpret_cast<const uint8_t *>(serializedMsg.data()),
-                                          serializedMsg.size());
-            }
-        }
-        q.deque.clear();
+        auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
+        const auto serializedMsg = msg->SerializeAsString();
+        const auto now = nanosecondsSinceEpoch();
+        _server->broadcastMessage(msg_chan_id, now, reinterpret_cast<const uint8_t *>(serializedMsg.data()),
+                                  serializedMsg.size());
     }
 }
 
