@@ -17,6 +17,9 @@
 #include <boost/asio.hpp>
 #include <memory>
 #include <optional>
+
+#include <thread>  // For std::this_thread::sleep_for
+#include <chrono>  // For std::chrono::seconds
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -49,7 +52,7 @@ int main(int argc, char *argv[])
     comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
 
     core::StateEstimator state_estimator(logger);
-    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, mcap_log_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);

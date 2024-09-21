@@ -174,6 +174,13 @@ target_link_libraries(test_mcap PUBLIC
     mcap::mcap
 )
 
+add_executable(test_msg_logger test/test_msglogger.cpp)
+
+target_link_libraries(test_msg_logger PUBLIC
+    drivebrain_core
+)
+
+
 
 
 ###                   ###
