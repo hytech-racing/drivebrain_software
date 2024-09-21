@@ -14,9 +14,9 @@ namespace comms
                              uint16_t send_port) : _logger(logger),
                                                    _input_deque_ref(in_deq),
                                                    _message_logger(message_logger),
-                                                   _state_estimator(state_estimator),
                                                    _socket(io_context, udp::endpoint(udp::v4(), recv_port)),
-                                                   _send_port(send_port),
+                                                                                    _state_estimator(state_estimator),
+                  _send_port(send_port),
                                                    _send_ip(send_ip)
     {
         _mcu_msg = std::make_shared<hytech_msgs::MCUOutputData>();

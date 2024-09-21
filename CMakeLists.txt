@@ -62,6 +62,21 @@ target_link_libraries(drivebrain_core PUBLIC
 
 make_cmake_package(drivebrain_core drivebrain)
 
+
+add_library(drivebrain_common_utils INTERFACE)
+
+target_include_directories(drivebrain_common_utils INTERFACE
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_common_utils/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_common_utils/include>
+)
+
+target_link_libraries(drivebrain_common_utils INTERFACE
+    protobuf::libprotobuf
+)
+
+make_cmake_package(drivebrain_common_utils drivebrain)
+
+
 # foxglove parameter server interface
 add_library(foxglove_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_server/src/foxglove_server.cpp)
 
@@ -77,7 +92,8 @@ target_link_libraries(foxglove_server PUBLIC
     protobuf::libprotobuf
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
-    foxglove_websocket::foxglove_websocket    
+    foxglove_websocket::foxglove_websocket
+    drivebrain_common_utils    
 )
 target_compile_features(foxglove_server PUBLIC cxx_std_17) 
 make_cmake_package(foxglove_server drivebrain)

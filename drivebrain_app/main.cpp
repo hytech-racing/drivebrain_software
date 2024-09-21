@@ -61,7 +61,12 @@ int main(int argc, char *argv[])
     auto foxglove_server = core::FoxgloveWSServer(configurable_components);
 
     std::function<void(std::shared_ptr<google::protobuf::Message>)> temp_mcap_log_func = [&](std::shared_ptr<google::protobuf::Message> n)
-    { std::cout << "rec out " << std::endl; };
+    { 
+        if(n->GetDescriptor()->name() == "SpeedControlIn")
+        {
+            std::cout <<"yo wtf" <<std::endl;
+        }
+    };
     std::function<void(void)> close_file_temp = []() {};
     std::function<void(const std::string &)> open_file_temp = [](const std::string &) {};
 
@@ -70,7 +75,7 @@ int main(int argc, char *argv[])
                                                                                close_file_temp,
                                                                                open_file_temp,
                                                                                std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
-    comms::MCUETHComms eth_driver(logger, eth_tx_queue, live_telem_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     auto _ = controller.init();
 

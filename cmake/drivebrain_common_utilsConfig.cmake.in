@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/drivebrain_common_utilsTargets.cmake")
+
+find_dependency(protobuf)
+
+check_required_components(drivebrain_common_utils)

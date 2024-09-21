@@ -14,6 +14,7 @@
 
 #include <google/protobuf/message.h>
 
+
 namespace core
 {
     class FoxgloveWSServer

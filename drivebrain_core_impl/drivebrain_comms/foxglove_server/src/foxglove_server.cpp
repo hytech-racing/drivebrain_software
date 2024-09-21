@@ -45,7 +45,7 @@ static std::string SerializeFdSet(const google::protobuf::Descriptor *toplevelDe
     return fdSet.SerializeAsString();
 }
 
-core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components, deqtype &out_queue) : _components(configurable_components), _out_queue(out_queue)
+core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
     {
@@ -104,7 +104,12 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         return;
     }
 
-    _id_name_map = util::generate_name_to_id_map(proto_name);
+    auto potential_id_map = util::generate_name_to_id_map(proto_name);
+    if(potential_id_map)
+    {
+        _id_name_map = *potential_id_map;
+    }
+    
 
     std::vector<foxglove::ChannelWithoutId> channels;
 
@@ -116,11 +121,16 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         server_channel.encoding = "protobuf";
         server_channel.schemaName = message_descriptor->full_name();
         server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
+        std::cout << "server_channel.topic: " << server_channel.topic << "with id: " << i <<std::endl;
         channels.push_back(server_channel);
     }
 
     auto res_ids = _server->addChannels(channels);
-    
+    for(const auto & id : res_ids)
+    {
+        std::cout << "id: " << id <<std::endl;
+    }
+
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);
 }
@@ -129,7 +139,7 @@ void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobu
 {
 
     if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
-    {
+    {        
         auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
         const auto serializedMsg = msg->SerializeAsString();
         const auto now = nanosecondsSinceEpoch();
@@ -147,22 +157,22 @@ foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::strin
     }
     else if (std::holds_alternative<int>(param))
     {
-        std::cout << set_name << " Variant holds a int: " << std::get<int>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a int: " << std::get<int>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<int>(param));
     }
     else if (std::holds_alternative<float>(param))
     {
-        std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, ((double)std::get<float>(param)));
     }
     else if (std::holds_alternative<double>(param))
     {
-        std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<double>(param));
     }
     else if (std::holds_alternative<std::string>(param))
     {
-        std::cout << set_name << " Variant holds a string: " << std::get<std::string>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a string: " << std::get<std::string>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<std::string>(param));
     }
     else

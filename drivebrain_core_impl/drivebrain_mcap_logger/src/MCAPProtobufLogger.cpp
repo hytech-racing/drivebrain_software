@@ -14,7 +14,7 @@ namespace common
     {
         const auto res = _writer.open(name.c_str(), _options);
         if (!res.ok()) {
-            std::cerr << "Failed to open " << outputFilename << " for writing: " << res.message
+            std::cerr << "Failed to open " << name << " for writing: " << res.message
                         << std::endl;
         }
     }

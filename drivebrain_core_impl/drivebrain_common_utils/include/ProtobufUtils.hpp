@@ -28,7 +28,8 @@ namespace util
 
         for (int i = 0; i < file_descriptor->message_type_count(); ++i)
         {
-            map[message_descriptor->name()] = i;
+            const google::protobuf::Descriptor* message_descriptor = file_descriptor->message_type(i);
+            map[message_descriptor->name()] = i+1;
         }
         return map;
     }

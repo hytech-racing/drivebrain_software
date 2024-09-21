@@ -18,8 +18,8 @@
 // - [x] handle receiving UDP messages on a specific port
 // - [x] handle parsing of UDP message as protobuf message on the port
 // TODO:
-// figure out if we want to keep the queue work flow for sending or if we want to 
-// instead use just a direct pointer / ref to a generic driver interface that we 
+// figure out if we want to keep the queue work flow for sending or if we want to
+// instead use just a direct pointer / ref to a generic driver interface that we
 // can give to the estimation / control thread to handle the sending of the control msgs
 
 namespace comms
@@ -30,7 +30,14 @@ namespace comms
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
         using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         MCUETHComms() = delete;
-        MCUETHComms(core::Logger &logger, deqtype &in_deq, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context &io_context, const std::string &send_ip, uint16_t recv_port, uint16_t send_port);
+        MCUETHComms(core::Logger &logger,
+                    deqtype &in_deq,
+                    std::shared_ptr<loggertype> message_logger,
+                    core::StateEstimator &state_estimator,
+                    boost::asio::io_context &io_context,
+                    const std::string &send_ip,
+                    uint16_t recv_port,
+                    uint16_t send_port);
 
     private:
         void _handle_send_msg_from_queue();
@@ -54,9 +61,7 @@ namespace comms
         boost::asio::ip::udp::endpoint _remote_endpoint;
         std::shared_ptr<hytech_msgs::MCUOutputData> _mcu_msg;
         deqtype &_input_deque_ref; // "input" = the messages that get input to the ethernet comms driver to send out
-        deqtype &_telem_deque_ref; // "input" = the messages that get input to the ethernet comms driver to send out
         std::thread _output_thread;
-
     };
 
 }
