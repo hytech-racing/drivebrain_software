@@ -142,6 +142,20 @@ target_link_libraries(drivebrain_control PUBLIC
 )
 make_cmake_package(drivebrain_control drivebrain)
 
+add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp)
+target_include_directories(drivebrain_mcap_logger PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_mcap_logger/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_mcap_logger/include>    
+)
+
+target_link_libraries(drivebrain_mcap_logger PUBLIC
+    drivebrain_core 
+    drivebrain_common_utils
+    mcap::mcap
+    protobuf::libprotobuf
+)
+make_cmake_package(drivebrain_mcap_logger drivebrain)
+
 ###############
 # executables #
 ###############

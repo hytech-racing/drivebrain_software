@@ -3,18 +3,16 @@
 
 #include <google/protobuf/message.h>
 
-#include <MsgLogger.hpp>
-
 #include <memory>
 #include <string>
 #include <unordered_map>
 
 namespace common
 {
-    class MCAPProtobufLogger : public MsgLogger<google::protobuf::Message>
+    class MCAPProtobufLogger 
     {
     public:
-        MCAPProtobufLogger(const std::string &base_dir) : MsgLogger<google::protobuf::Message>(file_name);
+        MCAPProtobufLogger(const std::string &base_dir);
         void log_msg(std::shared_ptr<google::protobuf::Message> out_msg);
         void open_new_mcap(const std::string &name);
         void close_current_mcap();
