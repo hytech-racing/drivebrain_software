@@ -43,7 +43,6 @@ namespace util
         int running_index = 1;
         for (const auto &desc : descriptors)
         {
-
             for (int i = 0; i < (desc->message_type_count()); ++i)
             {
                 const google::protobuf::Descriptor *message_descriptor = desc->message_type(i);

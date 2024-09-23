@@ -26,6 +26,9 @@ find_package(mcap REQUIRED)
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
+
+find_package(gRPC CONFIG REQUIRED)
+find_package(db_service_grpc_cpp REQUIRED)
 include(create_package)
 
 #####################
@@ -156,10 +159,23 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
     
 )
 target_link_libraries(drivebrain_mcap_logger INTERFACE
-mcap::mcap
+    mcap::mcap
 )
 
 make_cmake_package(drivebrain_mcap_logger drivebrain)
+
+add_library(db_service_impl SHARED drivebrain_core_impl/drivebrain_comms/db_service_impl/src/DBServiceImpl.cpp)
+target_include_directories(db_service_impl PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/db_service_impl/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/db_service_impl/include>    
+)
+
+target_link_libraries(db_service_impl PUBLIC 
+    drivebrain_core
+    db_service_grpc_cpp::db_service_grpc_cpp
+    gRPC::grpc++_reflection
+)
+make_cmake_package(db_service_impl drivebrain)
 
 ###############
 # executables #
@@ -194,6 +210,12 @@ target_link_libraries(mcu_standin PUBLIC
     protobuf::libprotobuf
 )
 
+add_executable(test_db_grpc test/test_db_interace_grpc_service.cpp)
+
+target_link_libraries(test_db_grpc PUBLIC
+    db_service_grpc_cpp::db_service_grpc_cpp
+    gRPC::grpc++_reflection
+)
 # add_executable(mcu_test test/test_mcu_send.cpp)
 
 
@@ -233,6 +255,7 @@ target_link_libraries(alpha_build PUBLIC
     ETH_driver
     drivebrain_mcap_logger
     mcap::mcap
+    db_service_impl
 )
 
 include(GNUInstallDirs)

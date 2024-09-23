@@ -8,6 +8,7 @@
 #include <mcap/writer.hpp>
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
+#include <DBServiceImpl.hpp>
 #include <array>
 
 #include <thread> // std::this_thread::sleep_for
@@ -90,6 +91,19 @@ int main(int argc, char *argv[])
 
     auto _ = controller.init();
 
+    DBInterfaceImpl db_service_inst(message_logger);
+    std::thread db_service_thread([&db_service_inst]()
+        {
+            std::cout <<"started io context thread" <<std::endl;
+            try {
+                while (!stop_signal.load()) {
+                    // Run the io_context as long as stop_signal is false
+                    db_service_inst.run_server();  // Run at least one handler, or return immediately if none
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error in io_context: " << e.what() << std::endl;
+            }
+        }); 
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue
@@ -147,6 +161,8 @@ int main(int argc, char *argv[])
     std::cout << "joined main process" << std::endl;
     io_context.stop();
     io_context_thread.join();
+    db_service_inst.stop_server();
+    db_service_thread.join(); 
     std::cout << "joined io context" << std::endl;
     return 0;
 }

@@ -42,6 +42,7 @@ namespace core
             if (init_logging)
             {
                 auto log_name = _generate_log_name(_log_file_extension);
+                _current_log_name = log_name;
                 _open_log_function(log_name);
                 _logging = init_logging;
             }
@@ -61,38 +62,44 @@ namespace core
 
         void log_msg(MsgType msg)
         {
+            // TODO maybe make this also more thread safe ... ?
             if (_logging)
             {
                 auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
                 _handle_output_messages(msg, _logger_msg_function);
             }
-            _handle_output_messages(msg,_live_msg_output_func);
+            _handle_output_messages(msg, _live_msg_output_func);
         }
 
         // will only open a new file for logging if we are not currently logging
         void start_logging_to_new_file()
         {
+            std::unique_lock lk(_mtx);
             if (!_logging)
             {
-                std::unique_lock lk(_thread_safe_log.mtx);
                 _logging = true;
-                _open_log_function(_generate_log_name(_log_file_extension));
+                _current_log_name = _generate_log_name(_log_file_extension);
+                _open_log_function(_current_log_name);
             }
+        }
+        std::tuple<const std::string &, bool> get_logger_status()
+        {
+            std::unique_lock lk(_mtx);
+            return {_current_log_name, _logging};
         }
 
         void stop_logging_to_file()
         {
             std::cout << "attempting stop" << std::endl;
-            if (_logging)
             {
-                _logging = false;
-                _stop_log_function();
+                std::unique_lock lk(_mtx);
+                if (_logging)
+                {
+                    _logging = false;
+                    _stop_log_function();
+                }
             }
             std::cout << "stopped" << std::endl;
-        }
-        bool messages_still_need_output()
-        {
-            return false;
         }
 
     private:
@@ -115,7 +122,6 @@ namespace core
 
         void _handle_output_messages(MsgType msg, std::function<void(MsgType)> output_function)
         {
-
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
             if (out_msg->GetDescriptor()->name() == "MCUOutputData")
             {
@@ -131,9 +137,11 @@ namespace core
     private:
         bool _running = true;
         bool _logging = false;
+        std::mutex _mtx;
         ThreadSafeOutput _thread_safe_log, _thread_safe_live_output;
 
         std::string _log_file_extension;
+        std::string _current_log_name = "NONE";
         std::function<void()> _stop_log_function;
         std::function<void(const std::string &)> _open_log_function;
         std::function<void(MsgType)> _logger_msg_function;

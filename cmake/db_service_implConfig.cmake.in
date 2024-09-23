@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/db_service_implTargets.cmake")
+
+check_required_components(db_service_impl)

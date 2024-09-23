@@ -48,8 +48,17 @@
           version = "0.0.1";
           src = "${HT_proto}/proto";
         };
+        db_service = nix-proto.mkProtoDerivation
+          {
+            name = "db_service";
+            version = "0.0.1";
+            src = nix-proto.lib.srcFromNamespace {
+              root = ./proto;
+              namespace = "db_service";
+            };
+          };
       };
-      
+
     in
     flake-parts.lib.mkFlake { inherit inputs; }
 
@@ -98,7 +107,7 @@
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [pkgs.mcap-cli];
+              packages = [ pkgs.mcap-cli ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

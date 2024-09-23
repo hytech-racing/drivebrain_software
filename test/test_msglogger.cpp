@@ -82,7 +82,7 @@ int main()
         logger_test.log_msg(out);
     }
 
-    while(logger_test.messages_still_need_output())
+    while(true)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
