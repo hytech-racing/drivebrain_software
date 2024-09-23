@@ -24,7 +24,12 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
     );
     return s;
 }
-
+comms::CANDriver::~CANDriver()
+{
+    _running = false;
+    _input_deque_ref.cv.notify_all();
+    _output_thread.join();
+}
 bool comms::CANDriver::init()
 {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
@@ -336,13 +341,13 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 {
     // we will assume that this queue only has messages that we want to send
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-    while (true)
+    while (_running)
     {
         {
             std::unique_lock lk(_input_deque_ref.mtx);
             // TODO unfuck this, queue management shouldnt live within the queue itself
             _input_deque_ref.cv.wait(lk, [this]()
-                                     { return !_input_deque_ref.deque.empty(); });
+                                     { return !_input_deque_ref.deque.empty() || !_running; });
 
             if (_input_deque_ref.deque.empty())
             {

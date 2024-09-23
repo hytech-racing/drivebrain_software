@@ -73,8 +73,10 @@ namespace comms
             _socket(io_context),
             _dbc_path(dbc_path)
         {
+            _running = true;
             _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
         }
+        ~CANDriver();
         bool init();
         void _handle_send_msg_from_queue();
         std::shared_ptr<google::protobuf::Message> pb_msg_recv(const can_frame &in_frame);
@@ -119,6 +121,6 @@ namespace comms
         std::unordered_map<uint64_t, std::unique_ptr<dbcppp::IMessage>> _messages;
         std::unordered_map<std::string, uint64_t> _messages_names_and_ids;
         int _CAN_socket; // can socket bound to
-        
+        bool _running = false;
     };
 }

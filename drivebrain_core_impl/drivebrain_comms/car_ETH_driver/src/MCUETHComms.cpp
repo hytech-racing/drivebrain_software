@@ -21,23 +21,30 @@ namespace comms
     {
         _mcu_msg = std::make_shared<hytech_msgs::MCUOutputData>();
         _logger.log_string("starting out thread", core::LogLevel::INFO);
-
+        _running = true;
         _output_thread = std::thread(&MCUETHComms::_handle_send_msg_from_queue, this);
         _logger.log_string("starting eth comms recv", core::LogLevel::INFO);
         _start_receive();
         _logger.log_string("started eth comms", core::LogLevel::INFO);
     }
+    MCUETHComms::~MCUETHComms()
+    {
+        _running = false;
+        _input_deque_ref.cv.notify_all();
+        _output_thread.join();
+        std::cout <<"destructed MCU ETH COMMS" <<std::endl;
+    }
 
     void MCUETHComms::_handle_send_msg_from_queue()
     {
         // we will assume that this queue only has messages that we want to send
-        while (true)
+        while (_running)
         {
             {
                 std::unique_lock lk(_input_deque_ref.mtx);
                 // TODO unfuck this, queue management shouldnt live within the queue itself
                 _input_deque_ref.cv.wait(lk, [this]()
-                                         { return !_input_deque_ref.deque.empty(); });
+                                         { return !_input_deque_ref.deque.empty() || !_running; });
 
                 if (_input_deque_ref.deque.empty())
                 {
