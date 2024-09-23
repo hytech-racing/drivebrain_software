@@ -4,7 +4,8 @@
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
 #include <MsgLogger.hpp>
-
+#include <MCAPProtobufLogger.hpp>
+#include <mcap/writer.hpp>
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
 #include <array>
@@ -19,14 +20,27 @@
 #include <memory>
 #include <optional>
 
+#include <mcap/mcap.hpp>
 #include <thread> // For std::this_thread::sleep_for
 #include <chrono> // For std::chrono::seconds
+
+#include <csignal>
+#include <cstdlib>
+
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
 // - [x] CAN driver that can receive the pedals messages
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
+
+bool running = true;
+
+// Signal handler function
+void signalHandler(int signal) {
+    std::cout << "Interrupt signal (" << signal << ") received. Cleaning up..." << std::endl;
+    running = false; // Set running to false to exit the main loop or gracefully terminate
+}
 
 int main(int argc, char *argv[])
 {
@@ -47,8 +61,11 @@ int main(int argc, char *argv[])
         param_path = argv[1];
         dbc_path = argv[2];
     }
+
     core::JsonFileHandler config(param_path);
     comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
+
+    auto mcap_logger = common::MCAPProtobufLogger("temp");
 
     core::StateEstimator state_estimator(logger);
 
@@ -60,21 +77,15 @@ int main(int argc, char *argv[])
 
     auto foxglove_server = core::FoxgloveWSServer(configurable_components);
 
-    std::function<void(std::shared_ptr<google::protobuf::Message>)> temp_mcap_log_func = [&](std::shared_ptr<google::protobuf::Message> n)
-    { 
-        if(n->GetDescriptor()->name() == "SpeedControlIn")
-        {
-            std::cout <<"yo wtf" <<std::endl;
-        }
-    };
+    
     std::function<void(void)> close_file_temp = []() {};
     std::function<void(const std::string &)> open_file_temp = [](const std::string &) {};
 
     auto message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(".mcap", true,
-                                                                               temp_mcap_log_func,
-                                                                               close_file_temp,
-                                                                               open_file_temp,
-                                                                               std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
+                                                                                                        std::bind(&common::MCAPProtobufLogger::log_msg, std::ref(mcap_logger), std::placeholders::_1),
+                                                                                                        std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(mcap_logger)),
+                                                                                                        std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
+                                                                                                        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     auto _ = controller.init();
@@ -119,8 +130,12 @@ int main(int argc, char *argv[])
             
         } });
 
-    while (true)
+    std::signal(SIGINT, signalHandler);
+
+    while (running)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    
+    return 0;
 }

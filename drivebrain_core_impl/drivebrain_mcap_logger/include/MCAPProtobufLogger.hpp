@@ -2,11 +2,12 @@
 #define __MCAPPROTOBUFLOGGER_H__
 
 #include <google/protobuf/message.h>
-
+#include <mcap.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
-
+#include <mcap/writer.hpp>
+#include <mcap/mcap.hpp>
 namespace common
 {
     class MCAPProtobufLogger 
@@ -19,7 +20,7 @@ namespace common
     private:
         mcap::McapWriterOptions _options;
         mcap::McapWriter _writer;
-        std::unordered_map<std::string, uint32_t> _msg_name_id_map
+        std::unordered_map<std::string, uint32_t> _msg_name_id_map;
 
     };
 }

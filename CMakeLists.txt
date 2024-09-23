@@ -151,9 +151,14 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_core 
     drivebrain_common_utils
-    mcap::mcap
     protobuf::libprotobuf
+    mcap::mcap
+    
 )
+target_link_libraries(drivebrain_mcap_logger INTERFACE
+mcap::mcap
+)
+
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
 ###############
@@ -189,26 +194,27 @@ target_link_libraries(mcu_standin PUBLIC
     protobuf::libprotobuf
 )
 
-add_executable(mcu_test test/test_mcu_send.cpp)
+# add_executable(mcu_test test/test_mcu_send.cpp)
 
 
-target_link_libraries(mcu_test PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
+# target_link_libraries(mcu_test PUBLIC
+#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+#     protobuf::libprotobuf
+# )
 
 add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+
 target_link_libraries(test_mcap PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
     mcap::mcap
 )
 
-add_executable(test_msg_logger test/test_msglogger.cpp)
+# add_executable(test_msg_logger test/test_msglogger.cpp)
 
-target_link_libraries(test_msg_logger PUBLIC
-    drivebrain_core
-)
+# target_link_libraries(test_msg_logger PUBLIC
+#     drivebrain_core
+# )
 
 
 
@@ -225,10 +231,13 @@ target_link_libraries(alpha_build PUBLIC
     CAN_driver
     foxglove_server
     ETH_driver
+    drivebrain_mcap_logger
+    mcap::mcap
 )
+
 include(GNUInstallDirs)
 install(TARGETS 
-        # test_foxglove_server
+
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

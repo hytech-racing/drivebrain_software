@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "hytech_msgs.pb.h"
 #include <google/protobuf/message.h>
 
 namespace core
@@ -30,7 +31,10 @@ namespace core
                   std::function<void(MsgType)> logger_msg_func,
                   std::function<void()> stop_log_func,
                   std::function<void(const std::string &)> open_log_func,
-                  std::function<void(MsgType)> live_msg_output_func) : _log_file_extension(log_file_extension),
+                  std::function<void(MsgType)> live_msg_output_func) : 
+                                                                       _logger_msg_function(logger_msg_func),
+                                                                       _live_msg_output_func(live_msg_output_func),
+                                                                       _log_file_extension(log_file_extension),
                                                                        _stop_log_function(stop_log_func),
                                                                        _open_log_function(open_log_func)
         {
@@ -52,11 +56,12 @@ namespace core
             // should be fine for the most part to not lock here, this is the only place we are writing these bools
             _running = false;
             _logging = false;
+            _stop_log_function();
             _thread_safe_log.cv.notify_all();
             _thread_safe_live_output.cv.notify_all();
             _logger_thread.join();
             _live_telem_thread.join();
-            _stop_log_function();
+
             std::cout << "safely exited" << std::endl;
         }
 
@@ -64,6 +69,15 @@ namespace core
         {
             if (_logging)
             {
+                auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
+                if(out_msg->GetDescriptor()->name() == "MCUOutputData")
+                {
+                    auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
+                    if (cast_msg->brake_percent() == 0)
+                    {
+                        std::cout << "empty msg recvd at logger level" <<std::endl;
+                    }
+                }
                 _add_msg_to_queue(_thread_safe_log, msg);
             }
             _add_msg_to_queue(_thread_safe_live_output, msg);
@@ -82,14 +96,14 @@ namespace core
 
         void stop_logging_to_file()
         {
-            std::cout << "attempting stop" <<std::endl;
+            std::cout << "attempting stop" << std::endl;
             if (_logging)
             {
                 std::unique_lock lk(_thread_safe_log.mtx);
                 _logging = false;
                 _stop_log_function();
             }
-            std::cout << "stopped" <<std::endl;
+            std::cout << "stopped" << std::endl;
         }
         bool messages_still_need_output()
         {
@@ -139,29 +153,31 @@ namespace core
 
         void _handle_output_messages(ThreadSafeOutput &queue, std::function<void(MsgType)> output_function, bool is_logger)
         {
-            while (_running)
-            {
-                std::deque<MsgType> local_q;
-                {
                     std::unique_lock lk(queue.mtx);
 
                     // only the is_logger thread can "pause" while running
-                    queue.cv.wait(lk, [is_logger, &local_q, &queue, this]()
-                                  { 
-                                    return ( (!queue.deque.empty()) || !_running); });
-                    if(!queue.deque.empty())
+                    queue.cv.wait(lk, [is_logger, &queue, this]()
+                                  { return ((!queue.deque.empty()) || !_running); });
+                    if (!queue.deque.empty())
                     {
-                        local_q = queue.deque;
+                        for (auto msg : queue.deque)
+                        {
+                            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
+                            if(out_msg->GetDescriptor()->name() == "MCUOutputData")
+                            {
+                                auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
+                                if (cast_msg->brake_percent() == 0)
+                                {
+                                    std::cout << "empty msg recvd at output level" <<std::endl;
+                                }
+                            }
+                            output_function(msg);
+                        }
                         queue.deque.clear();
                     }
                 }
-
-                for (const auto &msg : local_q)
-                {
-                    output_function(msg);
-                }
             }
-        }
+        
 
     private:
         bool _running = true;
@@ -171,8 +187,8 @@ namespace core
         std::string _log_file_extension;
         std::function<void()> _stop_log_function;
         std::function<void(const std::string &)> _open_log_function;
-        std::thread _logger_thread;
-        std::thread _live_telem_thread;
+        
+        
     };
 }
 #endif // __MSG_LOGGER__

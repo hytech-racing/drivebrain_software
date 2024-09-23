@@ -15,8 +15,8 @@ namespace comms
                                                    _input_deque_ref(in_deq),
                                                    _message_logger(message_logger),
                                                    _socket(io_context, udp::endpoint(udp::v4(), recv_port)),
-                                                                                    _state_estimator(state_estimator),
-                  _send_port(send_port),
+                                                   _state_estimator(state_estimator),
+                                                   _send_port(send_port),
                                                    _send_ip(send_ip)
     {
         _mcu_msg = std::make_shared<hytech_msgs::MCUOutputData>();
@@ -31,7 +31,6 @@ namespace comms
     void MCUETHComms::_handle_send_msg_from_queue()
     {
         // we will assume that this queue only has messages that we want to send
-        core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
         while (true)
         {
             {
@@ -44,16 +43,12 @@ namespace comms
                 {
                     return;
                 }
-                
-                q.deque = _input_deque_ref.deque;
+                for (const auto &msg : _input_deque_ref.deque)
+                {
+                    _send_message(msg);
+                }
                 _input_deque_ref.deque.clear();
             }
-
-            for (const auto &msg : q.deque)
-            {
-                _send_message(msg);
-            }
-            q.deque.clear();
         }
     }
     void MCUETHComms::_send_message(std::shared_ptr<google::protobuf::Message> msg_out)
@@ -74,7 +69,20 @@ namespace comms
         if (!error)
         {
             _mcu_msg->ParseFromArray(_recv_buffer.data(), size);
+            if(size != 10)
+            {
+                std::cout <<"bad size: " << size <<std::endl;
+            }
+            
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
+            if(out_msg->GetDescriptor()->name() == "MCUOutputData")
+            {
+                auto msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
+                if (msg->brake_percent() == 0)
+                {
+                    std::cout << "empty msg recvd at recv level" <<std::endl;
+                }
+            }
             _state_estimator.handle_recv_process(out_msg);
             _message_logger->log_msg(out_msg);
             _start_receive();
