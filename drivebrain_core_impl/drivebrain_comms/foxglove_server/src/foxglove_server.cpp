@@ -94,43 +94,33 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
     };
 
     // TODO make the .proto file name a parameter
-    std::string proto_name = "hytech_msgs.proto";
-    const google::protobuf::FileDescriptor *file_descriptor =
-        google::protobuf::DescriptorPool::generated_pool()->FindFileByName(proto_name);
 
-    if (!file_descriptor)
-    {
-        std::cerr << "File descriptor not found!" << std::endl;
-        return;
-    }
-
-    auto potential_id_map = util::generate_name_to_id_map(proto_name);
-    if(potential_id_map)
+    auto potential_id_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
+    if (potential_id_map)
     {
         _id_name_map = *potential_id_map;
     }
-    
+
+    auto descriptors = util::get_pb_descriptors({"hytech_msgs.proto", "hytech.proto"});
 
     std::vector<foxglove::ChannelWithoutId> channels;
 
-    for (int i = 0; i < file_descriptor->message_type_count(); ++i)
+    for (const auto &file_descriptor : descriptors)
     {
-        const google::protobuf::Descriptor *message_descriptor = file_descriptor->message_type(i);
-        foxglove::ChannelWithoutId server_channel;
-        server_channel.topic = message_descriptor->name();
-        server_channel.encoding = "protobuf";
-        server_channel.schemaName = message_descriptor->full_name();
-        server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
-        std::cout << "server_channel.topic: " << server_channel.topic << "with id: " << i <<std::endl;
-        channels.push_back(server_channel);
+
+        for (int i = 0; i < file_descriptor->message_type_count(); ++i)
+        {
+            const google::protobuf::Descriptor *message_descriptor = file_descriptor->message_type(i);
+            foxglove::ChannelWithoutId server_channel;
+            server_channel.topic = message_descriptor->name();
+            server_channel.encoding = "protobuf";
+            server_channel.schemaName = message_descriptor->full_name();
+            server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
+            channels.push_back(server_channel);
+        }
     }
 
     auto res_ids = _server->addChannels(channels);
-    for(const auto & id : res_ids)
-    {
-        std::cout << "id: " << id <<std::endl;
-    }
-
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);
 }
@@ -139,7 +129,7 @@ void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobu
 {
 
     if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
-    {        
+    {
         auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
         const auto serializedMsg = msg->SerializeAsString();
         const auto now = nanosecondsSinceEpoch();

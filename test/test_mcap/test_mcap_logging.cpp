@@ -4,7 +4,6 @@
 #define MCAP_IMPLEMENTATION
 #include "writer.hpp"
 #include "BuildFileDescriptorSet.h"
-// #include "foxglove/PointCloud.pb.h"
 #include <hytech_msgs.pb.h>
 
 

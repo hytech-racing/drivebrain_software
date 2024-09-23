@@ -63,14 +63,12 @@ int main(int argc, char *argv[])
     }
 
     core::JsonFileHandler config(param_path);
-    comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
 
     core::StateEstimator state_estimator(logger);
 
-    std::cout << "driver init " << driver.init() << std::endl;
-    configurable_components.push_back(&driver);
+    
 
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
@@ -85,6 +83,9 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(mcap_logger)),
                                                                                                         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
+    comms::CANDriver driver(config, logger, message_logger, tx_queue, rx_queue, io_context, dbc_path);
+    std::cout << "driver init " << driver.init() << std::endl;
+    configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     auto _ = controller.init();

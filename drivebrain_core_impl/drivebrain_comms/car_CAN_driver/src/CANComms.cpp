@@ -135,6 +135,7 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
         _output_deque_ref.deque.push_back(msg);
         _output_deque_ref.cv.notify_all();
     }
+    _message_logger->log_msg(msg);
 }
 
 // gets a protobuf message from just the name of it
@@ -363,8 +364,8 @@ void comms::CANDriver::_handle_send_msg_from_queue()
             auto can_msg = _get_CAN_msg(msg);
             if (can_msg)
             {
-                // std::cout << "sending" <<std::endl;
                 _send_message(*can_msg);
+                _message_logger->log_msg(msg);
             }
         }
         q.deque.clear();

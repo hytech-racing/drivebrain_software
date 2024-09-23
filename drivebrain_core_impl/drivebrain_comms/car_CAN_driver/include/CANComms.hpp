@@ -3,7 +3,7 @@
 #include <Configurable.hpp>
 #include <DriverBus.hpp>
 #include <Logger.hpp>
-
+#include <MsgLogger.hpp>
 #include <hytech.pb.h>
 
 // system includes
@@ -59,15 +59,16 @@ namespace comms
     public:
         using FieldVariant = std::variant<int32_t, int64_t, uint32_t, uint64_t, float, double, bool, std::string, std::monostate>;
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        
+        using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         /// @brief constructur
         /// @param json_file_handler the file handler 
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path) : 
             Configurable(logger, json_file_handler, "CANDriver"),
             _logger(logger),
+            _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _output_deque_ref(out_deq),
             _socket(io_context),
@@ -107,6 +108,7 @@ namespace comms
 
     private:
         core::Logger& _logger;
+        std::shared_ptr<loggertype> _message_logger;
         deqtype &_input_deque_ref;
         deqtype &_output_deque_ref;
 
