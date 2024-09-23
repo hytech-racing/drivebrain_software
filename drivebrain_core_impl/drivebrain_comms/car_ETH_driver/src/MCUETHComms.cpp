@@ -46,6 +46,7 @@ namespace comms
                 for (const auto &msg : _input_deque_ref.deque)
                 {
                     _send_message(msg);
+                    _message_logger->log_msg(msg);
                 }
                 _input_deque_ref.deque.clear();
             }
@@ -75,14 +76,6 @@ namespace comms
             }
             
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
-            if(out_msg->GetDescriptor()->name() == "MCUOutputData")
-            {
-                auto msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-                if (msg->brake_percent() == 0)
-                {
-                    std::cout << "empty msg recvd at recv level" <<std::endl;
-                }
-            }
             _state_estimator.handle_recv_process(out_msg);
             _message_logger->log_msg(out_msg);
             _start_receive();

@@ -34,12 +34,12 @@
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
 
-bool running = true;
-
+std::atomic<bool> stop_signal{false};
 // Signal handler function
-void signalHandler(int signal) {
+void signalHandler(int signal)
+{
     std::cout << "Interrupt signal (" << signal << ") received. Cleaning up..." << std::endl;
-    running = false; // Set running to false to exit the main loop or gracefully terminate
+    stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
 }
 
 int main(int argc, char *argv[])
@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
 
     auto foxglove_server = core::FoxgloveWSServer(configurable_components);
 
-    
     std::function<void(void)> close_file_temp = []() {};
     std::function<void(const std::string &)> open_file_temp = [](const std::string &) {};
 
@@ -93,25 +92,32 @@ int main(int argc, char *argv[])
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue
-    std::thread io_context_thread([&io_context]()
-                                  {
-        std::cout <<"started io context thread" <<std::endl;
-        io_context.run(); });
+    std::thread io_context_thread([&io_context, &stop_signal]()
+        {
+            std::cout <<"started io context thread" <<std::endl;
+            try {
+                while (!stop_signal.load()) {
+                    // Run the io_context as long as stop_signal is false
+                    io_context.run_one();  // Run at least one handler, or return immediately if none
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error in io_context: " << e.what() << std::endl;
+            }
+        });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&stop_signal, &rx_queue, &eth_tx_queue, &controller, &state_estimator]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
         auto loop_time = controller.get_dt_sec();
         auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
-        while(true)
+        while(!stop_signal.load())
         {
             auto start_time = std::chrono::high_resolution_clock::now();
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
             if(state_and_validity.second)
             {
-                // std::cout << state_and_validity.first.input.requested_accel <<std::endl;
                 auto out = controller.step_controller(state_and_validity.first);
                 out_msg->CopyFrom(out);
                 {
@@ -132,10 +138,14 @@ int main(int argc, char *argv[])
 
     std::signal(SIGINT, signalHandler);
 
-    while (running)
+    while (!stop_signal.load())
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    
+    process_thread.join();
+    std::cout << "joined main process" << std::endl;
+    io_context.stop();
+    io_context_thread.join();
+    std::cout << "joined io context" << std::endl;
     return 0;
 }

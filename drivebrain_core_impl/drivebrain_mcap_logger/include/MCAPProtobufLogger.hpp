@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <mcap/writer.hpp>
 #include <mcap/mcap.hpp>
+#include <mutex>
 namespace common
 {
     class MCAPProtobufLogger 
@@ -20,6 +21,7 @@ namespace common
     private:
         mcap::McapWriterOptions _options;
         mcap::McapWriter _writer;
+        std::mutex _mtx;
         std::unordered_map<std::string, uint32_t> _msg_name_id_map;
 
     };

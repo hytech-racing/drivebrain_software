@@ -31,8 +31,7 @@ namespace core
                   std::function<void(MsgType)> logger_msg_func,
                   std::function<void()> stop_log_func,
                   std::function<void(const std::string &)> open_log_func,
-                  std::function<void(MsgType)> live_msg_output_func) : 
-                                                                       _logger_msg_function(logger_msg_func),
+                  std::function<void(MsgType)> live_msg_output_func) : _logger_msg_function(logger_msg_func),
                                                                        _live_msg_output_func(live_msg_output_func),
                                                                        _log_file_extension(log_file_extension),
                                                                        _stop_log_function(stop_log_func),
@@ -47,8 +46,8 @@ namespace core
                 _logging = init_logging;
             }
 
-            _logger_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_log), logger_msg_func, true);
-            _live_telem_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_live_output), live_msg_output_func, false);
+            // _logger_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_log), logger_msg_func, true);
+            // _live_telem_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_live_output), live_msg_output_func, false);
         }
 
         ~MsgLogger()
@@ -57,11 +56,6 @@ namespace core
             _running = false;
             _logging = false;
             _stop_log_function();
-            _thread_safe_log.cv.notify_all();
-            _thread_safe_live_output.cv.notify_all();
-            _logger_thread.join();
-            _live_telem_thread.join();
-
             std::cout << "safely exited" << std::endl;
         }
 
@@ -70,17 +64,9 @@ namespace core
             if (_logging)
             {
                 auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-                if(out_msg->GetDescriptor()->name() == "MCUOutputData")
-                {
-                    auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-                    if (cast_msg->brake_percent() == 0)
-                    {
-                        std::cout << "empty msg recvd at logger level" <<std::endl;
-                    }
-                }
-                _add_msg_to_queue(_thread_safe_log, msg);
+                _handle_output_messages(msg, _logger_msg_function);
             }
-            _add_msg_to_queue(_thread_safe_live_output, msg);
+            _handle_output_messages(msg,_live_msg_output_func);
         }
 
         // will only open a new file for logging if we are not currently logging
@@ -99,7 +85,6 @@ namespace core
             std::cout << "attempting stop" << std::endl;
             if (_logging)
             {
-                std::unique_lock lk(_thread_safe_log.mtx);
                 _logging = false;
                 _stop_log_function();
             }
@@ -107,20 +92,6 @@ namespace core
         }
         bool messages_still_need_output()
         {
-            {
-                std::unique_lock lk(_thread_safe_log.mtx);
-                if (!_thread_safe_log.deque.empty())
-                {
-                    return true;
-                }
-            }
-            {
-                std::unique_lock lk(_thread_safe_live_output.mtx);
-                if (!_thread_safe_live_output.deque.empty())
-                {
-                    return true;
-                }
-            }
             return false;
         }
 
@@ -142,42 +113,20 @@ namespace core
             return ss.str();
         }
 
-        void _add_msg_to_queue(ThreadSafeOutput &queue, MsgType msg)
+        void _handle_output_messages(MsgType msg, std::function<void(MsgType)> output_function)
         {
+
+            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
+            if (out_msg->GetDescriptor()->name() == "MCUOutputData")
             {
-                std::unique_lock lk(queue.mtx);
-                queue.deque.push_back(msg);
-                queue.cv.notify_all();
-            }
-        }
-
-        void _handle_output_messages(ThreadSafeOutput &queue, std::function<void(MsgType)> output_function, bool is_logger)
-        {
-                    std::unique_lock lk(queue.mtx);
-
-                    // only the is_logger thread can "pause" while running
-                    queue.cv.wait(lk, [is_logger, &queue, this]()
-                                  { return ((!queue.deque.empty()) || !_running); });
-                    if (!queue.deque.empty())
-                    {
-                        for (auto msg : queue.deque)
-                        {
-                            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-                            if(out_msg->GetDescriptor()->name() == "MCUOutputData")
-                            {
-                                auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-                                if (cast_msg->brake_percent() == 0)
-                                {
-                                    std::cout << "empty msg recvd at output level" <<std::endl;
-                                }
-                            }
-                            output_function(msg);
-                        }
-                        queue.deque.clear();
-                    }
+                auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
+                if (cast_msg->brake_percent() == 0)
+                {
+                    std::cout << "empty msg recvd at output level" << std::endl;
                 }
             }
-        
+            output_function(msg);
+        }
 
     private:
         bool _running = true;
@@ -187,8 +136,8 @@ namespace core
         std::string _log_file_extension;
         std::function<void()> _stop_log_function;
         std::function<void(const std::string &)> _open_log_function;
-        
-        
+        std::function<void(MsgType)> _logger_msg_function;
+        std::function<void(MsgType)> _live_msg_output_func;
     };
 }
 #endif // __MSG_LOGGER__
