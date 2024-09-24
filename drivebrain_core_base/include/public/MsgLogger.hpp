@@ -47,8 +47,6 @@ namespace core
                 _logging = init_logging;
             }
 
-            // _logger_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_log), logger_msg_func, true);
-            // _live_telem_thread = std::thread(&MsgLogger::_handle_output_messages, this, std::ref(_thread_safe_live_output), live_msg_output_func, false);
         }
 
         ~MsgLogger()
@@ -112,7 +110,6 @@ namespace core
             // Create a stringstream to format the date and time
             std::stringstream ss;
 
-            // Format: YYYY-MM-DD_HH-MM-SS (with custom prefix and extension)
             ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S")
                << extension;
 

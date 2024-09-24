@@ -57,7 +57,7 @@ target_include_directories(drivebrain_core PRIVATE
 
 target_link_libraries(drivebrain_core PUBLIC 
     nlohmann_json::nlohmann_json 
-    Boost::boost 
+    Boost::boost
     Boost::system 
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
@@ -79,57 +79,36 @@ target_link_libraries(drivebrain_common_utils INTERFACE
 
 make_cmake_package(drivebrain_common_utils drivebrain)
 
-
-# foxglove parameter server interface
-add_library(foxglove_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_server/src/foxglove_server.cpp)
-
-target_compile_features(foxglove_server PUBLIC cxx_std_17)
-
-target_include_directories(foxglove_server PUBLIC 
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/foxglove_server/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/foxglove_server/include>    
-)
-
-target_link_libraries(foxglove_server PUBLIC 
-    drivebrain_core
-    protobuf::libprotobuf
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    hytech_np_proto_cpp::hytech_np_proto_cpp
-    foxglove_websocket::foxglove_websocket
-    drivebrain_common_utils    
-)
-target_compile_features(foxglove_server PUBLIC cxx_std_17) 
-make_cmake_package(foxglove_server drivebrain)
-
 # CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
-add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
-
-target_include_directories(CAN_driver PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>    
+add_library(drivebrain_comms SHARED
+    drivebrain_core_impl/drivebrain_comms/src/foxglove_server.cpp
+    drivebrain_core_impl/drivebrain_comms/src/CANComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/MCUETHComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
 )
 
-target_link_libraries(CAN_driver PUBLIC 
+target_compile_features(drivebrain_comms PUBLIC cxx_std_17)
+
+
+target_include_directories(drivebrain_comms PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/include>    
+)
+
+target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core
-    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_common_utils
+    gRPC::grpc++_reflection
+    foxglove_websocket::foxglove_websocket
     protobuf::libprotobuf
     dbcppp::dbcppp
-)
-make_cmake_package(CAN_driver drivebrain)
-
-add_library(ETH_driver SHARED drivebrain_core_impl/drivebrain_comms/car_ETH_driver/src/MCUETHComms.cpp)
-target_include_directories(ETH_driver PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>    
-)
-
-target_link_libraries(ETH_driver PUBLIC 
-    drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
+    db_service_grpc_cpp::db_service_grpc_cpp
 )
-make_cmake_package(ETH_driver drivebrain)
+
+make_cmake_package(drivebrain_comms drivebrain)
+
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
@@ -143,6 +122,7 @@ target_link_libraries(drivebrain_control PUBLIC
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
 )
+
 make_cmake_package(drivebrain_control drivebrain)
 
 add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp)
@@ -164,18 +144,6 @@ target_link_libraries(drivebrain_mcap_logger INTERFACE
 
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
-add_library(db_service_impl SHARED drivebrain_core_impl/drivebrain_comms/db_service_impl/src/DBServiceImpl.cpp)
-target_include_directories(db_service_impl PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/db_service_impl/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/db_service_impl/include>    
-)
-
-target_link_libraries(db_service_impl PUBLIC 
-    drivebrain_core
-    db_service_grpc_cpp::db_service_grpc_cpp
-    gRPC::grpc++_reflection
-)
-make_cmake_package(db_service_impl drivebrain)
 
 ###############
 # executables #
@@ -216,13 +184,7 @@ target_link_libraries(test_db_grpc PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     gRPC::grpc++_reflection
 )
-# add_executable(mcu_test test/test_mcu_send.cpp)
 
-
-# target_link_libraries(mcu_test PUBLIC
-#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-#     protobuf::libprotobuf
-# )
 
 add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
@@ -231,15 +193,6 @@ target_link_libraries(test_mcap PUBLIC
     protobuf::libprotobuf
     mcap::mcap
 )
-
-# add_executable(test_msg_logger test/test_msglogger.cpp)
-
-# target_link_libraries(test_msg_logger PUBLIC
-#     drivebrain_core
-# )
-
-
-
 
 ###                   ###
 ### system executable ###
@@ -250,17 +203,12 @@ add_executable(alpha_build drivebrain_app/main.cpp)
 target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
-    CAN_driver
-    foxglove_server
-    ETH_driver
+    drivebrain_comms
     drivebrain_mcap_logger
-    mcap::mcap
-    db_service_impl
 )
 
 include(GNUInstallDirs)
 install(TARGETS 
-
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
