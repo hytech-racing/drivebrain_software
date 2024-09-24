@@ -39,8 +39,11 @@ rec { # rec is required for us to access the description and use it as a variabl
     data_acq.inputs.ht_can_pkg_flake.follows = "ht_can";
     data_acq.inputs.nix-proto.follows = "nix-proto";
     data_acq.inputs.nixpkgs.follows = "nixpkgs";
+
+    vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
+
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -95,6 +98,7 @@ rec { # rec is required for us to access the description and use it as a variabl
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
+                vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
                 self.overlays.db_overlay
@@ -112,7 +116,8 @@ rec { # rec is required for us to access the description and use it as a variabl
                   dbc_path=${pkgs.ht_can_pkg}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-                  alias build="rm -rf build && mkdir build && cd build && cmake .. && make -j && cd .."
+                  alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
+                  alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];

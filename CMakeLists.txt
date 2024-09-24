@@ -21,6 +21,8 @@ configure_file(
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
+find_package(libvncxx REQUIRED)
+
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
@@ -35,6 +37,7 @@ find_package(cmake_macros REQUIRED)
 
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
+
 include(create_package)
 
 #####################
@@ -64,7 +67,7 @@ target_include_directories(drivebrain_core PRIVATE
 target_link_libraries(drivebrain_core PUBLIC 
     nlohmann_json::nlohmann_json 
     Boost::boost
-    Boost::system 
+    Boost::system
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
 )
@@ -207,6 +210,16 @@ target_link_libraries(test_mcap PUBLIC
     protobuf::libprotobuf
     mcap::mcap
 )
+
+set(CMAKE_CXX_STANDARD 17) 
+add_executable(test_vn test/test_vn.cpp)
+target_link_libraries(test_vn PUBLIC
+    Boost::boost
+    Boost::system
+    libvncxx::libvncxx
+)
+
+target_compile_features(test_vn PUBLIC cxx_std_11)
 
 ###                   ###
 ### system executable ###
