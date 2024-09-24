@@ -1,5 +1,7 @@
-{
-  description = "drivebrain flake";
+rec { # rec is required for us to access the description and use it as a variable for the flake input
+  # OH BOI THIS IS A HACK
+  description = "2024-09-24T13_32_59";
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 
@@ -14,9 +16,16 @@
 
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
-
-    HT_proto.url = "github:hytech-racing/HT_proto";
-    HT_proto.flake = false;
+    
+    # fug it we ball, description is a variable
+    HT_proto =
+      {
+        type = "github";
+        owner = "hytech-racing";
+        repo = "HT_proto";
+        ref = description; # we have configurable flakes at home:
+        flake = false;
+      };
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
@@ -45,7 +54,7 @@
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = "0.0.1";
+          version = description;
           src = "${HT_proto}/proto";
         };
         db_service = nix-proto.mkProtoDerivation

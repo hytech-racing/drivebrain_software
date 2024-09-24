@@ -12,6 +12,12 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/version_header/versions.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version_header/versions.h"
+    @ONLY
+)
+
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
@@ -95,6 +101,11 @@ target_include_directories(drivebrain_comms PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/include>    
 )
 
+target_include_directories(drivebrain_comms PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
+
 target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core
     drivebrain_common_utils
@@ -141,7 +152,10 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
 target_link_libraries(drivebrain_mcap_logger INTERFACE
     mcap::mcap
 )
-
+target_include_directories(drivebrain_mcap_logger PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
 
