@@ -3,6 +3,7 @@
 #include <boost/array.hpp>
 #include "libvncxx/vntime.h"
 #include "libvncxx/packetfinder.h"
+#include "libvncxx/packet.h"
 #include <cstdint>
 #include <optional>
 #include <iterator>
@@ -10,6 +11,8 @@
 using SerialPort = boost::asio::serial_port;
 
 using namespace vn::xplat;
+using namespace vn::protocol::uart;
+
 void validPacketFoundHandler(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts)
 {
     if (packet.type() == vn::protocol::uart::Packet::TYPE_BINARY)
@@ -54,6 +57,23 @@ void readData(SerialPort& m_serial, boost::array<std::uint8_t, 512>& m_inputBuf,
             readData(m_serial, m_inputBuf, processor);
         }
     );
+}
+
+void write_data(SerialPort& m_serial, boost::array<std::uint8_t, 512>& m_outputBuf)
+{
+    auto numOfBytes = Packet::genWriteBinaryOutput1(
+		ERRORDETECTIONMODE_CHECKSUM,
+		(char *)m_outputBuf.data(),
+		m_outputBuf.size(),
+		ASYNCMODE_PORT1,
+		200,
+		COMMONGROUP_TIMESTARTUP | COMMONGROUP_YAWPITCHROLL,	// Note use of binary OR to configure flags.
+		TIMEGROUP_NONE,
+		IMUGROUP_NONE,
+		GPSGROUP_NONE,
+		ATTITUDEGROUP_NONE,
+		INSGROUP_NONE,
+		GPSGROUP_NONE);
 }
 
 int main()
