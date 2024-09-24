@@ -77,11 +77,6 @@ namespace comms
         if (!error)
         {
             _mcu_msg->ParseFromArray(_recv_buffer.data(), size);
-            if(size != 10)
-            {
-                std::cout <<"bad size: " << size <<std::endl;
-            }
-            
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
             _state_estimator.handle_recv_process(out_msg);
             _message_logger->log_msg(out_msg);
