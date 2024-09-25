@@ -1014,11 +1014,11 @@
         "utils": "utils_9"
       },
       "locked": {
-        "lastModified": 1727104203,
-        "narHash": "sha256-vCkoX5Xiclrl5/HYI+9qRVuUXX2Nn90bANu49DDjuGk=",
+        "lastModified": 1727224162,
+        "narHash": "sha256-rb6PVizoIShIt779PWeOIQaZfh+cmmmLy/uvBz/3IPc=",
         "owner": "RCMast3r",
         "repo": "vn_driver_lib",
-        "rev": "9c04408ae56fca3ebeba6acfe6ff218ca6efee87",
+        "rev": "10767a8a25467d04f368f5f38537addeca07709b",
         "type": "github"
       },
       "original": {
