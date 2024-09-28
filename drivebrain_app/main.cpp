@@ -26,11 +26,21 @@
 int main(int argc, char* argv[])
 {
 
+    // io context for boost async io. gets given to the drivers working with all system peripherals
     boost::asio::io_context io_context;
+    
+    // data receive queue for all input messages from the CAN driver
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
-    std::vector<core::common::Configurable *> configurable_components;
 
+    // transmit queue for data going from components to the CAN driver
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
+
+
+
+    // vector of pointers to configurable components to be given to the param handler. 
+    // these are the pointers to components that can be configured
+    std::vector<core::common::Configurable *> configurable_components;
+    
     std::string param_path = "config/test_config/can_driver.json";
     std::optional<std::string> dbc_path = std::nullopt;
     if(argc == 3)
