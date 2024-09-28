@@ -7,6 +7,7 @@
 #include <cctype>
 
 #include "hytech_msgs.pb.h"
+#include "base_msgs.pb.h"
 
 #include "libvncxx/vntime.h"
 #include "libvncxx/packetfinder.h"
@@ -23,7 +24,6 @@ namespace comms
     {
         Configurable(logger, json_file_handler, "VNDriver");
         _logger(logger);
-        _mcu_message = std::make_shared<hytech_msgs::VNOutputData>();
         _state_estimator(state_estimator);
 
         // Try to establish a connection to the driver
@@ -75,8 +75,8 @@ namespace comms
 
         num_of_bytes = Packet::genWriteBinaryOutput1(
             ErrorDetectionMode::ERRORDETECTIONMODE_NONE,
-            (char *)m_outputBuf.data(),
-            m_outputBuf.size(),
+            (char *)_output_buff.data(),
+            _output_buff.size(),
             AsyncMode::ASYNCMODE_PORT1,
             2,
             (CommonGroup::COMMONGROUP_YAWPITCHROLL | CommonGroup::COMMONGROUP_ANGULARRATE), // Note use of binary OR to configure flags.
@@ -87,7 +87,7 @@ namespace comms
             (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY),
             GpsGroup::GPSGROUP_NONE);
 
-        boost::asio::async_write(m_serial,
+        boost::asio::async_write(_serial,
                                  boost::asio::buffer(_output_buff.data(), num_of_bytes),
                                  [](const boost::system::error_code &ec, std::size_t bytes_transferred)
                                  {
@@ -100,12 +100,11 @@ namespace comms
                                          std::cerr << "Error sending data: " << ec.message() << "\n";
                                      }
                                  });
-        return 1;
     }
 
     void VNDriver::_set_baud_rate(int rate, int port)
     {
-        auto num_of_bytes = vn::protocol::uart::Packet.genWriteSerialBaudRate(
+        auto num_of_bytes = vn::protocol::uart::Packet::genWriteSerialBaudRate(
             ErrorDetectionMode::ERRORDETECTIONMODE_NONE,
             (char *)_output_buff.data(),
             _output_buff.size(),
@@ -126,8 +125,6 @@ namespace comms
                                  });
 
         _serial.set_option(SerialPort::baud_rate(rate));
-
-        return 0;
     }
 
     void VNDriver::_handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts)
@@ -159,24 +156,41 @@ namespace comms
             auto vel_body = packet.extractVec3f();
 
             // Create the protobuf message to send
-            _mcu_message->set_yaw(ypr_data.x);
-            _mcu_message->set_roll(ypr_data.z);
-            _mcu_message->set_pitch(ypr_data.y);
-            _mcu_message->set_uncomp_accel_x(uncomp_accel.x);
-            _mcu_message->set_uncomp_accel_y(uncomp_accel.y);
-            _mcu_message->set_uncomp_accel_z(uncomp_accel.z);
-            _mcu_message->set_accel_body_x(linear_accel_body.x);
-            _mcu_message->set_accel_body_y(linear_accel_body.y);
-            _mcu_message->set_accel_body_z(linear_accel_body.z);
-            _mcu_message->set_ins_status(static_cast<uint16_t>(ins_status &= 0x3));
-            _mcu_message->set_pos_lla_x(pos_lla.x);
-            _mcu_message->set_pos_lla_y(pos_lla.y);
-            _mcu_message->set_pos_lla_z(pos_lla.z);
-            _mcu_message->set_vel_body_x(vel_body.x);
-            _mcu_message->set_vel_body_y(vel_body.y);
-            _mcu_message->set_vel_body_z(vel_body.z);    
+            std::shared_ptr<hytech_msgs::VNData> msg_out = std::make_shared<hytech_msgs::VNData>();
 
-            _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_message));        
+            hytech_msgs::xyz_vector* linear_vel_msg = msg_out->mutable_vn_vel_m_s();
+            linear_vel_msg->set_x(vel_body.x);
+            linear_vel_msg->set_y(vel_body.y);
+            linear_vel_msg->set_z(vel_body.z);
+
+            hytech_msgs::xyz_vector* linear_accel_msg = msg_out->mutable_vn_linear_accel_m_ss();
+            linear_accel_msg->set_x(linear_accel_body.x);
+            linear_accel_msg->set_y(linear_accel_body.y);
+            linear_accel_msg->set_z(linear_accel_body.z);
+
+            hytech_msgs::xyz_vector* linear_accel_uncomp_msg = msg_out->mutable_vn_linear_accel_uncomp_m_ss();
+            linear_accel_uncomp_msg->set_x(uncomp_accel.x);
+            linear_accel_uncomp_msg->set_y(uncomp_accel.y);
+            linear_accel_uncomp_msg->set_z(uncomp_accel.z);
+
+            hytech_msgs::xyz_vector* angular_rate_data_msg = msg_out->mutable_vn_angular_rate_rad_s();
+            angular_rate_data_msg->set_x(angular_rate_data.x);
+            angular_rate_data_msg->set_y(angular_rate_data.y);
+            angular_rate_data_msg->set_z(angular_rate_data.z);
+
+            hytech_msgs::ypr_vector* ypr_data_msg = msg_out->mutable_vn_ypr_rad();
+            ypr_data_msg->set_yaw(ypr_data.x);
+            ypr_data_msg->set_pitch(ypr_data.y);
+            ypr_data_msg->set_roll(ypr_data.z);
+
+            hytech_msgs::GPS_data* vn_gps_msg = msg_out->mutable_vn_gps();
+            vn_gps_msg->set_lat(pos_lla.x);
+            vn_gps_msg->set_lon(pos_lla.y);
+
+            hytech_msgs::vn_status* vn_ins_msg = msg_out->mutable_status();
+            vn_ins_msg->set_ins_status(hytech_msgs::INSStatus::TRACKING_2);
+
+            _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));        
         }
         else
         {

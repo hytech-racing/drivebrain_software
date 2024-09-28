@@ -47,7 +47,6 @@ namespace comms {
         private: 
             // Private variables
             core::Logger& _logger;
-            std::shared_ptr<hytech_msgs::VNDriverData> _mcu_message;
             core::StateEstimator &_state_estimator;
 
 
