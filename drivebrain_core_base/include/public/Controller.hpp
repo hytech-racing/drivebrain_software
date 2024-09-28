@@ -24,8 +24,13 @@ namespace control
     {
     public:
         Controller() = default;
-        // TODO may want to have a default set of controller attributes that we can return (name, time-step, etc.)
+        /// @brief get the desired time delta / discrete time step length in seconds of the controller
+        /// @return time delta in seconds
         virtual float get_dt_sec() = 0;
+
+        /// @brief step the controller
+        /// @param in the input of the controller
+        /// @return the result of the controller
         virtual ControllerResult step_controller(const ControllerInput& in) = 0;
     };
 }
