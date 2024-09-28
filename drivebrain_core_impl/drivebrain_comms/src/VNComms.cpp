@@ -15,15 +15,17 @@
 
 using namespace vn::xplat;
 using namespace vn::protocol::uart;
+using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 
 
 namespace comms
 {
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, core::StateEstimator &state_estimator)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
     {
         Configurable(logger, json_file_handler, "VNDriver");
         _logger(logger);
+        _message_logger(message_logger);
         _state_estimator(state_estimator);
 
         // Try to establish a connection to the driver
@@ -73,7 +75,7 @@ namespace comms
     void VNDriver::_configure_binary_outputs()
     {
 
-        num_of_bytes = Packet::genWriteBinaryOutput1(
+        auto num_of_bytes = Packet::genWriteBinaryOutput1(
             ErrorDetectionMode::ERRORDETECTIONMODE_NONE,
             (char *)_output_buff.data(),
             _output_buff.size(),
@@ -190,7 +192,8 @@ namespace comms
             hytech_msgs::vn_status* vn_ins_msg = msg_out->mutable_status();
             vn_ins_msg->set_ins_status(hytech_msgs::INSStatus::TRACKING_2);
 
-            _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));        
+            _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));      
+            _message_logger.log_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
         }
         else
         {

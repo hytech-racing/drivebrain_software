@@ -42,7 +42,7 @@ namespace comms {
     class VNDriver : public core::common::Configurable
     {
         public:
-            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, core::StateEstimator &state_estimator)
+            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
 
         private: 
             // Private variables
@@ -55,6 +55,7 @@ namespace comms {
             boost::array<std::uint8_t, 512> _output_buff;
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
+            std::shared_ptr<loggertype> _message_logger
             
             // Private methods
             void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);
