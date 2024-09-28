@@ -16,8 +16,7 @@ void StateEstimator::_start_recv_thread()
                 std::unique_lock lk(_msg_in_queue.mtx);
                 _msg_in_queue.cv.wait(lk, [this]()
                                         { return !_msg_in_queue.deque.empty(); });
-                auto m = _msg_in_queue.deque.back();
-                input_msg = m; 
+                input_msg = _msg_in_queue.deque.back();
                 _msg_in_queue.deque.pop_back();
             }
 
@@ -84,7 +83,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
 
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
 {
-    auto state_is_valid = _validate_stamps(_timestamp_array);
+    bool state_is_valid = _validate_stamps(_timestamp_array);
     {
         std::unique_lock lk(_state_mutex);
 

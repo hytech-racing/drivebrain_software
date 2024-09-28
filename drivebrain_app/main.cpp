@@ -58,9 +58,9 @@ int main(int argc, char* argv[])
     control::SimpleController controller(config);
     configurable_components.push_back(&controller);
 
-    auto param_server = core::FoxgloveParameterServer(configurable_components);
+    core::FoxgloveParameterServer param_server(configurable_components);
 
-    auto _ = controller.init();
+    bool successful_controller_init = controller.init();
 
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
@@ -75,16 +75,16 @@ int main(int argc, char* argv[])
         auto torque_to_send = std::make_shared<drivebrain_torque_lim_input>();
         auto speed_to_send = std::make_shared<drivebrain_speed_set_input>();
 
-        auto loop_time = controller.get_dt_sec();
-        auto loop_time_micros = (int)(loop_time*1000000.0f);
+        float loop_time = controller.get_dt_sec();
+        int loop_time_micros = (int)(loop_time*1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(true)
         {
             auto start_time = std::chrono::high_resolution_clock::now();
-            auto state_and_validity = state_estimator.get_latest_state_and_validity();
+            std::pair<core::VehicleState, bool> state_and_validity = state_estimator.get_latest_state_and_validity();
             if(state_and_validity.second)
             {
-                auto out = controller.step_controller(state_and_validity.first);
+                std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> out = controller.step_controller(state_and_validity.first);
                 torque_to_send->CopyFrom(out.first);
                 {
                     std::unique_lock lk(tx_queue.mtx);

@@ -82,7 +82,7 @@ namespace core
                         std::is_same_v<ParamType, std::string>,
                     "ParamType must be bool, int, double, float, or std::string");
             }
-            /// @brief Gets a parameter value within the component's scope, ensuring it exists with a default value and if it doesnt it will created it
+            /// @brief Gets a parameter value within the component's scope from the shared config file, ensuring it exists with and returning std::nullopt if it does not
             /// @tparam ParamType parameter type
             /// @param key the id of the parameter being requested
             /// @return the optional config value
@@ -92,7 +92,7 @@ namespace core
                 _handle_assert<ParamType>();
 
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
-                auto &config = _json_file_handler.get_config();
+                nlohmann::json &config = _json_file_handler.get_config();
 
                 // Ensure the component's section exists and if it doesnt we created it
                 if (!config.contains(_component_name))
@@ -114,7 +114,7 @@ namespace core
             std::optional<ParamType> get_live_parameter(const std::string &key)
             {
                 _handle_assert<ParamType>();
-                auto res = get_parameter_value<ParamType>(key);
+                std::optional res = get_parameter_value<ParamType>(key);
 
                 if (!res)
                 {

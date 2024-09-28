@@ -27,9 +27,9 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
 
 bool comms::CANDriver::init()
 {
-    auto canbus_device = get_parameter_value<std::string>("canbus_device");
+    std::optional canbus_device = get_parameter_value<std::string>("canbus_device");
     
-    auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    std::optional dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
 
     if (!(canbus_device && dbc_file_path))
     {
@@ -119,7 +119,7 @@ void comms::CANDriver::_send_message(const struct can_frame &frame)
 
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 {
-    auto msg = pb_msg_recv(frame);
+    std::shared_ptr<google::protobuf::Message> msg = pb_msg_recv(frame);
     {
         std::unique_lock lk(_output_deque_ref.mtx);
         _output_deque_ref.deque.push_back(msg);
@@ -196,9 +196,9 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     auto iter = _messages.find(frame.can_id);
     if (iter != _messages.end())
     {
-        auto msg = iter->second->Clone();
+        std::unique_ptr<dbcppp::IMessage> msg = iter->second->Clone();
         // std::cout << "Received Message: " << msg->Name() << "\n";
-        auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
+        std::shared_ptr<google::protobuf::Message> msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
@@ -281,37 +281,31 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
 
     if(_messages_names_and_ids.find(messageTypeName) !=_messages_names_and_ids.end())
     {
-        auto id = _messages_names_and_ids[messageTypeName];
-        auto msg = _messages[id]->Clone();
+        uint64_t id = _messages_names_and_ids[messageTypeName];
+        std::unique_ptr<dbcppp::IMessage> msg = _messages[id]->Clone();
         frame.can_id = id;
         frame.len = msg->MessageSize();
         for (const auto &sig : msg->Signals())
         {
-            // std::cout << sig.Name() << std::endl;
-            auto field_value = get_field_value(pb_msg, sig.Name());
+            comms::CANDriver::FieldVariant field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
                     {
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
-                // std::cout << "float Field value: " << std::get<float>(arg) << std::endl;
                 auto val = std::get<float>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int32_t>(arg)){
-                // std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
                 auto val = std::get<int32_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int64_t>(arg)){
-                // std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
                 auto val = std::get<int64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<uint64_t>(arg)){
-                // std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
                 auto val = std::get<uint64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<bool>(arg)){
-                // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
             } else {
@@ -351,7 +345,7 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 
         for (const auto &msg : q.deque)
         {
-            auto can_msg = _get_CAN_msg(msg);
+            std::optional<can_frame> can_msg = _get_CAN_msg(msg);
             if(can_msg)
             {
                 // std::cout << "sending" <<std::endl;

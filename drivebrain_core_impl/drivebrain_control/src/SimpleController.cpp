@@ -36,11 +36,12 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
 
 bool control::SimpleController::init()
 {
-    auto max_torque = get_live_parameter<float>("max_torque");
-    auto max_regen_torque = get_live_parameter<float>("max_regen_torque");
-    auto rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
-    auto regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
-    auto positive_speed_set = get_live_parameter<float>("positive_speed_set");
+    std::optional max_torque = get_live_parameter<float>("max_torque");
+    std::optional max_regen_torque = get_live_parameter<float>("max_regen_torque");
+    std::optional rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
+    std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
+    std::optional positive_speed_set = get_live_parameter<float>("positive_speed_set");
+
     if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
     {
         return false;
@@ -69,7 +70,7 @@ std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> control::Simp
         // Positive torque request
         torqueRequest = ((float)accelRequest) * _config.max_torque;
         
-        auto max_rpm = _config.positive_speed_set * constants::METERS_PER_SECOND_TO_RPM;
+        float max_rpm = _config.positive_speed_set * constants::METERS_PER_SECOND_TO_RPM;
         speed_cmd_out.set_drivebrain_set_rpm_fl(max_rpm);
         speed_cmd_out.set_drivebrain_set_rpm_fr(max_rpm);
         speed_cmd_out.set_drivebrain_set_rpm_rl(max_rpm);

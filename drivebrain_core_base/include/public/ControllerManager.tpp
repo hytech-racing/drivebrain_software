@@ -4,9 +4,9 @@
 template <typename ControllerType, size_t NumControllers>
 bool control::ControllerManager<ControllerType, NumControllers>::init()
 {
-    auto max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
-    auto max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
-    auto max_accel_switch_request = get_parameter_value<float>("max_accel_switch_float");
+    std::optional max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
+    std::optional max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
+    std::optional max_accel_switch_request = get_parameter_value<float>("max_accel_switch_float");
 
     if (!(max_switch_speed && max_torque_switch && max_accel_switch_request))
     {
