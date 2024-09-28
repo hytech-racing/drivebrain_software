@@ -21,12 +21,13 @@ using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 namespace comms
 {
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
+   VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
+    : core::common::Configurable(logger, json_file_handler, "VNDriver"),
+      _logger(logger), 
+      _state_estimator(state_estimator), 
+      _message_logger(message_logger), 
+      _serial(_io)
     {
-        Configurable(logger, json_file_handler, "VNDriver");
-        _logger(logger);
-        _message_logger(message_logger);
-        _state_estimator(state_estimator);
 
         // Try to establish a connection to the driver
         _logger.log_string("Opening device.", core::LogLevel::INFO);
@@ -46,8 +47,7 @@ namespace comms
 
         if (ec)
         {
-            _logger.log_string("Failed to open device.", core::LogLevel::Error);
-            return 1;
+            _logger.log_string("Failed to open device.", core::LogLevel::INFO);
         }
 
         _logger.log_string("Setting baud rate.", core::LogLevel::INFO);
@@ -59,7 +59,7 @@ namespace comms
         _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
         _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
 
-        _set_baud_rate(baud_rate, port);
+        _set_baud_rate((int) baud_rate.value(), (int) port.value());
 
         // Configures the binary outputs for the device
         _logger.log_string("Configuring binary outputs.", core::LogLevel::INFO);
