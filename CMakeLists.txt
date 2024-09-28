@@ -13,7 +13,7 @@ find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
@@ -127,6 +127,7 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     CAN_driver
     foxglove_param_server
+    Boost::program_options
 )
 
 include(GNUInstallDirs)

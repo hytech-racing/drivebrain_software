@@ -13,7 +13,9 @@
 
 #include <cassert>
 
+#include <boost/program_options.hpp>
 #include <boost/asio.hpp>
+
 #include <memory>
 #include <optional>
 // TODO first application will have
@@ -41,13 +43,28 @@ int main(int argc, char* argv[])
     // these are the pointers to components that can be configured
     std::vector<core::common::Configurable *> configurable_components;
     
-    std::string param_path = "config/test_config/can_driver.json";
+    std::string param_path;    
     std::optional<std::string> dbc_path = std::nullopt;
-    if(argc == 3)
-    {
-        param_path = argv[1];
-        dbc_path = argv[2];
+    
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "produce help message")
+        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/test_config/can_driver.json"), "Path to the parameter JSON file")
+        ("dbc-path,d", po::value<std::string>(), "Path to the DBC file (optional)");
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    
+    if (vm.count("help")) {
+        std::cout << desc << "\n";
+        return 1;
     }
+    if (vm.count("dbc-path")) {
+        dbc_path = vm["dbc-path"].as<std::string>();
+    }
+
     core::JsonFileHandler config(param_path);
     comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
     core::StateEstimator state_estimator(rx_queue);
