@@ -100,7 +100,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         }
         else
         {
-            return status_type::NO_ERROR;
+            return status_type::ERROR_CONTROLLER_NO_TORQUE_OR_SPEED_OUTPUT;
         }
     };
 
