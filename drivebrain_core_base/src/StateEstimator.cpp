@@ -4,6 +4,20 @@
 
 using namespace core;
 
+bool StateEstimator::init()
+{
+    // shared threshold for both maximum jitter and maximum time for received state variables for valid state estimate 
+    std::optional threshold_microseconds = get_live_parameter<int>("threshold_microseconds");
+
+    if (!(threshold_microseconds))
+    {
+        return false;
+    }
+
+    _config = {*threshold_microseconds};
+    return true;
+}
+
 void StateEstimator::_start_recv_thread()
 {
     _run_recv_thread = true;
@@ -64,8 +78,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
         std::unique_lock lk(_state_mutex);
         timestamp_array_to_sort = timestamp_arr;
     }
-    const std::chrono::microseconds threshold(30000); // 30 milliseconds in microseconds
-
+    const std::chrono::microseconds threshold(_config.threshold_microseconds); 
     // Sort the array
     std::sort(timestamp_array_to_sort.begin(), timestamp_array_to_sort.end());
 

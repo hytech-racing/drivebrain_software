@@ -2,7 +2,7 @@
 #define __STATEESTIMATOR_H__
 
 // TODO:
-// - [ ] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
+// - [x] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
 
 // implement a thing that can maintain a "flexible" state of the car such that
 // it can build up a state of the car from the messages coming in. It starts out with an empty
@@ -26,26 +26,34 @@
 
 #include <DriverBus.hpp>
 #include <VehicleDataTypes.hpp>
+#include <Configurable.hpp>
 
 namespace core
 {
-
-    class StateEstimator
+    class StateEstimator : public common::Configurable
     {
     public:
-        StateEstimator(core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &msg_input_queue) : _msg_in_queue(msg_input_queue)
+        struct config {
+            int threshold_microseconds;
+        };
+
+        StateEstimator(core::JsonFileHandler &json_file_handler, core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &msg_input_queue) : 
+        Configurable(json_file_handler, "StateEstimator"),
+        _msg_in_queue(msg_input_queue)
         {
             _vehicle_state = {};
             _start_recv_thread();
-            // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time {0}; 
             _timestamp_array = { zero_start_time, zero_start_time, zero_start_time};
+            (void)init();
         }
         ~StateEstimator()
         {
            _run_recv_thread =false;
            _recv_thread.join(); 
         }
+
+        bool init();
         
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
     private:
@@ -59,7 +67,7 @@ namespace core
         core::VehicleState _vehicle_state;
         std::array<std::chrono::microseconds, 3> _timestamp_array;
         common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>& _msg_in_queue;
-        
+        config _config; 
     };
 }
 

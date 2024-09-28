@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
     core::JsonFileHandler config(param_path);
     comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
-    core::StateEstimator state_estimator(rx_queue);
+    core::StateEstimator state_estimator(config, rx_queue);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
