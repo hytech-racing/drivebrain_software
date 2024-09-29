@@ -28,6 +28,7 @@
 #include <DriverBus.hpp>
 #include <VehicleDataTypes.hpp>
 #include <Logger.hpp>
+#include <MsgLogger.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
 // that can update pieces of the state that would be optimal.
@@ -39,11 +40,14 @@ namespace core
 {
     class StateEstimator
     {
+
+    using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
+
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
         
         
-        StateEstimator(core::Logger &shared_logger) : _logger(shared_logger)
+        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger) : _logger(shared_logger), _message_logger(message_logger)
         {
             _vehicle_state = {};
             // initialize the 3 state variables to have a zero timestamp
@@ -65,6 +69,7 @@ namespace core
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;
         std::array<std::chrono::microseconds, 1> _timestamp_array;
+        std::shared_ptr<loggertype> _message_logger;
 
     };
 }

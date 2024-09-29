@@ -1,6 +1,6 @@
 rec { # rec is required for us to access the description and use it as a variable for the flake input
   # OH BOI THIS IS A HACK
-  description = "2024-09-24T13_32_59";
+  description = "2024-09-29T04_29_43";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";

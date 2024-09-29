@@ -67,11 +67,7 @@ int main(int argc, char *argv[])
     core::JsonFileHandler config(param_path);
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
-
-    core::StateEstimator state_estimator(logger);
-
     
-
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
 
@@ -85,6 +81,9 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(mcap_logger)),
                                                                                                         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
+
+    core::StateEstimator state_estimator(logger, message_logger);
+
     comms::CANDriver driver(config, logger, message_logger, tx_queue, rx_queue, io_context, dbc_path);
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
