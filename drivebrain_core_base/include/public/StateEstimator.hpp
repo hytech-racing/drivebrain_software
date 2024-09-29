@@ -35,6 +35,7 @@
 // - [ ] implement the ability to kick off threads for a vector of input queues
 namespace core
 {
+    
     class StateEstimator : public common::Configurable
     class StateEstimator : public common::Configurable
     {
@@ -53,13 +54,18 @@ namespace core
             _timestamp_array = { zero_start_time, zero_start_time, zero_start_time};
             (void)init();
         }
+        
+        /// @brief destructor that attempts to stop and join threads. in later versions of this destructor this actually works
         ~StateEstimator()
         {
            _run_recv_thread =false;
            _recv_thread.join(); 
         }
 
+        /// @brief initialization function required by the Configurable partially-virtualized base class
+        /// @return true or false on successful init of state estimator
         bool init();
+        
         
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
 
@@ -72,8 +78,12 @@ namespace core
         config _config;
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
-        core::VehicleState _vehicle_state;
-        std::array<std::chrono::microseconds, 3> _timestamp_array;
+        core::VehicleState _vehicle_state; 
+
+        /// @brief timestamp array containing previous received pieces of the state of when the were received last for validation. 
+        std::array<std::chrono::microseconds, 3> _timestamp_array; 
+        
+        /// @brief input queue of data
         common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>& _msg_in_queue;
         config _config; 
     };
