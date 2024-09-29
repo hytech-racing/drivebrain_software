@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     
     std::string param_path;    
     std::optional<std::string> dbc_path = std::nullopt;
-    
+    // program option parsing 
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -65,8 +65,14 @@ int main(int argc, char* argv[])
         dbc_path = vm["dbc-path"].as<std::string>();
     }
 
+    // config file handler that gets given to all configurable components.
     core::JsonFileHandler config(param_path);
+    
+    // the CAN driver that parses data and can send data from the tx queue when protobuf message data is put into the queue as 
+    // long as it has an associated CAN message
     comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
+    
+    // the state estimator that can take in data from the rx queue that the CAN driver puts messages out onto and update the vehicle's state
     core::StateEstimator state_estimator(config, rx_queue);
 
     std::cout << "driver init " << driver.init() << std::endl;
@@ -75,8 +81,11 @@ int main(int argc, char* argv[])
     control::SimpleController controller(config);
     configurable_components.push_back(&controller);
 
+    // live parameter server that relies upon having pointers to configurable components for 
+    // getting and handling updates of the registered live parameters
     core::FoxgloveParameterServer param_server(configurable_components);
 
+    // required init, maybe want to call this in the constructor instead
     bool successful_controller_init = controller.init();
 
     // what we will do here is have a temporary super-loop.
@@ -87,6 +96,9 @@ int main(int argc, char* argv[])
         std::cout <<"started io context thread" <<std::endl;
         io_context.run(); });
 
+    // the main loop that handles evaluation of the state estimator to sample the vehicle state and give it to the controller to act upon and 
+    // result in a controller output. this controller output is then out into the transmit queue to be sent out. since the CAN driver is threaded the queue
+    // is already waiting for the messages to come accross and as soon as they are put into the queue they will send.
     std::thread process_thread([&rx_queue, &tx_queue, &controller, &state_estimator]()
                                {
         auto torque_to_send = std::make_shared<drivebrain_torque_lim_input>();
@@ -119,10 +131,11 @@ int main(int argc, char* argv[])
 
             auto elapsed = 
                 std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-
+            // make sure our loop rate is what we expect it to be
             std::this_thread::sleep_for(loop_chrono_time - elapsed);
         } });
 
+    // keep-alive loop for the main thread
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));

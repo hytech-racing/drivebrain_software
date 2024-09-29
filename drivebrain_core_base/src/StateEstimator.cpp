@@ -21,6 +21,12 @@ bool StateEstimator::init()
 void StateEstimator::_start_recv_thread()
 {
     _run_recv_thread = true;
+    // create the receive thread by giving it a lambda function that it runs
+
+    // general flow: 
+    // while running, wait on a message to enter the queue, then when a message is in the queue, get it and check what type it is.
+    // next, cast the shared_ptr to it's proper type and then access it's data and update it's associated vehicle state vars
+    // if we dont have a handler for the specific data, simply just continue, no need to do anything with it
     _recv_thread = std::thread([this]()
                                {
         while(_run_recv_thread)
@@ -33,7 +39,7 @@ void StateEstimator::_start_recv_thread()
                 input_msg = _msg_in_queue.deque.back();
                 _msg_in_queue.deque.pop_back();
             }
-
+                // check by the input names what type to cast the input pointer to
                 if( input_msg->GetTypeName() == "mcu_pedal_readings")
                 {
                     auto in_msg = std::static_pointer_cast<mcu_pedal_readings>(input_msg);
