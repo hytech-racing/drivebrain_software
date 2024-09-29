@@ -22,11 +22,9 @@ namespace comms
         _logger.log_string("Opening vn driver.", core::LogLevel::INFO);
 
         auto device_name = get_parameter_value<std::string>("device_name");
-        std::cout << device_name.value() << std::endl;
-        auto baud_rate = get_parameter_value<int>("baud_rate");
-        std::cout << baud_rate.value() << std::endl;
+        _config.baud_rate = get_parameter_value<int>("baud_rate").value();
+        _config.freq_divisor = get_parameter_value<int>("freq_divisor").value();
         auto port = get_parameter_value<int>("port");
-        std::cout << port.value() << std::endl;
 
         _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
         
@@ -42,7 +40,7 @@ namespace comms
         }
 
         // Set the baud rate of the device along with other configs
-        _serial.set_option(SerialPort::baud_rate(921600));
+        _serial.set_option(SerialPort::baud_rate(_config.baud_rate));
         _serial.set_option(SerialPort::character_size(8));
         _serial.set_option(SerialPort::parity(SerialPort::parity::none));
         _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
@@ -86,7 +84,7 @@ namespace comms
             (char *)_output_buff.data(),
             _output_buff.size(),
             AsyncMode::ASYNCMODE_PORT1,
-            1,
+            _config.freq_divisor,
             (CommonGroup::COMMONGROUP_YAWPITCHROLL | CommonGroup::COMMONGROUP_ANGULARRATE), // Note use of binary OR to configure flags.
             TimeGroup::TIMEGROUP_NONE,
             ImuGroup::IMUGROUP_UNCOMPACCEL,

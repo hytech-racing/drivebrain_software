@@ -14,6 +14,7 @@
     "VNDriver": {
         "device_name": "/dev/ttyUSB0",
         "baud_rate": 921600, 
-        "port": 1
+        "port": 1,
+        "freq_divisor": 1
     }
 }

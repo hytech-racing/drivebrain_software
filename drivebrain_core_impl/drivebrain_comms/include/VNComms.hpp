@@ -43,6 +43,10 @@ namespace comms {
         public:
             VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator, boost::asio::io_context &io_context);
             bool init();
+            struct config {
+                int baud_rate;
+                int freq_divisor;
+            };
 
         private: 
             // Private variables
@@ -54,7 +58,8 @@ namespace comms {
             boost::array<std::uint8_t, 512> _output_buff;
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
-            std::shared_ptr<loggertype> _message_logger;     
+            std::shared_ptr<loggertype> _message_logger; 
+            config _config;    
 
         public: 
             // Public methods
