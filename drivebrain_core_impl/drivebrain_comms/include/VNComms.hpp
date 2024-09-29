@@ -2,14 +2,18 @@
 
 #include <Configurable.hpp>
 #include <Logger.hpp>
+#include <MsgLogger.hpp>
+#include <StateEstimator.hpp>
 
 // protobuf
 #include <google/protobuf/any.pb.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/dynamic_message.h>
+#include "hytech_msgs.pb.h"
 
 // boost
 #include <boost/asio.hpp>
+#include <boost/array.hpp>
 
 // c++ stl includes
 #include <memory>
@@ -30,19 +34,15 @@
 
 using namespace vn::xplat;
 using namespace vn::protocol::uart;
-
-#include "hytech_msgs.pb.h"
-
 using SerialPort = boost::asio::serial_port;
-
-using namespace vn::xplat;
-using namespace vn::protocol::uart;
+using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 
 namespace comms {
     class VNDriver : public core::common::Configurable
     {
         public:
-            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
+            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator);
+            bool init();
 
         private: 
             // Private variables
@@ -55,13 +55,18 @@ namespace comms {
             boost::array<std::uint8_t, 512> _output_buff;
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
-            std::shared_ptr<loggertype> _message_logger
-            
+            std::shared_ptr<loggertype> _message_logger;     
+
+        public: 
+            // Public methods
+            void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);  
+        
+        private:
             // Private methods
-            void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);
+            static void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);
             void _configure_binary_outputs();
             void _start_recieve();
             void _set_baud_rate(int rate, int port);
 
-    }
+    };
 }

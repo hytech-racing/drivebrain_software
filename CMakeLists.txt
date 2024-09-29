@@ -120,6 +120,8 @@ target_link_libraries(drivebrain_comms PUBLIC
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     db_service_grpc_cpp::db_service_grpc_cpp
+    libvncxx::libvncxx
+
 )
 
 make_cmake_package(drivebrain_comms drivebrain)

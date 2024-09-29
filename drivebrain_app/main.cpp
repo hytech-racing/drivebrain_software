@@ -3,6 +3,7 @@
 #include <SimpleController.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
+#include <VNComms.hpp>
 #include <MsgLogger.hpp>
 #include <MCAPProtobufLogger.hpp>
 #include <mcap/writer.hpp>
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
+    comms::VNDriver vn_driver(config, logger, message_logger, state_estimator);
 
     auto _ = controller.init();
 
