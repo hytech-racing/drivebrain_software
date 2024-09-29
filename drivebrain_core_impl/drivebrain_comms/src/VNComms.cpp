@@ -19,34 +19,34 @@ namespace comms
     bool VNDriver::init()
     {
         // Try to establish a connection to the driver
-        _logger.log_string("Opening device.", core::LogLevel::INFO);
+        _logger.log_string("Opening vn driver.", core::LogLevel::INFO);
 
         auto device_name = get_parameter_value<std::string>("device_name");
+        std::cout << device_name.value() << std::endl;
         auto baud_rate = get_parameter_value<int>("baud_rate");
+        std::cout << baud_rate.value() << std::endl;
         auto port = get_parameter_value<int>("port");
+        std::cout << port.value() << std::endl;
 
-        _processor.registerPossiblePacketFoundHandler(this, VNDriver::_handle_recieve);
-        SerialPort _serial(_io);
+        _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
+        
         boost::system::error_code ec;
 
         _serial.open(device_name.value(), ec);
 
         if (ec)
         {
-            _logger.log_string("Failed to open device.", core::LogLevel::INFO);
+            std::cout << "error " << ec <<std::endl;
+            _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
             return 1;
         }
 
-        _logger.log_string("Setting baud rate.", core::LogLevel::INFO);
-
         // Set the baud rate of the device along with other configs
-        _serial.set_option(SerialPort::baud_rate(115200));
+        _serial.set_option(SerialPort::baud_rate(921600));
         _serial.set_option(SerialPort::character_size(8));
         _serial.set_option(SerialPort::parity(SerialPort::parity::none));
         _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
         _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
-
-        _set_baud_rate((int)baud_rate.value(), (int)port.value());
 
         // Configures the binary outputs for the device
         _logger.log_string("Configuring binary outputs.", core::LogLevel::INFO);
@@ -56,12 +56,12 @@ namespace comms
         return 0;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
           _logger(logger),
           _state_estimator(state_estimator),
           _message_logger(message_logger),
-          _serial(_io)
+          _serial(io)
     {
 
         init();
@@ -86,7 +86,7 @@ namespace comms
             (char *)_output_buff.data(),
             _output_buff.size(),
             AsyncMode::ASYNCMODE_PORT1,
-            2,
+            1,
             (CommonGroup::COMMONGROUP_YAWPITCHROLL | CommonGroup::COMMONGROUP_ANGULARRATE), // Note use of binary OR to configure flags.
             TimeGroup::TIMEGROUP_NONE,
             ImuGroup::IMUGROUP_UNCOMPACCEL,
@@ -108,31 +108,6 @@ namespace comms
                                          std::cerr << "Error sending data: " << ec.message() << "\n";
                                      }
                                  });
-    }
-
-    void VNDriver::_set_baud_rate(int rate, int port)
-    {
-        auto num_of_bytes = vn::protocol::uart::Packet::genWriteSerialBaudRate(
-            ErrorDetectionMode::ERRORDETECTIONMODE_NONE,
-            (char *)_output_buff.data(),
-            _output_buff.size(),
-            rate,
-            port);
-
-        boost::asio::async_write(_serial, boost::asio::buffer(_output_buff.data(), num_of_bytes),
-                                 [](const boost::system::error_code &ec, std::size_t bytes_transferred)
-                                 {
-                                     if (!ec)
-                                     {
-                                         std::cout << "Successfully sent " << bytes_transferred << " bytes.\n";
-                                     }
-                                     else
-                                     {
-                                         std::cerr << "Error sending data: " << ec.message() << "\n";
-                                     }
-                                 });
-
-        _serial.set_option(SerialPort::baud_rate(rate));
     }
 
     void VNDriver::_handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts)
@@ -221,7 +196,7 @@ namespace comms
                     }
                     return;
                 }
-
+                // _logger.log_string("logging", core::LogLevel::INFO);
                 _processor.processReceivedData((char *)(_input_buff.data()), bytesCount);
                 // Initiate another asynchronous read
                 _start_recieve();

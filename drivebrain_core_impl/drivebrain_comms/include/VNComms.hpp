@@ -41,7 +41,7 @@ namespace comms {
     class VNDriver : public core::common::Configurable
     {
         public:
-            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator);
+            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator, boost::asio::io_context &io_context);
             bool init();
 
         private: 
@@ -51,7 +51,6 @@ namespace comms {
 
 
             vn::protocol::uart::PacketFinder _processor;
-            boost::asio::io_service _io;
             boost::array<std::uint8_t, 512> _output_buff;
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
@@ -66,7 +65,6 @@ namespace comms {
             static void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);
             void _configure_binary_outputs();
             void _start_recieve();
-            void _set_baud_rate(int rate, int port);
 
     };
 }

@@ -89,14 +89,14 @@ int main(int argc, char *argv[])
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
-    comms::VNDriver vn_driver(config, logger, message_logger, state_estimator);
+    comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
 
     auto _ = controller.init();
 
     DBInterfaceImpl db_service_inst(message_logger);
     std::thread db_service_thread([&db_service_inst]()
         {
-            std::cout <<"started io context thread" <<std::endl;
+            std::cout <<"started db service thread" <<std::endl;
             try {
                 while (!stop_signal.load()) {
                     // Run the io_context as long as stop_signal is false
