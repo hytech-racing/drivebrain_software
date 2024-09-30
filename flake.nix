@@ -1,5 +1,5 @@
-rec { # rec is required for us to access the description and use it as a variable for the flake input
-  # OH BOI THIS IS A HACK
+rec {
+  
   description = "2024-09-29T04_29_43";
 
   inputs = {
@@ -17,14 +17,12 @@ rec { # rec is required for us to access the description and use it as a variabl
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
     
-    # fug it we ball, description is a variable
     HT_proto =
       {
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = description; # we have configurable flakes at home:
-        flake = false;
+        flake = true;
       };
 
     foxglove-schemas-src = {
@@ -57,7 +55,7 @@ rec { # rec is required for us to access the description and use it as a variabl
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = description;
+          version = HT_proto.rev;
           src = "${HT_proto}/proto";
         };
         db_service = nix-proto.mkProtoDerivation
