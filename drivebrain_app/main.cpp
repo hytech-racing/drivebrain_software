@@ -24,7 +24,6 @@ int main()
 {
 
     boost::asio::io_context io_context;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
     std::vector<core::common::Configurable *> configurable_components;
 

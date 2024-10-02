@@ -23,7 +23,7 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can";
+    ht_can.url = "github:hytech-racing/ht_can/testingoverride";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
 
     data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";
@@ -38,6 +38,7 @@
         systems = [
           "x86_64-linux"
           "aarch64-linux"
+          "aarch64-darwin"
         ];
         imports = [
           inputs.flake-parts.flakeModules.easyOverlay
@@ -72,6 +73,26 @@
               overlays = [
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
+
+                 (self: super: {
+                   python311 = super.python311.override {
+                    packageOverrides = pyself: pysuper: {
+                        crccheck = pysuper.crccheck.overrideAttrs (oldAttrs: {
+                            meta.platforms = nixpkgs.lib.platforms.all;
+                        });
+                        cantools = pysuper.cantools.overrideAttrs (oldAttrs: {
+                            doCheck = false;
+                            disabledTests = ["test_plot_style test_plot_tz"];
+                        });
+                    };
+                    };
+                    }
+                   )
+
+
+
+
+
               ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               config = { };
             };
