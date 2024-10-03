@@ -9,11 +9,11 @@ project(drivebrain_software LANGUAGES CXX C)
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 
 ### this one is generated from nix-proto but using foxglove's 
-find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+# find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
@@ -28,7 +28,7 @@ include(create_package)
 #####################
 
 # drivebrain core library
-add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp)
+add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp drivebrain_core_base/src/StateEstimator.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/public>
@@ -56,7 +56,6 @@ target_include_directories(foxglove_param_server PUBLIC
 
 target_link_libraries(foxglove_param_server PUBLIC 
     drivebrain_core 
-    foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
     foxglove_websocket::foxglove_websocket    
 )
 target_compile_features(foxglove_param_server PUBLIC cxx_std_17) 
@@ -112,11 +111,11 @@ make_cmake_package(drivebrain_control drivebrain)
 #     Boost::boost
 # )
 
-add_executable(test_param_server test/test_param_server.cpp)
+# add_executable(test_param_server test/test_param_server.cpp)
 
-target_link_libraries(test_param_server PUBLIC 
-    foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
-    foxglove_websocket::foxglove_websocket)
+# target_link_libraries(test_param_server PUBLIC 
+#     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
+#     foxglove_websocket::foxglove_websocket)
 
 ###                   ###
 ### system executable ###
@@ -128,11 +127,12 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     CAN_driver
     foxglove_param_server
+    Boost::program_options
 )
 
 include(GNUInstallDirs)
 install(TARGETS 
-        test_param_server
+        # test_param_server
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

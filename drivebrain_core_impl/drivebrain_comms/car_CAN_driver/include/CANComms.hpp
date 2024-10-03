@@ -64,11 +64,12 @@ namespace comms
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, deqtype &out_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path) : 
             Configurable(json_file_handler, "CANDriver"),
             _input_deque_ref(in_deq),
             _output_deque_ref(out_deq), 
-            _socket(io_context)
+            _socket(io_context),
+            _dbc_path(dbc_path)
         {
             _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
         }
@@ -110,9 +111,11 @@ namespace comms
         struct can_frame _frame;
 
         boost::asio::posix::stream_descriptor _socket;
+        std::optional<std::string> _dbc_path;
 
         std::unordered_map<uint64_t, std::unique_ptr<dbcppp::IMessage>> _messages;
         std::unordered_map<std::string, uint64_t> _messages_names_and_ids;
         int _CAN_socket; // can socket bound to
+        
     };
 }

@@ -104,26 +104,6 @@
     },
     "devshell": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1722113426,
-        "narHash": "sha256-Yo/3loq572A8Su6aY5GP56knpuKYRvM2a1meP9oJZCw=",
-        "owner": "numtide",
-        "repo": "devshell",
-        "rev": "67cce7359e4cd3c45296fb4aaf6a19e2a9c757ae",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "devshell",
-        "type": "github"
-      }
-    },
-    "devshell_2": {
-      "inputs": {
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
@@ -293,15 +273,16 @@
         "utils": "utils_7"
       },
       "locked": {
-        "lastModified": 1724726870,
-        "narHash": "sha256-QHfikufGlpHToUbd1AekFDFM/9+wqkwUo+aRJw6YQDE=",
+        "lastModified": 1725563292,
+        "narHash": "sha256-kaxoAcIdi/+X3hJXIK0d7h1RPNj3TA3sz2luWYAx1Rw=",
         "owner": "hytech-racing",
         "repo": "ht_can",
-        "rev": "2af91612af37f29efd7481236a8cf48c7265c81f",
+        "rev": "68ecba30855ee822d6f487b79401839044dd353b",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
+        "ref": "121",
         "repo": "ht_can",
         "type": "github"
       }
@@ -365,7 +346,7 @@
         "commsdsl-src": "commsdsl-src",
         "commslib-src": "commslib-src",
         "dbcppp-src": "dbcppp-src",
-        "devshell": "devshell_2",
+        "devshell": "devshell",
         "flake-parts": "flake-parts_2",
         "flow-ipc-src": "flow-ipc-src",
         "foxglove-ws-protocol-src": "foxglove-ws-protocol-src",
@@ -618,7 +599,6 @@
     "root": {
       "inputs": {
         "data_acq": "data_acq",
-        "devshell": "devshell",
         "easy_cmake": "easy_cmake",
         "flake-parts": "flake-parts",
         "foxglove-schemas-src": "foxglove-schemas-src",

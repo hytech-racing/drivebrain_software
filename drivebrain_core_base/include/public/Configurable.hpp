@@ -41,7 +41,7 @@
 // then the initial init can call the same set param function that gets called at init time
 
 // live parameters:
-// - [ ] add live parameter handling through use of boost signals
+// - [x] add live parameter handling through use of boost signals
 
 // the live parameter settings will be handled by having a true or false flag within the get_parameter.
 // if this flag is set, the is gotten from the config file and then the map of live parameters gets it's
@@ -54,6 +54,7 @@ namespace core
         {
 
         public:
+            /// @brief helper type alias
             using ParamTypes = std::variant<bool, int, float, double, std::string, std::monostate>;
 
             /// @brief constructor for base class
@@ -110,17 +111,17 @@ namespace core
                         std::is_same_v<ParamType, std::string>,
                     "ParamType must be bool, int, double, float, or std::string");
             }
-            /// @brief Gets a parameter value within the component's scope, ensuring it exists with a default value and if it doesnt it will created it
-            /// @tparam ParamType parameter type
-            /// @param key the id of the parameter being requested
-            /// @return the optional config value, std::nullopt if not found
+            /// @brief Gets a parameter value within the component's scope from the shared config file, ensuring it exists with and returning std::nullopt if it does not
+            /// @tparam ParamType parameter type that can be a bool, int, double, float or string
+            /// @param key the id of the parameter being requested within the namespace of this component's name
+            /// @return the optional config value std::nullopt if not available, otherwise it is an optional POD
             template <typename ParamType>
             std::optional<ParamType> get_parameter_value(const std::string &key)
             {
                 _handle_assert<ParamType>();
 
                 // TODO assert that the template type is only of the specific types supported by nlohmann's json lib
-                auto &config = _json_file_handler.get_config();
+                nlohmann::json &config = _json_file_handler.get_config();
 
                 // Ensure the component's section exists and if it doesnt we created it
                 if (!config.contains(_component_name))
@@ -147,7 +148,7 @@ namespace core
             std::optional<ParamType> get_live_parameter(const std::string &key)
             {
                 _handle_assert<ParamType>();
-                auto res = get_parameter_value<ParamType>(key);
+                std::optional res = get_parameter_value<ParamType>(key);
 
                 if (!res)
                 {
@@ -166,7 +167,8 @@ namespace core
         private:
             std::string _component_name;
             core::JsonFileHandler &_json_file_handler;
-
+            
+            /// @brief anonymous struct for associating the mutex with what it is guarding specifically within this class
             struct
             {
                 std::unordered_map<std::string, ParamTypes> param_vals;
