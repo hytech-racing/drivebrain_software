@@ -1,4 +1,5 @@
-rec { # rec is required for us to access the description and use it as a variable for the flake input
+rec {
+  # rec is required for us to access the description and use it as a variable for the flake input
   # OH BOI THIS IS A HACK
   description = "2024-09-24T13_32_59";
 
@@ -16,7 +17,7 @@ rec { # rec is required for us to access the description and use it as a variabl
 
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
-    
+
     # fug it we ball, description is a variable
     HT_proto =
       {
@@ -130,11 +131,11 @@ rec { # rec is required for us to access the description and use it as a variabl
               import nixpkgs {
                 inherit system;
                 overlays = [
+                  vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
                   self.overlays.db_overlay
-                ]
-                ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+                ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };
       };

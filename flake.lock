@@ -165,16 +165,17 @@
         "utils": "utils_8"
       },
       "locked": {
-        "lastModified": 1696028845,
-        "narHash": "sha256-i3rPkVz8xmQwAkC5LAejXB2Hd8Is4sHXaniQEvxsfjQ=",
+        "lastModified": 1696029959,
+        "narHash": "sha256-TF8u57hb+0Vq/Z2fG9nE0/0iQV/bMb+v+eLtL76ttFM=",
         "owner": "RCMast3r",
         "repo": "easy_cmake",
-        "rev": "c3308d4f359bb29dd7aa323a186b9d0af334ee21",
+        "rev": "5be1d78ff8383590a3cf5ed3680554d8e619489e",
         "type": "github"
       },
       "original": {
         "owner": "RCMast3r",
         "repo": "easy_cmake",
+        "rev": "5be1d78ff8383590a3cf5ed3680554d8e619489e",
         "type": "github"
       }
     },
@@ -1014,11 +1015,11 @@
         "utils": "utils_9"
       },
       "locked": {
-        "lastModified": 1727224162,
-        "narHash": "sha256-rb6PVizoIShIt779PWeOIQaZfh+cmmmLy/uvBz/3IPc=",
+        "lastModified": 1727972954,
+        "narHash": "sha256-rBVNGm52+468L2syDd3ZR770CxWtLYxZnlsRcioUqwE=",
         "owner": "RCMast3r",
         "repo": "vn_driver_lib",
-        "rev": "10767a8a25467d04f368f5f38537addeca07709b",
+        "rev": "f1ab135475bcac579b534fd082b7b7dea425b09a",
         "type": "github"
       },
       "original": {
