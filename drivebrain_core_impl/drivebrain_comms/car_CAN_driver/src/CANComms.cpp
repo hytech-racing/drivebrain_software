@@ -172,6 +172,9 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             }
             switch (field->type())
             {
+            case google::protobuf::FieldDescriptor::TYPE_ENUM:
+                reflection->SetEnumValue(message.get(), field, (int)std::get<int>(it->second));
+                break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
                 // std::cout << "uh yo " << it->second.index() <<std::endl;
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
@@ -215,9 +218,20 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
                 (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
             {
-                // TODO get correct type from raw signal and store it in the map. right now they are all doubles
-                msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
-                // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+                auto raw_value = sig.Decode(frame.data);
+                
+                // Check if the signal has enum descriptions (ValueEncodingDescriptions)
+                if (sig.ValueEncodingDescriptions_Size() > 0)
+                {
+                    // Enum signal: Cast the decoded raw value to an integer and store it
+                    msg_field_map[sig.Name()] = static_cast<int>(raw_value);
+                }
+                else{
+                    // TODO get correct type from raw signal and store it in the map. right now they are all doubles
+                    msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
+                    // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+                }
+
             }
         }
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
