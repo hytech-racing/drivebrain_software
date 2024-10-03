@@ -4,6 +4,21 @@
 #include "hytech_msgs.pb.h"
 using namespace core;
 
+
+bool StateEstimator::init()
+{
+    // shared threshold for both maximum jitter and maximum time for received state variables for valid state estimate 
+    std::optional threshold_microseconds = get_live_parameter<int>("threshold_microseconds");
+
+    if (!(threshold_microseconds))
+    {
+        return false;
+    }
+
+    _config = {*threshold_microseconds};
+    return true;
+}
+
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
     if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
@@ -29,8 +44,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
         std::unique_lock lk(_state_mutex);
         timestamp_array_to_sort = timestamp_arr;
     }
-    const std::chrono::microseconds threshold(30000); // 30 milliseconds in microseconds
-
+    const std::chrono::microseconds threshold(_config.threshold_microseconds); 
     // Sort the array
     std::sort(timestamp_array_to_sort.begin(), timestamp_array_to_sort.end());
 
@@ -48,7 +62,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
 
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
 {
-    auto state_is_valid = _validate_stamps(_timestamp_array);
+    bool state_is_valid = _validate_stamps(_timestamp_array);
     {
         std::unique_lock lk(_state_mutex);
         
