@@ -49,7 +49,7 @@ namespace core
 {
     namespace common
     {
-        /// @brief this is the class that configurable components inherit from to get parameter access to the top-level ptree
+        /// @brief this is the (partially virtual) class that configurable components inherit from to get parameter access to the top-level ptree
         class Configurable
         {
 
@@ -57,23 +57,49 @@ namespace core
             /// @brief helper type alias
             using ParamTypes = std::variant<bool, int, float, double, std::string, std::monostate>;
 
-        
+            /// @brief constructor for base class
+            /// @param json_file_handler the referrence to the json file loaded in main
+            /// @param component_name name of the component (required to be unique)
             Configurable(core::JsonFileHandler &json_file_handler, const std::string &component_name)
                 : _json_file_handler(json_file_handler), _component_name(component_name) {}
 
+            /// @brief getter for name
+            /// @return name of the component
             std::string get_name();
+
+            /// @brief gets the names of the parameters for this component
+            /// @return vector of names
             std::vector<std::string> get_param_names();
 
+            /// @brief gets the map of param names with all param values
+            /// @return unordered map of names and vals (variant)
             std::unordered_map<std::string, ParamTypes> get_params_map();
 
+            /// @brief external function signature for use by the parameter server for handling the parameter updates. calls the user-implemented boost signal
+            /// @param key the id of the parameter that should be contained within the param map
+            /// @param param_val the parameter value to change to 
             void handle_live_param_update(const std::string &key, ParamTypes param_val);
 
+            // TODO renamd id to key to stay consistent with naming, also switch to const ref
+
+            /// @brief getter for param value at specified id
+            /// @param id map key for parameter within map
+            /// @return param value
             Configurable::ParamTypes get_cached_param(std::string id);
 
         protected:
+            /// @brief boost signal that the user is expected to connect their parameter update handler function for changing their internal parameter values
             boost::signals2::signal<void(const std::unordered_map<std::string, ParamTypes> &)> param_update_handler_sig;
+
+            /// @brief virtual init function that has to be implemented. it is expected that the use puts their getters for live / "static" parameters within this function
+            /// @return false if not all params found that were expected, true if all params were good. other initialization code can be included not pertaining to configuration base class as well
             virtual bool init() = 0;
 
+
+            // TODO look into making this private
+
+            /// @brief internal type checker to ensure that param types are what they are only what we support
+            /// @tparam ParamType the desired parameter type
             template <typename ParamType>
             void _handle_assert()
             {
@@ -113,10 +139,11 @@ namespace core
                 return config[_component_name][key].get<ParamType>();
             }
 
-            /// @brief gets the parameter value from the config file while also registering it as a live parameter that can be updated
-            /// @tparam ParamType see @ref get_parameter_value  
-            /// @param key see @ref get_parameter_value 
-            /// @return see @ref get_parmeter_value
+
+            /// @brief same as the @ref get_parameter_value function, however it also registers the parameter to the internal live parameter map
+            /// @tparam ParamType the parameter type
+            /// @param key  the id of the parameter being requested
+            /// @return the optional config value, std::nullopt if not found
             template <typename ParamType>
             std::optional<ParamType> get_live_parameter(const std::string &key)
             {
