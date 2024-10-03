@@ -326,6 +326,27 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
             } else if(std::holds_alternative<bool>(arg)){
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
+
+            } else if (std::holds_alternative<std::string>(arg)){
+                auto enum_name = std::get<std::string>(arg);
+                bool found = false;
+
+                // iterating to find correct value
+                for (const auto &enc : sig.ValueEncodingDescriptions())
+                {
+                    if (enc.second == enum_name)
+                    {
+                        sig.Encode(enc.first, frame.data);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    std::cout << "enum not found " << std::endl;
+                }
+                
             } else {
                 std::cout <<"uh not supported yet" <<std::endl;
             } },
