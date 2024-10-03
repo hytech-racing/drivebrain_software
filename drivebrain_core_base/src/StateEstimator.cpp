@@ -4,6 +4,21 @@
 #include "hytech_msgs.pb.h"
 using namespace core;
 
+
+bool StateEstimator::init()
+{
+    // shared threshold for both maximum jitter and maximum time for received state variables for valid state estimate 
+    std::optional threshold_microseconds = get_live_parameter<int>("threshold_microseconds");
+
+    if (!(threshold_microseconds))
+    {
+        return false;
+    }
+
+    _config = {*threshold_microseconds};
+    return true;
+}
+
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
     if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
@@ -18,40 +33,7 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_rpms = rpms;
         }
     }
-    // if( message->GetTypeName() == "mcu_pedal_readings")
-    // {
-    //     auto in_msg = std::static_pointer_cast<mcu_pedal_readings>(message);
-    //     core::DriverInput input = { (in_msg->accel_percent_float() / 100.0f), (in_msg->brake_percent_float() / 100.0f)};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.input = input;
-    //     }
-    // }
 
-    // else if(message->GetTypeName() == "vn_vel")
-    // {
-    //     auto in_msg = std::static_pointer_cast<vn_vel>(message);
-    //     xyz_vec<float> body_vel = {in_msg->vn_body_vel_x(), in_msg->vn_body_vel_y(), in_msg->vn_body_vel_z()};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[1] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.current_body_vel_ms = body_vel;
-    //     }
-    // }
-
-    // else if(message->GetTypeName() == "drivetrain_rpms_telem")
-    // {
-    //     auto in_msg = std::static_pointer_cast<drivetrain_rpms_telem>(message);
-    //     veh_vec<float> rpms = {(float)in_msg->fl_motor_rpm(), (float)in_msg->fr_motor_rpm(), (float)in_msg->rl_motor_rpm(), (float)in_msg->rr_motor_rpm()};
-    //     {
-    //         std::unique_lock lk(_state_mutex);
-    //         _timestamp_array[2] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    //         _vehicle_state.current_rpms = rpms;
-    //     }
-    // } else {
-    //     return;
-    // }
 }
 
 // TODO parameterize the timeout threshold
@@ -63,8 +45,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
         std::unique_lock lk(_state_mutex);
         timestamp_array_to_sort = timestamp_arr;
     }
-    const std::chrono::microseconds threshold(30000); // 30 milliseconds in microseconds
-
+    const std::chrono::microseconds threshold(_config.threshold_microseconds); 
     // Sort the array
     std::sort(timestamp_array_to_sort.begin(), timestamp_array_to_sort.end());
 
@@ -82,7 +63,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
 
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
 {
-    auto state_is_valid = _validate_stamps(_timestamp_array);
+    bool state_is_valid = _validate_stamps(_timestamp_array);
     {
         std::unique_lock lk(_state_mutex);
         

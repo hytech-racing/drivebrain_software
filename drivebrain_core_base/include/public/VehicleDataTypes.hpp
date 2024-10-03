@@ -2,7 +2,7 @@
 #define __VEHICLESTATE_H__
 #include <Utils.hpp>
 #include <variant>
-
+#include <Literals.hpp>
 // TODO this will need a one-to-one protobuf message
 namespace core
 {
@@ -17,20 +17,20 @@ namespace core
     {
         bool is_ready_to_drive;
         DriverInput input;
-        veh_vec<float> current_rpms;
-        xyz_vec<float> current_body_vel_ms;
+        veh_vec<velocity_rpm> current_rpms;
+        xyz_vec<speed_m_s> current_body_vel_ms;
     };
 
     struct SpeedControlOut
     {
-        veh_vec<float> desired_rpms;
-        veh_vec<float> positive_torque_lim_nm;
-        veh_vec<float> negative_torque_lim_nm;
+        veh_vec<velocity_rpm> desired_rpms;
+        veh_vec<torque_nm> positive_torque_lim_nm;
+        veh_vec<torque_nm> negative_torque_lim_nm;
     };
 
     struct TorqueControlOut
     {
-        veh_vec<float> desired_torques_nm;
+        veh_vec<torque_nm> desired_torques_nm;
     };
 
     // we will have both speed and torque control output controllers
@@ -43,11 +43,12 @@ namespace core
     {
         enum class ControllerManagerStatus
         {
-            NO_ERROR = 0,
-            ERROR_CONTROLLER_INDEX_OUT_OF_RANGE = 1,
-            ERROR_SPEED_DIFF_TOO_HIGH = 2,
-            ERROR_TORQUE_DIFF_TOO_HIGH = 3,
-            ERROR_DRIVER_ON_PEDAL = 3
+            NO_ERROR,
+            ERROR_CONTROLLER_INDEX_OUT_OF_RANGE,
+            ERROR_SPEED_DIFF_TOO_HIGH,
+            ERROR_TORQUE_DIFF_TOO_HIGH,
+            ERROR_DRIVER_ON_PEDAL,
+            NUM_CONTROLLER_MANAGER_STATUSES
         };
     }
 
