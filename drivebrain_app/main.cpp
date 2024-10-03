@@ -2,6 +2,7 @@
 #include <CANComms.hpp>
 #include <SimpleController.hpp>
 #include <StateEstimator.hpp>
+#include <MCUETHComms.hpp>
 
 #include <DrivebrainBase.hpp>
 #include <param_server.hpp>
@@ -25,23 +26,24 @@
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 
     // io context for boost async io. gets given to the drivers working with all system peripherals
     boost::asio::io_context io_context;
-    
-    // data receive queue for all input messages from the CAN driver
+    auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> eth_tx_queue;
+
+    std::vector<core::common::Configurable *> configurable_components;
 
     // transmit queue for data going from components to the CAN driver
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue;
 
 
 
     // vector of pointers to configurable components to be given to the param handler. 
     // these are the pointers to components that can be configured
-    std::vector<core::common::Configurable *> configurable_components;
     
     std::string param_path;    
     std::optional<std::string> dbc_path = std::nullopt;
@@ -67,18 +69,15 @@ int main(int argc, char* argv[])
 
     // config file handler that gets given to all configurable components.
     core::JsonFileHandler config(param_path);
-    
-    // the CAN driver that parses data and can send data from the tx queue when protobuf message data is put into the queue as 
-    // long as it has an associated CAN message
-    comms::CANDriver driver(config, tx_queue, rx_queue, io_context, dbc_path);
-    
-    // the state estimator that can take in data from the rx queue that the CAN driver puts messages out onto and update the vehicle's state
-    core::StateEstimator state_estimator(config, rx_queue);
+    comms::CANDriver driver(config, logger, tx_queue, rx_queue, io_context, dbc_path);
+
+    core::StateEstimator state_estimator(config, logger);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, state_estimator, io_context, "192.168.1.30", 2001, 2000);
 
     std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
 
-    control::SimpleController controller(config);
+    control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
 
     // live parameter server that relies upon having pointers to configurable components for 
@@ -95,17 +94,16 @@ int main(int argc, char* argv[])
                                   {
         std::cout <<"started io context thread" <<std::endl;
         io_context.run(); });
-
+    
     // the main loop that handles evaluation of the state estimator to sample the vehicle state and give it to the controller to act upon and 
     // result in a controller output. this controller output is then out into the transmit queue to be sent out. since the CAN driver is threaded the queue
     // is already waiting for the messages to come accross and as soon as they are put into the queue they will send.
-    std::thread process_thread([&rx_queue, &tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
                                {
-        auto torque_to_send = std::make_shared<drivebrain_torque_lim_input>();
-        auto speed_to_send = std::make_shared<drivebrain_speed_set_input>();
+        auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
-        float loop_time = controller.get_dt_sec();
-        int loop_time_micros = (int)(loop_time*1000000.0f);
+        auto loop_time = controller.get_dt_sec();
+        auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(true)
         {
@@ -113,19 +111,15 @@ int main(int argc, char* argv[])
             std::pair<core::VehicleState, bool> state_and_validity = state_estimator.get_latest_state_and_validity();
             if(state_and_validity.second)
             {
-                std::pair<drivebrain_torque_lim_input, drivebrain_speed_set_input> out = controller.step_controller(state_and_validity.first);
-                torque_to_send->CopyFrom(out.first);
+                // std::cout << state_and_validity.first.input.requested_accel <<std::endl;
+                auto out = controller.step_controller(state_and_validity.first);
+                out_msg->CopyFrom(out);
                 {
-                    std::unique_lock lk(tx_queue.mtx);
-                    tx_queue.deque.push_back(torque_to_send);
-                    tx_queue.cv.notify_all();
+                    std::unique_lock lk(eth_tx_queue.mtx);
+                    eth_tx_queue.deque.push_back(out_msg);
+                    eth_tx_queue.cv.notify_all();
                 }
-                speed_to_send->CopyFrom(out.second);
-                {
-                    std::unique_lock lk(tx_queue.mtx);
-                    tx_queue.deque.push_back(speed_to_send);
-                    tx_queue.cv.notify_all();
-                }
+            } else {
             }
             auto end_time = std::chrono::high_resolution_clock::now();
 
@@ -133,6 +127,7 @@ int main(int argc, char* argv[])
                 std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
             // make sure our loop rate is what we expect it to be
             std::this_thread::sleep_for(loop_chrono_time - elapsed);
+            
         } });
 
     // keep-alive loop for the main thread

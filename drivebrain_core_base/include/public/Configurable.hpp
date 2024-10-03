@@ -2,6 +2,7 @@
 
 // TODO make this private
 #include <JsonFileHandler.hpp>
+#include <Logger.hpp>
 
 #include <boost/signals2.hpp>
 
@@ -56,12 +57,15 @@ namespace core
         public:
             /// @brief helper type alias
             using ParamTypes = std::variant<bool, int, float, double, std::string, std::monostate>;
-
+            
+            
+            
             /// @brief constructor for base class
+            /// @param logger 
             /// @param json_file_handler the referrence to the json file loaded in main
             /// @param component_name name of the component (required to be unique)
-            Configurable(core::JsonFileHandler &json_file_handler, const std::string &component_name)
-                : _json_file_handler(json_file_handler), _component_name(component_name) {}
+            Configurable(core::Logger &logger, core::JsonFileHandler &json_file_handler, const std::string &component_name)
+                : _logger(logger), _json_file_handler(json_file_handler), _component_name(component_name) {}
 
             /// @brief getter for name
             /// @return name of the component
@@ -126,14 +130,18 @@ namespace core
                 // Ensure the component's section exists and if it doesnt we created it
                 if (!config.contains(_component_name))
                 {
-                    std::cout << "WARNING: config file does not contain config for component: " << _component_name << std::endl;
+                    auto log_str = std::string("config file does not contain config for component: ") + _component_name;
+
+                    _logger.log_string(log_str, core::LogLevel::WARNING);
                     return std::nullopt;
                 }
 
                 // Access the specific key within the component's section
                 if (!config[_component_name].contains(key))
                 {
-                    std::cout << "WARNING: config file does not contain config: " << key << " for component: " << _component_name << std::endl;
+                    auto log_str = std::string("config file does not contain config: ") + key + std::string("for component: ") + _component_name;
+                    _logger.log_string(log_str, core::LogLevel::WARNING);
+
                     return std::nullopt;
                 }
                 return config[_component_name][key].get<ParamType>();
@@ -165,6 +173,7 @@ namespace core
             }
 
         private:
+            core::Logger &_logger;
             std::string _component_name;
             core::JsonFileHandler &_json_file_handler;
             

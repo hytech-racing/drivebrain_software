@@ -27,13 +27,13 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
 
 bool comms::CANDriver::init()
 {
-    std::optional canbus_device = get_parameter_value<std::string>("canbus_device");
-    
-    std::optional dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    auto canbus_device = get_parameter_value<std::string>("canbus_device");
+
+    auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
 
     if (!(canbus_device && dbc_file_path))
     {
-        std::cout << "ERROR: couldnt get params" <<std::endl;
+        _logger.log_string("couldnt get params", core::LogLevel::ERROR);
         return false;
     }
     std::shared_ptr<dbcppp::INetwork> net;
@@ -46,15 +46,16 @@ bool comms::CANDriver::init()
     {
         _messages.insert(std::make_pair(msg.Id(), msg.Clone()));
         _messages_names_and_ids.insert(std::make_pair(_to_lowercase(msg.Name()), msg.Id()));
-        std::cout << msg.Name() << std::endl;
     }
 
     if (!_open_socket(*canbus_device))
     {
-        std::cout << "ERROR: couldnt open socket"<<std::endl; 
+        _logger.log_string("couldnt open socket", core::LogLevel::ERROR);
         return false;
     }
-    std::cout <<"inited, started read" <<std::endl;
+
+    _logger.log_string("inited, started read", core::LogLevel::INFO);
+
     _do_read();
     return true;
 }
@@ -64,7 +65,9 @@ bool comms::CANDriver::_open_socket(const std::string &interface_name)
     int raw_socket = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (raw_socket < 0)
     {
-        std::cerr << "Error creating CAN socket: " << strerror(errno) << std::endl;
+        auto err_str = std::string("Error creating CAN socket: ") + std::string(strerror(errno));
+        _logger.log_string(err_str.c_str(), core::LogLevel::ERROR);
+
         return false;
     }
 
@@ -78,7 +81,9 @@ bool comms::CANDriver::_open_socket(const std::string &interface_name)
 
     if (::bind(raw_socket, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
     {
-        std::cerr << "Error binding CAN socket: " << strerror(errno) << std::endl;
+        auto err_str = std::string("Error binding CAN socket: ") + std::string(strerror(errno));
+        _logger.log_string(err_str.c_str(), core::LogLevel::ERROR);
+
         ::close(raw_socket);
         return false;
     }
@@ -110,7 +115,7 @@ void comms::CANDriver::_send_message(const struct can_frame &frame)
     boost::asio::async_write(_socket, boost::asio::buffer(&frame, sizeof(frame)),
                              [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/)
                              {
-                                 if(ec)
+                                 if (ec)
                                  {
                                      std::cerr << "Error sending CAN message: " << ec.message() << std::endl;
                                  }
@@ -174,7 +179,7 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
                 reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
-//                std::cout << "Set bool field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
+                //                std::cout << "Set bool field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
@@ -215,7 +220,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
                 // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
             }
         }
-
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
         return msg_to_populate;
     }
@@ -279,7 +283,7 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
     // std::cout << "got message type name of " << messageTypeName << std::endl;
 
-    if(_messages_names_and_ids.find(messageTypeName) !=_messages_names_and_ids.end())
+    if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {
         uint64_t id = _messages_names_and_ids[messageTypeName];
         std::unique_ptr<dbcppp::IMessage> msg = _messages[id]->Clone();
@@ -290,7 +294,7 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
             comms::CANDriver::FieldVariant field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
-                    {
+                       {
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
@@ -311,14 +315,15 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
             } else {
                 std::cout <<"uh not supported yet" <<std::endl;
             } },
-                    field_value);
+                       field_value);
         }
     }
-    else {
-        std::cout <<"WARNING: not creating a frame to send due to not finding frame name"<<std::endl;
+    else
+    {
+        std::cout << "WARNING: not creating a frame to send due to not finding frame name" << std::endl;
         return std::nullopt;
     }
-    
+
     return frame;
 }
 
@@ -332,7 +337,7 @@ void comms::CANDriver::_handle_send_msg_from_queue()
             std::unique_lock lk(_input_deque_ref.mtx);
             // TODO unfuck this, queue management shouldnt live within the queue itself
             _input_deque_ref.cv.wait(lk, [this]()
-                                      { return !_input_deque_ref.deque.empty(); });
+                                     { return !_input_deque_ref.deque.empty(); });
 
             if (_input_deque_ref.deque.empty())
             {
@@ -351,7 +356,6 @@ void comms::CANDriver::_handle_send_msg_from_queue()
                 // std::cout << "sending" <<std::endl;
                 _send_message(*can_msg);
             }
-            
         }
         q.deque.clear();
     }

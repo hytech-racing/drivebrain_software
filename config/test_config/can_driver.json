@@ -7,7 +7,8 @@
     "SimpleController": {
         "max_torque": 22.4,
         "max_regen_torque": 10.0,
-        "rear_torque_scale": 1.0, 
-        "regen_torque_scale": 0.6
+        "rear_torque_scale": 1.0,
+        "regen_torque_scale": 0.6,
+        "positive_speed_set" : 3
     }
 }

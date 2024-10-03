@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "HT_proto": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1726542465,
+        "narHash": "sha256-DdAyOUCJGscPDrOkGsXBDwgZrV0OSej0wHn2zFL1NXM=",
+        "owner": "hytech-racing",
+        "repo": "HT_proto",
+        "rev": "1ca5c66ef0fa4ac59e24ea4135dee0409c403bb7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hytech-racing",
+        "repo": "HT_proto",
+        "type": "github"
+      }
+    },
     "asyncudp": {
       "inputs": {
         "nixpkgs": "nixpkgs",
@@ -598,6 +614,7 @@
     },
     "root": {
       "inputs": {
+        "HT_proto": "HT_proto",
         "data_acq": "data_acq",
         "easy_cmake": "easy_cmake",
         "flake-parts": "flake-parts",

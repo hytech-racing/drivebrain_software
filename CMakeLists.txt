@@ -1,13 +1,17 @@
 cmake_minimum_required(VERSION 3.24)
 project(drivebrain_software LANGUAGES CXX C)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
+
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
 
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
-
+find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
@@ -16,6 +20,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
+
 
 # custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
@@ -28,7 +33,11 @@ include(create_package)
 #####################
 
 # drivebrain core library
-add_library(drivebrain_core SHARED drivebrain_core_base/src/JsonFileHandler.cpp drivebrain_core_base/src/Configurable.cpp drivebrain_core_base/src/StateEstimator.cpp)
+add_library(drivebrain_core SHARED 
+    drivebrain_core_base/src/JsonFileHandler.cpp 
+    drivebrain_core_base/src/Configurable.cpp 
+    drivebrain_core_base/src/StateEstimator.cpp
+    drivebrain_core_base/src/Logger.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
     $<INSTALL_INTERFACE:drivebrain_core_base/include/public>
@@ -43,7 +52,14 @@ target_include_directories(drivebrain_core PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_base/include/private>    
 )
 
-target_link_libraries(drivebrain_core PUBLIC nlohmann_json::nlohmann_json Boost::boost Boost::system)
+target_link_libraries(drivebrain_core PUBLIC 
+    nlohmann_json::nlohmann_json 
+    Boost::boost 
+    Boost::system 
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+)
+
 make_cmake_package(drivebrain_core drivebrain)
 
 # foxglove parameter server interface
@@ -76,6 +92,20 @@ target_link_libraries(CAN_driver PUBLIC
     dbcppp::dbcppp
 )
 make_cmake_package(CAN_driver drivebrain)
+
+add_library(ETH_driver SHARED drivebrain_core_impl/drivebrain_comms/car_ETH_driver/src/MCUETHComms.cpp)
+target_include_directories(ETH_driver PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>    
+)
+
+target_link_libraries(ETH_driver PUBLIC 
+    drivebrain_core
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+make_cmake_package(ETH_driver drivebrain)
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
@@ -120,6 +150,10 @@ make_cmake_package(drivebrain_control drivebrain)
 ###                   ###
 ### system executable ###
 ###                   ###
+
+add_executable(mcu_standin test/test_mcu.cpp)
+add_executable(mcu_test test/test_mcu_send.cpp)
+
 add_executable(alpha_build drivebrain_app/main.cpp)
 
 target_link_libraries(alpha_build PUBLIC
@@ -127,7 +161,17 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     CAN_driver
     foxglove_param_server
+    ETH_driver
     Boost::program_options
+)
+
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+target_link_libraries(mcu_test PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
 )
 
 include(GNUInstallDirs)
