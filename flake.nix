@@ -48,7 +48,7 @@
           version = "0.0.1";
           src = "${HT_proto}/proto";
 
-          # protoDeps = [base_api ]; TODO add in the generated protos
+          #protoDeps = [base_api ]; TODO add in the generated protos
         };
       };
 
