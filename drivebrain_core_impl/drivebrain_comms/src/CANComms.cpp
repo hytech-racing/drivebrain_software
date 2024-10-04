@@ -56,7 +56,6 @@ bool comms::CANDriver::init()
 
     for (const auto &msg : net->Messages())
     {
-        std::cout <<"adding message: "<< msg.Id() << std::endl;
         _messages.insert(std::make_pair(msg.Id(), msg.Clone()));
         _messages_names_and_ids.insert(std::make_pair(_to_lowercase(msg.Name()), msg.Id()));
     }

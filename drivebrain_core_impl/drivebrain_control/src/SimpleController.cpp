@@ -61,7 +61,8 @@ hytech_msgs::MCUCommandData control::SimpleController::step_controller(const cor
     float torqueRequest;
 
     hytech_msgs::MCUCommandData cmd_out;
-    
+    cmd_out.set_prev_mcu_recv_millis(in.prev_MCU_recv_millis); // heartbeat
+
     if (accelRequest >= 0.0)
     {
         // Positive torque request

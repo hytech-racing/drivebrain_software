@@ -67,11 +67,7 @@ int main(int argc, char *argv[])
     core::JsonFileHandler config(param_path);
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
-
-    core::StateEstimator state_estimator(logger);
-
     
-
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
 
@@ -94,6 +90,9 @@ int main(int argc, char *argv[])
         stop_signal.store(true);
     }
     
+
+    core::StateEstimator state_estimator(logger, message_logger);
+
     configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
     comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);

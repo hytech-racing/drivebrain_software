@@ -17,8 +17,14 @@ namespace core
     {
         bool is_ready_to_drive;
         DriverInput input;
-        veh_vec<float> current_rpms;
         xyz_vec<float> current_body_vel_ms;
+        xyz_vec<float> current_body_accel_mss;
+        xyz_vec<float> current_angular_rate_rads;
+        ypr_vec<float> current_ypr_rad;
+        veh_vec<float> current_rpms;
+        bool state_is_valid;
+        int prev_MCU_recv_millis;
+        float steering_angle_deg;
     };
 
     struct SpeedControlOut
