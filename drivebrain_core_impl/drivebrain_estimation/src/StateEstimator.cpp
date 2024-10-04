@@ -21,7 +21,22 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
         }
     }
+    else if (message->GetTypeName() == "mcu_suspension")
+    {
+        auto in_msg = std::static_pointer_cast<mcu_suspension>(message);
 
+        std::unique_lock lk(_state_mutex);
+        _raw_input_data.raw_load_cell_values.FL = in_msg->load_cell_fl();
+        _raw_input_data.raw_load_cell_values.FR = in_msg->load_cell_fr();
+    }
+    else if (message->GetTypeName() == "sab_suspension")
+    {
+        auto in_msg = std::static_pointer_cast<sab_suspension>(message);
+
+        std::unique_lock lk(_state_mutex);
+        _raw_input_data.raw_load_cell_values.RL = in_msg->load_cell_rl();
+        _raw_input_data.raw_load_cell_values.RR = in_msg->load_cell_rr();
+    }
     else if (message->GetTypeName() == "hytech_msgs.VNData")
     {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
@@ -81,10 +96,15 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
     return within_threshold && all_members_received && last_update_recent_enough;
 }
 
+void StateEstimator::set_previous_control_output(SpeedControlOut prev_control_output)
+{
+    std::unique_lock lk(_state_mutex);
+    _vehicle_state.prev_controller_output = prev_control_output;
+}
+
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
 {
     auto state_is_valid = _validate_stamps(_timestamp_array);
-    
 
     core::VehicleState current_state;
     {
@@ -92,10 +112,78 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         std::unique_lock lk(_state_mutex);
         current_state = _vehicle_state;
     }
-    // TODO add in state estimation calculations from simulink code gen
 
     // Create the proto message to send
     std::shared_ptr<hytech_msgs::VehicleData> msg_out = std::make_shared<hytech_msgs::VehicleData>();
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// matlab math ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    auto matlab_math_data = _matlab_estimator.evaluate_estimator(current_state);
+
+    hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
+
+    auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();
+
+    auto fl_xyz = current_tire_forces->mutable_fl();
+    fl_xyz->set_x(matlab_math_data.tire_forces_n.FL.x);
+    fl_xyz->set_y(matlab_math_data.tire_forces_n.FL.y);
+    fl_xyz->set_z(matlab_math_data.tire_forces_n.FL.z);
+
+    auto fr_xyz = current_tire_forces->mutable_fr();
+    fr_xyz->set_x(matlab_math_data.tire_forces_n.FR.x);
+    fr_xyz->set_y(matlab_math_data.tire_forces_n.FR.y);
+    fr_xyz->set_z(matlab_math_data.tire_forces_n.FR.z);
+
+    auto rl_xyz = current_tire_forces->mutable_rl();
+    rl_xyz->set_x(matlab_math_data.tire_forces_n.RL.x);
+    rl_xyz->set_y(matlab_math_data.tire_forces_n.RL.y);
+    rl_xyz->set_z(matlab_math_data.tire_forces_n.RL.z);
+
+    auto rr_xyz = current_tire_forces->mutable_rr();
+    rr_xyz->set_x(matlab_math_data.tire_forces_n.RR.x);
+    rr_xyz->set_y(matlab_math_data.tire_forces_n.RR.y);
+    rr_xyz->set_z(matlab_math_data.tire_forces_n.RR.z);
+
+    auto current_tire_moments_nm = current_tire_dynamics->mutable_tire_moments_nm();
+
+    auto fl_xyz_moments = current_tire_moments_nm->mutable_fl();
+    fl_xyz_moments->set_x(matlab_math_data.tire_moments_nm.FL.x);
+    fl_xyz_moments->set_y(matlab_math_data.tire_moments_nm.FL.y);
+    fl_xyz_moments->set_z(matlab_math_data.tire_moments_nm.FL.z);
+
+    auto fr_xyz_moments = current_tire_moments_nm->mutable_fr();
+    fr_xyz_moments->set_x(matlab_math_data.tire_moments_nm.FR.x);
+    fr_xyz_moments->set_y(matlab_math_data.tire_moments_nm.FR.y);
+    fr_xyz_moments->set_z(matlab_math_data.tire_moments_nm.FR.z);
+
+    auto rl_xyz_moments = current_tire_moments_nm->mutable_rl();
+    rl_xyz_moments->set_x(matlab_math_data.tire_moments_nm.RL.x);
+    rl_xyz_moments->set_y(matlab_math_data.tire_moments_nm.RL.y);
+    rl_xyz_moments->set_z(matlab_math_data.tire_moments_nm.RL.z);
+
+    auto rr_xyz_moments = current_tire_moments_nm->mutable_rr();
+    rr_xyz_moments->set_x(matlab_math_data.tire_moments_nm.RR.x);
+    rr_xyz_moments->set_y(matlab_math_data.tire_moments_nm.RR.y);
+    rr_xyz_moments->set_z(matlab_math_data.tire_moments_nm.RR.z);
+
+    auto current_accel_saturation_nm = current_tire_dynamics->mutable_accel_saturation_nm();
+
+    current_accel_saturation_nm->set_fl(matlab_math_data.accel_saturation_nm.FL);
+    current_accel_saturation_nm->set_fr(matlab_math_data.accel_saturation_nm.FR);
+    current_accel_saturation_nm->set_rl(matlab_math_data.accel_saturation_nm.RL);
+    current_accel_saturation_nm->set_rr(matlab_math_data.accel_saturation_nm.RR);
+
+    auto current_brake_saturation_nm = current_tire_dynamics->mutable_brake_saturation_nm();
+
+    current_brake_saturation_nm->set_fl(matlab_math_data.brake_saturation_nm.FL);
+    current_brake_saturation_nm->set_fr(matlab_math_data.brake_saturation_nm.FR);
+    current_brake_saturation_nm->set_rl(matlab_math_data.brake_saturation_nm.RL);
+    current_brake_saturation_nm->set_rr(matlab_math_data.brake_saturation_nm.RR);
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
     msg_out->set_is_ready_to_drive(true);
 

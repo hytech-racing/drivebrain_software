@@ -29,13 +29,27 @@
 #include <VehicleDataTypes.hpp>
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
+#include <MatlabMath.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
 // that can update pieces of the state that would be optimal.
 
 // TODO:
 // - [ ] write tests for the timestamp checking / verification of the state data
-// - [ ] implement the ability to kick off threads for a vector of input queues
+
+
+
+// user story:
+// i want the ability to add in new estimation components by composition or construction
+    // how will we know what the estimator is changing / adding as far as state variables? -> this will get annoying 
+// i dont want to have to change code in here every time we add a new state variable / data derived 
+// from the raw sensor data input
+
+// new ideas: 
+// for a more generic state estimator we can template the class based on the raw input data struct 
+// and the vehicle state struct. 
+
+// for now i will just move the state estimator into the estimation impl and call it a day 
 namespace core
 {
     class StateEstimator
@@ -45,11 +59,11 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        
-        
-        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger) : _logger(shared_logger), _message_logger(message_logger)
+        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger, estimation::MatlabMath& matlab_estimator) 
+        : _logger(shared_logger), _message_logger(message_logger), _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
+            _raw_input_data = {};
             _vehicle_state.prev_MCU_recv_millis = -1; // init the last mcu recv millis to < 0
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
@@ -58,19 +72,22 @@ namespace core
         ~StateEstimator()  =default;
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
+        void set_previous_control_output(SpeedControlOut prev_control_output);
 
     private:
         template <size_t arr_len>
         bool _validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr);
 
     private:
+        
         core::Logger &_logger;
-
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;
+        core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 1> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
+        estimation::MatlabMath& _matlab_estimator;
 
     };
 }

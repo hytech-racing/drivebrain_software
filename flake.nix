@@ -1,5 +1,4 @@
-rec {
-  
+{ 
   description = "drivebrain flake";
 
   inputs = {
@@ -22,7 +21,7 @@ rec {
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-04T01_43_38";
+        ref = "2024-10-04T04_27_55";
         flake = false;
       };
 
@@ -41,8 +40,10 @@ rec {
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
+    matlab-math.url = "github:hytech-racing/MATLAB-math";
+
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab-math, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -97,6 +98,7 @@ rec {
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
+                matlab-math.overlays.default
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default

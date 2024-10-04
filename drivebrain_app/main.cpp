@@ -90,8 +90,14 @@ int main(int argc, char *argv[])
         stop_signal.store(true);
     }
     
+    estimation::MatlabMath matlab_math(logger, config, construction_failed);
+    
+    if(construction_failed)
+    {
+        stop_signal.store(true);
+    }
 
-    core::StateEstimator state_estimator(logger, message_logger);
+    core::StateEstimator state_estimator(logger, message_logger, matlab_math);
 
     configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
@@ -138,11 +144,25 @@ int main(int argc, char *argv[])
         while(!stop_signal.load())
         {
             auto start_time = std::chrono::high_resolution_clock::now();
+            // samples internal state set by the handle recv functions
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
+            auto out_struct = controller.step_controller(state_and_validity.first);
+            // feedback
+            state_estimator.set_previous_control_output(out_struct);
+            // output
             if(state_and_validity.second)
             {
-                auto out = controller.step_controller(state_and_validity.first);
-                out_msg->CopyFrom(out);
+                out_msg->set_prev_mcu_recv_millis(out_struct.mcu_recv_millis);
+                out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+                out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
+                out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
+                out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+
+                out_msg->mutable_torque_limit_nm()->set_fl(out_struct.torque_lim_nm.FL);
+                out_msg->mutable_torque_limit_nm()->set_fr(out_struct.torque_lim_nm.FR);
+                out_msg->mutable_torque_limit_nm()->set_rl(out_struct.torque_lim_nm.RL);
+                out_msg->mutable_torque_limit_nm()->set_rr(out_struct.torque_lim_nm.RR);
+
                 {
                     std::unique_lock lk(eth_tx_queue.mtx);
                     eth_tx_queue.deque.push_back(out_msg);

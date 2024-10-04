@@ -37,6 +37,7 @@ find_package(cmake_macros REQUIRED)
 
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
+find_package(matlab_math REQUIRED)
 
 include(create_package)
 
@@ -48,7 +49,6 @@ include(create_package)
 add_library(drivebrain_core SHARED 
     drivebrain_core_base/src/JsonFileHandler.cpp 
     drivebrain_core_base/src/Configurable.cpp 
-    drivebrain_core_base/src/StateEstimator.cpp
     drivebrain_core_base/src/Logger.cpp)
 
 target_include_directories(drivebrain_core PUBLIC 
@@ -121,6 +121,7 @@ target_link_libraries(drivebrain_comms PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     db_service_grpc_cpp::db_service_grpc_cpp
     libvncxx::libvncxx
+    drivebrain_estimation
 
 )
 
@@ -153,8 +154,8 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
-    
 )
+
 target_link_libraries(drivebrain_mcap_logger INTERFACE
     mcap::mcap
 )
@@ -164,6 +165,23 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 )
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
+add_library(drivebrain_estimation SHARED 
+    drivebrain_core_impl/drivebrain_estimation/src/MatlabMath.cpp
+    drivebrain_core_impl/drivebrain_estimation/src/StateEstimator.cpp
+)
+
+target_include_directories(drivebrain_estimation PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_estimation/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_estimation/include>    
+)
+
+target_link_libraries(drivebrain_estimation PUBLIC
+    drivebrain_core 
+    drivebrain_common_utils
+    matlab_math::matlab_math_lib
+)
+
+make_cmake_package(drivebrain_estimation drivebrain)
 
 ###############
 # executables #

@@ -70,7 +70,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
             {
                 return true;
             }
-            else if (check_veh_vec(pval->positive_torque_lim_nm, _max_torque_switch, false))
+            else if (check_veh_vec(pval->torque_lim_nm, _max_torque_switch, false))
             {
                 return true;
             } else {
