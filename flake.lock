@@ -283,6 +283,9 @@
     },
     "ht_can": {
       "inputs": {
+        "nix-proto": [
+          "nix-proto"
+        ],
         "nixpkgs": [
           "nixpkgs"
         ],

@@ -334,9 +334,9 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
                 // iterating to find correct value
                 for (const auto &enc : sig.ValueEncodingDescriptions())
                 {
-                    if (enc.second == enum_name)
+                    if (enc.Description() == enum_name)
                     {
-                        sig.Encode(enc.first, frame.data);
+                        sig.Encode(enc.Value(), frame.data);
                         found = true;
                         break;
                     }

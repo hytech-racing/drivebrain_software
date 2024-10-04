@@ -25,6 +25,7 @@
 
     ht_can.url = "github:hytech-racing/ht_can/121";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
+    ht_can.inputs.nix-proto.follows = "nix-proto";
 
     data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";
     data_acq.inputs.ht_can_pkg_flake.follows = "ht_can";
@@ -78,6 +79,14 @@
         perSystem = { config, pkgs, system, ... }:
 
           {
+            # _module.args.pkgs = import inputs.nixpkgs {
+            #   inherit system;
+            #   overlays = [
+            #     nebs-packages.overlays.default
+            #     easy_cmake.overlays.default
+            #   ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+            #   config = { };
+            # };
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
