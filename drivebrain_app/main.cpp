@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
     std::vector<core::common::Configurable *> configurable_components;
 
-    std::string param_path = "config/test_config/can_driver.json";
+    std::string param_path = "../config/test_config/can_driver.json";
     std::optional<std::string> dbc_path = std::nullopt;
     if (argc == 3)
     {

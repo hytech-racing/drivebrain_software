@@ -33,9 +33,12 @@ comms::CANDriver::~CANDriver()
 }
 bool comms::CANDriver::init()
 {
-    auto canbus_device = get_parameter_value<std::string>("canbus_device");
+    // auto canbus_device = get_parameter_value<std::string>("canbus_device");
+    std::optional<std::string> canbus_device = std::make_optional("vcan0");
 
-    auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    // auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    std::optional<std::string> dbc_file_path = std::make_optional("../config/test_config/hytech.dbc");
+
 
     if (!(canbus_device && dbc_file_path))
     {
@@ -182,6 +185,9 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             }
             switch (field->type())
             {
+            case google::protobuf::FieldDescriptor::TYPE_ENUM:
+                reflection->SetEnumValue(message.get(), field, (int)std::get<int>(it->second));
+                break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
                 
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
@@ -218,8 +224,20 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
                 (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
             {
-                // TODO get correct type from raw signal and store it in the map. right now they are all doubles
-                msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
+                auto raw_value = sig.Decode(frame.data);
+
+                // Check if the signal has enum descriptions (ValueEncodingDescriptions)
+                if (sig.ValueEncodingDescriptions_Size() > 0)
+                {
+                    // Enum signal: Cast the decoded raw value to an integer and store it
+                    msg_field_map[sig.Name()] = static_cast<int>(raw_value);
+                }
+                else{
+                    // TODO get correct type from raw signal and store it in the map. right now they are all doubles
+                    msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
+                    // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+                }
+
             }
         }
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
@@ -320,6 +338,26 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
                 // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
+            
+            } else if (std::holds_alternative<std::string>(arg)){
+                auto enum_name = std::get<std::string>(arg);
+                bool found = false;
+
+                // iterating to find correct value
+                for (const auto &enc : sig.ValueEncodingDescriptions())
+                {
+                    if (enc.Description() == enum_name)
+                    {
+                        sig.Encode(enc.Value(), frame.data);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    std::cout << "enum not found " << std::endl;
+                }
             } else {
                 std::cout <<"uh not supported yet" <<std::endl;
             } },
