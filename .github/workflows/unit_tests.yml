@@ -1,9 +1,7 @@
 name: Unit Tests
 
 on: 
-  push:
-    branches:
-      - feature/unit_testing_ci_inegration
+  push
 
 jobs:
   build:
