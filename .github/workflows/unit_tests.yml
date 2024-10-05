@@ -16,11 +16,7 @@ jobs:
           repository: hytech-racing/drivebrain_software
           ref: ${{ github.ref }}
       
-      - run: |
-          nix develop .#tests
-          mkdir build
-          cd build
-          cmake ..
+      - run: nix build
 
       
 
