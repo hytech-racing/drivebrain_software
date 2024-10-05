@@ -18,6 +18,9 @@ jobs:
       
       - run: nix build
 
+      - name: Test
+        run: ./result/bin/alpha_test
+
       
 
         
