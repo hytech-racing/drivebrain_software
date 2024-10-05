@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: cachix/install-nix-action@v29
 
-      - name: Build And Test
+      - name: Build
         uses: actions/checkout@v4
         with:
           repository: hytech-racing/drivebrain_software
