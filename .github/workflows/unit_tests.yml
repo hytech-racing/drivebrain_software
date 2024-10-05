@@ -18,10 +18,14 @@ jobs:
       
       - run: nix develop .#tests
 
-      - name: Create Build Directory and Generate Makefile
-        run: |
-          mkdir build
-          cd build
-          cmake ..
+      - name: Create Build Directory
+        run: mkdir build 
+
+      - name: Enter Build
+        run: cd build
+      
+      - name: Create Makefile
+        run: cmake ..
+
         
       
