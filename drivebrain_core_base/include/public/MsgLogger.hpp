@@ -113,7 +113,7 @@ namespace core
             namespace fs = std::filesystem;
             if(fs::exists("/etc/nixos"))
             {
-                ss << "/home/nixos/recordings";
+                ss << "/home/nixos/recordings/";
             }
 
             ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S")
