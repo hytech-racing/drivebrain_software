@@ -28,6 +28,11 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
+
+find_dependency(PkgConfig)
+pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
+
+find_package(zstd REQUIRED)
 find_package(mcap REQUIRED)
 
 # custom packaged libraries, code didnt require changes just the packaging
@@ -122,7 +127,6 @@ target_link_libraries(drivebrain_comms PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     libvncxx::libvncxx
     drivebrain_estimation
-
 )
 
 make_cmake_package(drivebrain_comms drivebrain)
@@ -154,11 +158,14 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
+    PkgConfig::lz4 
+    zstd::libzstd_shared
 )
 
-target_link_libraries(drivebrain_mcap_logger INTERFACE
-    mcap::mcap
-)
+# target_link_libraries(drivebrain_mcap_logger INTERFACE
+#     mcap::mcap
+# )
+
 target_include_directories(drivebrain_mcap_logger PUBLIC
     $<INSTALL_INTERFACE:version_header>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
@@ -224,13 +231,13 @@ target_link_libraries(test_db_grpc PUBLIC
 )
 
 
-add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+# add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
-target_link_libraries(test_mcap PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-    mcap::mcap
-)
+# target_link_libraries(test_mcap PUBLIC
+#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+#     protobuf::libprotobuf
+#     mcap::mcap
+# )
 
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)

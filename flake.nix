@@ -1,4 +1,4 @@
-{ 
+{
   description = "drivebrain flake";
 
   inputs = {
@@ -15,7 +15,7 @@
 
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
-    
+
     HT_proto =
       {
         type = "github";
@@ -70,6 +70,11 @@
             };
           };
       };
+      my_overlays = [
+        (final: prev: {
+          drivebrain_software = final.callPackage ./default.nix { };
+        })
+      ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
     in
     flake-parts.lib.mkFlake { inherit inputs; }
@@ -85,11 +90,7 @@
 
 
         flake.overlays = {
-          db_overlay = final: prev: {
-            drivebrain_software = final.callPackage ./default.nix { };
-          };
-          inherit nix-proto-foxglove-overlays;
-
+          default = nixpkgs.lib.composeManyExtensions my_overlays;
         };
 
         perSystem = { config, pkgs, system, ... }:
@@ -102,7 +103,7 @@
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
-                self.overlays.db_overlay
+                self.overlays.default
               ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               config = { };
             };
@@ -135,7 +136,7 @@
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
-                  self.overlays.db_overlay
+                  self.overlays.default
                 ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };
