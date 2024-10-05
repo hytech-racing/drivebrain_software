@@ -70,6 +70,14 @@ int main(int argc, char *argv[])
     
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
+    bool construction_failed = false;
+    estimation::MatlabMath matlab_math(logger, config, construction_failed);
+    
+    if(construction_failed)
+    {
+        stop_signal.store(true);
+    }
+    configurable_components.push_back(&matlab_math);
 
     auto foxglove_server = core::FoxgloveWSServer(configurable_components);
 
@@ -81,8 +89,12 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(mcap_logger)),
                                                                                                         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
-    bool construction_failed = false;
-    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed);
+    
+    
+
+
+    core::StateEstimator state_estimator(logger, message_logger, matlab_math);
+    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed, state_estimator);
 
     // std::cout << "driver init " << driver.init() << std::endl;
     if(construction_failed)
@@ -90,14 +102,6 @@ int main(int argc, char *argv[])
         stop_signal.store(true);
     }
     
-    estimation::MatlabMath matlab_math(logger, config, construction_failed);
-    
-    if(construction_failed)
-    {
-        stop_signal.store(true);
-    }
-
-    core::StateEstimator state_estimator(logger, message_logger, matlab_math);
 
     configurable_components.push_back(&driver);
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
@@ -147,6 +151,7 @@ int main(int argc, char *argv[])
             // samples internal state set by the handle recv functions
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
             auto out_struct = controller.step_controller(state_and_validity.first);
+            auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
             // feedback
             state_estimator.set_previous_control_output(out_struct);
             // output
@@ -158,10 +163,10 @@ int main(int argc, char *argv[])
                 out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
                 out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
 
-                out_msg->mutable_torque_limit_nm()->set_fl(out_struct.torque_lim_nm.FL);
-                out_msg->mutable_torque_limit_nm()->set_fr(out_struct.torque_lim_nm.FR);
-                out_msg->mutable_torque_limit_nm()->set_rl(out_struct.torque_lim_nm.RL);
-                out_msg->mutable_torque_limit_nm()->set_rr(out_struct.torque_lim_nm.RR);
+                out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
+                out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));
+                out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
+                out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.res_torque_lim_nm.RR));
 
                 {
                     std::unique_lock lk(eth_tx_queue.mtx);

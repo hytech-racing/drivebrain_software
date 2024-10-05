@@ -3,16 +3,16 @@
     "HT_proto": {
       "flake": false,
       "locked": {
-        "lastModified": 1728016061,
-        "narHash": "sha256-buiz4WF69g9xjM0Ao3c8imWwoPqy6BHaIYa3wB3s3PY=",
+        "lastModified": 1728087551,
+        "narHash": "sha256-ZApAl5w0qyjeK1oanGePc48UMPEyHLntT8Efd8CWQYE=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "10bdc9671cef0021e3ecbbfaaf4ab9ae2434c67f",
+        "rev": "45609ddfd4e3da40a642a1521129f1277ce57484",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "2024-10-04T04_27_55",
+        "ref": "2024-10-05T00_19_35",
         "repo": "HT_proto",
         "type": "github"
       }
@@ -361,11 +361,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1728028613,
-        "narHash": "sha256-gOoy77WUPRoC+Cya691UeOwo+r30uiwFkI+3o8dQoC0=",
+        "lastModified": 1728082239,
+        "narHash": "sha256-cvTg2ulNdetytG2V4TDl7FLGc+2vZz1etMoJEThUGgc=",
         "owner": "hytech-racing",
         "repo": "MATLAB-math",
-        "rev": "96f1f9a3549605c6135fa468ab1503863bcd8a85",
+        "rev": "5abe56a2e0f6c3e8167e34a358d94794bfd98e3c",
         "type": "github"
       },
       "original": {

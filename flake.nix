@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-04T04_27_55";
+        ref = "2024-10-05T00_19_35";
         flake = false;
       };
 
@@ -131,6 +131,7 @@
               import nixpkgs {
                 inherit system;
                 overlays = [
+                  matlab-math.overlays.default
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default

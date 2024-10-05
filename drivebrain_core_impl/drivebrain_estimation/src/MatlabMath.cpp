@@ -118,24 +118,23 @@ namespace estimation
         return true;
     }
 
-    core::TireDynamics MatlabMath::evaluate_estimator(const core::VehicleState &current_state)
+    std::pair<core::TireDynamics, core::ControllerTorqueOut> MatlabMath::evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input)
     {
 
         // TODO: erm i forgor
-        _inputs.FL_b; // '<Root>/SA FL'
-        _inputs.FR_b; // '<Root>/SA FR'
-        _inputs.RL_g; // '<Root>/SA RL'
-        _inputs.RR_a; // '<Root>/SA RR'
+        _inputs.FL_b = 0.0f; // '<Root>/SA FL'
+        _inputs.FR_b = 0.0f; // '<Root>/SA FR'
+        _inputs.RL_g = 0.0f; // '<Root>/SA RL'
+        _inputs.RR_a = 0.0f; // '<Root>/SA RR'
 
-        _inputs.LCFL; // '<Root>/LC FL'
-        _inputs.LCFR; // '<Root>/LC FR'
-        _inputs.LCRL; // '<Root>/LC RL'
-        _inputs.LCRR; // '<Root>/LC RR'
-
-        _inputs.FL; // '<Root>/SL FL'
-        _inputs.FR; // '<Root>/SL FR'
-        _inputs.RL; // '<Root>/SL RL'
-        _inputs.RR; // '<Root>/SL RR'
+        _inputs.LCFL = raw_input.raw_load_cell_values.FL; // '<Root>/LC FL'
+        _inputs.LCFR = raw_input.raw_load_cell_values.FR; // '<Root>/LC FR'
+        _inputs.LCRL = raw_input.raw_load_cell_values.RL; // '<Root>/LC RL'
+        _inputs.LCRR = raw_input.raw_load_cell_values.RR; // '<Root>/LC RR'
+        _inputs.FL = 0; // '<Root>/SL FL'
+        _inputs.FR = 0; // '<Root>/SL FR'
+        _inputs.RL = 0; // '<Root>/SL RL'
+        _inputs.RR = 0; // '<Root>/SL RR'
 
         // TODO fix, this is assuming that we are in mode 0. need to get actual torque request that isnt supremely dumb
         if ((current_state.input.requested_accel - current_state.input.requested_brake) >= 0)
@@ -159,12 +158,12 @@ namespace estimation
         _inputs.MotorRPMRR = current_state.current_rpms.RR; // '<Root>/Motor RPM RR'
 
         _inputs.LMUXFL = _config.lmux_fl; // '<Root>/LMUX FL'
-        _inputs.LMUXFR = _config.lmuy_fl; // '<Root>/LMUX FR'
-        _inputs.LMUXRL = _config.lmux_fr; // '<Root>/LMUX RL'
-        _inputs.LMUXRR = _config.lmuy_fr; // '<Root>/LMUX RR'
-        _inputs.LMUYFL = _config.lmux_rl; // '<Root>/LMUY FL'
-        _inputs.LMUYFR = _config.lmuy_rl; // '<Root>/LMUY FR'
-        _inputs.LMUYRL = _config.lmux_rr; // '<Root>/LMUY RL'
+        _inputs.LMUXFR = _config.lmux_fr; // '<Root>/LMUX FR'
+        _inputs.LMUXRL = _config.lmux_rl; // '<Root>/LMUX RL'
+        _inputs.LMUXRR = _config.lmux_rr; // '<Root>/LMUX RR'
+        _inputs.LMUYFL = _config.lmuy_fl; // '<Root>/LMUY FL'
+        _inputs.LMUYFR = _config.lmuy_fr; // '<Root>/LMUY FR'
+        _inputs.LMUYRL = _config.lmuy_rl; // '<Root>/LMUY RL'
         _inputs.LMUYRR = _config.lmuy_rr; // '<Root>/LMUY RR'
 
         _inputs.Interp_x1_FL = _config.x1_fl; // '<Root>/Interp_x1_FL'
@@ -197,6 +196,7 @@ namespace estimation
         Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T outputs = _model.getExternalOutputs();
 
         core::TireDynamics result;
+        core::ControllerTorqueOut control_res;
 
         result.tire_forces_n.FL.x = outputs.FXFL;
         result.tire_forces_n.FR.x = outputs.FXFR;
@@ -223,11 +223,8 @@ namespace estimation
         result.brake_saturation_nm.RL = outputs.satBrakeTRL;
         result.brake_saturation_nm.RR = outputs.satBrakeTRR;
 
-        // ? = real_T torq_req_FL;                // '<Root>/torq_req_FL'
-        // ? = real_T torq_req_FR;                // '<Root>/torq_req_FR'
-        // ? = real_T torq_req_RL;                // '<Root>/torq_req_RL'
-        // ? = real_T torq_req_RR;                // '<Root>/torq_req_RR'
-        return result;
+        control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR};                // '<Root>/torq_req_FL'
+        return {result, control_res};
     }
 
 }

@@ -107,10 +107,12 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_is_valid = _validate_stamps(_timestamp_array);
 
     core::VehicleState current_state;
+    core::RawInputData current_raw_data;
     {
-        _vehicle_state.state_is_valid = state_is_valid;
         std::unique_lock lk(_state_mutex);
+        _vehicle_state.state_is_valid = state_is_valid;
         current_state = _vehicle_state;
+        current_raw_data = _raw_input_data;
     }
 
     // Create the proto message to send
@@ -119,8 +121,13 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     ////////////////////////////////////////////////////////////////////////////
     /// matlab math ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    auto matlab_math_data = _matlab_estimator.evaluate_estimator(current_state);
-
+    auto res_pair = _matlab_estimator.evaluate_estimator(current_state, current_raw_data);
+    auto matlab_math_data = res_pair.first;
+    {
+        std::unique_lock lk(_state_mutex);
+        _vehicle_state.matlab_math_temp_out = res_pair.second;
+    }
+    
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
 
     auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();
@@ -219,6 +226,13 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
 
     msg_out->set_state_is_valid(state_is_valid);
     msg_out->set_steering_angle_deg(current_state.steering_angle_deg);
+
+
+    auto prev_driver_torque_req = msg_out->mutable_driver_torque();
+    prev_driver_torque_req->set_fl(current_state.prev_controller_output.torque_lim_nm.FL);
+    prev_driver_torque_req->set_fr(current_state.prev_controller_output.torque_lim_nm.FL);
+    prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.FL);
+    prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.FL);
 
     _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
 

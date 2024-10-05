@@ -1,6 +1,7 @@
 #ifndef __MATLABMATH_H__
 #define __MATLABMATH_H__
 
+#include <utility>
 #include <Configurable.hpp>
 #include <VehicleDataTypes.hpp>
 #include <hytech_msgs.pb.h> // for TireDynamics
@@ -55,7 +56,7 @@ namespace estimation
             // TODO
             // hytech_msgs::TireDynamics convert_to_proto()
 
-            core::TireDynamics evaluate_estimator(const core::VehicleState &current_state);
+            std::pair<core::TireDynamics, core::ControllerTorqueOut> evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input);
             bool init();
             
         private:

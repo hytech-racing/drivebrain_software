@@ -9,6 +9,7 @@
 #include <functional>
 #include <condition_variable>
 #include <mutex>
+#include <filesystem>
 
 #include "hytech_msgs.pb.h"
 #include <google/protobuf/message.h>
@@ -109,6 +110,11 @@ namespace core
 
             // Create a stringstream to format the date and time
             std::stringstream ss;
+            namespace fs = std::filesystem;
+            if(fs::exists("/etc/nixos"))
+            {
+                ss << "/home/nixos/recordings";
+            }
 
             ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S")
                << extension;
@@ -123,10 +129,6 @@ namespace core
             if (out_msg->GetDescriptor()->name() == "MCUOutputData")
             {
                 auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-                if (cast_msg->brake_percent() == 0)
-                {
-                    std::cout << "empty msg recvd at output level" << std::endl;
-                }
             }
             output_function(msg);
         }

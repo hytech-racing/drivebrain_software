@@ -4,6 +4,7 @@
 #include <DriverBus.hpp>
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
+#include <StateEstimator.hpp>
 #include <hytech.pb.h>
 
 // system includes
@@ -65,13 +66,14 @@ namespace comms
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, core::StateEstimator &state_estimator) : 
             Configurable(logger, json_file_handler, "CANDriver"),
             _logger(logger),
             _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _socket(io_context),
-            _dbc_path(dbc_path)
+            _dbc_path(dbc_path),
+            _state_estimator(state_estimator)
         {
             _running = true;
             _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
@@ -124,5 +126,6 @@ namespace comms
         std::unordered_map<std::string, uint64_t> _messages_names_and_ids;
         int _CAN_socket; // can socket bound to
         bool _running = false;
+        core::StateEstimator & _state_estimator;
     };
 }
