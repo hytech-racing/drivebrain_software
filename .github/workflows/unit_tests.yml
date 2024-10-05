@@ -21,7 +21,7 @@ jobs:
       - name: Create Build Directory and Generate Makefile
         run: >- 
           mkdir build
-          cd build
-          cmake ..
+          -cd build
+          -cmake ..
         
       
