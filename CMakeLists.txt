@@ -181,6 +181,8 @@ target_link_libraries(alpha_test PUBLIC
     gtest
 )
 
+add_test(NAME AlphaTest COMMAND alpha_test)
+
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf

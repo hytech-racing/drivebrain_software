@@ -17,4 +17,13 @@ jobs:
           ref: ${{ github.ref }}
       
       - run: nix develop .#tests
+
+      - name: Create Build Directory and Generate Makefile
+        run: | 
+        {
+          mkdir build
+          cd build
+          cmake ..
+        }
+        
       
