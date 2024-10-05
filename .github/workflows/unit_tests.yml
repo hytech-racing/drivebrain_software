@@ -1,0 +1,22 @@
+name: Unit Tests
+
+on: 
+  push:
+    branches:
+      - feature/unit_testing_ci_inegration
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: cachix/install-nix-action@v23
+
+      - name: Open Development Environment
+      - uses: actions/checkout@v4
+        with:
+          repository: hytech-racing/drivebrain_software
+          ref: ${{ github.ref }}
+        
+      - run: nix develop .#tests
+      
