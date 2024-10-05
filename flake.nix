@@ -106,6 +106,20 @@
                 pkgs.drivebrain_software
               ];
             };
+
+            devShells.tests = pkgs.mkShell rec {
+              name = "nix-devshell";
+              shellHook = ''
+ 
+                '';
+              nativeBuiltInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
+
+              inputsFrom = [
+                pkgs.drivebrain_software
+              ];
+            
+            };
+
             legacyPackages =
               import nixpkgs {
                 inherit system;
@@ -114,8 +128,8 @@
                   easy_cmake.overlays.default
                   (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
                 ]
-                ++ data_acq.overlays.x86_64-linux
-                ++ self.flake.overlays;
+                ++ data_acq.overlays.x86_64-linux;
+                # ++ self.flake.overlays;
               };
           };
       };

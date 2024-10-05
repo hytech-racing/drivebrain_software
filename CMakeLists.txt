@@ -26,6 +26,8 @@ find_package(GTest REQUIRED)
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
+find_package(GTest REQUIRED)
+
 include(create_package)
 
 #####################
@@ -156,6 +158,10 @@ add_executable(mcu_test test/test_mcu_send.cpp)
 
 add_executable(alpha_build drivebrain_app/main.cpp)
 
+enable_testing()
+
+add_executable(alpha_test unit_test/main.cpp)
+
 target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
@@ -163,6 +169,16 @@ target_link_libraries(alpha_build PUBLIC
     foxglove_param_server
     ETH_driver
     Boost::program_options
+)
+
+target_link_libraries(alpha_test PUBLIC 
+    drivebrain_core
+    drivebrain_control
+    CAN_driver
+    foxglove_param_server
+    ETH_driver
+    Boost::program_options
+    gtest
 )
 
 target_link_libraries(mcu_standin PUBLIC
