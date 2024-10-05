@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v29
 
       - name: Open Development Environment
         uses: actions/checkout@v4
@@ -16,5 +16,5 @@ jobs:
           repository: hytech-racing/drivebrain_software
           ref: ${{ github.ref }}
       
-      - run: nix --version
+      - run: nix develop .#tests
       
