@@ -19,6 +19,7 @@ jobs:
       - name: Enter the development environment
         run: | 
           nix build
+          ls
           ./results/bin/alpha_test
 
         
