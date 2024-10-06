@@ -50,6 +50,12 @@ namespace core
             ERROR_DRIVER_ON_PEDAL,
             NUM_CONTROLLER_MANAGER_STATUSES
         };
+
+        struct ControllerManagerState
+        {
+            ControllerManagerStatus current_status;
+            ControllerOutput current_controller_output;
+        };
     }
 
 }

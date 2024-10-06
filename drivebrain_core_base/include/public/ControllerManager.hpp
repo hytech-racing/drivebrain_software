@@ -15,6 +15,12 @@
 #include <VehicleManager.hpp>
 #include <VehicleDataTypes.hpp>
 
+//what GRPC again
+
+//what does mutex mean(mutual exclusion?)
+
+//why: Sharing TC Mux between MCU and drivebrain
+
 // will be based on: https://github.com/hytech-racing/MCU/blob/adc599c9a2a3d1afe4ee22fcad0fd1116c474500/lib/systems/include/TorqueControllerMux.h
 
 // TODO look into sharing tc mux between MCU and drivebrain software
@@ -64,8 +70,10 @@ namespace control
     public:
         
 
-        ControllerManager(core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(json_file_handler, "ControllerManager"),
-                                                                                                                                _controllers(controllers)
+        ControllerManager(core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers, core::StateEstimator state_estimator) : Configurable(json_file_handler, "ControllerManager"),
+                                                                                                                                                                        _controllers(controllers),
+                                                                                                                                                                        _state_estimator(state_estimator)
+
         {
         }
         ~ControllerManager() = default;
@@ -74,38 +82,57 @@ namespace control
         /// @return true or false depending on success of init
         bool init();
 
-        /// @brief TODO maybe remove this
-        /// @param new_controller_index 
-        /// @return 
-        bool attempt_controller_change(size_t new_controller_index)
-        {
-            static const size_t num_controllers = NumControllers;
-            if (new_controller_index > (num_controllers - 1))
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+        bool swap_active_controller(size_t new_controller_index);
         
         float get_active_controller_timestep()
         {
             return _controllers[_current_controller_index]->get_dt_sec();
         }
 
-        core::ControllerOutput step_active_controller(const core::VehicleState&input)
+        core::ControllerOutput step_active_controller(const core::VehicleState& input)
+        {   
+            if(stepping){
+                _current_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input)
+            }
+            return _current_state.current_controller_output;
+        }
+
+        bool pause_stepping()
         {
-            return _controllers[_current_controller_index]->step_controller(input);
+            if(stepping)
+            {
+                stepping = false;
+                return true;
+            }
+            else
+            {
+                //if you pause while its not stepping
+                return false;
+            }
+        }
+
+        bool unpause_stepping()
+        {
+            if(!stepping)
+            {
+                stepping = true;
+                return true;
+            }
+            else
+            {
+                //if you unpause while its stepping 
+                return false;
+            }
         }
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
-
-    private:
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
+        core::StateEstimator _state_estimator;
+        core::control::ControllerManagerState _current_state;
+        //flag for pause/unpause -> could be temporary or permanent way of pausing(idk how threads work(rn(I will soon(Probably))))
+        bool stepping = true;
 
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req;
     };

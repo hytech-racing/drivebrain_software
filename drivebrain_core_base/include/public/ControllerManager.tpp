@@ -124,3 +124,27 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
 
     return status_type::NO_ERROR;
 }
+
+bool control::ControllerManager::swap_active_controller(size_t new_controller_index)
+{   
+    static const size_t num_controllers = NumControllers;
+    if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
+    {
+        _current_state.current_status = core::control::ControllerManagerStatus::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
+        return false;
+    }
+
+    core::VehicleState current_state = _state_estimator.get_latest_state_and_validity().first;
+    _current_state.current_status = _can_switch_controller(current_state, _controllers[_current_controller_index]->step_controller(current_state), _controllers[new_controller_index]->step_controller(current_state));
+    if(_current_state.current_status == core::control::ControllerManagerStatus::NO_ERROR)
+    {
+        _current_controller_index = new_controller_index;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+    //TODO: swap drivetrain controller when new controller mode wants to
+}
