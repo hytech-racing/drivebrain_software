@@ -195,8 +195,8 @@ install(TARGETS
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-# install(TARGETS 
-#         # test_param_server
-#         alpha_test
-#     RUNTIME 
-#         DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS 
+        # test_param_server
+        alpha_test
+    RUNTIME 
+        DESTINATION ${CMAKE_INSTALL_BINDIR})

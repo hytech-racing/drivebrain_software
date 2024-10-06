@@ -18,10 +18,8 @@ jobs:
 
       - name: Enter the development environment
         run: | 
-          nix develop .#tests
-          mkdir build
-          cd build
-          cmake ..
+          nix build
+          ./results/bin/alpha_test
 
         
       
