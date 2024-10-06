@@ -24,7 +24,7 @@ jobs:
           mkdir build
           cd build
           cmake ..
-        shell: nix develop .#tests
+        shell: nix develop .#tests {0}
 
       
 
