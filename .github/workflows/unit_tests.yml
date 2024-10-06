@@ -13,8 +13,8 @@ jobs:
       - name: Build And Test
         uses: actions/checkout@v4
         with:
-          repository: hytech-racing/HT_proto
-          ref: ref/heads/master
+          repository: hytech-racing/drivebrain_software
+          ref: ${{ github.ref }}
 
       - name: Enter the development environment
         run: nix develop .#tests
@@ -24,6 +24,7 @@ jobs:
           mkdir build
           cd build
           cmake ..
+        shell: nix develop .#tests
 
       
 
