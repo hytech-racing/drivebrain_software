@@ -20,9 +20,9 @@ namespace core
     class FoxgloveWSServer
     {
     public:
-        FoxgloveWSServer() = delete;
+        // FoxgloveWSServer() = delete;
 
-        FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components);
+        explicit FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components);
         void send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg);
         ~FoxgloveWSServer()
         {

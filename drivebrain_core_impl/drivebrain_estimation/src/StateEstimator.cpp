@@ -5,8 +5,8 @@
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
-{
-    if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
+{   // FIXME: use this pattern over hard coding
+    if (message->GetTypeName() == hytech_msgs::MCUOutputData::descriptor()->full_name())
     {
         auto in_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(message);
         core::DriverInput input = {(in_msg->accel_percent()), (in_msg->brake_percent())};
@@ -39,6 +39,7 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
     }
     else if (message->GetTypeName() == "hytech_msgs.VNData")
     {
+        // NOTE: new data flag
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
         xyz_vec<float> body_vel_ms = {
             (in_msg->vn_vel_m_s().x()),

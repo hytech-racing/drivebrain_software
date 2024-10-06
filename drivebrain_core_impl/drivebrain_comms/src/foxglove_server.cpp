@@ -140,6 +140,7 @@ void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobu
 
 foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::string &set_name, core::common::Configurable::ParamTypes param)
 {
+    //FIXME: Suggest using visit here.
     if (std::holds_alternative<bool>(param))
     {
         std::cout << set_name << " Variant holds an bool: " << std::get<bool>(param) << std::endl;

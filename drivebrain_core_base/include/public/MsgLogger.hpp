@@ -64,9 +64,8 @@ namespace core
             // TODO maybe make this also more thread safe ... ?
             if (_logging)
             {
-                auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-                _handle_output_messages(msg, _logger_msg_function);
-            }
+                auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg); // FIXME remove this
+                _handle_output_messages(msg, _logger_msg_function);            }
             _handle_output_messages(msg, _live_msg_output_func);
         }
 

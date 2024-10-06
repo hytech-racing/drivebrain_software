@@ -2,6 +2,7 @@
 #define __VEHICLESTATE_H__
 #include <Utils.hpp>
 #include <variant>
+#include <cstdint>
 
 // TODO this will need a one-to-one protobuf message
 namespace core
@@ -44,7 +45,7 @@ namespace core
     
     struct SpeedControlOut
     {
-        int64_t mcu_recv_millis;
+        std::int64_t mcu_recv_millis;
         veh_vec<float> desired_rpms;
         veh_vec<float> torque_lim_nm;
     };

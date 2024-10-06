@@ -43,7 +43,7 @@ void signalHandler(int signal)
     std::cout << "Interrupt signal (" << signal << ") received. Cleaning up..." << std::endl;
     stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
 }
-
+// Consider a driver/runtime class to allow testing be very aware of construction order 
 int main(int argc, char *argv[])
 {
 
@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 
     if (construction_failed)
     {
+        //FIXME Return
         stop_signal.store(true);
     }
     configurable_components.push_back(&matlab_math);
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
     // std::cout << "driver init " << driver.init() << std::endl;
     if (construction_failed)
     {
+        //FIXME return
         stop_signal.store(true);
     }
 
@@ -110,6 +112,7 @@ int main(int argc, char *argv[])
                                   {
             std::cout <<"started db service thread" <<std::endl;
             try {
+                //FIXME: Remove while and replaced with if or return on failed init look into shutdown grpc handler
                 while (!stop_signal.load()) {
                     // Run the io_context as long as stop_signal is false
                     db_service_inst.run_server();  // Run at least one handler, or return immediately if none
@@ -124,6 +127,7 @@ int main(int argc, char *argv[])
                                   {
             std::cout <<"started io context thread" <<std::endl;
             try {
+                //FIXME: Use blocking call and use io_context shutdown
                 while (!stop_signal.load()) {
                     // Run the io_context as long as stop_signal is false
                     io_context.run_one();  // Run at least one handler, or return immediately if none
@@ -136,8 +140,8 @@ int main(int argc, char *argv[])
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
-        auto loop_time = controller.get_dt_sec();
-        auto loop_time_micros = (int)(loop_time * 1000000.0f);
+        auto loop_time = controller.get_dt_sec(); //NOTE: return chrono duration
+        auto loop_time_micros = (int)(loop_time * 1000000.0f); //FIXME: add constant no style cast
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(!stop_signal.load())
         {
@@ -164,22 +168,28 @@ int main(int argc, char *argv[])
 
             {
                 std::unique_lock lk(eth_tx_queue.mtx);
-                eth_tx_queue.deque.push_back(out_msg);
-                eth_tx_queue.cv.notify_all();
+                eth_tx_queue.deque.push_back(std::move(out_msg));
+                eth_tx_queue.cv.notify_all(); // FIXME: this should be outside
             }
             // } else {
             // }
+            
             auto end_time = std::chrono::high_resolution_clock::now();
 
             auto elapsed = 
                 std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-
+            // Consider a sleep until or even better condition_variable wait here.
             std::this_thread::sleep_for(loop_chrono_time - elapsed);
             
         } });
-
+    // struct Message {
+    //   std::string type_name;
+    //   std::vector<uint8_t> data;
+    //   explicit Message(google::protobuf::Message* message) {
+    // }
+    // }
     std::signal(SIGINT, signalHandler);
-
+    // FIXME: remove un needed while
     while (!stop_signal.load())
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));

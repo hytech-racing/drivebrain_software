@@ -77,7 +77,7 @@ namespace comms
         {
             _running = true;
             _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
-            construction_failed = !init();
+            construction_failed = !init(); //FIXME throw here or have a create that returns an optional
         }
         ~CANDriver();
         bool init();

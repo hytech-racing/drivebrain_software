@@ -16,8 +16,9 @@
 #include <string>
 #include <queue>
 namespace util
-{
-    std::vector<const google::protobuf::FileDescriptor *> get_pb_descriptors(const std::vector<std::string> &filenames)
+{ 
+    // FIXME: use inline for free function defined in the header
+   std::vector<const google::protobuf::FileDescriptor *> get_pb_descriptors(const std::vector<std::string> &filenames)
     {
         std::vector<const google::protobuf::FileDescriptor *> descriptors;
         for (const auto &name : filenames)
@@ -38,15 +39,19 @@ namespace util
     std::optional<std::unordered_map<std::string, uint32_t>> generate_name_to_id_map(const std::vector<std::string> &filenames)
     {
         auto descriptors = get_pb_descriptors(filenames);
-        std::unordered_map<std::string, uint32_t> map;
+        std::optional<std::unordered_map<std::string, uint32_t>> map;
 
         int running_index = 1;
         for (const auto &desc : descriptors)
         {
             for (int i = 0; i < (desc->message_type_count()); ++i)
             {
+                if (!map)
+                {
+                  map = std::unordered_map<std::string, uint32_t>();
+                }
                 const google::protobuf::Descriptor *message_descriptor = desc->message_type(i);
-                map[message_descriptor->name()] = running_index;
+                map->insert_or_assign(message_descriptor->name(), running_index);
                 running_index++;
             }
         }

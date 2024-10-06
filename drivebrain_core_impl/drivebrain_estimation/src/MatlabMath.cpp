@@ -156,7 +156,7 @@ namespace estimation
         _inputs.MotorRPMFR = current_state.current_rpms.FR; // '<Root>/Motor RPM FR'
         _inputs.MotorRPMRL = current_state.current_rpms.RL; // '<Root>/Motor RPM RL'
         _inputs.MotorRPMRR = current_state.current_rpms.RR; // '<Root>/Motor RPM RR'
-
+        //FIXME: Where the lock at
         _inputs.LMUXFL = _config.lmux_fl; // '<Root>/LMUX FL'
         _inputs.LMUXFR = _config.lmux_fr; // '<Root>/LMUX FR'
         _inputs.LMUXRL = _config.lmux_rl; // '<Root>/LMUX RL'

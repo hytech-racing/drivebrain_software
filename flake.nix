@@ -1,5 +1,6 @@
-{
-  description = "drivebrain flake";
+
+rec {
+  description = let testval = 1; in  "drivebrain flake" + testval;
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
@@ -21,7 +22,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-05T00_19_35";
+        ref = description;
         flake = false;
       };
 

@@ -44,7 +44,7 @@ namespace core
     bool Logger::_do_print(LogLevel lvl)
     {
 
-        if (static_cast<int>(lvl) <= static_cast<int>(_lvl))
+        if (lvl <= _lvl)
         {
             return true;
         }

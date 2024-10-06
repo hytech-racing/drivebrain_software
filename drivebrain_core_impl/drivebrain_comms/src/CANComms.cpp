@@ -27,7 +27,7 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
 }
 comms::CANDriver::~CANDriver()
 {
-    _running = false;
+    _running = false; // FIXME use the mutex here
     _input_deque_ref.cv.notify_all();
     _output_thread.join();
 }
@@ -266,10 +266,14 @@ comms::CANDriver::FieldVariant comms::CANDriver::get_field_value(std::shared_ptr
     case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
         return reflection->GetBool(*message, field);
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        // FIXME change to cerr and monostate return
         return reflection->GetString(*message, field);
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        // TODO:: support enums
+        // FIXME: change to cerr and monostate return
         return reflection->GetEnum(*message, field)->name();
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        // FIXME change to cerr and monostate return
         return "Nested messages not supported";
     default:
         std::cerr << "Unsupported field type" << std::endl;
@@ -298,7 +302,7 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
             auto field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
-                       {
+                       { //FIXME use if constexpr
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
@@ -348,19 +352,18 @@ void comms::CANDriver::_handle_send_msg_from_queue()
             _input_deque_ref.cv.wait(lk, [this]()
                                      { return !_input_deque_ref.deque.empty() || !_running; });
 
-            if (_input_deque_ref.deque.empty())
+            if (!_running)
             {
                 return;
             }
-
+            // FIXME: swap here?
             q.deque = _input_deque_ref.deque;
             _input_deque_ref.deque.clear();
         }
 
         for (const auto &msg : q.deque)
         {
-            auto can_msg = _get_CAN_msg(msg);
-            if (can_msg)
+            if (auto can_msg = _get_CAN_msg(msg))
             {
                 _send_message(*can_msg);
                 _message_logger->log_msg(msg);
