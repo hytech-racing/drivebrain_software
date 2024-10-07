@@ -20,7 +20,7 @@ jobs:
         run: | 
           nix build
           ls
-          ./results/bin/alpha_test
+          ./result/bin/alpha_test
 
         
       
