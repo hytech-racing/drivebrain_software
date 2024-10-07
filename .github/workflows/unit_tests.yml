@@ -18,9 +18,8 @@ jobs:
 
       - name: Enter the development environment
         run: | 
-          nix build
-          ls
-          ./result/bin/alpha_test
+          nix develop .#tests
+          nix flake metadata 
 
         
       
