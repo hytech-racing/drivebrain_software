@@ -20,6 +20,9 @@ jobs:
         run: | 
           nix develop .#tests
           nix flake metadata 
+          mkdir build
+          cd build
+          cmake ..
 
         
       
