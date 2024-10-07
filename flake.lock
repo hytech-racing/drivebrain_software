@@ -254,11 +254,11 @@
     "foxglove-mcap-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1726698516,
-        "narHash": "sha256-0cTioEtjmQve5Nv89BCkXrmSM9Kmd1LMfWtFoZY3k7g=",
+        "lastModified": 1728342210,
+        "narHash": "sha256-+8+i4UTbXIcVBIug7zyBWQmnjX0lfLgsfnmJId/U3xk=",
         "owner": "RCMast3r",
         "repo": "mcap",
-        "rev": "66e34d5260e7499b0ce055dfa9d59a350be4f703",
+        "rev": "74648f4fd941219eb62c17174dce4285385b5a3d",
         "type": "github"
       },
       "original": {
@@ -429,11 +429,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1726698542,
-        "narHash": "sha256-bLsr4EKItuc2Bn45RGZ1yMUHp/epahxJyS1drbpQ/vA=",
+        "lastModified": 1728342286,
+        "narHash": "sha256-BiaoZV0F8yvmM3P4rKxEM8RWZw6JZs/zIdx1RjieOLw=",
         "owner": "RCMast3r",
         "repo": "nebs_packages",
-        "rev": "1575dbda8450d63e6dcaab3fd8eeb8d182ab168b",
+        "rev": "2d0f791a05fe5e3d1fb241d574be1624bbcff2ca",
         "type": "github"
       },
       "original": {

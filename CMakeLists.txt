@@ -29,10 +29,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
-find_dependency(PkgConfig)
-pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
-
-find_package(zstd REQUIRED)
 find_package(mcap REQUIRED)
 
 # custom packaged libraries, code didnt require changes just the packaging
@@ -158,8 +154,6 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
-    PkgConfig::lz4 
-    zstd::libzstd_shared
 )
 
 # target_link_libraries(drivebrain_mcap_logger INTERFACE
