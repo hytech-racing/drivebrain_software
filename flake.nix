@@ -1,7 +1,6 @@
 rec {
-  # rec is required for us to access the description and use it as a variable for the flake input
-  # OH BOI THIS IS A HACK
-  description = "2024-09-24T13_32_59";
+
+  description = "drivebrain flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
@@ -24,7 +23,6 @@ rec {
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = description; # we have configurable flakes at home:
         flake = false;
       };
 
@@ -58,7 +56,7 @@ rec {
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = description;
+          version = "0.0.1";
           src = "${HT_proto}/proto";
         };
         db_service = nix-proto.mkProtoDerivation

@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/test_config/can_driver.json"), "Path to the parameter JSON file")
+        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/drivebrain_config.json"), "Path to the parameter JSON file")
         ("dbc-path,d", po::value<std::string>(), "Path to the DBC file (optional)");
 
     po::variables_map vm;
