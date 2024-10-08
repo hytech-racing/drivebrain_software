@@ -124,10 +124,7 @@ int main(int argc, char *argv[])
                                   {
             std::cout <<"started io context thread" <<std::endl;
             try {
-                while (!stop_signal.load()) {
-                    // Run the io_context as long as stop_signal is false
-                    io_context.run_one();  // Run at least one handler, or return immediately if none
-                }
+                io_context.run();
             } catch (const std::exception& e) {
                 std::cerr << "Error in io_context: " << e.what() << std::endl;
             } });
@@ -167,8 +164,7 @@ int main(int argc, char *argv[])
                 eth_tx_queue.deque.push_back(out_msg);
                 eth_tx_queue.cv.notify_all();
             }
-            // } else {
-            // }
+
             auto end_time = std::chrono::high_resolution_clock::now();
 
             auto elapsed = 

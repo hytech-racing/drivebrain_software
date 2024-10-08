@@ -19,24 +19,15 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_rpms = rpms;
             _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
             _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
+            _raw_input_data.raw_load_cell_values = {
+                in_msg->load_cell_data().fl(),
+                in_msg->load_cell_data().fr(),
+                in_msg->load_cell_data().rl(),
+                in_msg->load_cell_data().rr(),
+            };
         }
     }
-    else if (message->GetTypeName() == "mcu_suspension")
-    {
-        auto in_msg = std::static_pointer_cast<mcu_suspension>(message);
-
-        std::unique_lock lk(_state_mutex);
-        _raw_input_data.raw_load_cell_values.FL = in_msg->load_cell_fl();
-        _raw_input_data.raw_load_cell_values.FR = in_msg->load_cell_fr();
-    }
-    else if (message->GetTypeName() == "sab_suspension")
-    {
-        auto in_msg = std::static_pointer_cast<sab_suspension>(message);
-
-        std::unique_lock lk(_state_mutex);
-        _raw_input_data.raw_load_cell_values.RL = in_msg->load_cell_rl();
-        _raw_input_data.raw_load_cell_values.RR = in_msg->load_cell_rr();
-    }
+    
     else if (message->GetTypeName() == "hytech_msgs.VNData")
     {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
@@ -127,7 +118,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         std::unique_lock lk(_state_mutex);
         _vehicle_state.matlab_math_temp_out = res_pair.second;
     }
-    
+
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
 
     auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();
@@ -187,12 +178,15 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_brake_saturation_nm->set_fr(matlab_math_data.brake_saturation_nm.FR);
     current_brake_saturation_nm->set_rl(matlab_math_data.brake_saturation_nm.RL);
     current_brake_saturation_nm->set_rr(matlab_math_data.brake_saturation_nm.RR);
+    
+    msg_out->set_v_y_lm(matlab_math_data.v_y_lm);
+    msg_out->set_psi_dot_lm_deg_s(matlab_math_data.psi_dot_lm_deg_s);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    msg_out->set_is_ready_to_drive(true);
+    `set_is_ready_to_drive(true);
 
     hytech_msgs::SpeedControlIn *current_inputs = msg_out->mutable_current_inputs();
     current_inputs->set_accel_percent(current_state.input.requested_accel);
@@ -226,7 +220,6 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
 
     msg_out->set_state_is_valid(state_is_valid);
     msg_out->set_steering_angle_deg(current_state.steering_angle_deg);
-
 
     auto prev_driver_torque_req = msg_out->mutable_driver_torque();
     prev_driver_torque_req->set_fl(current_state.prev_controller_output.torque_lim_nm.FL);

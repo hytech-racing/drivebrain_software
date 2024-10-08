@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-05T00_19_35";
+        ref = "2024-10-08T00_48_56";
         flake = false;
       };
 
@@ -30,7 +30,7 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/121";
+    ht_can.url = "github:hytech-racing/ht_can/132";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
 
     data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";

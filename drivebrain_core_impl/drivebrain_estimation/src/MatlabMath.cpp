@@ -191,6 +191,10 @@ namespace estimation
         _inputs.interp_y2_RR = _config.y2_rr; // '<Root>/interp_y2_RR'
         _inputs.interp_y3_RR = _config.y3_rr; // '<Root>/interp_y3_RR'
 
+        _inputs.SteeringWheelAngleDeg = current_state.steering_angle_deg;
+        _inputs.Vx_VN = current_state.current_body_vel_ms.x;
+        // _inputs.Vx_VN = 10.0f;
+
         _model.setExternalInputs(&_inputs);
         _model.step();
         Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T outputs = _model.getExternalOutputs();
@@ -222,6 +226,9 @@ namespace estimation
         result.brake_saturation_nm.FR = outputs.satBrakeTFR;
         result.brake_saturation_nm.RL = outputs.satBrakeTRL;
         result.brake_saturation_nm.RR = outputs.satBrakeTRR;
+
+        result.v_y_lm = outputs.Vy_LM;
+        result.psi_dot_lm_deg_s = outputs.Psi_dot_LMdegs;
 
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR};                // '<Root>/torq_req_FL'
         return {result, control_res};

@@ -7,10 +7,9 @@
 namespace core
 {
 
-    
     // TODO change all driver inputs to use this?
-    // this is the struct that will contain the data that is already 
-    // being logged via the sensor interfaces and doesnt go directly 
+    // this is the struct that will contain the data that is already
+    // being logged via the sensor interfaces and doesnt go directly
     // into the vehicle state
     struct RawInputData
     {
@@ -33,15 +32,19 @@ namespace core
         veh_vec<xyz_vec<float>> tire_moments_nm;
         veh_vec<float> accel_saturation_nm;
         veh_vec<float> brake_saturation_nm;
+        float v_y_lm;
+        float psi_dot_lm_deg_s;
         TireDynamics()
         {
             tire_forces_n = {};
             tire_moments_nm = {};
             accel_saturation_nm = {};
             brake_saturation_nm = {};
+            v_y_lm = 0;
+            psi_dot_lm_deg_s = 0;
         }
     };
-    
+
     struct SpeedControlOut
     {
         int64_t mcu_recv_millis;

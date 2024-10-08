@@ -41,10 +41,12 @@ bool comms::CANDriver::init()
     {
         _logger.log_string("couldnt get params", core::LogLevel::ERROR);
         return false;
-    } else if (!std::filesystem::exists(*dbc_file_path)){
+    }
+    else if (!std::filesystem::exists(*dbc_file_path))
+    {
         std::string msg("params file does not exist! ");
-        msg +=" "; 
-        msg +=(*dbc_file_path);
+        msg += " ";
+        msg += (*dbc_file_path);
         _logger.log_string(msg, core::LogLevel::ERROR);
         return false;
     }
@@ -136,11 +138,11 @@ void comms::CANDriver::_send_message(const struct can_frame &frame)
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 {
     auto msg = pb_msg_recv(frame);
-    if(msg){
+    if (msg)
+    {
         _state_estimator.handle_recv_process(msg);
         _message_logger->log_msg(msg);
     }
-    
 }
 
 // gets a protobuf message from just the name of it
@@ -150,10 +152,17 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name
 
     std::shared_ptr<google::protobuf::Message> prototype_message;
     const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-    prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
-    if (!prototype_message)
+    if (desc)
     {
-        std::cerr << "Failed to create prototype message" << std::endl;
+        prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
+        if (!prototype_message)
+        {
+            std::cerr << "Failed to create prototype message" << std::endl;
+            return nullptr;
+        }
+    }
+    else
+    {
         return nullptr;
     }
     return prototype_message;
@@ -184,7 +193,7 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             switch (field->type())
             {
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-                
+
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
@@ -210,21 +219,28 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     {
         auto msg = iter->second->Clone();
         auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
-
-        std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
-        for (const dbcppp::ISignal &sig : msg->Signals())
+        if (msg_to_populate)
         {
-            const dbcppp::ISignal *mux_sig = msg->MuxSignal();
 
-            if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
-                (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
+            std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
+            for (const dbcppp::ISignal &sig : msg->Signals())
             {
-                // TODO get correct type from raw signal and store it in the map. right now they are all doubles
-                msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
+                const dbcppp::ISignal *mux_sig = msg->MuxSignal();
+
+                if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
+                    (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
+                {
+                    // TODO get correct type from raw signal and store it in the map. right now they are all doubles
+                    msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
+                }
             }
+            set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
+            return msg_to_populate;
         }
-        set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
-        return msg_to_populate;
+        else
+        {
+            return nullptr;
+        }
     }
 
     return nullptr;
@@ -270,7 +286,8 @@ comms::CANDriver::FieldVariant comms::CANDriver::get_field_value(std::shared_ptr
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
         return reflection->GetEnum(*message, field)->name();
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-        return "Nested messages not supported";
+        std::cerr << "Nested messages not supported" << std::endl;
+        return std::monostate{};
     default:
         std::cerr << "Unsupported field type" << std::endl;
         return std::monostate{};
@@ -359,11 +376,14 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 
         for (const auto &msg : q.deque)
         {
-            auto can_msg = _get_CAN_msg(msg);
-            if (can_msg)
+            if (msg)
             {
-                _send_message(*can_msg);
-                _message_logger->log_msg(msg);
+                auto can_msg = _get_CAN_msg(msg);
+                if (can_msg)
+                {
+                    _send_message(*can_msg);
+                    _message_logger->log_msg(msg);
+                }
             }
         }
         q.deque.clear();
