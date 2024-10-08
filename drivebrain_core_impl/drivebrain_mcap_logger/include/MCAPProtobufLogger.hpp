@@ -9,6 +9,7 @@
 #include <mcap/writer.hpp>
 #include <mcap/mcap.hpp>
 #include <mutex>
+
 namespace common
 {
     class MCAPProtobufLogger 

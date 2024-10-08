@@ -12,8 +12,16 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/version_header/versions.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version_header/versions.h"
+    @ONLY
+)
+
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+
+find_package(libvncxx REQUIRED)
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
@@ -29,6 +37,7 @@ find_package(cmake_macros REQUIRED)
 
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
+
 include(create_package)
 
 #####################
@@ -58,7 +67,7 @@ target_include_directories(drivebrain_core PRIVATE
 target_link_libraries(drivebrain_core PUBLIC 
     nlohmann_json::nlohmann_json 
     Boost::boost
-    Boost::system 
+    Boost::system
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
 )
@@ -85,6 +94,7 @@ make_cmake_package(drivebrain_common_utils drivebrain)
 add_library(drivebrain_comms SHARED
     drivebrain_core_impl/drivebrain_comms/src/foxglove_server.cpp
     drivebrain_core_impl/drivebrain_comms/src/CANComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/VNComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/MCUETHComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
 )
@@ -97,6 +107,11 @@ target_include_directories(drivebrain_comms PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/include>    
 )
 
+target_include_directories(drivebrain_comms PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
+
 target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core
     drivebrain_common_utils
@@ -107,6 +122,8 @@ target_link_libraries(drivebrain_comms PUBLIC
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     db_service_grpc_cpp::db_service_grpc_cpp
+    libvncxx::libvncxx
+
 )
 
 make_cmake_package(drivebrain_comms drivebrain)
@@ -143,7 +160,10 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
 target_link_libraries(drivebrain_mcap_logger INTERFACE
     mcap::mcap
 )
-
+target_include_directories(drivebrain_mcap_logger PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
 
@@ -195,6 +215,16 @@ target_link_libraries(test_mcap PUBLIC
     protobuf::libprotobuf
     mcap::mcap
 )
+
+set(CMAKE_CXX_STANDARD 17) 
+add_executable(test_vn test/test_vn.cpp)
+target_link_libraries(test_vn PUBLIC
+    Boost::boost
+    Boost::system
+    libvncxx::libvncxx
+)
+
+target_compile_features(test_vn PUBLIC cxx_std_11)
 
 ###                   ###
 ### system executable ###
