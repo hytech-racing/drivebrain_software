@@ -33,11 +33,6 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
                                                                                                                        const core::ControllerOutput &next_controller_output)
 {
     using status_type = core::control::ControllerManagerStatus;
-
-    bool speedPreventsChange = true;
-    // Check if torque delta permits mode change
-    bool torqueDeltaPreventsModeChange = true;
-
     // shared function to check if values are above a maximum value
     auto check_veh_vec = [](veh_vec<float> vehicle_vector, float max_val, bool check_with_abs) -> bool
     {
@@ -60,69 +55,68 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // check to see if current drivetrain rpms are too high to switch controller
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
-        return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        _current_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        return _current_state.current_status;
     }
-
 
     // function to check whether or not the controller output is with range. 
     // can determine what type the controller output is and checks to see whether or not it has issues.
 
     // if the controller output is a speed controller type: checks both desired rpms level and max torque limit level to verify range.
     // if the controller output is a torque controller type: only checks the torque setpoint
-    auto verify_controller_output = [this, &check_veh_vec](const core::ControllerOutput &controller_output) -> bool
-    {
+    auto verify_controller_output = [this, &check_veh_vec](const core::ControllerOutput &controller_output) -> status_type
+    {   
+        // 1: "trajectory/speed" control (speed control with torque limit)
+        // check: make sure that either the setpoint rpm is low enough OR (AND?) the torque setpoint is low enough
         if (const core::SpeedControlOut *pval = std::get_if<core::SpeedControlOut>(&controller_output.out))
         {
             if (check_veh_vec(pval->desired_rpms, _max_switch_rpm, true))
             {
-                return true;
+                return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
             }
             else if (check_veh_vec(pval->positive_torque_lim_nm, _max_torque_switch, false))
             {
-                return true;
+                return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
             } else {
-                return false;
+                return status_type::NO_ERROR;
             }
         }
+        // 2: "torque" control (just torque setpoints)
+        // check: make sure the torque setpoint is low enough
         else if (const core::TorqueControlOut *pval = std::get_if<core::TorqueControlOut>(&controller_output.out))
         {
             if (check_veh_vec(pval->desired_torques_nm, _max_torque_switch, false))
             {
-                return true;
+                return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
+            }
+            else
+            {
+                return status_type::NO_ERROR;
             }
         }
         else
         {
-            return true;
+            return status_type::NO_ERROR;
         }
     };
 
-    bool currentControllerOutputPreventingSwitch = verify_controller_output(previous_output);
-    bool proposedControllerOutputPreventingSwitch = verify_controller_output(next_controller_output);
+    status_type prev_status = verify_controller_output(previous_output);
+    status_type switch_staus = verify_controller_output(next_controller_output);
 
-    // TODO add checking for both controller types and if we are switching between controller output types what that looks like
+    if(prev_status == status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
+    {
+        _current_state.current_status = status_type::NO_ERROR;
+    }
+    else if(prev_status != status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
+    {
+        _current_state.current_status = prev_status;
+    }
+    else
+    {
+        _current_state.current_status = switch_status;
+    }
 
-    // instead of checking the difference between controller outputs, we will just make sure that the outputs themselves are under specific val
-
-    // cases:
-
-    // 1: "trajectory/speed" control (speed control with torque limit)
-    // check: make sure that either the setpoint rpm is low enough OR (AND?) the torque setpoint is low enough
-    // 2: "torque" control (just torque setpoints)
-    // check: make sure the torque setpoint is low enough
-
-    // only if the torque delta is positive do we not want to switch to the new one
-    // torqueDeltaPreventsModeChange = (desired_controller_out.torqueSetpoints[i] - previous_controller_command.torqueSetpoints[i]) > max_torque_pos_change_delta_;
-    // if (speedPreventsChange)
-    // {
-    //     return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
-    // }
-    // if (torqueDeltaPreventsModeChange)
-    // {
-    //     return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
-    // }
-
-    return status_type::NO_ERROR;
+    return _current_state.current_status;
 }
 
 bool control::ControllerManager::swap_active_controller(size_t new_controller_index)
@@ -130,13 +124,12 @@ bool control::ControllerManager::swap_active_controller(size_t new_controller_in
     static const size_t num_controllers = NumControllers;
     if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
     {
-        _current_state.current_status = core::control::ControllerManagerStatus::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
+        _current_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
         return false;
     }
 
     core::VehicleState current_state = _state_estimator.get_latest_state_and_validity().first;
-    _current_state.current_status = _can_switch_controller(current_state, _controllers[_current_controller_index]->step_controller(current_state), _controllers[new_controller_index]->step_controller(current_state));
-    if(_current_state.current_status == core::control::ControllerManagerStatus::NO_ERROR)
+    if(_can_switch_controller(current_state, _controllers[_current_controller_index]->step_controller(current_state), _controllers[new_controller_index]->step_controller(current_state)) != status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
         return true;

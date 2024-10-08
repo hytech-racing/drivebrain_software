@@ -48,6 +48,7 @@ namespace core
             ERROR_SPEED_DIFF_TOO_HIGH,
             ERROR_TORQUE_DIFF_TOO_HIGH,
             ERROR_DRIVER_ON_PEDAL,
+            ERROR_CONTROLLER_NO_TORQUE_OR_SPEED_OUTPUT,
             NUM_CONTROLLER_MANAGER_STATUSES
         };
 
