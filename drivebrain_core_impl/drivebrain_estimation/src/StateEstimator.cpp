@@ -181,12 +181,12 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     
     msg_out->set_v_y_lm(matlab_math_data.v_y_lm);
     msg_out->set_psi_dot_lm_deg_s(matlab_math_data.psi_dot_lm_deg_s);
-
+    
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    `set_is_ready_to_drive(true);
+    msg_out->set_is_ready_to_drive(true);
 
     hytech_msgs::SpeedControlIn *current_inputs = msg_out->mutable_current_inputs();
     current_inputs->set_accel_percent(current_state.input.requested_accel);
