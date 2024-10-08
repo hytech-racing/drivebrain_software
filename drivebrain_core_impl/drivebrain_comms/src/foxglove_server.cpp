@@ -19,32 +19,6 @@ static uint64_t nanosecondsSinceEpoch()
                         .count());
 }
 
-/// Builds a FileDescriptorSet of this descriptor and all transitive dependencies, for use as a
-/// channel schema.
-static std::string SerializeFdSet(const google::protobuf::Descriptor *toplevelDescriptor)
-{
-    google::protobuf::FileDescriptorSet fdSet;
-    std::queue<const google::protobuf::FileDescriptor *> toAdd;
-    toAdd.push(toplevelDescriptor->file());
-    std::unordered_set<std::string> seenDependencies;
-    while (!toAdd.empty())
-    {
-        const google::protobuf::FileDescriptor *next = toAdd.front();
-        toAdd.pop();
-        next->CopyTo(fdSet.add_file());
-        for (int i = 0; i < next->dependency_count(); ++i)
-        {
-            const auto &dep = next->dependency(i);
-            if (seenDependencies.find(dep->name()) == seenDependencies.end())
-            {
-                seenDependencies.insert(dep->name());
-                toAdd.push(dep);
-            }
-        }
-    }
-    return fdSet.SerializeAsString();
-}
-
 core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
@@ -114,7 +88,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
             server_channel.topic = message_descriptor->name();
             server_channel.encoding = "protobuf";
             server_channel.schemaName = message_descriptor->full_name();
-            server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
+            server_channel.schema = foxglove::base64Encode(util::build_file_descriptor_set(message_descriptor).SerializeAsString());
             channels.push_back(server_channel);
         }
     }

@@ -123,14 +123,13 @@ int main(int argc, char *argv[])
     DBInterfaceImpl db_service_inst(message_logger);
     std::thread db_service_thread([&db_service_inst]()
         {
-            std::cout <<"started io context thread" <<std::endl;
             try {
                 while (!stop_signal.load()) {
                     // Run the io_context as long as stop_signal is false
                     db_service_inst.run_server();  // Run at least one handler, or return immediately if none
                 }
             } catch (const std::exception& e) {
-                std::cerr << "Error in io_context: " << e.what() << std::endl;
+                std::cerr << "Error in drivebrain service thread: " << e.what() << std::endl;
             }
         }); 
     // what we will do here is have a temporary super-loop.

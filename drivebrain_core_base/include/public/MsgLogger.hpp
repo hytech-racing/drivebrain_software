@@ -46,7 +46,6 @@ namespace core
                 _open_log_function(log_name);
                 _logging = init_logging;
             }
-
         }
 
         ~MsgLogger()
@@ -61,12 +60,27 @@ namespace core
         void log_msg(MsgType msg)
         {
             // TODO maybe make this also more thread safe ... ?
-            if (_logging)
+            bool logging = true;
+            {
+                std::unique_lock lk(_mtx);
+                logging = _logging;
+            }
+
+            if (logging)
             {
                 auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-                _handle_output_messages(msg, _logger_msg_function);
+                {
+                    std::unique_lock lk(_mtx);
+
+                    _handle_output_messages(msg, _logger_msg_function);
+                    _handle_output_messages(msg, _live_msg_output_func);
+                }
             }
-            _handle_output_messages(msg, _live_msg_output_func);
+            else
+            {
+                std::unique_lock lk(_mtx);
+                _handle_output_messages(msg, _live_msg_output_func);
+            }
         }
 
         // will only open a new file for logging if we are not currently logging

@@ -66,14 +66,16 @@ target_link_libraries(drivebrain_core PUBLIC
 make_cmake_package(drivebrain_core drivebrain)
 
 
-add_library(drivebrain_common_utils INTERFACE)
+add_library(drivebrain_common_utils SHARED 
+    drivebrain_core_impl/drivebrain_common_utils/src/ProtobufUtils.cpp
+)
 
-target_include_directories(drivebrain_common_utils INTERFACE
+target_include_directories(drivebrain_common_utils PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_common_utils/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_common_utils/include>
 )
 
-target_link_libraries(drivebrain_common_utils INTERFACE
+target_link_libraries(drivebrain_common_utils PUBLIC
     protobuf::libprotobuf
 )
 
