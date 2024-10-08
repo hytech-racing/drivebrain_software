@@ -158,7 +158,12 @@ add_executable(mcu_test test/test_mcu_send.cpp)
 
 add_executable(alpha_build drivebrain_app/main.cpp)
 
-add_executable(alpha_test unit_test/main.cpp)
+enable_testing()
+
+add_executable(alpha_test 
+    unit_test/main.cpp
+    unit_test/SimpleControllerTest.cpp
+)
 
 target_link_libraries(alpha_build PUBLIC
     drivebrain_core
@@ -169,6 +174,7 @@ target_link_libraries(alpha_build PUBLIC
     Boost::program_options
 )
 
+
 target_link_libraries(alpha_test PUBLIC 
     drivebrain_core
     drivebrain_control
@@ -178,6 +184,8 @@ target_link_libraries(alpha_test PUBLIC
     Boost::program_options
     gtest
 )
+
+add_test(NAME MyTest COMMAND alpha_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
@@ -195,8 +203,3 @@ install(TARGETS
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(TARGETS 
-        # test_param_server
-        alpha_test
-    RUNTIME 
-        DESTINATION ${CMAKE_INSTALL_BINDIR})

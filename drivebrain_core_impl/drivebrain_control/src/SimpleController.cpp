@@ -26,11 +26,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
         _config.regen_torque_scale = *pval;
         std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale <<std::endl;
     }
-    if(auto pval = std::get_if<speed_m_s>(&new_param_map.at("positive_speed_set")))
-    {
-        _config.positive_speed_set = *pval;
-        std::cout << "setting new positive_speed_set " << _config.positive_speed_set <<std::endl;
-    }
 }
 
 bool control::SimpleController::init()
@@ -39,7 +34,7 @@ bool control::SimpleController::init()
     std::optional max_regen_torque = get_live_parameter<torque_nm>("max_regen_torque");
     std::optional rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
     std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
-    std::optional positive_speed_set = get_live_parameter<speed_m_s>("positive_speed_set");
+    std::optional positive_speed_set = get_parameter_value<speed_m_s>("positive_speed_set");
 
     if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
     {
