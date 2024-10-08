@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
 
     core::StateEstimator state_estimator(logger, message_logger, matlab_math);
-    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed, state_estimator);
+    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed);
 
     // std::cout << "driver init " << driver.init() << std::endl;
     if (construction_failed)

@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <variant>
+#include <filesystem>
 
 // https://docs.kernel.org/networking/can.html
 
@@ -24,16 +25,30 @@ std::string comms::CANDriver::_to_lowercase(std::string s)
     );
     return s;
 }
-
+comms::CANDriver::~CANDriver()
+{
+    _running = false;
+    _input_deque_ref.cv.notify_all();
+    _output_thread.join();
+}
 bool comms::CANDriver::init()
 {
-    auto canbus_device = get_parameter_value<std::string>("canbus_device");
+    // auto canbus_device = get_parameter_value<std::string>("canbus_device");
+    std::optional<std::string> canbus_device = std::make_optional("vcan0");
 
-    auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    // auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
+    std::optional<std::string> dbc_file_path = std::make_optional("../config/test_config/hytech.dbc");
+
 
     if (!(canbus_device && dbc_file_path))
     {
         _logger.log_string("couldnt get params", core::LogLevel::ERROR);
+        return false;
+    } else if (!std::filesystem::exists(*dbc_file_path)){
+        std::string msg("params file does not exist! ");
+        msg +=" "; 
+        msg +=(*dbc_file_path);
+        _logger.log_string(msg, core::LogLevel::ERROR);
         return false;
     }
     std::shared_ptr<dbcppp::INetwork> net;
@@ -99,7 +114,6 @@ void comms::CANDriver::_do_read()
                             {
                                 if (!ec && bytes_transferred == sizeof(_frame))
                                 {
-                                    // std::cout << "recvd" <<std::endl;
                                     _handle_recv_CAN_frame(_frame);
                                     _do_read(); // Continue reading for the next frame
                                 }
@@ -124,12 +138,11 @@ void comms::CANDriver::_send_message(const struct can_frame &frame)
 
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 {
-    std::shared_ptr<google::protobuf::Message> msg = pb_msg_recv(frame);
-    {
-        std::unique_lock lk(_output_deque_ref.mtx);
-        _output_deque_ref.deque.push_back(msg);
-        _output_deque_ref.cv.notify_all();
+    auto msg = pb_msg_recv(frame);
+    if(msg){
+        _message_logger->log_msg(msg);
     }
+    
 }
 
 // gets a protobuf message from just the name of it
@@ -176,24 +189,20 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
                 reflection->SetEnumValue(message.get(), field, (int)std::get<int>(it->second));
                 break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-                // std::cout << "uh yo " << it->second.index() <<std::endl;
+                
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
-                // std::cout << "Set float field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
                 reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
-                //                std::cout << "Set bool field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
-                // std::cout << "Set double field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_INT32:
                 reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
                 break;
             default:
                 break;
-                // std::cout << "warning, no valid type detected" << std::endl;
             }
         }
     }
@@ -204,15 +213,12 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     auto iter = _messages.find(frame.can_id);
     if (iter != _messages.end())
     {
-        std::unique_ptr<dbcppp::IMessage> msg = iter->second->Clone();
-        // std::cout << "Received Message: " << msg->Name() << "\n";
-        std::shared_ptr<google::protobuf::Message> msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
+        auto msg = iter->second->Clone();
+        auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
         {
-            // sig.Decode(frame.data);
-            // std::cout << "sig name " << sig.Name() << std::endl;
             const dbcppp::ISignal *mux_sig = msg->MuxSignal();
 
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
@@ -299,34 +305,40 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
 
     if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {
-        uint64_t id = _messages_names_and_ids[messageTypeName];
-        std::unique_ptr<dbcppp::IMessage> msg = _messages[id]->Clone();
+        auto id = _messages_names_and_ids[messageTypeName];
+        auto msg = _messages[id]->Clone();
         frame.can_id = id;
         frame.len = msg->MessageSize();
         for (const auto &sig : msg->Signals())
         {
-            comms::CANDriver::FieldVariant field_value = get_field_value(pb_msg, sig.Name());
+            // std::cout << sig.Name() << std::endl;
+            auto field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
                        {
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
+                // std::cout << "float Field value: " << std::get<float>(arg) << std::endl;
                 auto val = std::get<float>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int32_t>(arg)){
+                // std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
                 auto val = std::get<int32_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int64_t>(arg)){
+                // std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
                 auto val = std::get<int64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<uint64_t>(arg)){
+                // std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
                 auto val = std::get<uint64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<bool>(arg)){
+                // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
-
+            
             } else if (std::holds_alternative<std::string>(arg)){
                 auto enum_name = std::get<std::string>(arg);
                 bool found = false;
@@ -346,7 +358,6 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
                 {
                     std::cout << "enum not found " << std::endl;
                 }
-
             } else {
                 std::cout <<"uh not supported yet" <<std::endl;
             } },
@@ -366,13 +377,13 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 {
     // we will assume that this queue only has messages that we want to send
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-    while (true)
+    while (_running)
     {
         {
             std::unique_lock lk(_input_deque_ref.mtx);
             // TODO unfuck this, queue management shouldnt live within the queue itself
             _input_deque_ref.cv.wait(lk, [this]()
-                                     { return !_input_deque_ref.deque.empty(); });
+                                     { return !_input_deque_ref.deque.empty() || !_running; });
 
             if (_input_deque_ref.deque.empty())
             {
@@ -385,11 +396,11 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 
         for (const auto &msg : q.deque)
         {
-            std::optional<can_frame> can_msg = _get_CAN_msg(msg);
-            if(can_msg)
+            auto can_msg = _get_CAN_msg(msg);
+            if (can_msg)
             {
-                // std::cout << "sending" <<std::endl;
                 _send_message(*can_msg);
+                _message_logger->log_msg(msg);
             }
         }
         q.deque.clear();
