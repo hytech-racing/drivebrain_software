@@ -5,12 +5,15 @@
 #include <variant>
 
 // from drivebrain_core
-#include <Configurable.hpp> 
+#include <Configurable.hpp>
+#include <websocket/base64.hpp>
+#include <websocket/server_factory.hpp>
+#include <websocket/websocket_notls.hpp>
+#include <websocket/websocket_server.hpp>
+#include <DriverBus.hpp>
 
-#include <foxglove/websocket/base64.hpp>
-#include <foxglove/websocket/server_factory.hpp>
-#include <foxglove/websocket/websocket_notls.hpp>
-#include <foxglove/websocket/websocket_server.hpp>
+#include <google/protobuf/message.h>
+
 
 // TODO:
 // - [ ] look into renaming if using the same class for foxglove server for live data too
@@ -19,15 +22,15 @@
 
 namespace core
 {
-    class FoxgloveParameterServer
+    class FoxgloveWSServer
     {
     public:
-        FoxgloveParameterServer() = delete;
+        FoxgloveWSServer() = delete;
 
-        /// @brief constructor for the parameter server
-        /// @param configurable_components vector of pointers to stack allocated components
-        FoxgloveParameterServer(std::vector<core::common::Configurable*> configurable_components);
-        ~FoxgloveParameterServer(){
+        FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components);
+        void send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg);
+        ~FoxgloveWSServer()
+        {
             _server->stop();
         }
 
@@ -56,11 +59,13 @@ namespace core
         /// @param incoming_param the new foxglove parameter value that may need conversion
         /// @return optional foxglove parameter, if the type is un-supported for conversion this is a nullopt and the parameter update should not occur
         std::optional<foxglove::Parameter> _convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param);
+        void _handle_foxglove_send();
     private:
-        
-        std::vector<core::common::Configurable*> _components;
+        std::vector<core::common::Configurable *> _components;
         std::unique_ptr<foxglove::ServerInterface<websocketpp::connection_hdl>> _server;
-        std::function<void(foxglove::WebSocketLogLevel, char const*)> _log_handler;
+        std::function<void(foxglove::WebSocketLogLevel, char const *)> _log_handler;
         foxglove::ServerOptions _server_options;
+        std::unordered_map<std::string, foxglove::ChannelId> _id_name_map;
+
     };
 }

@@ -4,3 +4,5 @@ result/
 build/
 result-dev
 result-dev/
+*.mcap
+core.*

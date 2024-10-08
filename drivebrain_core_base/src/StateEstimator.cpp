@@ -33,7 +33,6 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_rpms = rpms;
         }
     }
-
 }
 
 // TODO parameterize the timeout threshold

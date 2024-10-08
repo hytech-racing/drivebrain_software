@@ -1,7 +1,25 @@
-#include <param_server.hpp>
+#include <foxglove_server.hpp>
 #include <variant>
+#include <hytech_msgs.pb.h>
+#include <ProtobufUtils.hpp>
 
-core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
+#include <queue>
+#include <unordered_map>
+
+#include <string>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+
+#include <algorithm>
+
+static uint64_t nanosecondsSinceEpoch()
+{
+    return uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count());
+}
+
+core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
     {
@@ -11,7 +29,7 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
     _server_options.capabilities.push_back("parameters");
 
     _server = foxglove::ServerFactory::createServer<websocketpp::connection_hdl>(
-        "beep boop", _log_handler, _server_options);
+        "T.A.R.S", _log_handler, _server_options);
 
     foxglove::ServerHandlers<foxglove::ConnHandle> hdlrs;
 
@@ -36,11 +54,64 @@ core::FoxgloveParameterServer::FoxgloveParameterServer(std::vector<core::common:
         _server->publishParameterValues(clientHandle, fxglove_params_vec, request_id);
     };
 
+    hdlrs.subscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle)
+    {
+        const auto clientStr = _server->remoteEndpointString(clientHandle);
+        std::cout << "Client " << clientStr << " subscribed to " << chanId << std::endl;
+    };
+
+    hdlrs.unsubscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle)
+    {
+        const auto clientStr = _server->remoteEndpointString(clientHandle);
+        std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
+    };
+
+    // TODO make the .proto file name a parameter
+
+    auto potential_id_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
+    if (potential_id_map)
+    {
+        _id_name_map = *potential_id_map;
+    }
+
+    auto descriptors = util::get_pb_descriptors({"hytech_msgs.proto", "hytech.proto"});
+
+    std::vector<foxglove::ChannelWithoutId> channels;
+
+    for (const auto &file_descriptor : descriptors)
+    {
+
+        for (int i = 0; i < file_descriptor->message_type_count(); ++i)
+        {
+            const google::protobuf::Descriptor *message_descriptor = file_descriptor->message_type(i);
+            foxglove::ChannelWithoutId server_channel;
+            server_channel.topic = message_descriptor->name();
+            server_channel.encoding = "protobuf";
+            server_channel.schemaName = message_descriptor->full_name();
+            server_channel.schema = foxglove::base64Encode(util::build_file_descriptor_set(message_descriptor).SerializeAsString());
+            channels.push_back(server_channel);
+        }
+    }
+
+    auto res_ids = _server->addChannels(channels);
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);
 }
 
-foxglove::Parameter core::FoxgloveParameterServer::_get_foxglove_param(const std::string &set_name, core::common::Configurable::ParamTypes param)
+void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg)
+{
+
+    if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
+    {
+        auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];
+        const auto serializedMsg = msg->SerializeAsString();
+        const auto now = nanosecondsSinceEpoch();
+        _server->broadcastMessage(msg_chan_id, now, reinterpret_cast<const uint8_t *>(serializedMsg.data()),
+                                  serializedMsg.size());
+    }
+}
+
+foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::string &set_name, core::common::Configurable::ParamTypes param)
 {
     if (std::holds_alternative<bool>(param))
     {
@@ -49,22 +120,22 @@ foxglove::Parameter core::FoxgloveParameterServer::_get_foxglove_param(const std
     }
     else if (std::holds_alternative<int>(param))
     {
-        std::cout << set_name << " Variant holds a int: " << std::get<int>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a int: " << std::get<int>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<int>(param));
     }
     else if (std::holds_alternative<float>(param))
     {
-        std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, ((double)std::get<float>(param)));
     }
     else if (std::holds_alternative<double>(param))
     {
-        std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<double>(param));
     }
     else if (std::holds_alternative<std::string>(param))
     {
-        std::cout << set_name << " Variant holds a string: " << std::get<std::string>(param) << std::endl;
+        // std::cout << set_name << " Variant holds a string: " << std::get<std::string>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<std::string>(param));
     }
     else
@@ -75,7 +146,7 @@ foxglove::Parameter core::FoxgloveParameterServer::_get_foxglove_param(const std
     return {};
 }
 
-core::common::Configurable::ParamTypes core::FoxgloveParameterServer::_get_db_param(foxglove::Parameter param)
+core::common::Configurable::ParamTypes core::FoxgloveWSServer::_get_db_param(foxglove::Parameter param)
 {
 
     if (param.getValue().getType() == foxglove::ParameterType::PARAMETER_BOOL)
@@ -102,7 +173,7 @@ core::common::Configurable::ParamTypes core::FoxgloveParameterServer::_get_db_pa
     return std::monostate();
 }
 
-std::optional<foxglove::Parameter> core::FoxgloveParameterServer::_convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param)
+std::optional<foxglove::Parameter> core::FoxgloveWSServer::_convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param)
 {
     foxglove::ParameterType current_param_type = _get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType();
     foxglove::ParameterType type = incoming_param.getValue().getType();
@@ -120,13 +191,14 @@ std::optional<foxglove::Parameter> core::FoxgloveParameterServer::_convert_foxgl
     {
         return foxglove::Parameter(incoming_param.getName(), static_cast<int64_t>(incoming_param.getValue().getValue<double>()));
     }
-    else {
-        std::cout <<"WARNING: unsupported type input, not setting" << std::endl;
+    else
+    {
+        std::cout << "WARNING: unsupported type input, not setting" << std::endl;
         return std::nullopt;
     }
 }
 
-void core::FoxgloveParameterServer::_set_db_param(foxglove::Parameter param_update)
+void core::FoxgloveWSServer::_set_db_param(foxglove::Parameter param_update)
 {
     size_t split_pos = param_update.getName().find("/");
 
@@ -151,7 +223,7 @@ void core::FoxgloveParameterServer::_set_db_param(foxglove::Parameter param_upda
     std::cout << "WARNING: could not find component " << component_name << std::endl;
 }
 
-std::vector<foxglove::Parameter> core::FoxgloveParameterServer::_get_current_params()
+std::vector<foxglove::Parameter> core::FoxgloveWSServer::_get_current_params()
 {
     std::vector<foxglove::Parameter> params;
     for (const auto component : _components)

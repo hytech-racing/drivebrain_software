@@ -33,7 +33,7 @@
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, ... }@inputs:
     let
-      
+
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
@@ -47,12 +47,18 @@
           name = "drivebrain_core_msgs";
           version = "0.0.1";
           src = "${HT_proto}/proto";
-
-          # protoDeps = [base_api]; TODO add in the generated protos
         };
+        db_service = nix-proto.mkProtoDerivation
+          {
+            name = "db_service";
+            version = "0.0.1";
+            src = nix-proto.lib.srcFromNamespace {
+              root = ./proto;
+              namespace = "db_service";
+            };
+          };
       };
 
-      # my_overlays = [db_overlay] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
     in
     flake-parts.lib.mkFlake { inherit inputs; }
 
@@ -66,13 +72,12 @@
         ];
 
 
-
         flake.overlays = {
           db_overlay = final: prev: {
             drivebrain_software = final.callPackage ./default.nix { };
           };
           inherit nix-proto-foxglove-overlays;
-          
+
         };
 
         perSystem = { config, pkgs, system, ... }:
@@ -98,10 +103,11 @@
                   dbc_path=${pkgs.ht_can_pkg}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
+                  alias build="rm -rf build && mkdir build && cd build && cmake .. && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              # packages = [];
+              packages = [ pkgs.mcap-cli ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];
@@ -112,10 +118,9 @@
                 overlays = [
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
-                  (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
+                  self.overlays.db_overlay
                 ]
-                ++ data_acq.overlays.x86_64-linux
-                ++ self.flake.overlays;
+                ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };
       };
