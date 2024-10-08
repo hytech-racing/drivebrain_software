@@ -10,5 +10,46 @@
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
         "positive_speed_set" : 3
+    }, 
+    "VNDriver": {
+        "device_name": "/dev/ttyUSB0",
+        "baud_rate": 921600, 
+        "port": 1,
+        "freq_divisor": 1
+    },
+    "MatlabMath":
+    {
+        "lmux_fl": 0,
+        "lmuy_fl": 0,
+        "lmux_fr": 0,
+        "lmuy_fr": 0,
+        "lmux_rl": 0,
+        "lmuy_rl": 0,
+        "lmux_rr": 0,
+        "lmuy_rr": 0,
+        "x1_fl": 0,
+        "x2_fl": 0,
+        "x3_fl": 0,
+        "y1_fl": 0,
+        "y2_fl": 0,
+        "y3_fl": 0,
+        "x1_fr": 0,
+        "x2_fr": 0,
+        "x3_fr": 0,
+        "y1_fr": 0,
+        "y2_fr": 0,
+        "y3_fr": 0,
+        "x1_rl": 0,
+        "x2_rl": 0,
+        "x3_rl": 0,
+        "y1_rl": 0,
+        "y2_rl": 0,
+        "y3_rl": 0,
+        "x1_rr": 0,
+        "x2_rr": 0,
+        "x3_rr": 0,
+        "y1_rr": 0,
+        "y2_rr": 0,
+        "y3_rr": 0
     }
 }

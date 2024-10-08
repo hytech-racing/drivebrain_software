@@ -7,26 +7,61 @@
 namespace core
 {
 
+    
+    // TODO change all driver inputs to use this?
+    // this is the struct that will contain the data that is already 
+    // being logged via the sensor interfaces and doesnt go directly 
+    // into the vehicle state
+    struct RawInputData
+    {
+        veh_vec<float> raw_load_cell_values;
+    };
+
     struct DriverInput
     {
         float requested_accel; // float from 0 to 1 representing percent of accel pedal travel
         float requested_brake; // float from 0 to 1 representing pedal travel of brake
     };
 
+    struct TireDynamics
+    {
+        veh_vec<xyz_vec<float>> tire_forces_n;
+        veh_vec<xyz_vec<float>> tire_moments_nm;
+        veh_vec<float> accel_saturation_nm;
+        veh_vec<float> brake_saturation_nm;
+        TireDynamics()
+        {
+            tire_forces_n = {};
+            tire_moments_nm = {};
+            accel_saturation_nm = {};
+            brake_saturation_nm = {};
+        }
+    };
+    
+    struct SpeedControlOut
+    {
+        int64_t mcu_recv_millis;
+        veh_vec<float> desired_rpms;
+        veh_vec<float> torque_lim_nm;
+    };
+
     struct VehicleState
     {
         bool is_ready_to_drive;
         DriverInput input;
-        veh_vec<velocity_rpm> current_rpms;
-        xyz_vec<speed_m_s> current_body_vel_ms;
+        xyz_vec<float> current_body_vel_ms;
+        xyz_vec<float> current_body_accel_mss;
+        xyz_vec<float> current_angular_rate_rads;
+        ypr_vec<float> current_ypr_rad;
+        veh_vec<float> current_rpms;
+        bool state_is_valid;
+        int prev_MCU_recv_millis;
+        float steering_angle_deg;
+        SpeedControlOut prev_controller_output;
+        TireDynamics tire_dynamics;
     };
 
-    struct SpeedControlOut
-    {
-        veh_vec<velocity_rpm> desired_rpms;
-        veh_vec<torque_nm> positive_torque_lim_nm;
-        veh_vec<torque_nm> negative_torque_lim_nm;
-    };
+    
 
     struct TorqueControlOut
     {

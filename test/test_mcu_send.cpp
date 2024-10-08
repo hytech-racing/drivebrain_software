@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "hytech_msgs.pb.h"
+#include <thread>
+
 void sendSpeedControlInMessage(const std::string &ip, int port)
 {
     // Create a UDP socket
@@ -61,6 +63,12 @@ void sendSpeedControlInMessage(const std::string &ip, int port)
         {
             std::cout << "Sent " << sent_bytes << " bytes to " << ip << ":" << port << std::endl;
         }
+
+        using namespace std::chrono_literals;
+ 
+
+ 
+        std::this_thread::sleep_for(1ms);
     }
 
     // Close the socket
