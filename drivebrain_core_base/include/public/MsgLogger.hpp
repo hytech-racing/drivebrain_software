@@ -135,7 +135,6 @@ namespace core
         bool _running = true;
         bool _logging = false;
         std::mutex _mtx;
-        ThreadSafeOutput _thread_safe_log, _thread_safe_live_output;
 
         std::string _log_file_extension;
         std::string _current_log_name = "NONE";
