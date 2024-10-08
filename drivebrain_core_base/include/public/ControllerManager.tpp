@@ -55,8 +55,8 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // check to see if current drivetrain rpms are too high to switch controller
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
-        _current_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
-        return _current_state.current_status;
+        _current_car_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        return _current_car_state.current_status;
     }
 
     // function to check whether or not the controller output is with range. 
@@ -105,31 +105,30 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
 
     if(prev_status == status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
     {
-        _current_state.current_status = status_type::NO_ERROR;
+        _current_car_state.current_status = status_type::NO_ERROR;
     }
     else if(prev_status != status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
     {
-        _current_state.current_status = prev_status;
+        _current_car_state.current_status = prev_status;
     }
     else
     {
-        _current_state.current_status = switch_status;
+        _current_car_state.current_status = switch_status;
     }
 
-    return _current_state.current_status;
+    return _current_car_state.current_status;
 }
 
-bool control::ControllerManager::swap_active_controller(size_t new_controller_index)
+bool control::ControllerManager::swap_active_controller(size_t new_controller_index, const core::VehicleState& input)
 {   
     static const size_t num_controllers = NumControllers;
     if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
     {
-        _current_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
+        _current_car_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
         return false;
     }
-
-    core::VehicleState current_state = _state_estimator.get_latest_state_and_validity().first;
-    if(_can_switch_controller(current_state, _controllers[_current_controller_index]->step_controller(current_state), _controllers[new_controller_index]->step_controller(current_state)) != status_type::NO_ERROR)
+    
+    if(_can_switch_controller(input, _controllers[_current_controller_index]->step_controller(input), _controllers[new_controller_index]->step_controller(input)) != status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
         return true;

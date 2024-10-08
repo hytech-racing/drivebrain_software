@@ -54,9 +54,6 @@
 // on a side note, how are we going to prevent mutex deadlocking on the shared state?
 // we will do this by having the state estimator and the controller ticking in the same loop so no need for worrying about threading
 
-// TODO: remove vehicle state input param from step or find another way to get the vehicle state into switch controller
-// probably do one of the other -> pass it in to the method or pass it in to the constructor, both are implemented right now
-
 namespace control
 {
 
@@ -84,11 +81,11 @@ namespace control
         /// @brief attempts to switch the active controller
         /// @param new_controller_index desired controller index
         /// @return true if it successfully switches and false if it does not
-        /// @note if it returns false the _current_state member variable will have an altered status variable 
-        bool swap_active_controller(size_t new_controller_index);
+        /// @note if it returns false the _current_car_state member variable will have an altered status variable 
+        bool swap_active_controller(size_t new_controller_index, const core::VehicleState& input);
         
-        /// @brief 
-        /// @return 
+        /// @brief fetches the active controllers desired seconds between controller evaluations
+        /// @return the period in seconds for the active controller
         float get_active_controller_timestep()
         {
             return _controllers[_current_controller_index]->get_dt_sec();
@@ -96,9 +93,9 @@ namespace control
 
         /// @brief allows access to controller manager state for efficient communication
         /// @return ControllerManagerState types: ControllerManagerStatus, ControllerOutput
-        core::control::ControllerManagerState get_current_state()
+        core::control::ControllerManagerState get_current_car_state()
         {
-            return _current_state;
+            return _current_car_state;
         }
 
         /// @brief evaluates the currently active controller 
@@ -107,9 +104,9 @@ namespace control
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
             if(stepping){
-                _current_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input)
+                _current_car_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input)
             }
-            return _current_state.current_controller_output;
+            return _current_car_state.current_controller_output;
         }
 
         /// @brief stops the active controller from being evaluated at its time step
@@ -148,8 +145,7 @@ namespace control
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
-        core::StateEstimator _state_estimator;
-        core::control::ControllerManagerState _current_state;
+        core::control::ControllerManagerState _current_car_state;
         //flag for pause/unpause -> could be temporary or permanent way of pausing
         bool stepping = true;
 
