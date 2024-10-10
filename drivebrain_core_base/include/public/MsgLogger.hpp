@@ -124,12 +124,7 @@ namespace core
         }
 
         void _handle_output_messages(MsgType msg, std::function<void(MsgType)> output_function)
-        {
-            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-            if (out_msg->GetDescriptor()->name() == "MCUOutputData")
-            {
-                auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-            }
+        {            
             output_function(msg);
         }
 

@@ -5,6 +5,7 @@
 #include <hytech_msgs.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
+#include <mutex>
 // ABOUT: this controller is an implementation of mode 0
 
 // this controller will be reactionary for now
@@ -36,6 +37,7 @@ namespace control
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
+        std::mutex _config_mutex;
         config _config;
     };
 }
