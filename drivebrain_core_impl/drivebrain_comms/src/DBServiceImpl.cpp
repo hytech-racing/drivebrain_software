@@ -34,11 +34,20 @@ grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *co
     }
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst) : _logger_inst(logger_inst)
+grpc::Status DBInterfaceImpl::RequestCurrentVectornavRotMatrix(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
+{
+    _vn_driver->
+}
+
+DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst,
+                                 VNDriver *vn_driver) : _logger_inst(logger_inst),
+                                                        _vn_driver(vn_driver)
 {
 }
-void DBInterfaceImpl::stop_server() {
-    if (_server) {
+void DBInterfaceImpl::stop_server()
+{
+    if (_server)
+    {
         std::cout << "Shutting down the server..." << std::endl;
         _server->Shutdown();
     }

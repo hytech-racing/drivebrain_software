@@ -7,22 +7,26 @@
 #include <grpcpp/grpcpp.h>
 
 #include <MsgLogger.hpp>
+#include <VNComms.hpp>
+
 
 class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {
 
     struct InitStruct {
         std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst;
+        VNDriver * vn_driver;
     };
     grpc::Status RequestStopLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override; 
     grpc::Status RequestStartLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override;
     grpc::Status RequestCurrentLoggerStatus(grpc::ServerContext* context, const google::protobuf::Empty* request, db_service::v1::service::LoggerStatus* response) override; 
     
     public: 
-        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst);
+        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, VNDriver * vn_driver);
         void run_server(); 
         void stop_server();
     private:
         std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _logger_inst;
+        VNDriver * _vn_driver;
         std::unique_ptr<grpc::Server> _server;  // Store server instance here
 
 };

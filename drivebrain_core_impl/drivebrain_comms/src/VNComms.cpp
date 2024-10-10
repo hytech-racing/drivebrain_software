@@ -27,14 +27,14 @@ namespace comms
         auto port = get_parameter_value<int>("port");
 
         _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
-        
+
         boost::system::error_code ec;
 
         _serial.open(device_name.value(), ec);
 
         if (ec)
         {
-            std::cout << "error " << ec <<std::endl;
+            std::cout << "error " << ec << std::endl;
             _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
             return 1;
         }
@@ -54,7 +54,7 @@ namespace comms
         return 0;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context &io)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
           _logger(logger),
           _state_estimator(state_estimator),
@@ -74,6 +74,34 @@ namespace comms
     {
         _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
         _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+    }
+    
+    
+
+    void VNDriver::configure_rotation_matrix(std::array<float, 9> row_major_array_update)
+    {
+        vn::math::mat3f mat(
+            row_major_array_update[0], row_major_array_update[1], row_major_array_update[2], // Row 1
+            row_major_array_update[3], row_major_array_update[4], row_major_array_update[5], // Row 2
+            row_major_array_update[6], row_major_array_update[7], row_major_array_update[8]  // Row 3
+        );
+
+        auto num_of_bytes = Packet::genWriteReferenceFrameRotation(ErrorDetectionMode::ERRORDETECTIONMODE_NONE, (char *)_output_buff.data(), _output_buff.size(), mat);
+
+        boost::asio::async_write(_serial,
+                                 boost::asio::buffer(_output_buff.data(), num_of_bytes),
+                                 [](const boost::system::error_code &ec, std::size_t bytes_transferred)
+                                 {
+                                     if (!ec)
+                                     {
+                                        
+                                     }
+                                     else
+                                     {
+                                         std::cerr << "Error sending data: " << ec.message() << "\n";
+                                     }
+                                 });
+
     }
 
     void VNDriver::_configure_binary_outputs()
@@ -173,6 +201,9 @@ namespace comms
             vn_ins_msg->set_ins_status(hytech_msgs::INSStatus::TRACKING_2);
 
             this_instance->log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+        } else if(packet.type() == vn::protocol::uart::Packet::TYPE_ASCII)
+        {
+            
         }
         else
         {

@@ -17,8 +17,27 @@ message LoggerStatus
     string active_or_previous_log_file_name = 2;
 }
 
+message Matrix {
+  message Row {
+    repeated float values = 1;
+  }
+  repeated Row rows = 1;
+}
+
+message VectornavRotationMatrix
+{
+    Matrix rot_matrix = 1;
+}
+
+message VectornavReturnStatus
+{
+    bool got_data =1;
+}
+
 service DBInterface
 {
+    rpc RequestCurrentVectornavRotMatrix (google.protobuf.Empty) returns (VectornavRotationMatrix);
+    rpc SetVectornavRotMatrix (VectornavRotationMatrix) returns (VectornavReturnStatus);
     rpc RequestControllerChange (DesiredController) returns (ControllerChangeStatus);
     rpc RequestStopLogging (google.protobuf.Empty) returns (LoggerStatus);
     rpc RequestCurrentLoggerStatus (google.protobuf.Empty) returns (LoggerStatus);

@@ -46,8 +46,10 @@ namespace comms {
             struct config {
                 int baud_rate;
                 int freq_divisor;
+                std::array<float, 9> current_row_major_rotation_matrix;
             };
-
+            void configure_rotation_matrix(std::array<float, 9>);
+            
         private: 
             // Private variables
             core::Logger& _logger;
