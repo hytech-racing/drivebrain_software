@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <variant>
+#include <filesystem>
 
 // https://docs.kernel.org/networking/can.html
 
@@ -40,6 +41,12 @@ bool comms::CANDriver::init()
     {
         _logger.log_string("couldnt get params", core::LogLevel::ERROR);
         return false;
+    } else if (!std::filesystem::exists(*dbc_file_path)){
+        std::string msg("params file does not exist! ");
+        msg +=" "; 
+        msg +=(*dbc_file_path);
+        _logger.log_string(msg, core::LogLevel::ERROR);
+        return false;
     }
     std::shared_ptr<dbcppp::INetwork> net;
     {
@@ -49,6 +56,7 @@ bool comms::CANDriver::init()
 
     for (const auto &msg : net->Messages())
     {
+        std::cout <<"adding message: "<< msg.Id() << std::endl;
         _messages.insert(std::make_pair(msg.Id(), msg.Clone()));
         _messages_names_and_ids.insert(std::make_pair(_to_lowercase(msg.Name()), msg.Id()));
     }
@@ -104,7 +112,6 @@ void comms::CANDriver::_do_read()
                             {
                                 if (!ec && bytes_transferred == sizeof(_frame))
                                 {
-                                    // std::cout << "recvd" <<std::endl;
                                     _handle_recv_CAN_frame(_frame);
                                     _do_read(); // Continue reading for the next frame
                                 }
@@ -129,13 +136,11 @@ void comms::CANDriver::_send_message(const struct can_frame &frame)
 
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 {
-    std::shared_ptr<google::protobuf::Message> msg = pb_msg_recv(frame);
-    {
-        std::unique_lock lk(_output_deque_ref.mtx);
-        _output_deque_ref.deque.push_back(msg);
-        _output_deque_ref.cv.notify_all();
+    auto msg = pb_msg_recv(frame);
+    if(msg){
+        _message_logger->log_msg(msg);
     }
-    _message_logger->log_msg(msg);
+    
 }
 
 // gets a protobuf message from just the name of it
@@ -179,24 +184,20 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             switch (field->type())
             {
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-                // std::cout << "uh yo " << it->second.index() <<std::endl;
+                
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
-                // std::cout << "Set float field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
                 reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
-                //                std::cout << "Set bool field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
-                // std::cout << "Set double field: " << field_name << " = " << std::get<double>(it->second) << std::endl;
                 break;
             case google::protobuf::FieldDescriptor::TYPE_INT32:
                 reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
                 break;
             default:
                 break;
-                // std::cout << "warning, no valid type detected" << std::endl;
             }
         }
     }
@@ -214,8 +215,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
         {
-            // sig.Decode(frame.data);
-            // std::cout << "sig name " << sig.Name() << std::endl;
             const dbcppp::ISignal *mux_sig = msg->MuxSignal();
 
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
@@ -223,7 +222,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
             {
                 // TODO get correct type from raw signal and store it in the map. right now they are all doubles
                 msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
-                // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
             }
         }
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);

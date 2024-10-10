@@ -3,6 +3,7 @@
 #include <SimpleController.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
+#include <VNComms.hpp>
 #include <MsgLogger.hpp>
 #include <MCAPProtobufLogger.hpp>
 #include <mcap/writer.hpp>
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/test_config/can_driver.json"), "Path to the parameter JSON file")
+        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/drivebrain_config.json"), "Path to the parameter JSON file")
         ("dbc-path,d", po::value<std::string>(), "Path to the DBC file (optional)");
 
     po::variables_map vm;
@@ -110,12 +111,19 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(mcap_logger)),
                                                                                                         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
+    bool construction_failed = false;
+    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed);
+
+    // std::cout << "driver init " << driver.init() << std::endl;
+    if(construction_failed)
+    {
+        stop_signal.store(true);
+    }
     
-    comms::CANDriver driver(config, logger, message_logger, tx_queue, rx_queue, io_context, dbc_path);
-    std::cout << "driver init " << driver.init() << std::endl;
     configurable_components.push_back(&driver);
     
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
+    comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
 
     // required init, maybe want to call this in the constructor instead
     bool successful_controller_init = controller.init();
@@ -135,7 +143,7 @@ int main(int argc, char *argv[])
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue
-    std::thread io_context_thread([&io_context, &stop_signal]()
+    std::thread io_context_thread([&io_context]()
         {
             std::cout <<"started io context thread" <<std::endl;
             try {
@@ -148,7 +156,7 @@ int main(int argc, char *argv[])
             }
         });
 
-    std::thread process_thread([&stop_signal, &rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 

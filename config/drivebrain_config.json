@@ -1,8 +1,7 @@
-
 {
     "CANDriver": {
         "canbus_device": "vcan0",
-        "path_to_dbc": "config/test_config/hytech.dbc"
+        "path_to_dbc": "config/hytech.dbc"
     },
     "SimpleController": {
         "max_torque": 22.4,
@@ -10,5 +9,11 @@
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
         "positive_speed_set" : 3
+    }, 
+    "VNDriver": {
+        "device_name": "/dev/ttyUSB0",
+        "baud_rate": 921600, 
+        "port": 1,
+        "freq_divisor": 1
     }
 }
