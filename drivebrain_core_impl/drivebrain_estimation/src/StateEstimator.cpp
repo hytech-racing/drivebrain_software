@@ -180,7 +180,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_brake_saturation_nm->set_rr(matlab_math_data.brake_saturation_nm.RR);
     
     msg_out->set_v_y_lm(matlab_math_data.v_y_lm);
-    msg_out->set_psi_dot_lm_deg_s(matlab_math_data.psi_dot_lm_deg_s);
+    msg_out->set_psi_dot_lm_rad_s(matlab_math_data.psi_dot_lm_rad_s);
     
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

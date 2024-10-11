@@ -228,7 +228,7 @@ namespace estimation
         result.brake_saturation_nm.RR = outputs.satBrakeTRR;
 
         result.v_y_lm = outputs.Vy_LM;
-        result.psi_dot_lm_deg_s = outputs.Psi_dot_LMdegs;
+        result.psi_dot_lm_rad_s = outputs.Psi_dot_LMrads;
 
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR};                // '<Root>/torq_req_FL'
         return {result, control_res};

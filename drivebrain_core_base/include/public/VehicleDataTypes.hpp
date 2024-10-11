@@ -33,7 +33,7 @@ namespace core
         veh_vec<float> accel_saturation_nm;
         veh_vec<float> brake_saturation_nm;
         float v_y_lm;
-        float psi_dot_lm_deg_s;
+        float psi_dot_lm_rad_s;
         TireDynamics()
         {
             tire_forces_n = {};
@@ -41,7 +41,7 @@ namespace core
             accel_saturation_nm = {};
             brake_saturation_nm = {};
             v_y_lm = 0;
-            psi_dot_lm_deg_s = 0;
+            psi_dot_lm_rad_s = 0;
         }
     };
 
