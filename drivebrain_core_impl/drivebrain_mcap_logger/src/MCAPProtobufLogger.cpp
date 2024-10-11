@@ -60,10 +60,6 @@ namespace common
         add_schema_func(schema_only_descriptors, true);
         add_schema_func(receiving_descriptors, false);
 
-        // TODO log a version message with the versions specified at opening of new mcap file
-        // hytech_msgs::
-        // _msg_name_id_map[""]
-
         std::cout << "added message descriptions to mcap" << std::endl;
     }
 

@@ -31,6 +31,8 @@
 #include <csignal>
 #include <cstdlib>
 
+#include <versions.h>
+
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -87,6 +89,7 @@ int main(int argc, char *argv[])
     if (vm.count("dbc-path")) {
         dbc_path = vm["dbc-path"].as<std::string>();
     }
+
 
     // config file handler that gets given to all configurable components.
     core::JsonFileHandler config(param_path);
