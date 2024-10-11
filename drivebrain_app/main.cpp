@@ -33,6 +33,9 @@
 
 #include <versions.h>
 
+#include "hytech_msgs.pb.h"
+#include "base_msgs.pb.h"
+
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -159,7 +162,9 @@ int main(int argc, char *argv[])
             }
         });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::chrono::high_resolution_clock::time_point last_sent_versions = std::chrono::high_resolution_clock::now();
+
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator, &message_logger, &last_sent_versions]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
@@ -181,6 +186,17 @@ int main(int argc, char *argv[])
                 }
             } else {
             }
+
+            // Log versions every second
+            const auto time_from_last_version_send = std::chrono::duration_cast<std::chrono::seconds>(start_time - last_sent_versions);
+            if (time_from_last_version_send.count() > 1.0) {
+                std::shared_ptr<hytech_msgs::Versions> vmsg = std::make_shared<hytech_msgs::Versions>();
+                vmsg->set_ht_can_version(HYTECH_NP_PROTO_CPP_VERSION);
+                vmsg->set_ht_proto_version(DRIVEBRAIN_CORE_MSGS_PROTO_CPP_VERSION);
+                message_logger->log_msg(vmsg);
+                last_sent_versions = start_time;
+            }
+
             auto end_time = std::chrono::high_resolution_clock::now();
 
             auto elapsed = 
@@ -193,7 +209,7 @@ int main(int argc, char *argv[])
     std::signal(SIGINT, signalHandler);
 
     while (!stop_signal.load())
-    {
+    {   
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     process_thread.join();

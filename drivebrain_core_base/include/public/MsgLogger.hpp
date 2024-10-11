@@ -76,22 +76,6 @@ namespace core
                     _handle_output_messages(msg, _logger_msg_function);
                     _handle_output_messages(msg, _live_msg_output_func);
 
-                    // Send version information every 1 second
-                    std::cout << "test this runs periodically" << std::endl;
-                    const auto time_now = std::chrono::system_clock::now();
-                    const auto time_from_last_version_send = std::chrono::duration_cast<std::chrono::seconds>(time_now - last_sent_versions);
-                    if (time_from_last_version_send.count() > 1.0) {
-                        std::shared_ptr<hytech_msgs::HTCanVersion> htc_msg = std::make_shared<hytech_msgs::HTCanVersion>();
-                        std::shared_ptr<hytech_msgs::HTProtoVersion> htp_msg = std::make_shared<hytech_msgs::HTProtoVersion>();
-                        htc_msg->set_ht_can_version(HYTECH_NP_PROTO_CPP_VERSION);
-                        htp_msg->set_ht_proto_version(DRIVEBRAIN_CORE_MSGS_PROTO_CPP_VERSION);
-                        _handle_output_messages(static_cast<std::shared_ptr<google::protobuf::Message>>(htc_msg), _logger_msg_function);
-                        _handle_output_messages(static_cast<std::shared_ptr<google::protobuf::Message>>(htp_msg), _logger_msg_function);
-                        _handle_output_messages(static_cast<std::shared_ptr<google::protobuf::Message>>(htc_msg), _live_msg_output_func);
-                        _handle_output_messages(static_cast<std::shared_ptr<google::protobuf::Message>>(htp_msg), _live_msg_output_func);
-                        // std::cout << "sending versions" << std::endl;
-                        last_sent_versions = time_now;
-                    }
                 }
             }
             else
@@ -167,9 +151,6 @@ namespace core
         bool _running = true;
         bool _logging = false;
         std::mutex _mtx;
-
-        std::chrono::system_clock::time_point last_sent_versions;
-
 
         std::string _log_file_extension;
         std::string _current_log_name = "NONE";

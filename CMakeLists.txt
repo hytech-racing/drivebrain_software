@@ -237,6 +237,7 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     drivebrain_comms
     drivebrain_mcap_logger
+    protobuf::libprotobuf
     Boost::program_options
 )
 
