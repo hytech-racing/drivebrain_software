@@ -54,9 +54,19 @@
 // on a side note, how are we going to prevent mutex deadlocking on the shared state?
 // we will do this by having the state estimator and the controller ticking in the same loop so no need for worrying about threading
 
+namespace CONTROLLER_MANAGER_DEFAULT_PARAMS
+{
+    veh_vec<float> zeros = { 0 , 0 , 0 , 0 };
+
+    core::ControllerOutput empty_controller_output = {
+        .out = core::TorqueControlOut{
+            .desired_torques_nm = zeros
+        }
+    };
+};
+
 namespace control
 {
-
     // TODO turn into concept
     template <typename ControllerType, size_t NumControllers>
     class ControllerManager : public core::common::Configurable
@@ -66,10 +76,8 @@ namespace control
         /// @param json_file_handler current file handler to handle controller configurations
         /// @param controllers list of controllers that the manager will mux between and manager
         /// @param state_estimator instance to allow for direct communication between controllers and state estimator
-        ControllerManager(core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers, core::StateEstimator state_estimator) : Configurable(json_file_handler, "ControllerManager"),
-                                                                                                                                                                        _controllers(controllers),
-                                                                                                                                                                        _state_estimator(state_estimator)
-
+        ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(logger, json_file_handler, "ControllerManager"),
+                                                                                                                                _controllers(controllers)
         {
         }
         ~ControllerManager() = default;
@@ -104,7 +112,7 @@ namespace control
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
             if(stepping){
-                _current_car_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input)
+                _current_car_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input);
             }
             return _current_car_state.current_controller_output;
         }

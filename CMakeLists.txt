@@ -147,36 +147,51 @@ make_cmake_package(drivebrain_control drivebrain)
 #     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
 #     foxglove_websocket::foxglove_websocket)
 
+# Add test executable for controller manager tests
+add_executable(tests test/test_controller_manager.cpp)
+
+# Link the test executable with necessary libraries and GTest
+target_link_libraries(tests PUBLIC
+    drivebrain_core
+    drivebrain_control
+    GTest::gtest_main
+)
+
+# Enable testing and add the test executable to CTest
+enable_testing()
+add_test(NAME ControllerManagerTests COMMAND tests)
+
 ###                   ###
 ### system executable ###
 ###                   ###
 
-add_executable(mcu_standin test/test_mcu.cpp)
-add_executable(mcu_test test/test_mcu_send.cpp)
+# add_executable(mcu_standin test/test_mcu.cpp)
+# add_executable(mcu_test test/test_mcu_send.cpp)
 
-add_executable(alpha_build drivebrain_app/main.cpp)
+# add_executable(alpha_build drivebrain_app/main.cpp)
 
-target_link_libraries(alpha_build PUBLIC
-    drivebrain_core
-    drivebrain_control
-    CAN_driver
-    foxglove_param_server
-    ETH_driver
-    Boost::program_options
-)
+# target_link_libraries(alpha_build PUBLIC
+#     drivebrain_core
+#     drivebrain_control
+#     CAN_driver
+#     foxglove_param_server
+#     ETH_driver
+#     Boost::program_options
+# )
 
-target_link_libraries(mcu_standin PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
-target_link_libraries(mcu_test PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
+# target_link_libraries(mcu_standin PUBLIC
+#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+#     protobuf::libprotobuf
+# )
+# target_link_libraries(mcu_test PUBLIC
+#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+#     protobuf::libprotobuf
+# )
 
 include(GNUInstallDirs)
 install(TARGETS 
         # test_param_server
-        alpha_build
+        # alpha_build
+        tests
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -1,4 +1,3 @@
-
 #include <ControllerManager.hpp>
 
 template <typename ControllerType, size_t NumControllers>
@@ -23,6 +22,11 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     _max_switch_rpm = ((*max_switch_speed) * constants::METERS_PER_SECOND_TO_RPM);
     _max_torque_switch = *max_torque_switch;
     _max_accel_switch_req = *max_accel_switch_request;
+
+    _current_car_state = {
+        .current_status = core::control::ControllerManagerStatus::NO_ERROR,
+        .current_controller_output = CONTROLLER_MANAGER_DEFAULT_PARAMS::empty_controller_output
+    };
 
     return true;
 }
@@ -56,6 +60,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
         _current_car_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        std::cout << "0" << std::endl;
         return _current_car_state.current_status;
     }
 
@@ -72,10 +77,12 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         {
             if (check_veh_vec(pval->desired_rpms, _max_switch_rpm, true))
             {
+                std::cout << "1" << std::endl;
                 return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
             }
             else if (check_veh_vec(pval->positive_torque_lim_nm, _max_torque_switch, false))
             {
+                std::cout << "2" << std::endl;
                 return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
             } else {
                 return status_type::NO_ERROR;
@@ -87,6 +94,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         {
             if (check_veh_vec(pval->desired_torques_nm, _max_torque_switch, false))
             {
+                std::cout << "3" << std::endl;
                 return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
             }
             else
@@ -101,7 +109,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     };
 
     status_type prev_status = verify_controller_output(previous_output);
-    status_type switch_staus = verify_controller_output(next_controller_output);
+    status_type switch_status = verify_controller_output(next_controller_output);
 
     if(prev_status == status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
     {
@@ -119,22 +127,27 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     return _current_car_state.current_status;
 }
 
-bool control::ControllerManager::swap_active_controller(size_t new_controller_index, const core::VehicleState& input)
+template <typename ControllerType, size_t NumControllers>
+bool control::ControllerManager<ControllerType, NumControllers>::swap_active_controller(size_t new_controller_index, const core::VehicleState& input)
 {   
-    static const size_t num_controllers = NumControllers;
+    using status_type = core::control::ControllerManagerStatus;
+    static const size_t num_controllers = sizeof(_controllers);
     if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
     {
-        _current_car_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE
+        _current_car_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE;
+        std::cout << "agag" << std::endl;
         return false;
     }
     
-    if(_can_switch_controller(input, _controllers[_current_controller_index]->step_controller(input), _controllers[new_controller_index]->step_controller(input)) != status_type::NO_ERROR)
+    if(_can_switch_controller(input, _controllers[_current_controller_index]->step_controller(input), _controllers[new_controller_index]->step_controller(input)) == status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
+        std::cout << "trueee" << std::endl;
         return true;
     }
     else
     {
+        std::cout << "ag" << std::endl;
         return false;
     }
 
