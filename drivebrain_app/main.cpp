@@ -29,6 +29,7 @@
 #include <csignal>
 #include <cstdlib>
 
+#include <iostream>
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -140,6 +141,7 @@ int main(int argc, char *argv[])
         {
             auto start_time = std::chrono::high_resolution_clock::now();
             // samples internal state set by the handle recv functions
+            
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
             auto out_struct = controller.step_controller(state_and_validity.first);
             auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
@@ -169,8 +171,14 @@ int main(int argc, char *argv[])
 
             auto elapsed = 
                 std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-
-            std::this_thread::sleep_for(loop_chrono_time - elapsed);
+            if(loop_chrono_time > elapsed)
+            {
+                std::this_thread::sleep_for(loop_chrono_time - elapsed);
+            } else {
+                // std::cout <<"WARNING: missed timing" <<std::endl;
+            }
+            
+            
             
         } });
 

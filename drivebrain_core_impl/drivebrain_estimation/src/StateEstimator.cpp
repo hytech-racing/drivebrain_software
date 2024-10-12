@@ -27,7 +27,7 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             };
         }
     }
-    
+
     else if (message->GetTypeName() == "hytech_msgs.VNData")
     {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
@@ -95,16 +95,17 @@ void StateEstimator::set_previous_control_output(SpeedControlOut prev_control_ou
 
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
 {
-    auto state_is_valid = _validate_stamps(_timestamp_array);
-
+    // auto state_is_valid = _validate_stamps(_timestamp_array);
+    auto state_estim_start = std::chrono::high_resolution_clock::now();
     core::VehicleState current_state;
     core::RawInputData current_raw_data;
+    auto state_mutex_start = std::chrono::high_resolution_clock::now();
     {
         std::unique_lock lk(_state_mutex);
-        _vehicle_state.state_is_valid = state_is_valid;
         current_state = _vehicle_state;
         current_raw_data = _raw_input_data;
     }
+    auto state_mutex_end = std::chrono::high_resolution_clock::now();
 
     // Create the proto message to send
     std::shared_ptr<hytech_msgs::VehicleData> msg_out = std::make_shared<hytech_msgs::VehicleData>();
@@ -112,12 +113,17 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     ////////////////////////////////////////////////////////////////////////////
     /// matlab math ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    auto matlab_math_start = std::chrono::high_resolution_clock::now();
     auto res_pair = _matlab_estimator.evaluate_estimator(current_state, current_raw_data);
+    auto matlab_math_end = std::chrono::high_resolution_clock::now();
     auto matlab_math_data = res_pair.first;
+    auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
+
     {
         std::unique_lock lk(_state_mutex);
         _vehicle_state.matlab_math_temp_out = res_pair.second;
     }
+    auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
 
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
 
@@ -178,10 +184,10 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_brake_saturation_nm->set_fr(matlab_math_data.brake_saturation_nm.FR);
     current_brake_saturation_nm->set_rl(matlab_math_data.brake_saturation_nm.RL);
     current_brake_saturation_nm->set_rr(matlab_math_data.brake_saturation_nm.RR);
-    
+
     msg_out->set_v_y_lm(matlab_math_data.v_y_lm);
     msg_out->set_psi_dot_lm_rad_s(matlab_math_data.psi_dot_lm_rad_s);
-    
+
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -218,7 +224,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     curr_rpms->set_rl(current_state.current_rpms.RL);
     curr_rpms->set_rr(current_state.current_rpms.RR);
 
-    msg_out->set_state_is_valid(state_is_valid);
+    msg_out->set_state_is_valid(true);
     msg_out->set_steering_angle_deg(current_state.steering_angle_deg);
 
     auto prev_driver_torque_req = msg_out->mutable_driver_torque();
@@ -227,7 +233,23 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.FL);
     prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.FL);
 
+    auto log_start = std::chrono::high_resolution_clock::now();
     _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+    auto log_end = std::chrono::high_resolution_clock::now();
+    
+    auto state_estim_end = std::chrono::high_resolution_clock::now();
 
-    return {current_state, state_is_valid};
+    // auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(state_estim_end - state_estim_start);
+    // if (elapsed > std::chrono::microseconds(6000))
+    // {
+    //     // std::cout << "WARNING: timing" << std::endl;
+    //     // std::cout << "total: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count())) << " us\n";
+    //     // std::cout << "state mutex: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_end - state_mutex_start).count())) << " us\n";
+    //     // std::cout << "state mutex 2: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_2_end - state_mutex_2_start).count())) << " us\n";
+    //     // std::cout << "matlab math: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(matlab_math_end - matlab_math_start).count())) << " us\n";
+    //     // std::cout << "log time: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start).count())) << " us\n";
+
+    // }
+
+    return {current_state, true};
 }

@@ -31,7 +31,7 @@ namespace control
             float positive_speed_set;
         };
         SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
-        float get_dt_sec() { return 0.001; }
+        float get_dt_sec() { return 0.005; }
         bool init();
         core::SpeedControlOut step_controller(const core::VehicleState &in) override;
 

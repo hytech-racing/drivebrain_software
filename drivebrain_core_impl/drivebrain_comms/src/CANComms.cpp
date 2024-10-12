@@ -160,6 +160,7 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name
             std::cerr << "Failed to create prototype message" << std::endl;
             return nullptr;
         }
+        // delete desc;
     }
     else
     {
@@ -301,7 +302,6 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
-    // std::cout << "got message type name of " << messageTypeName << std::endl;
 
     if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {

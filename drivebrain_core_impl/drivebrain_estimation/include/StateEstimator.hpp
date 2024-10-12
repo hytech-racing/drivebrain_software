@@ -64,6 +64,7 @@ namespace core
         {
             _vehicle_state = {}; // initialize to all zeros
             _raw_input_data = {};
+            _vehicle_state.state_is_valid = true;
             _vehicle_state.prev_MCU_recv_millis = -1; // init the last mcu recv millis to < 0
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
