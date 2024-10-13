@@ -3,7 +3,6 @@
 
 // TODO:
 // - [x] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
-// - [x] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
 
 // implement a thing that can maintain a "flexible" state of the car such that
 // it can build up a state of the car from the messages coming in. It starts out with an empty
@@ -28,45 +27,42 @@
 
 #include <DriverBus.hpp>
 #include <VehicleDataTypes.hpp>
+#include <Logger.hpp>
 #include <Configurable.hpp>
+
+// while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
+// that can update pieces of the state that would be optimal.
 
 // TODO:
 // - [ ] write tests for the timestamp checking / verification of the state data
 // - [ ] implement the ability to kick off threads for a vector of input queues
 namespace core
 {
-    
-    class StateEstimator : public common::Configurable
     class StateEstimator : public common::Configurable
     {
     public:
-        struct config {
+        using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
+        struct config
+        {
             int threshold_microseconds;
         };
 
-        StateEstimator(core::JsonFileHandler &json_file_handler, core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> &msg_input_queue) : 
-        Configurable(json_file_handler, "StateEstimator"),
-        _msg_in_queue(msg_input_queue)
+        StateEstimator(core::JsonFileHandler &json_file_handler, core::Logger &shared_logger) : _logger(shared_logger),
+                                                                                                Configurable(shared_logger, json_file_handler, "StateEstimator")
         {
             _vehicle_state = {};
-            _start_recv_thread();
-            std::chrono::microseconds zero_start_time {0}; 
-            _timestamp_array = { zero_start_time, zero_start_time, zero_start_time};
+            // initialize the 3 state variables to have a zero timestamp
+            std::chrono::microseconds zero_start_time{0};
+            _timestamp_array = {zero_start_time};
             (void)init();
         }
-        
-        /// @brief destructor that attempts to stop and join threads. in later versions of this destructor this actually works
-        ~StateEstimator()
-        {
-           _run_recv_thread =false;
-           _recv_thread.join(); 
-        }
+        ~StateEstimator() = default;
 
         /// @brief initialization function required by the Configurable partially-virtualized base class
         /// @return true or false on successful init of state estimator
         bool init();
-        
-        
+
+        void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
 
     private:
@@ -79,13 +75,7 @@ namespace core
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state; 
-
-        /// @brief timestamp array containing previous received pieces of the state of when the were received last for validation. 
-        std::array<std::chrono::microseconds, 3> _timestamp_array; 
-        
-        /// @brief input queue of data
-        common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>& _msg_in_queue;
-        config _config; 
+        std::array<std::chrono::microseconds, 1> _timestamp_array;
     };
 }
 
