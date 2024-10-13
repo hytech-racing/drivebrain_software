@@ -2,7 +2,6 @@
 #include <chrono>
 #include <algorithm>
 #include "hytech_msgs.pb.h"
-#include "hytech_msgs.pb.h"
 using namespace core;
 
 
@@ -33,11 +32,8 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.input = input;
             _vehicle_state.current_rpms = rpms;
         }
-    } else if (message->GetTypeName() == "hytech_msgs.VNData")
-    {
-        auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
-        
     }
+
 }
 
 // TODO parameterize the timeout threshold
