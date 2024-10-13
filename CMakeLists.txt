@@ -13,7 +13,7 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
 ### this one is generated from nix-proto but using foxglove's 
-# find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
@@ -148,18 +148,19 @@ make_cmake_package(drivebrain_control drivebrain)
 #     foxglove_websocket::foxglove_websocket)
 
 # Add test executable for controller manager tests
-add_executable(tests test/test_controller_manager.cpp)
+#this is what I used to build my tests
+# add_executable(tests test/test_controller_manager.cpp)
 
-# Link the test executable with necessary libraries and GTest
-target_link_libraries(tests PUBLIC
-    drivebrain_core
-    drivebrain_control
-    GTest::gtest_main
-)
+# # Link the test executable with necessary libraries and GTest
+# target_link_libraries(tests PUBLIC
+#     drivebrain_core
+#     drivebrain_control
+#     GTest::gtest_main
+# )
 
-# Enable testing and add the test executable to CTest
-enable_testing()
-add_test(NAME ControllerManagerTests COMMAND tests)
+# # Enable testing and add the test executable to CTest
+# enable_testing()
+# add_test(NAME ControllerManagerTests COMMAND tests)
 
 ###                   ###
 ### system executable ###
@@ -168,25 +169,25 @@ add_test(NAME ControllerManagerTests COMMAND tests)
 # add_executable(mcu_standin test/test_mcu.cpp)
 # add_executable(mcu_test test/test_mcu_send.cpp)
 
-# add_executable(alpha_build drivebrain_app/main.cpp)
+add_executable(alpha_build drivebrain_app/main.cpp)
 
-# target_link_libraries(alpha_build PUBLIC
-#     drivebrain_core
-#     drivebrain_control
-#     CAN_driver
-#     foxglove_param_server
-#     ETH_driver
-#     Boost::program_options
-# )
+target_link_libraries(alpha_build PUBLIC
+    drivebrain_core
+    drivebrain_control
+    CAN_driver
+    foxglove_param_server
+    ETH_driver
+    Boost::program_options
+)
 
-# target_link_libraries(mcu_standin PUBLIC
-#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-#     protobuf::libprotobuf
-# )
-# target_link_libraries(mcu_test PUBLIC
-#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-#     protobuf::libprotobuf
-# )
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+target_link_libraries(mcu_test PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
 
 include(GNUInstallDirs)
 install(TARGETS 

@@ -148,12 +148,14 @@ namespace control
                 return false;
             }
         }
+        
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
         core::control::ControllerManagerState _current_car_state;
+        
         //flag for pause/unpause -> could be temporary or permanent way of pausing
         bool stepping = true;
 

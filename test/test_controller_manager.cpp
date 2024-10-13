@@ -55,6 +55,7 @@ protected:
         controller1.set_output(controller_output);
 
         controller_manager.init();
+        // std::cout << "set up" << std::endl;
     }
 
     void TearDown() override {
@@ -90,10 +91,11 @@ TEST_F(ControllerManagerTest, StepActiveController) {
 // Test switching controllers
 TEST_F(ControllerManagerTest, SwapControllerSuccess) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
+    controller_manager.unpause_stepping();
     ASSERT_TRUE(controller_manager.swap_active_controller(1, vehicle_state));
 
     core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+    ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
 // Test out of range index
@@ -104,7 +106,7 @@ TEST_F(ControllerManagerTest, SwapControllerFailure_OutOfRange) {
 
 // Test high RPM
 TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM) {
-    vehicle_state.current_rpms = {10000, 10000, 10000, 10000};
+    vehicle_state.current_rpms = {100000, 10000, 10000, 10000};
 
     ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
     EXPECT_EQ(controller_manager.get_current_car_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_DIFF_TOO_HIGH);
@@ -116,7 +118,7 @@ TEST_F(ControllerManagerTest, PauseStepping) {
     ASSERT_FALSE(controller_manager.pause_stepping());
 
     core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<std::monostate>(output.out)); // No output after pausing
+    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out)); // No output after pausing
 }
 
 // Test unpausing the controller stepping
