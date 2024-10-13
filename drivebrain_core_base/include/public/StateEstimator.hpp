@@ -74,7 +74,7 @@ namespace core
         config _config;
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
-        core::VehicleState _vehicle_state; 
+        core::VehicleState _vehicle_state;
         std::array<std::chrono::microseconds, 1> _timestamp_array;
     };
 }
