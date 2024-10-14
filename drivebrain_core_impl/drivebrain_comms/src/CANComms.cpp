@@ -37,6 +37,7 @@ bool comms::CANDriver::init()
 
     auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
 
+
     if (!(canbus_device && dbc_file_path))
     {
         _logger.log_string("couldnt get params", core::LogLevel::ERROR);
@@ -56,7 +57,6 @@ bool comms::CANDriver::init()
 
     for (const auto &msg : net->Messages())
     {
-        std::cout <<"adding message: "<< msg.Id() << std::endl;
         _messages.insert(std::make_pair(msg.Id(), msg.Clone()));
         _messages_names_and_ids.insert(std::make_pair(_to_lowercase(msg.Name()), msg.Id()));
     }
@@ -147,9 +147,9 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame)
 std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name(const std::string &name)
 {
     // Create a dynamic message factory
-
     std::shared_ptr<google::protobuf::Message> prototype_message;
-    const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
+
+    const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName("hytech." + name);
     prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
     if (!prototype_message)
     {
@@ -183,6 +183,9 @@ void comms::CANDriver::set_field_values_of_pb_msg(const std::unordered_map<std::
             }
             switch (field->type())
             {
+            case google::protobuf::FieldDescriptor::TYPE_ENUM:
+                reflection->SetEnumValue(message.get(), field, (int)std::get<int>(it->second));
+                break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
                 
                 reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
@@ -208,9 +211,8 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     auto iter = _messages.find(frame.can_id);
     if (iter != _messages.end())
     {
-        std::unique_ptr<dbcppp::IMessage> msg = iter->second->Clone();
-        // std::cout << "Received Message: " << msg->Name() << "\n";
-        std::shared_ptr<google::protobuf::Message> msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
+        auto msg = iter->second->Clone();
+        auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
@@ -220,8 +222,20 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
             if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
                 (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
             {
-                // TODO get correct type from raw signal and store it in the map. right now they are all doubles
-                msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
+                auto raw_value = sig.Decode(frame.data);
+
+                // Check if the signal has enum descriptions (ValueEncodingDescriptions)
+                if (sig.ValueEncodingDescriptions_Size() > 0)
+                {
+                    // Enum signal: Cast the decoded raw value to an integer and store it
+                    msg_field_map[sig.Name()] = static_cast<int>(raw_value);
+                }
+                else{
+                    // TODO get correct type from raw signal and store it in the map. right now they are all doubles
+                    msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
+                    // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
+                }
+
             }
         }
         set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
@@ -285,37 +299,63 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
-    // std::cout << "got message type name of " << messageTypeName << std::endl;
+    std::cout << "got message type name of " << messageTypeName << std::endl;
 
     if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {
-        uint64_t id = _messages_names_and_ids[messageTypeName];
-        std::unique_ptr<dbcppp::IMessage> msg = _messages[id]->Clone();
+        auto id = _messages_names_and_ids[messageTypeName];
+        auto msg = _messages[id]->Clone();
         frame.can_id = id;
         frame.len = msg->MessageSize();
         for (const auto &sig : msg->Signals())
         {
-            comms::CANDriver::FieldVariant field_value = get_field_value(pb_msg, sig.Name());
+            std::cout << sig.Name() << std::endl;
+            auto field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
                        {
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
+                // std::cout << "float Field value: " << std::get<float>(arg) << std::endl;
                 auto val = std::get<float>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int32_t>(arg)){
+                // std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
                 auto val = std::get<int32_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int64_t>(arg)){
+                // std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
                 auto val = std::get<int64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<uint64_t>(arg)){
+                // std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
                 auto val = std::get<uint64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<bool>(arg)){
+                // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
+            
+            } else if (std::holds_alternative<std::string>(arg)){
+                auto enum_name = std::get<std::string>(arg);
+                bool found = false;
+
+                // iterating to find correct value
+                for (const auto &enc : sig.ValueEncodingDescriptions())
+                {
+                    if (enc.Description() == enum_name)
+                    {
+                        sig.Encode(enc.Value(), frame.data);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    std::cout << "enum not found " << std::endl;
+                }
             } else {
                 std::cout <<"uh not supported yet" <<std::endl;
             } },
@@ -354,8 +394,8 @@ void comms::CANDriver::_handle_send_msg_from_queue()
 
         for (const auto &msg : q.deque)
         {
-            std::optional<can_frame> can_msg = _get_CAN_msg(msg);
-            if(can_msg)
+            auto can_msg = _get_CAN_msg(msg);
+            if (can_msg)
             {
                 _send_message(*can_msg);
                 _message_logger->log_msg(msg);

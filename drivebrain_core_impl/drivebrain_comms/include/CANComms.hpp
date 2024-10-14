@@ -110,6 +110,7 @@ namespace comms
         core::Logger& _logger;
         std::shared_ptr<loggertype> _message_logger;
         deqtype &_input_deque_ref;
+        // deqtype &_output_deque_ref;
 
         std::condition_variable _cv;
         std::thread _output_thread;
