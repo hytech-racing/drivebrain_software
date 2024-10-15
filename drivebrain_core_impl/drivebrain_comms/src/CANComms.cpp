@@ -150,6 +150,10 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::_get_pb_msg_by_name
     std::shared_ptr<google::protobuf::Message> prototype_message;
 
     const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName("hytech." + name);
+    if (!desc) {
+        std::cerr << "Prototype message does not exist in descriptor pool" << std::endl;
+        return nullptr;
+    }
     prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
     if (!prototype_message)
     {
@@ -213,6 +217,9 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
     {
         auto msg = iter->second->Clone();
         auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
+        if (!msg_to_populate) {
+            return nullptr;
+        }
 
         std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
         for (const dbcppp::ISignal &sig : msg->Signals())
@@ -233,7 +240,6 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
                 else{
                     // TODO get correct type from raw signal and store it in the map. right now they are all doubles
                     msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
-                    // std::cout << "\t" << sig.Name() << "=" << sig.RawToPhys(sig.Decode(frame.data)) << sig.Unit() << "\n";
                 }
 
             }
@@ -299,7 +305,6 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
-    std::cout << "got message type name of " << messageTypeName << std::endl;
 
     if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {
@@ -317,23 +322,18 @@ std::optional<can_frame> comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::
             if (std::holds_alternative<std::monostate>(arg)) {
                 std::cout << "No value found or unsupported field" << std::endl;
             } else if (std::holds_alternative<float>(arg)){
-                // std::cout << "float Field value: " << std::get<float>(arg) << std::endl;
                 auto val = std::get<float>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int32_t>(arg)){
-                // std::cout << "Field value: " << std::get<int32_t>(arg) << std::endl;
                 auto val = std::get<int32_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<int64_t>(arg)){
-                // std::cout << "Field value: " << std::get<int64_t>(arg) << std::endl;
                 auto val = std::get<int64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<uint64_t>(arg)){
-                // std::cout << "Field value: " << std::get<uint64_t>(arg) << std::endl;
                 auto val = std::get<uint64_t>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
             } else if(std::holds_alternative<bool>(arg)){
-                // std::cout << "Field value: " << std::get<bool>(arg) << std::endl;
                 auto val = std::get<bool>(arg);
                 sig.Encode(val, frame.data);
             

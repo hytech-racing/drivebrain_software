@@ -34,7 +34,6 @@
 #include <versions.h>
 
 #include "hytech_msgs.pb.h"
-#include "base_msgs.pb.h"
 
 // TODO first application will have
 
