@@ -76,6 +76,12 @@ namespace estimation
             _config.BrakeBiasFront = *pval;
             std::cout << "setting new BrakeBiasFront " << _config.BrakeBiasFront << std::endl;
         }
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_psi_dot")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_psi_dot = *pval;
+            std::cout << "setting new fake_psi_dot " << _config.fake_psi_dot << std::endl;
+        }
     }
 
     MatlabMath::MatlabMath(core::Logger &logger, core::JsonFileHandler &json_file_handler, bool &construction_failed)
@@ -100,6 +106,7 @@ namespace estimation
         auto Fake_Vx = get_live_parameter<float>("Fake_Vx");
         auto DriveBiasFront = get_live_parameter<float>("DriveBiasFront");
         auto BrakeBiasFront = get_live_parameter<float>("BrakeBiasFront");
+        auto fake_psi_dot = get_live_parameter<float>("fake_psi_dot");
 
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
@@ -146,8 +153,8 @@ namespace estimation
         {
             std::unique_lock lk(_config_mutex);
             _config = {
-                *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront,
-                *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr, // live configs
+                *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront, *fake_psi_dot,       // live configs (torque vectoring)
+                *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr, // live configs (tire)
                 *x1_fl, *x2_fl, *x3_fl, *y1_fl, *y2_fl, *y3_fl,                                 // file loaded configs (FL)
                 *x1_fr, *x2_fr, *x3_fr, *y1_fr, *y2_fr, *y3_fr,                                 // file loaded configs (FR)
                 *x1_rl, *x2_rl, *x3_rl, *y1_rl, *y2_rl, *y3_rl,                                 // file loaded configs (RL)
@@ -238,11 +245,15 @@ namespace estimation
         _inputs.interp_y2_RR = cur_config.y2_rr; // '<Root>/interp_y2_RR'
         _inputs.interp_y3_RR = cur_config.y3_rr; // '<Root>/interp_y3_RR'
 
+        
+
         _inputs.SteeringWheelAngleDeg = current_state.steering_angle_deg;
         _inputs.Vx_VN = current_state.current_body_vel_ms.x;
         
         _inputs.useFakeData = cur_config.use_fake_data;
         _inputs.Fake_Vx = cur_config.Fake_Vx;
+        _inputs.fake_psi_dot = cur_config.fake_psi_dot;
+
         _inputs.Psi_dot_VNrads = current_state.current_angular_rate_rads.z;
         _inputs.DriveBiasFront = cur_config.DriveBiasFront;
         _inputs.BrakeBiasFront = cur_config.BrakeBiasFront;
@@ -289,6 +300,7 @@ namespace estimation
         torque_vectoring_status.psi_dot_err = outputs.Yaw_Rate_Err;
         torque_vectoring_status.perceived_vx = outputs.Perceived_Vx;
         torque_vectoring_status.integral_yaw_rate_err = outputs.Integral_Yaw_Rate_Err;
+        torque_vectoring_status.perceived_psi_dot = outputs.perceived_psi_dot;
 
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR}; // '<Root>/torq_req_FL'
 

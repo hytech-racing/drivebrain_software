@@ -53,6 +53,7 @@ namespace core
         float psi_dot_err;
         float perceived_vx;
         float integral_yaw_rate_err;
+        float perceived_psi_dot;
     };
 
     struct MatlabMathResult

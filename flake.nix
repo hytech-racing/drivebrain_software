@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-15T06_31_59";
+        ref = "2024-10-15T07_06_59";
         flake = false;
       };
 

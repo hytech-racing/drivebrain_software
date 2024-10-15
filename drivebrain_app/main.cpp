@@ -151,10 +151,35 @@ int main(int argc, char *argv[])
             // if(state_and_validity.second)
             // {
             out_msg->set_prev_mcu_recv_millis(out_struct.mcu_recv_millis);
-            out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
-            out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
-            out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
-            out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+
+            if(temp_desired_torques.res_torque_lim_nm.FL < 0)
+            {
+                out_msg->mutable_desired_rpms()->set_fl(0);
+            } else {
+                out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+            }
+
+            if(temp_desired_torques.res_torque_lim_nm.FR < 0)
+            {
+                out_msg->mutable_desired_rpms()->set_fr(0);
+            } else {
+                out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
+            }
+
+            if(temp_desired_torques.res_torque_lim_nm.RL < 0)
+            {
+                out_msg->mutable_desired_rpms()->set_rl(0);
+            } else {
+                out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
+            }
+
+            if(temp_desired_torques.res_torque_lim_nm.RR < 0)
+            {
+                out_msg->mutable_desired_rpms()->set_rr(0);
+            } else {
+                out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+            }
+            
 
             out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
             out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));

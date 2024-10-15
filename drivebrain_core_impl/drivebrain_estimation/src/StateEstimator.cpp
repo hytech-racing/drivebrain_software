@@ -203,6 +203,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_tv_status->set_psi_dot_err(matlab_math_tv_data.psi_dot_err);
     current_tv_status->set_perceived_vx(matlab_math_tv_data.perceived_vx);
     current_tv_status->set_integral_yaw_rate_err(matlab_math_tv_data.integral_yaw_rate_err);
+    current_tv_status->set_perceived_psi_dot(matlab_math_tv_data.perceived_psi_dot);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

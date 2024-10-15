@@ -28,6 +28,7 @@ namespace estimation
                 float Fake_Vx;
                 float DriveBiasFront;
                 float BrakeBiasFront;
+                float fake_psi_dot;
                 // file loaded configs
                 float x1_fl;
                 float x2_fl;
