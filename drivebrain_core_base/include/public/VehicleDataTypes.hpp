@@ -51,6 +51,8 @@ namespace core
         float additional_mz_moment_nm;
         float des_psi_dot;
         float psi_dot_err;
+        float perceived_vx;
+        float integral_yaw_rate_err;
     };
 
     struct MatlabMathResult
