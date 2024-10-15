@@ -9,6 +9,7 @@
 #include <functional>
 #include <condition_variable>
 #include <mutex>
+#include <versions.h>
 
 #include "hytech_msgs.pb.h"
 #include <google/protobuf/message.h>
@@ -74,6 +75,7 @@ namespace core
 
                     _handle_output_messages(msg, _logger_msg_function);
                     _handle_output_messages(msg, _live_msg_output_func);
+
                 }
             }
             else
