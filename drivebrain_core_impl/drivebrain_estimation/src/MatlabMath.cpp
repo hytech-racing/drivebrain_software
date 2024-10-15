@@ -96,6 +96,11 @@ namespace estimation
         auto lmux_rr = get_live_parameter<float>("lmux_rr");
         auto lmuy_rr = get_live_parameter<float>("lmuy_rr");
 
+        auto use_fake_data = get_parameter_value<bool>("use_fake_data");
+        auto Fake_Vx = get_parameter_value<float>("Fake_Vx");
+        auto DriveBiasFront = get_parameter_value<float>("DriveBiasFront");
+        auto BrakeBiasFront = get_parameter_value<float>("BrakeBiasFront");
+
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
         auto x3_fl = get_parameter_value<float>("x3_fl");
@@ -128,6 +133,8 @@ namespace estimation
         auto y2_rr = get_parameter_value<float>("y2_rr");
         auto y3_rr = get_parameter_value<float>("y3_rr");
 
+        
+
         if (!(lmux_fl && lmuy_fl && lmux_fr && lmuy_fr && lmux_rl && lmuy_rl && lmux_rr && lmuy_rr &&
               x1_fl && x2_fl && x3_fl && y1_fl && y2_fl && y3_fl &&
               x1_fr && x2_fr && x3_fr && y1_fr && y2_fr && y3_fr &&
@@ -139,6 +146,7 @@ namespace estimation
         {
             std::unique_lock lk(_config_mutex);
             _config = {
+                *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront,
                 *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr, // live configs
                 *x1_fl, *x2_fl, *x3_fl, *y1_fl, *y2_fl, *y3_fl,                                 // file loaded configs (FL)
                 *x1_fr, *x2_fr, *x3_fr, *y1_fr, *y2_fr, *y3_fr,                                 // file loaded configs (FR)
