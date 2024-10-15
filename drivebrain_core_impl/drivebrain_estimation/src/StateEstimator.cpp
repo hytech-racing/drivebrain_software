@@ -199,6 +199,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     torque_add->set_rr(matlab_math_tv_data.torque_additional_nm.RR);
 
     current_tv_status->set_additional_mz_moment_nm(matlab_math_tv_data.additional_mz_moment_nm);
+    current_tv_status->set_des_psi_dot(matlab_math_tv_data.des_psi_dot);
+    current_tv_status->set_psi_dot_err(matlab_math_tv_data.psi_dot_err);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

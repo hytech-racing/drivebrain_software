@@ -49,6 +49,8 @@ namespace core
     {
         veh_vec<float> torque_additional_nm;
         float additional_mz_moment_nm;
+        float des_psi_dot;
+        float psi_dot_err;
     };
 
     struct MatlabMathResult

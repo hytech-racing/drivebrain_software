@@ -285,7 +285,8 @@ namespace estimation
 
         torque_vectoring_status.additional_mz_moment_nm = outputs.AdditionalMzNm;
         torque_vectoring_status.torque_additional_nm = {outputs.Torq_Add_FL, outputs.Torq_Add_FR, outputs.Torq_Add_RL, outputs.Torq_Add_RR};
-        
+        torque_vectoring_status.des_psi_dot = outputs.Des_Psi_dot;
+        torque_vectoring_status.psi_dot_err = outputs.Psi_dot_err;
 
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR}; // '<Root>/torq_req_FL'
 
