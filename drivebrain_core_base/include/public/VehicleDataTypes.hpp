@@ -45,6 +45,18 @@ namespace core
         }
     };
 
+    struct TorqueVectoringStatus
+    {
+        veh_vec<float> torque_additional_nm;
+        float additional_mz_moment_nm;
+    };
+
+    struct MatlabMathResult
+    {
+        TireDynamics tire_dynamics;
+        TorqueVectoringStatus torque_vectoring_status;
+    };
+
     struct SpeedControlOut
     {
         int64_t mcu_recv_millis;

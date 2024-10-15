@@ -24,6 +24,10 @@ namespace estimation
                 float lmuy_rl;
                 float lmux_rr;
                 float lmuy_rr;
+                bool use_fake_data;
+                float Fake_Vx;
+                float DriveBiasFront;
+                float BrakeBiasFront;
                 // file loaded configs
                 float x1_fl;
                 float x2_fl;
@@ -56,11 +60,12 @@ namespace estimation
             // TODO
             // hytech_msgs::TireDynamics convert_to_proto()
 
-            std::pair<core::TireDynamics, core::ControllerTorqueOut> evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input);
+            std::pair<core::MatlabMathResult, core::ControllerTorqueOut> evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input);
             bool init();
             
         private:
             config _config;
+            std::mutex _config_mutex;
             Tire_Model_Codegen::ExtU_Tire_Model_Codegen_T _inputs;
             Tire_Model_Codegen _model;
             void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
