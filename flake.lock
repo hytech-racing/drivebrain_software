@@ -361,11 +361,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1728951805,
-        "narHash": "sha256-tZiGdhqPDCIJf3HpGhRcIOaseS2+YKy+U2vcWs51JUs=",
+        "lastModified": 1728958124,
+        "narHash": "sha256-a20vbCZMj3XDiL8FVlGMIr27aSujUWrYuznjY9OlZwQ=",
         "owner": "hytech-racing",
         "repo": "MATLAB-math",
-        "rev": "a36840374fcbd13202349c606c04e90cb2afc724",
+        "rev": "b46aaf9fce8a8fe05e8ed5ae5e1d511df89f2998",
         "type": "github"
       },
       "original": {

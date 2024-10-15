@@ -96,10 +96,10 @@ namespace estimation
         auto lmux_rr = get_live_parameter<float>("lmux_rr");
         auto lmuy_rr = get_live_parameter<float>("lmuy_rr");
 
-        auto use_fake_data = get_parameter_value<bool>("use_fake_data");
-        auto Fake_Vx = get_parameter_value<float>("Fake_Vx");
-        auto DriveBiasFront = get_parameter_value<float>("DriveBiasFront");
-        auto BrakeBiasFront = get_parameter_value<float>("BrakeBiasFront");
+        auto use_fake_data = get_live_parameter<bool>("use_fake_data");
+        auto Fake_Vx = get_live_parameter<float>("Fake_Vx");
+        auto DriveBiasFront = get_live_parameter<float>("DriveBiasFront");
+        auto BrakeBiasFront = get_live_parameter<float>("BrakeBiasFront");
 
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
