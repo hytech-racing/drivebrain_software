@@ -216,6 +216,14 @@ target_link_libraries(test_mcap PUBLIC
     mcap::mcap
 )
 
+add_executable(test_controller_manager test/test_controller_manager.cpp)
+
+target_link_libraries(test_controller_manager PUBLIC
+    drivebrain_core
+    drivebrain_control
+    GTest::gtest_main
+)
+
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
 target_link_libraries(test_vn PUBLIC

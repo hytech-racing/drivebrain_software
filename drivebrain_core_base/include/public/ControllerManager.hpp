@@ -29,7 +29,7 @@
 //   even while being the "active" controller, however the controller manager
 //   shall handle when its configuration gets updated
 
-// - vehicle manager shall handle stepping of each controller at their
+// - vehicle manager shall handle evaluating of each controller at their
 //   desired rates and be able to switch between
 
 // - vehicle manager shall be able to change the mode of the drivetrain dependent
@@ -56,15 +56,16 @@
 
 namespace control
 {
-
     // TODO turn into concept
     template <typename ControllerType, size_t NumControllers>
     class ControllerManager : public core::common::Configurable
     {
     public:
-        
-
-        ControllerManager(core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(json_file_handler, "ControllerManager"),
+        /// @brief contructs instance of the controller manager
+        /// @param json_file_handler current file handler to handle controller configurations
+        /// @param controllers list of controllers that the manager will mux between and manager
+        /// @param state_estimator instance to allow for direct communication between controllers and state estimator
+        ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(logger, json_file_handler, "ControllerManager"),
                                                                                                                                 _controllers(controllers)
         {
         }
@@ -74,40 +75,51 @@ namespace control
         /// @return true or false depending on success of init
         bool init();
 
-        /// @brief TODO maybe remove this
-        /// @param new_controller_index 
-        /// @return 
-        bool attempt_controller_change(size_t new_controller_index)
-        {
-            static const size_t num_controllers = NumControllers;
-            if (new_controller_index > (num_controllers - 1))
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+        /// @brief attempts to switch the active controller
+        /// @param new_controller_index desired controller index
+        /// @return true if it successfully switches and false if it does not
+        /// @note if it returns false the _current_ctr_manager_state member variable will have an altered status variable 
+        bool swap_active_controller(size_t new_controller_index, const core::VehicleState& input);
         
+        /// @brief fetches the active controllers desired seconds between controller evaluations
+        /// @return the period in seconds for the active controller
         float get_active_controller_timestep()
         {
             return _controllers[_current_controller_index]->get_dt_sec();
         }
 
-        core::ControllerOutput step_active_controller(const core::VehicleState&input)
+        /// @brief allows access to controller manager state for efficient communication
+        /// @return ControllerManagerState types: ControllerManagerStatus, ControllerOutput
+        core::control::ControllerManagerState get_current_ctr_manager_state()
         {
-            return _controllers[_current_controller_index]->step_controller(input);
+            return _current_ctr_manager_state;
+        }
+
+        /// @brief evaluates the currently active controller 
+        /// @param input current vehicle state maintained by the state estimator
+        /// @return respective controller output to command the drivetrain
+        core::ControllerOutput step_active_controller(const core::VehicleState& input)
+        {   
+            _current_ctr_manager_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input);
+            return _current_ctr_manager_state.current_controller_output;
         }
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
-
-    private:
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
+        core::control::ControllerManagerState _current_ctr_manager_state;
 
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req;
+        
+        namespace controller_manager_default_values{
+            veh_vec<float> zero_veh_vector = { 0 , 0 , 0 , 0 };
+            core::ControllerOutput empty_controller_output = {
+                .out = core::TorqueControlOut{
+                    .desired_torques_nm = zero_veh_vector
+                }
+            };
+        };
     };
 }
 #include "ControllerManager.tpp"
