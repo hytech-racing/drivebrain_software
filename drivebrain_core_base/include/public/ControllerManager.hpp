@@ -29,7 +29,7 @@
 //   even while being the "active" controller, however the controller manager
 //   shall handle when its configuration gets updated
 
-// - vehicle manager shall handle stepping of each controller at their
+// - vehicle manager shall handle evaluating of each controller at their
 //   desired rates and be able to switch between
 
 // - vehicle manager shall be able to change the mode of the drivetrain dependent
@@ -53,17 +53,6 @@
 // on a side note, we need to make sure that we copy over the vehicle state here after locking onto the mutex and then unlock
 // on a side note, how are we going to prevent mutex deadlocking on the shared state?
 // we will do this by having the state estimator and the controller ticking in the same loop so no need for worrying about threading
-
-namespace CONTROLLER_MANAGER_DEFAULT_PARAMS
-{
-    veh_vec<float> zeros = { 0 , 0 , 0 , 0 };
-
-    core::ControllerOutput empty_controller_output = {
-        .out = core::TorqueControlOut{
-            .desired_torques_nm = zeros
-        }
-    };
-};
 
 namespace control
 {
@@ -89,7 +78,7 @@ namespace control
         /// @brief attempts to switch the active controller
         /// @param new_controller_index desired controller index
         /// @return true if it successfully switches and false if it does not
-        /// @note if it returns false the _current_car_state member variable will have an altered status variable 
+        /// @note if it returns false the _current_ctr_manager_state member variable will have an altered status variable 
         bool swap_active_controller(size_t new_controller_index, const core::VehicleState& input);
         
         /// @brief fetches the active controllers desired seconds between controller evaluations
@@ -101,9 +90,9 @@ namespace control
 
         /// @brief allows access to controller manager state for efficient communication
         /// @return ControllerManagerState types: ControllerManagerStatus, ControllerOutput
-        core::control::ControllerManagerState get_current_car_state()
+        core::control::ControllerManagerState get_current_ctr_manager_state()
         {
-            return _current_car_state;
+            return _current_ctr_manager_state;
         }
 
         /// @brief evaluates the currently active controller 
@@ -111,55 +100,26 @@ namespace control
         /// @return respective controller output to command the drivetrain
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
-            if(stepping){
-                _current_car_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input);
-            }
-            return _current_car_state.current_controller_output;
+            _current_ctr_manager_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input);
+            return _current_ctr_manager_state.current_controller_output;
         }
-
-        /// @brief stops the active controller from being evaluated at its time step
-        /// @return true if it successfully stops the stepping and false if it was already stopped
-        bool pause_stepping()
-        {
-            if(stepping)
-            {
-                stepping = false;
-                return true;
-            }
-            else
-            {
-                //if you pause while its not stepping
-                return false;
-            }
-        }
-
-        /// @brief starts the active controller's evaluation at its time step
-        /// @return true if it successfully starts the stepping and false if it was already stepping
-        bool unpause_stepping()
-        {
-            if(!stepping)
-            {
-                stepping = true;
-                return true;
-            }
-            else
-            {
-                //if you unpause while its stepping 
-                return false;
-            }
-        }
-        
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
-        core::control::ControllerManagerState _current_car_state;
-        
-        //flag for pause/unpause -> could be temporary or permanent way of pausing
-        bool stepping = true;
+        core::control::ControllerManagerState _current_ctr_manager_state;
 
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req;
+        
+        namespace controller_manager_default_values{
+            veh_vec<float> zero_veh_vector = { 0 , 0 , 0 , 0 };
+            core::ControllerOutput empty_controller_output = {
+                .out = core::TorqueControlOut{
+                    .desired_torques_nm = zero_veh_vector
+                }
+            };
+        };
     };
 }
 #include "ControllerManager.tpp"

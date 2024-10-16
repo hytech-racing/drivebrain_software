@@ -12,20 +12,32 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/version_header/versions.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version_header/versions.h"
+    @ONLY
+)
+
 ### this one is generated from nix-proto but using foxglove's 
-find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+# find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
+
+find_package(libvncxx REQUIRED)
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
-
+find_package(mcap REQUIRED)
 
 # custom packaged libraries, code didnt require changes just the packaging
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
+
+find_package(gRPC CONFIG REQUIRED)
+find_package(db_service_grpc_cpp REQUIRED)
+
 include(create_package)
 
 #####################
@@ -54,58 +66,68 @@ target_include_directories(drivebrain_core PRIVATE
 
 target_link_libraries(drivebrain_core PUBLIC 
     nlohmann_json::nlohmann_json 
-    Boost::boost 
-    Boost::system 
+    Boost::boost
+    Boost::system
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
 )
 
 make_cmake_package(drivebrain_core drivebrain)
 
-# foxglove parameter server interface
-add_library(foxglove_param_server SHARED drivebrain_core_impl/drivebrain_comms/foxglove_param_server/src/param_server.cpp)
 
-target_include_directories(foxglove_param_server PUBLIC 
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/foxglove_param_server/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/foxglove_param_server/include>    
+add_library(drivebrain_common_utils SHARED 
+    drivebrain_core_impl/drivebrain_common_utils/src/ProtobufUtils.cpp
 )
 
-target_link_libraries(foxglove_param_server PUBLIC 
-    drivebrain_core 
-    foxglove_websocket::foxglove_websocket    
+target_include_directories(drivebrain_common_utils PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_common_utils/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_common_utils/include>
 )
-target_compile_features(foxglove_param_server PUBLIC cxx_std_17) 
-make_cmake_package(foxglove_param_server drivebrain)
+
+target_link_libraries(drivebrain_common_utils PUBLIC
+    protobuf::libprotobuf
+)
+
+make_cmake_package(drivebrain_common_utils drivebrain)
 
 # CAN driver for parsing and encoding CAN packets and interacting with a socketCAN interface
-add_library(CAN_driver SHARED drivebrain_core_impl/drivebrain_comms/car_CAN_driver/src/CANComms.cpp)
-
-target_include_directories(CAN_driver PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include>    
+add_library(drivebrain_comms SHARED
+    drivebrain_core_impl/drivebrain_comms/src/foxglove_server.cpp
+    drivebrain_core_impl/drivebrain_comms/src/CANComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/VNComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/MCUETHComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
 )
 
-target_link_libraries(CAN_driver PUBLIC 
+target_compile_features(drivebrain_comms PUBLIC cxx_std_17)
+
+
+target_include_directories(drivebrain_comms PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/include>    
+)
+
+target_include_directories(drivebrain_comms PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
+
+target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core
-    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_common_utils
+    gRPC::grpc++_reflection
+    foxglove_websocket::foxglove_websocket
     protobuf::libprotobuf
     dbcppp::dbcppp
-)
-make_cmake_package(CAN_driver drivebrain)
-
-add_library(ETH_driver SHARED drivebrain_core_impl/drivebrain_comms/car_ETH_driver/src/MCUETHComms.cpp)
-target_include_directories(ETH_driver PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include>    
-)
-
-target_link_libraries(ETH_driver PUBLIC 
-    drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
+    db_service_grpc_cpp::db_service_grpc_cpp
+    libvncxx::libvncxx
+
 )
-make_cmake_package(ETH_driver drivebrain)
+
+make_cmake_package(drivebrain_comms drivebrain)
+
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
@@ -119,7 +141,31 @@ target_link_libraries(drivebrain_control PUBLIC
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
 )
+
 make_cmake_package(drivebrain_control drivebrain)
+
+add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp)
+target_include_directories(drivebrain_mcap_logger PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_mcap_logger/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_mcap_logger/include>    
+)
+
+target_link_libraries(drivebrain_mcap_logger PUBLIC
+    drivebrain_core 
+    drivebrain_common_utils
+    protobuf::libprotobuf
+    mcap::mcap
+    
+)
+target_link_libraries(drivebrain_mcap_logger INTERFACE
+    mcap::mcap
+)
+target_include_directories(drivebrain_mcap_logger PUBLIC
+    $<INSTALL_INTERFACE:version_header>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>    
+)
+make_cmake_package(drivebrain_mcap_logger drivebrain)
+
 
 ###############
 # executables #
@@ -141,42 +187,64 @@ make_cmake_package(drivebrain_control drivebrain)
 #     Boost::boost
 # )
 
-# add_executable(test_param_server test/test_param_server.cpp)
+# add_executable(test_foxglove_server test/test_foxglove_server.cpp)
 
-# target_link_libraries(test_param_server PUBLIC 
+# target_link_libraries(test_foxglove_server PUBLIC 
 #     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
 #     foxglove_websocket::foxglove_websocket)
 
-# Add test executable for controller manager tests
-#this is what I used to build my tests
-# add_executable(tests test/test_controller_manager.cpp)
+add_executable(mcu_standin test/test_mcu.cpp)
 
-# # Link the test executable with necessary libraries and GTest
-# target_link_libraries(tests PUBLIC
-#     drivebrain_core
-#     drivebrain_control
-#     GTest::gtest_main
-# )
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
 
-# # Enable testing and add the test executable to CTest
-# enable_testing()
-# add_test(NAME ControllerManagerTests COMMAND tests)
+add_executable(test_db_grpc test/test_db_interace_grpc_service.cpp)
+
+target_link_libraries(test_db_grpc PUBLIC
+    db_service_grpc_cpp::db_service_grpc_cpp
+    gRPC::grpc++_reflection
+)
+
+
+add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+
+target_link_libraries(test_mcap PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+    mcap::mcap
+)
+
+add_executable(test_controller_manager test/test_controller_manager.cpp)
+
+target_link_libraries(test_controller_manager PUBLIC
+    drivebrain_core
+    drivebrain_control
+    GTest::gtest_main
+)
+
+set(CMAKE_CXX_STANDARD 17) 
+add_executable(test_vn test/test_vn.cpp)
+target_link_libraries(test_vn PUBLIC
+    Boost::boost
+    Boost::system
+    libvncxx::libvncxx
+)
+
+target_compile_features(test_vn PUBLIC cxx_std_11)
 
 ###                   ###
 ### system executable ###
 ###                   ###
-
-# add_executable(mcu_standin test/test_mcu.cpp)
-# add_executable(mcu_test test/test_mcu_send.cpp)
 
 add_executable(alpha_build drivebrain_app/main.cpp)
 
 target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
-    CAN_driver
-    foxglove_param_server
-    ETH_driver
+    drivebrain_comms
+    drivebrain_mcap_logger
     Boost::program_options
 )
 
@@ -184,15 +252,10 @@ target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
 )
-target_link_libraries(mcu_test PUBLIC
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
-)
+
 
 include(GNUInstallDirs)
 install(TARGETS 
-        # test_param_server
-        # alpha_build
-        tests
+        alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

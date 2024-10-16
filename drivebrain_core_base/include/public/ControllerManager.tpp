@@ -23,9 +23,9 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     _max_torque_switch = *max_torque_switch;
     _max_accel_switch_req = *max_accel_switch_request;
 
-    _current_car_state = {
+    _current_ctr_manager_state = {
         .current_status = core::control::ControllerManagerStatus::NO_ERROR,
-        .current_controller_output = CONTROLLER_MANAGER_DEFAULT_PARAMS::empty_controller_output
+        .current_controller_output = control::controller_manager_default_values::empty_controller_output
     };
 
     return true;
@@ -59,8 +59,8 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // check to see if current drivetrain rpms are too high to switch controller
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
-        _current_car_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
-        return _current_car_state.current_status;
+        _current_ctr_manager_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        return _current_ctr_manager_state.current_status;
     }
 
     // function to check whether or not the controller output is with range. 
@@ -109,18 +109,18 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
 
     if(prev_status == status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
     {
-        _current_car_state.current_status = status_type::NO_ERROR;
+        _current_ctr_manager_state.current_status = status_type::NO_ERROR;
     }
     else if(prev_status != status_type::NO_ERROR && switch_status == status_type::NO_ERROR)
     {
-        _current_car_state.current_status = prev_status;
+        _current_ctr_manager_state.current_status = prev_status;
     }
     else
     {
-        _current_car_state.current_status = switch_status;
+        _current_ctr_manager_state.current_status = switch_status;
     }
 
-    return _current_car_state.current_status;
+    return _current_ctr_manager_state.current_status;
 }
 
 template <typename ControllerType, size_t NumControllers>
@@ -130,7 +130,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::swap_active_con
     static const size_t num_controllers = _controllers.size();
     if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
     {
-        _current_car_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE;
+        _current_ctr_manager_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE;
         return false;
     }
     
