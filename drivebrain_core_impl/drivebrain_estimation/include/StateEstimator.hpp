@@ -2,7 +2,7 @@
 #define __STATEESTIMATOR_H__
 
 // TODO:
-// - [ ] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
+// - [x] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
 
 // implement a thing that can maintain a "flexible" state of the car such that
 // it can build up a state of the car from the messages coming in. It starts out with an empty
@@ -30,6 +30,7 @@
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
 #include <MatlabMath.hpp>
+#include <Configurable.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
 // that can update pieces of the state that would be optimal.
@@ -70,7 +71,8 @@ namespace core
             std::chrono::microseconds zero_start_time{0};
             _timestamp_array = {zero_start_time};
         }
-        ~StateEstimator()  =default;
+        ~StateEstimator() = default;
+
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
         void set_previous_control_output(SpeedControlOut prev_control_output);

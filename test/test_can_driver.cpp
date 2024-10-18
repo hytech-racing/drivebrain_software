@@ -49,13 +49,13 @@ void print_can_frame(const struct can_frame &frame) {
 }
 
 TEST(CANDriver, test_construction) {
-    core::JsonFileHandler test_file("config/test_config/can_driver.json");
+    core::JsonFileHandler test_file("config/drivebrain_config.json");
     comms::CANDriver driver(test_file);
     EXPECT_TRUE(driver.init());
 }
 
 TEST(CANDriver, test_CAN_creation) {
-  core::JsonFileHandler test_file("config/test_config/can_driver.json");
+  core::JsonFileHandler test_file("config/drivebrain_config.json");
   TestCAN driver(test_file);
   EXPECT_TRUE(driver.init());
   auto ht_pb_test = std::make_shared<drivetrain_rpms_telem>();
@@ -75,7 +75,7 @@ TEST(CANDriver, test_CAN_creation) {
 
 TEST(CANDriver, test_CAN_recv)
 {
-    core::JsonFileHandler test_file("config/test_config/can_driver.json");
+    core::JsonFileHandler test_file("config/drivebrain_config.json");
     TestCAN driver(test_file);
     auto _ = driver.init();
     auto ht_pb_test = std::make_shared<drivetrain_rpms_telem>();
