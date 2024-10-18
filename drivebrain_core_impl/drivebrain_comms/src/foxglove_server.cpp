@@ -19,32 +19,6 @@ static uint64_t nanosecondsSinceEpoch()
                         .count());
 }
 
-/// Builds a FileDescriptorSet of this descriptor and all transitive dependencies, for use as a
-/// channel schema.
-static std::string SerializeFdSet(const google::protobuf::Descriptor *toplevelDescriptor)
-{
-    google::protobuf::FileDescriptorSet fdSet;
-    std::queue<const google::protobuf::FileDescriptor *> toAdd;
-    toAdd.push(toplevelDescriptor->file());
-    std::unordered_set<std::string> seenDependencies;
-    while (!toAdd.empty())
-    {
-        const google::protobuf::FileDescriptor *next = toAdd.front();
-        toAdd.pop();
-        next->CopyTo(fdSet.add_file());
-        for (int i = 0; i < next->dependency_count(); ++i)
-        {
-            const auto &dep = next->dependency(i);
-            if (seenDependencies.find(dep->name()) == seenDependencies.end())
-            {
-                seenDependencies.insert(dep->name());
-                toAdd.push(dep);
-            }
-        }
-    }
-    return fdSet.SerializeAsString();
-}
-
 core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
@@ -62,14 +36,13 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
     hdlrs.parameterRequestHandler = [this](const std::vector<std::string> &param_names, const std::optional<std::string> &request_id,
                                            foxglove::ConnHandle clientHandle)
     {
-        auto params_vec = _get_current_params();
+        std::vector<foxglove::Parameter> params_vec = _get_current_params();
         _server->publishParameterValues(clientHandle, params_vec, request_id);
     };
 
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
         // loop through all of the params we are trying to change
-        // auto name_type_map = _get_current_type_map();
 
         for (const auto &param_to_change : params)
         {
@@ -77,7 +50,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
             _set_db_param(param_to_change);
         }
         // get the updated params
-        auto fxglove_params_vec = _get_current_params();
+        std::vector<foxglove::Parameter> fxglove_params_vec = _get_current_params();
         _server->publishParameterValues(clientHandle, fxglove_params_vec, request_id);
     };
 
@@ -115,7 +88,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
             server_channel.topic = message_descriptor->name();
             server_channel.encoding = "protobuf";
             server_channel.schemaName = message_descriptor->full_name();
-            server_channel.schema = foxglove::base64Encode(SerializeFdSet(message_descriptor));
+            server_channel.schema = foxglove::base64Encode(util::build_file_descriptor_set(message_descriptor).SerializeAsString());
             channels.push_back(server_channel);
         }
     }
@@ -202,8 +175,8 @@ core::common::Configurable::ParamTypes core::FoxgloveWSServer::_get_db_param(fox
 
 std::optional<foxglove::Parameter> core::FoxgloveWSServer::_convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param)
 {
-    auto current_param_type = _get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType();
-    auto type = incoming_param.getValue().getType();
+    foxglove::ParameterType current_param_type = _get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType();
+    foxglove::ParameterType type = incoming_param.getValue().getType();
 
     using fpt = foxglove::ParameterType;
     if (_get_foxglove_param(incoming_param.getName(), curr_param_val).getValue().getType() == incoming_param.getValue().getType())
@@ -227,21 +200,21 @@ std::optional<foxglove::Parameter> core::FoxgloveWSServer::_convert_foxglove_par
 
 void core::FoxgloveWSServer::_set_db_param(foxglove::Parameter param_update)
 {
-    auto split_pos = param_update.getName().find("/");
+    size_t split_pos = param_update.getName().find("/");
 
-    auto param_name = param_update.getName().substr(split_pos + 1);
-    auto component_name = param_update.getName().substr(0, split_pos);
+    std::string param_name = param_update.getName().substr(split_pos + 1);
+    std::string component_name = param_update.getName().substr(0, split_pos);
 
     for (const auto component : _components)
     {
         if (component->get_name() == component_name)
         {
 
-            auto curr_param_val = component->get_cached_param(param_name);
-            auto converted_type = _convert_foxglove_param(curr_param_val, param_update);
-            if (converted_type)
+            core::common::Configurable::ParamTypes curr_param_val = component->get_cached_param(param_name);
+            std::optional<foxglove::Parameter> converted_type = _convert_foxglove_param(curr_param_val, param_update);
+            if(converted_type)
             {
-                auto val = _get_db_param(*converted_type);
+                core::common::Configurable::ParamTypes val = _get_db_param(*converted_type);
                 component->handle_live_param_update(param_name, val);
             }
             return;
@@ -255,13 +228,13 @@ std::vector<foxglove::Parameter> core::FoxgloveWSServer::_get_current_params()
     std::vector<foxglove::Parameter> params;
     for (const auto component : _components)
     {
-        auto params_map = component->get_params_map();
-        auto param_parent = component->get_name();
-        auto param_names = component->get_param_names();
+        std::unordered_map params_map = component->get_params_map();
+        std::string param_parent = component->get_name();
+        std::vector<std::string> param_names = component->get_param_names();
         for (const auto &component_param_name : param_names)
         {
-            auto foxglove_param_id = param_parent + "/" + component_param_name;
-            auto fxglove_param = _get_foxglove_param(foxglove_param_id, params_map[component_param_name]);
+            std::string foxglove_param_id = param_parent + "/" + component_param_name;
+            foxglove::Parameter fxglove_param = _get_foxglove_param(foxglove_param_id, params_map[component_param_name]);
             params.push_back(fxglove_param);
         }
     }

@@ -18,7 +18,9 @@
 
 #include <cassert>
 
+#include <boost/program_options.hpp>
 #include <boost/asio.hpp>
+
 #include <memory>
 #include <optional>
 
@@ -48,6 +50,7 @@ void signalHandler(int signal)
 int main(int argc, char *argv[])
 {
 
+    // io context for boost async io. gets given to the drivers working with all system peripherals
     boost::asio::io_context io_context;
     auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
@@ -57,14 +60,36 @@ int main(int argc, char *argv[])
 
     std::vector<core::common::Configurable *> configurable_components;
 
-    std::string param_path = "config/test_config/can_driver.json";
+    // transmit queue for data going from components to the CAN driver
+
+
+
+    // vector of pointers to configurable components to be given to the param handler. 
+    // these are the pointers to components that can be configured
+    
+    std::string param_path;    
     std::optional<std::string> dbc_path = std::nullopt;
-    if (argc == 3)
-    {
-        param_path = argv[1];
-        dbc_path = argv[2];
+    // program option parsing 
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "produce help message")
+        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/drivebrain_config.json"), "Path to the parameter JSON file")
+        ("dbc-path,d", po::value<std::string>(), "Path to the DBC file (optional)");
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    
+    if (vm.count("help")) {
+        std::cout << desc << "\n";
+        return 1;
+    }
+    if (vm.count("dbc-path")) {
+        dbc_path = vm["dbc-path"].as<std::string>();
     }
 
+    // config file handler that gets given to all configurable components.
     core::JsonFileHandler config(param_path);
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
@@ -80,8 +105,9 @@ int main(int argc, char *argv[])
     }
     configurable_components.push_back(&matlab_math);
 
-    auto foxglove_server = core::FoxgloveWSServer(configurable_components);
-
+    // live foxglove server server that relies upon having pointers to configurable components for 
+    // getting and handling updates of the registered live parameters
+    core::FoxgloveWSServer foxglove_server(configurable_components);
     std::function<void(void)> close_file_temp = []() {};
     std::function<void(const std::string &)> open_file_temp = [](const std::string &) {};
 
@@ -101,10 +127,12 @@ int main(int argc, char *argv[])
     }
 
     configurable_components.push_back(&driver);
+    
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
     comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
 
-    auto _ = controller.init();
+    // required init, maybe want to call this in the constructor instead
+    bool successful_controller_init = controller.init();
 
     DBInterfaceImpl db_service_inst(message_logger);
     std::thread db_service_thread([&db_service_inst]()
@@ -116,8 +144,9 @@ int main(int argc, char *argv[])
                     db_service_inst.run_server();  // Run at least one handler, or return immediately if none
                 }
             } catch (const std::exception& e) {
-                std::cerr << "Error in io_context: " << e.what() << std::endl;
-            } });
+                std::cerr << "Error in drivebrain service thread: " << e.what() << std::endl;
+            }
+        }); 
     // what we will do here is have a temporary super-loop.
     // in this thread we will block on having anything in the rx queue, everything by default goes into the foxglove server (TODO)
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue

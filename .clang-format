@@ -1,0 +1,7 @@
+BasedOnStyle: LLVM  # or Google, Mozilla, etc.
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never  # Ensures spaces instead of tabs are used
+BreakBeforeBraces: Attach  # Optional, adjust brace style
+AllowShortFunctionsOnASingleLine: Empty
+ColumnLimit: 100  # Adjust if desired

@@ -41,11 +41,12 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
 
 bool control::SimpleController::init()
 {
-    auto max_torque = get_live_parameter<float>("max_torque");
-    auto max_regen_torque = get_live_parameter<float>("max_regen_torque");
-    auto rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
-    auto regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
-    auto positive_speed_set = get_live_parameter<float>("positive_speed_set");
+    std::optional max_torque = get_live_parameter<torque_nm>("max_torque");
+    std::optional max_regen_torque = get_live_parameter<torque_nm>("max_regen_torque");
+    std::optional rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
+    std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
+    std::optional positive_speed_set = get_live_parameter<speed_m_s>("positive_speed_set");
+
     if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
     {
         return false;
@@ -69,7 +70,7 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
     // accelRequest goes between 1.0 and -1.0
     float accelRequest = (in.input.requested_accel) - (in.input.requested_brake);
 
-    float torqueRequest;
+    torque_nm torqueRequest;
 
     // hytech_msgs::MCUCommandData cmd_out;
     core::SpeedControlOut cmd_out;
@@ -81,16 +82,6 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
         torqueRequest = ((float)accelRequest) * cur_config.max_torque;
 
         auto max_rpm = cur_config.positive_speed_set * constants::METERS_PER_SECOND_TO_RPM;
-        // cmd_out.mutable_desired_rpms()->set_fl(max_rpm);
-        // cmd_out.mutable_desired_rpms()->set_fr(max_rpm);
-        // cmd_out.mutable_desired_rpms()->set_rl(max_rpm);
-        // cmd_out.mutable_desired_rpms()->set_rr(max_rpm);
-
-        // cmd_out.mutable_torque_limit_nm()->set_fl((torqueRequest * (2.0 - cur_config.rear_torque_scale)));
-        // cmd_out.mutable_torque_limit_nm()->set_fr((torqueRequest * (2.0 - cur_config.rear_torque_scale)));
-        // cmd_out.mutable_torque_limit_nm()->set_rl((torqueRequest * cur_config.rear_torque_scale));
-        // cmd_out.mutable_torque_limit_nm()->set_rr((torqueRequest * cur_config.rear_torque_scale));
-
         cmd_out.desired_rpms.FL = max_rpm;
         cmd_out.desired_rpms.FR = max_rpm;
         cmd_out.desired_rpms.RL = max_rpm;
@@ -105,16 +96,6 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
     {
         // Negative torque request
         torqueRequest = cur_config.max_reg_torque * accelRequest * -1.0;
-        // cmd_out.mutable_desired_rpms()->set_fl(0);
-        // cmd_out.mutable_desired_rpms()->set_fr(0);
-        // cmd_out.mutable_desired_rpms()->set_rl(0);
-        // cmd_out.mutable_desired_rpms()->set_rr(0);
-
-        // cmd_out.mutable_torque_limit_nm()->set_fl((torqueRequest * (2.0 - cur_config.regen_torque_scale)));
-        // cmd_out.mutable_torque_limit_nm()->set_fr((torqueRequest * (2.0 - cur_config.regen_torque_scale)));
-        // cmd_out.mutable_torque_limit_nm()->set_rl((torqueRequest * cur_config.regen_torque_scale));
-        // cmd_out.mutable_torque_limit_nm()->set_rr((torqueRequest * cur_config.regen_torque_scale));
-
         cmd_out.desired_rpms.FL = 0;
         cmd_out.desired_rpms.FR = 0;
         cmd_out.desired_rpms.RL = 0;

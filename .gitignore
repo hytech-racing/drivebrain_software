@@ -8,3 +8,4 @@ result-dev/
 core.*
 result-man/
 result-man
+.cache/
