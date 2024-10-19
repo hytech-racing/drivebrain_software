@@ -71,6 +71,7 @@ namespace core
             {
                 _handle_output_messages(msg, _logger_msg_function);   
             }
+            _handle_output_messages(msg, _live_msg_output_func);
         }
 
         // will only open a new file for logging if we are not currently logging
