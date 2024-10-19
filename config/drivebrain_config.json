@@ -12,7 +12,7 @@
     },
     "ControllerManager": {
         "max_controller_switch_speed_ms": 5.0,
-        "max_torque_switch_nm": 3000.0,
+        "max_torque_switch_nm": 100.0,
         "max_accel_switch_float": 0.2
     }, 
     "VNDriver": {

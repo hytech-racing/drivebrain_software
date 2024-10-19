@@ -100,7 +100,7 @@ namespace control
         /// @return respective controller output to command the drivetrain
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
-            _current_ctr_manager_state.current_controller_output = _controllers[_current_controller_index]->step_controller(input);
+            _current_ctr_manager_state.current_controller_output.out = _controllers[_current_controller_index]->step_controller(input);
             return _current_ctr_manager_state.current_controller_output;
         }
 
@@ -111,15 +111,6 @@ namespace control
         core::control::ControllerManagerState _current_ctr_manager_state;
 
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req;
-        
-        namespace controller_manager_default_values{
-            veh_vec<float> zero_veh_vector = { 0 , 0 , 0 , 0 };
-            core::ControllerOutput empty_controller_output = {
-                .out = core::TorqueControlOut{
-                    .desired_torques_nm = zero_veh_vector
-                }
-            };
-        };
     };
 }
 #include "ControllerManager.tpp"

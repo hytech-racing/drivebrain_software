@@ -25,7 +25,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
 
     _current_ctr_manager_state = {
         .current_status = core::control::ControllerManagerStatus::NO_ERROR,
-        .current_controller_output = control::controller_manager_default_values::empty_controller_output
+        .current_controller_output = std::monostate{}
     };
 
     return true;
@@ -78,7 +78,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
             {
                 return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
             }
-            else if (check_veh_vec(pval->positive_torque_lim_nm, _max_torque_switch, false))
+            else if (check_veh_vec(pval->torque_lim_nm, _max_torque_switch, false))
             {
                 return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
             } else {
@@ -134,7 +134,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::swap_active_con
         return false;
     }
     
-    if(_can_switch_controller(input, _controllers[_current_controller_index]->step_controller(input), _controllers[new_controller_index]->step_controller(input)) == status_type::NO_ERROR)
+    if(_can_switch_controller(input, {_controllers[_current_controller_index]->step_controller(input)}, {_controllers[new_controller_index]->step_controller(input)}) == status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
         return true;

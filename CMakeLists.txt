@@ -130,7 +130,7 @@ make_cmake_package(drivebrain_comms drivebrain)
 
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
-# drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
+
 target_include_directories(drivebrain_control PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_control/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_control/include>    
