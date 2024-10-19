@@ -63,6 +63,12 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         return _current_ctr_manager_state.current_status;
     }
 
+    if(current_state.input.requested_accel > _max_accel_switch_req)
+    {
+        _current_ctr_manager_state.current_status = status_type::ERROR_DRIVER_ON_PEDAL;
+        return _current_ctr_manager_state.current_status;
+    }
+
     // function to check whether or not the controller output is with range. 
     // can determine what type the controller output is and checks to see whether or not it has issues.
 

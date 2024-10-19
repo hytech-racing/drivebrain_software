@@ -81,7 +81,6 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
         torqueRequest = ((float)accelRequest) * cur_config.max_torque;
 
         auto max_rpm = cur_config.positive_speed_set * constants::METERS_PER_SECOND_TO_RPM;
-        std::cout << "accel request" << accelRequest << cur_config.positive_speed_set << " " << max_rpm << std::endl;
         // cmd_out.mutable_desired_rpms()->set_fl(max_rpm);
         // cmd_out.mutable_desired_rpms()->set_fr(max_rpm);
         // cmd_out.mutable_desired_rpms()->set_rl(max_rpm);
@@ -104,7 +103,6 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
     }
     else
     {
-        std::cout << "accel no" << accelRequest << std::endl;
         // Negative torque request
         torqueRequest = cur_config.max_reg_torque * accelRequest * -1.0;
         // cmd_out.mutable_desired_rpms()->set_fl(0);
