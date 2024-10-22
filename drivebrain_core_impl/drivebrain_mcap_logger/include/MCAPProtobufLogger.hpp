@@ -24,9 +24,7 @@ namespace common
             uint64_t log_time;
         };
 
-        
-
-        MCAPProtobufLogger(const std::string &base_dir);
+        MCAPProtobufLogger(const std::string &base_dir, const std::string &parameter_json_schema);
         ~MCAPProtobufLogger();
 
         /// @brief 
@@ -45,6 +43,7 @@ namespace common
         mcap::McapWriter _writer;
         std::mutex _logger_mtx;
         std::unordered_map<std::string, uint32_t> _msg_name_id_map;
+        std::string _parameter_json_schema;
 
     };
 }

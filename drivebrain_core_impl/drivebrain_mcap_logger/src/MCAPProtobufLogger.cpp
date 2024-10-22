@@ -10,8 +10,8 @@
 #include <utility>
 namespace common
 {
-    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir)
-        : _options(mcap::McapWriterOptions(""))
+    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir, const std::string& parameter_json_schema)
+        : _options(mcap::McapWriterOptions("")), _parameter_json_schema(parameter_json_schema)
     {
         auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
         if (optional_map)
@@ -76,6 +76,7 @@ namespace common
         add_schema_func(schema_only_descriptors, true);
         add_schema_func(receiving_descriptors, false);
 
+        mcap::Schema 
         // TODO log a version message with the versions specified at opening of new mcap file
         // hytech_msgs::
         // _msg_name_id_map[""]
