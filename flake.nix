@@ -110,7 +110,7 @@
             devShells.tests = pkgs.mkShell rec {
               name = "test-devshell";
               shellHook = ''
- 
+                  export CMAKE_PREFIX_PATH="/nix/store/"
                 '';
               nativeBuiltInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
 
