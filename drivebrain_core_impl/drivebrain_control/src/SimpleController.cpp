@@ -26,6 +26,12 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
         _config.regen_torque_scale = *pval;
         std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale <<std::endl;
     }
+    if (auto pval = std::get_if<float>(&new_param_map.at("positive_speed_set")))
+    {
+        std::unique_lock lk(_config_mutex);
+        _config.positive_speed_set = *pval;
+        std::cout << "setting new positive_speed_set " << _config.positive_speed_set << std::endl;
+    }
 }
 
 bool control::SimpleController::init()
