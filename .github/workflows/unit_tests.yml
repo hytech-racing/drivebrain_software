@@ -16,11 +16,6 @@ jobs:
           repository: hytech-racing/drivebrain_software
           ref: ${{ github.ref }}
 
-      - name: Setup Nix Development Environment 
-        id: setup_nix_env
-        run: |
-          nix develop .#tests --command bash -c 'env > $GITHUB_ENV'
-
       - name: Build and test
         run: |
           nix develop --command bash -c 'mkdir -p build && cd build && cmake .. && make -j && ctest --output-on-failure'
