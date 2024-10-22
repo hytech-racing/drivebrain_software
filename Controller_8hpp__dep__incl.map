@@ -1,0 +1,12 @@
+<map id="drivebrain_core_base/include/public/Controller.hpp" name="drivebrain_core_base/include/public/Controller.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="441,5,629,45"/>
+<area shape="rect" id="node2" href="$ControllerManager_8hpp.html" title=" " alt="" coords="218,101,457,141"/>
+<area shape="rect" id="node4" href="$DrivebrainBase_8hpp.html" title=" " alt="" coords="424,299,645,339"/>
+<area shape="rect" id="node8" href="$SimpleController_8hpp.html" title=" " alt="" coords="657,93,831,148"/>
+<area shape="rect" id="node3" href="$VehicleManager_8hpp.html" title=" " alt="" coords="224,203,451,243"/>
+<area shape="rect" id="node6" href="$VehicleManager_8cpp.html" title=" " alt="" coords="5,299,171,339"/>
+<area shape="rect" id="node7" href="$VehicleMsgConversion_8cpp.html" title=" " alt="" coords="195,299,400,339"/>
+<area shape="rect" id="node5" href="$main_8cpp.html" title=" " alt="" coords="527,387,689,412"/>
+<area shape="rect" id="node9" href="$Controllers_8hpp.html" title=" " alt="" coords="720,196,893,251"/>
+<area shape="rect" id="node10" href="$SimpleController_8cpp.html" title=" " alt="" coords="918,196,1069,251"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="core::common::Configurable" name="core::common::Configurable">
+<area shape="rect" id="node1" title="this is the (partially virtual) class that configurable components inherit from to get parameter acce..." alt="" coords="5,92,185,117"/>
+<area shape="rect" id="node2" href="$classcomms_1_1CANDriver.html" title=" " alt="" coords="279,5,412,31"/>
+<area shape="rect" id="node4" href="$classcontrol_1_1ControllerManager.html" title=" " alt="" coords="233,55,457,95"/>
+<area shape="rect" id="node5" href="$classcontrol_1_1SimpleController.html" title=" " alt="" coords="264,120,427,145"/>
+<area shape="rect" id="node6" href="$classcore_1_1StateEstimator.html" title=" " alt="" coords="276,169,415,195"/>
+<area shape="rect" id="node3" href="$classTestCAN.html" title=" " alt="" coords="505,5,581,31"/>
+</map>

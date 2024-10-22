@@ -1,0 +1,6 @@
+<map id="drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include" name="drivebrain_core_impl/drivebrain_comms/car_CAN_driver/include">
+<area shape="rect" id="node1" href="dir_015a201eb961006787e16de3dcf49764.html" title="include" alt="" coords="47,52,109,77"/>
+<area shape="rect" id="node2" href="dir_6bbc3939413c2e9f5e1089331c4f1db6.html" title="drivebrain_core_base" alt="" coords="5,125,151,151"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000009_000005.html" title="3" alt="" coords="82,99,90,114"/>
+<area shape="rect" id="clust1" href="dir_d8587d79161a6ff5c7e4255447b64bdb.html" title="car_CAN_driver" alt="" coords="21,16,135,88"/>
+</map>
