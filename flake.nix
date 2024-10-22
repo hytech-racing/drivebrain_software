@@ -1,5 +1,4 @@
-rec {
-
+{
   description = "drivebrain flake";
 
   inputs = {
@@ -17,12 +16,12 @@ rec {
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    # fug it we ball, description is a variable
     HT_proto =
       {
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
+        ref = "2024-10-15T07_06_59";
         flake = false;
       };
 
@@ -31,7 +30,7 @@ rec {
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/121";
+    ht_can.url = "github:hytech-racing/ht_can/132";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
 
     data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";
@@ -41,8 +40,10 @@ rec {
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
+    matlab-math.url = "github:hytech-racing/MATLAB-math";
+
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab-math, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -56,7 +57,7 @@ rec {
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = "0.0.1";
+          version = HT_proto.rev;
           src = "${HT_proto}/proto";
         };
         db_service = nix-proto.mkProtoDerivation
@@ -69,6 +70,11 @@ rec {
             };
           };
       };
+      my_overlays = [
+        (final: prev: {
+          drivebrain_software = final.callPackage ./default.nix { };
+        })
+      ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
     in
     flake-parts.lib.mkFlake { inherit inputs; }
@@ -84,11 +90,7 @@ rec {
 
 
         flake.overlays = {
-          db_overlay = final: prev: {
-            drivebrain_software = final.callPackage ./default.nix { };
-          };
-          inherit nix-proto-foxglove-overlays;
-
+          default = nixpkgs.lib.composeManyExtensions my_overlays;
         };
 
         perSystem = { config, pkgs, system, ... }:
@@ -97,10 +99,11 @@ rec {
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
+                matlab-math.overlays.default
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
-                self.overlays.db_overlay
+                self.overlays.default
               ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               config = { };
             };
@@ -129,10 +132,11 @@ rec {
               import nixpkgs {
                 inherit system;
                 overlays = [
+                  matlab-math.overlays.default
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
-                  self.overlays.db_overlay
+                  self.overlays.default
                 ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };

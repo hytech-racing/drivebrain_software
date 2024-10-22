@@ -6,3 +6,6 @@ result-dev
 result-dev/
 *.mcap
 core.*
+result-man/
+result-man
+.cache/

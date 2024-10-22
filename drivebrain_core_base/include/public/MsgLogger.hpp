@@ -9,6 +9,7 @@
 #include <functional>
 #include <condition_variable>
 #include <mutex>
+#include <filesystem>
 
 #include "hytech_msgs.pb.h"
 #include <google/protobuf/message.h>
@@ -68,19 +69,9 @@ namespace core
 
             if (logging)
             {
-                auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-                {
-                    std::unique_lock lk(_mtx);
-
-                    _handle_output_messages(msg, _logger_msg_function);
-                    _handle_output_messages(msg, _live_msg_output_func);
-                }
+                _handle_output_messages(msg, _logger_msg_function);   
             }
-            else
-            {
-                std::unique_lock lk(_mtx);
-                _handle_output_messages(msg, _live_msg_output_func);
-            }
+            _handle_output_messages(msg, _live_msg_output_func);
         }
 
         // will only open a new file for logging if we are not currently logging
@@ -123,6 +114,11 @@ namespace core
 
             // Create a stringstream to format the date and time
             std::stringstream ss;
+            namespace fs = std::filesystem;
+            if(fs::exists("/etc/nixos"))
+            {
+                ss << "/home/nixos/recordings/";
+            }
 
             ss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S")
                << extension;
@@ -132,16 +128,7 @@ namespace core
         }
 
         void _handle_output_messages(MsgType msg, std::function<void(MsgType)> output_function)
-        {
-            auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(msg);
-            if (out_msg->GetDescriptor()->name() == "MCUOutputData")
-            {
-                auto cast_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(out_msg);
-                if (cast_msg->brake_percent() == 0)
-                {
-                    std::cout << "empty msg recvd at output level" << std::endl;
-                }
-            }
+        {            
             output_function(msg);
         }
 
