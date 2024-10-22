@@ -20,6 +20,7 @@ jobs:
         run: | 
           nix develop .#tests
           ls /nix/store/
+          echo $CMAKE_PREFIX_PATH
 
         
       
