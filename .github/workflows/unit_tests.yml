@@ -10,15 +10,24 @@ jobs:
     steps:
       - uses: cachix/install-nix-action@v29
 
-      - name: Build And Test
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: hytech-racing/drivebrain_software
           ref: ${{ github.ref }}
 
-      - name: Enter the development environment
+      - name: Setup Nix Development Environment 
+        id: setup_nix_env
+        run: |
+          nix develop .#tests --command bash -c 'env > $GITHUB_ENV'
+
+      - name: Build
         run: | 
-          nix develop .#tests --command bash -c 'mkdir -p build && cd build && cmake .. && make -j && ctest'
+          mkdir -p build && cd build && cmake .. && make -j
+      
+      - name: Run Tests
+        run: | 
+          cd build && ctest --output-on-failure
 
         
       
