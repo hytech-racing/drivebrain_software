@@ -25,7 +25,7 @@ find_package(libvncxx REQUIRED)
 
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
@@ -76,14 +76,16 @@ target_link_libraries(drivebrain_core PUBLIC
 make_cmake_package(drivebrain_core drivebrain)
 
 
-add_library(drivebrain_common_utils INTERFACE)
+add_library(drivebrain_common_utils SHARED 
+    drivebrain_core_impl/drivebrain_common_utils/src/ProtobufUtils.cpp
+)
 
-target_include_directories(drivebrain_common_utils INTERFACE
+target_include_directories(drivebrain_common_utils PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_common_utils/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_common_utils/include>
 )
 
-target_link_libraries(drivebrain_common_utils INTERFACE
+target_link_libraries(drivebrain_common_utils PUBLIC
     protobuf::libprotobuf
 )
 
@@ -155,10 +157,6 @@ target_link_libraries(drivebrain_mcap_logger PUBLIC
     protobuf::libprotobuf
     mcap::mcap
 )
-
-# target_link_libraries(drivebrain_mcap_logger INTERFACE
-#     mcap::mcap
-# )
 
 target_include_directories(drivebrain_mcap_logger PUBLIC
     $<INSTALL_INTERFACE:version_header>
@@ -254,7 +252,14 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_control
     drivebrain_comms
     drivebrain_mcap_logger
+    Boost::program_options
 )
+
+target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+
 
 include(GNUInstallDirs)
 install(TARGETS 

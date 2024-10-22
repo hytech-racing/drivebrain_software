@@ -47,7 +47,6 @@ namespace core
                 _open_log_function(log_name);
                 _logging = init_logging;
             }
-
         }
 
         ~MsgLogger()
@@ -62,7 +61,13 @@ namespace core
         void log_msg(MsgType msg)
         {
             // TODO maybe make this also more thread safe ... ?
-            if (_logging)
+            bool logging = true;
+            {
+                std::unique_lock lk(_mtx);
+                logging = _logging;
+            }
+
+            if (logging)
             {
                 _handle_output_messages(msg, _logger_msg_function);   
             }
@@ -131,7 +136,6 @@ namespace core
         bool _running = true;
         bool _logging = false;
         std::mutex _mtx;
-        ThreadSafeOutput _thread_safe_log, _thread_safe_live_output;
 
         std::string _log_file_extension;
         std::string _current_log_name = "NONE";

@@ -1,6 +1,7 @@
 {
     "CANDriver": {
-        "canbus_device": "vcan0"
+        "canbus_device": "vcan0",
+        "path_to_dbc": "/home/ben/drivebrain_software/config/hytech.dbc"
     },
     "SimpleController": {
         "max_torque": 21,
@@ -48,6 +49,12 @@
         "x3_rr": 1165,
         "y1_rr": 451,
         "y2_rr": 565,
-        "y3_rr": 734
+        "y3_rr": 734,
+        "use_fake_data": false,
+        "Fake_Vx": 3.0,
+        "DriveBiasFront": 1.0,
+        "BrakeBiasFront": 1.0,
+        "fake_psi_dot": 0.2,
+        "integral_gain": 1414
     }
 }

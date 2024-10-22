@@ -70,7 +70,13 @@ namespace control
         }
         ~ControllerManager() = default;
 
+        /// @brief configurable required init function
+        /// @return true or false depending on success of init
         bool init();
+
+        /// @brief TODO maybe remove this
+        /// @param new_controller_index 
+        /// @return 
         bool attempt_controller_change(size_t new_controller_index)
         {
             static const size_t num_controllers = NumControllers;
@@ -83,7 +89,7 @@ namespace control
                 return true;
             }
         }
-
+        
         float get_active_controller_timestep()
         {
             return _controllers[_current_controller_index]->get_dt_sec();

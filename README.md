@@ -1,3 +1,16 @@
+## quickstart
+
+### native platform nix build:
+`nix build`
+
+### development building
+```nix develop```
+
+```build```
+
+### cross-compile natively (if on x86)
+`nix build .#legacyPackages.x86_64-linux.pkgsCross.aarch64-multiplatform.drivebrain_software`
+
 ## design
 
 [wiki link](https://wiki.hytechracing.org/books/software/page/drivebrain-architecture-rev1)

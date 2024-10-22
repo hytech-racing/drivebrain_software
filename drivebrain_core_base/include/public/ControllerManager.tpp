@@ -4,9 +4,9 @@
 template <typename ControllerType, size_t NumControllers>
 bool control::ControllerManager<ControllerType, NumControllers>::init()
 {
-    auto max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
-    auto max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
-    auto max_accel_switch_request = get_parameter_value<float>("max_accel_switch_float");
+    std::optional max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
+    std::optional max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
+    std::optional max_accel_switch_request = get_parameter_value<float>("max_accel_switch_float");
 
     if (!(max_switch_speed && max_torque_switch && max_accel_switch_request))
     {
@@ -17,6 +17,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     if ((*max_accel_switch_request) > 1.0)
     {
         std::cout << "ERROR: max accel switch float is greater than max value possible (1.0)" << std::endl;
+        return false;
     }
 
     _max_switch_rpm = ((*max_switch_speed) * constants::METERS_PER_SECOND_TO_RPM);
@@ -25,8 +26,6 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
 
     return true;
 }
-
-
 
 template <typename ControllerType, size_t NumControllers>
 core::control::ControllerManagerStatus control::ControllerManager<ControllerType, NumControllers>::_can_switch_controller(const core::VehicleState &current_state,
@@ -39,6 +38,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // Check if torque delta permits mode change
     bool torqueDeltaPreventsModeChange = true;
 
+    // shared function to check if values are above a maximum value
     auto check_veh_vec = [](veh_vec<float> vehicle_vector, float max_val, bool check_with_abs) -> bool
     {
         if (check_with_abs)
@@ -57,11 +57,18 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         }
     };
 
+    // check to see if current drivetrain rpms are too high to switch controller
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
         return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
     }
 
+
+    // function to check whether or not the controller output is with range. 
+    // can determine what type the controller output is and checks to see whether or not it has issues.
+
+    // if the controller output is a speed controller type: checks both desired rpms level and max torque limit level to verify range.
+    // if the controller output is a torque controller type: only checks the torque setpoint
     auto verify_controller_output = [this, &check_veh_vec](const core::ControllerOutput &controller_output) -> bool
     {
         if (const core::SpeedControlOut *pval = std::get_if<core::SpeedControlOut>(&controller_output.out))
