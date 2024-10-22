@@ -18,11 +18,7 @@ jobs:
 
       - name: Enter the development environment
         run: | 
-          nix develop .#tests
-          ls /nix/store/
-          echo "start of prefix path"
-          echo $CMAKE_PREFIX_PATH
-          echo "end of prefix path"
+          nix develop .#tests --command bash -c 'mkdir -p build && cd build && cmake .. && make -j && ctest'
 
         
       
