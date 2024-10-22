@@ -1,7 +1,8 @@
 name: Generate doxygen docs and deploy to github pages
 
 on:
-  push
+  push:
+    branch: master
 
 jobs:
 
