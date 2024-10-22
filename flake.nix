@@ -108,7 +108,7 @@
             };
 
             devShells.tests = pkgs.mkShell rec {
-              name = "nix-devshell";
+              name = "test-devshell";
               shellHook = ''
  
                 '';
