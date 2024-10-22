@@ -20,7 +20,9 @@ jobs:
         run: | 
           nix develop .#tests
           ls /nix/store/
+          echo "start of prefix path"
           echo $CMAKE_PREFIX_PATH
+          echo "end of prefix path"
 
         
       
