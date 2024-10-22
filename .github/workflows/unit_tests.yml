@@ -8,11 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install nix
       - uses: cachix/install-nix-action@v29
 
       - name: Build And Test
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
         with:
           repository: hytech-racing/drivebrain_software
           ref: ${{ github.ref }}
@@ -22,4 +21,5 @@ jobs:
           nix develop .#tests
           ls /nix/store/
 
-  
+        
+      
