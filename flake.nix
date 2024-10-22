@@ -109,7 +109,10 @@
 
             devShells.tests = pkgs.mkShell rec {
               name = "test-devshell";
-              shellHook = ''
+        
+              shellHook =
+                let icon = "f121";
+                in ''
                   dbc_path=${pkgs.ht_can_pkg}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
