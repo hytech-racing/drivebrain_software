@@ -110,7 +110,10 @@
             devShells.tests = pkgs.mkShell rec {
               name = "test-devshell";
               shellHook = ''
-                  export PLUH="hello"
+                  dbc_path=${pkgs.ht_can_pkg}
+                  export DBC_PATH=$dbc_path
+                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
+                  alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
 
               nativeBuiltInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
@@ -130,7 +133,6 @@
                   (final: _: { drivebrain_software = final.callPackage ./default.nix { }; })
                 ]
                 ++ data_acq.overlays.x86_64-linux;
-                # ++ self.flake.overlays;
               };
           };
       };
