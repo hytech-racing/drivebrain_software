@@ -9,7 +9,7 @@ namespace constants
 {
     constexpr long double GEARBOX_RATIO               = 11.86;
     constexpr long double WHEEL_DIAMETER              = 0.4064; // meters
-    constexpr long double RPM_TO_METERS_PER_SECOND    = WHEEL_DIAMETER * 3.1415 / GEARBOX_RATIO / 60.0;
+    constexpr long double RPM_TO_METERS_PER_SECOND    = WHEEL_DIAMETER * 3.1415 / GEARBOX_RATIO / 60.0; //0.00179413
     constexpr long double RPM_TO_KILOMETERS_PER_HOUR  = RPM_TO_METERS_PER_SECOND * 3600.0 / 1000.0;
     constexpr long double METERS_PER_SECOND_TO_RPM    = 1.0 / RPM_TO_METERS_PER_SECOND;
 
