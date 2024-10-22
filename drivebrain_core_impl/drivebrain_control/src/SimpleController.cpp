@@ -34,7 +34,7 @@ bool control::SimpleController::init()
     std::optional max_regen_torque = get_live_parameter<torque_nm>("max_regen_torque");
     std::optional rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
     std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
-    std::optional positive_speed_set = get_parameter_value<speed_m_s>("positive_speed_set");
+    std::optional positive_speed_set = get_live_parameter<speed_m_s>("positive_speed_set");
 
     if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
     {
