@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Drivebrain Software: Main Page</title>
+<title>Drivebrain Software: design</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -68,10 +68,204 @@ $(function() {
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">Drivebrain Software Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">design </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p ><a class="anchor" id="md_README"></a> <a href="https://wiki.hytechracing.org/books/software/page/drivebrain-architecture-rev1">wiki link</a></p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+implementation details</h1>
+<ul>
+<li><code>drivebrain_core_base</code> shouldnt change from car to car but <code>drivebrain_core_impl</code> may change</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md2"></a>
+first pass</h1>
+<p >ideas:</p><ul>
+<li>at first, we will generate protobuf message descriptions from the simulink model</li>
+<li>we will do handle manual integration for any new inputs / outputs</li>
+</ul>
+<p >questions:</p><ol type="1">
+<li>do we want to separate the state estimation and the controllers?<ul>
+<li>I think so since we can iterate on controllers faster than state estimation and switch between them using the same plugin/library defined state estimation systems.</li>
+</ul>
+</li>
+<li>does it really make sense to have the state estimation be separated from the controller when they are both developed in simulink?<ul>
+<li>maybe...?</li>
+<li>how will we handle having both the state estimation and the controller in simulink lap sim AND having to have wrapper code for when it becomes a separate lib integration?</li>
+</ul>
+</li>
+</ol>
+<p >I think for q2, we can go with keeping the state estimation monolithic?</p>
+<ul>
+<li>keep CASE, just new wrapper code for v1?</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md3"></a>
+prototyping</h1>
+<h2><a class="anchor" id="autotoc_md4"></a>
+ideas about manually implemented controllers vs generated controllers</h2>
+<p >idea: if we have the ability to go both ways for having the ability to both:</p>
+<ol type="1">
+<li>define/add inputs for a simulink model based on a .proto message</li>
+<li>generate a .proto message from either inputs OR outputs of a simulink model</li>
+</ol>
+<p >and generated code for the data passing into and out of proto messages, then we can book-end the controllers and estimators.</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
+release planning</h2>
+<h3><a class="anchor" id="autotoc_md6"></a>
+release notes:</h3>
+<ul>
+<li>verified that we can have both drivebrain and the data_acq bound to the same CAN device and receiving / talking over it<ul>
+<li>due to this, we dont need to have the live telem in the alpha since we will only be using CAN still for this release for all comms</li>
+</ul>
+</li>
+<li>[x] alpha feature set ((start: 8/19) ~2 weeks, 16 days): -&gt; basic control of car with TCU</li>
+<li>[x] basic controller library (7 days) (first pass I want to try out different types of regen handling)<ul>
+<li>[x] live parameter controller interface (2 days, 50%)</li>
+<li>[x] simple controller business logic (1 day)</li>
+<li>[x] basic state estimator that can be sampled and manages state (2 days)</li>
+</ul>
+</li>
+<li>[x] create the state estimation system that can hold multiple state estimators (2 days)<ul>
+<li>[x] create a state of the car that can be updated by each of the drivers (1 day)</li>
+<li>[x] integrate the driver inputs into state estimator for creating a shared state (2 days)</li>
+</ul>
+</li>
+<li>[x] CAN MCU driver library (4 days)<ul>
+<li>[x] DBC based parsing</li>
+<li>[x] async receiving and transmitting with Boost.Asio (2 days)</li>
+<li>[x] protobuf message packing (2 days)</li>
+<li>[x] simple internal communication with basic controller (1 day)</li>
+</ul>
+</li>
+<li>[x] application runtime (1 day)</li>
+<li>[x] foxglove live parameter server and websocket integration (1 day)</li>
+</ul>
+<p >beta feature set (4 weeks): -&gt; existing controller on TCU with telemetry and recording</p>
+<p >(WEEK 1):</p><ul>
+<li>[ ] switch to using ethernet comms for comms between drivebrain and teensy (2 days)</li>
+<li>[ ] vectornav UART driver integration that adds new messages to the message bus (1 week)</li>
+</ul>
+<p >(WEEK 2):</p><ul>
+<li>[ ] grpc server interface for switching between controllers (1 day)</li>
+<li>[ ] controller manager implementation (4 days)<ul>
+<li>[ ] be able to switch between controllers in a safe manor while driving (2 days, 50% done)</li>
+<li>[ ] hook into the grpc server through some method for handling the switch (2 days)</li>
+</ul>
+</li>
+</ul>
+<p >(WEEK 3)</p><ul>
+<li>[ ] improve protobuf generation from DBC by supporting enums properly (1 day)<ul>
+<li>tied to making the DBC parser also able to handle enums</li>
+</ul>
+</li>
+<li>[ ] CAN driver improvements (1 day)<ul>
+<li>[ ] make the DBC parser also be able to handle enums</li>
+</ul>
+</li>
+</ul>
+<p >(WEEK 4):</p><ul>
+<li>[ ] implement MCAP recording of all messages between components (1 week)<ul>
+<li>[ ] implement MCAP recording componenet (3 days)</li>
+<li>[ ] driver inputs into state estimator (1 day)</li>
+<li>[ ] state estimation output (1 day)</li>
+<li>[ ] controller output to the car (1 day)</li>
+</ul>
+</li>
+</ul>
+<p >(WEEK 5):</p><ul>
+<li>[ ] add CASE to controllers available to switch to (3 days)</li>
+<li>[ ] implement live telemetry of all messages (4 days)<ul>
+<li>[ ] add to the foxglove server interface the ability to live output protobuf messages (2 days)</li>
+<li>[ ] hookup all components (2 days)</li>
+</ul>
+</li>
+</ul>
+<p >v1 feature set (3 weeks): -&gt;</p><ul>
+<li>[ ] LQR based controller integrated onto car for torque vectoring (2 weeks)</li>
+<li>[ ] luke's models integrated into state estimator (1 week)</li>
+</ul>
+<p >v1.1 feature set (): -&gt; ht09-capable</p><ul>
+<li>[ ] be able <br  />
+</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md7"></a>
+TODOs</h2>
+<ul>
+<li>[ ] make a controller manager for switching between controllers</li>
+<li>[ ] implement simple controller to use for testing<ul>
+<li>end to end test of the controller?</li>
+</ul>
+</li>
+<li>[ ] write tests<ul>
+<li>will obv want to also have these run in CI (<code>nix develop</code> devshell works pretty well for this and we can use the same testing framework that is used by our platformio stuff for easy of knowledge sharing)</li>
+</ul>
+</li>
+<li>[ ] implement the core protocol over UART for the controller to talk directly to the micro<ul>
+<li>the output of this would also benefit from the commschamp to protobuf message adapter since we want to be able to log this output by default<ul>
+<li>these driver comms between the micro</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>[ ] make an interface for the foxglove parameter server<ul>
+<li>this will also need to talk with both the controller manager and the</li>
+<li>how will we hook this up into the controller and state estimator?</li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md8"></a>
+resources / libs to use</h2>
+<p >(potential) for CAN interaction: <a href="https://github.com/SimonCahill/libsockcanpp">https://github.com/SimonCahill/libsockcanpp</a></p>
+<p >for CAN parsing: <a href="https://github.com/xR3b0rn/dbcppp">https://github.com/xR3b0rn/dbcppp</a></p>
+<h1><a class="anchor" id="autotoc_md9"></a>
+what we want from the drivebrain driver bus</h1>
+<p >how much do we want to tie in protobuf?</p><ul>
+<li>do we want each driver to have to deal with protobufs or do we want them to output something else?<ul>
+<li>we need a way to unify each driver's output to the driver bus<ul>
+<li>I think it would be fine to have each driver be able to define their own protobuf message for output<ul>
+<li>we cant have a single message type that we compose from the driver messages</li>
+<li>we will need some sort of registration for each message type</li>
+</ul>
+</li>
+<li>each driver can act as an adapter to protobuf messages</li>
+<li>do we want to be able to have N messages be returned from each driver? or does each driver have to only output one message?<ul>
+<li>we still want to be able to have a single message per topic in foxglove / mcap</li>
+<li>we can have named channels in each driver</li>
+<li>protobuf introspection for the data acq</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p >what about a json based message struct generator for setting what each driver can output?</p><ul>
+<li>we can generate the json with matlab too and so we can hook into the code gen</li>
+<li>we can generate protos and adapter code between the struct and the resulting protobuf message to output requirements:</li>
+</ul>
+<p >needs to be composed directly from drivers it is composed of</p><ul>
+<li>the drivers being used are known at compile time</li>
+</ul>
+<p >parameter interface</p><ul>
+<li>the drivers have to a parameter update function that can be used outside of initialization</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md10"></a>
+development</h1>
+<p ><code>nix develop</code> enters you into the devshell for building with cmake</p>
+<p >example <code>c_cpp_properties.json</code> file to be placed in your <code>.vscode/</code>: </p><div class="fragment"><div class="line">{</div>
+<div class="line">    &quot;configurations&quot;: [</div>
+<div class="line">        {</div>
+<div class="line">            &quot;name&quot;: &quot;dev&quot;,</div>
+<div class="line">            &quot;includePath&quot;: [</div>
+<div class="line">                &quot;${workspaceFolder}/**&quot;</div>
+<div class="line">            ],</div>
+<div class="line">            &quot;defines&quot;: [],</div>
+<div class="line">            &quot;compileCommands&quot;: &quot;${workspaceFolder}/build/compile_commands.json&quot;</div>
+<div class="line">        }</div>
+<div class="line">    ],</div>
+<div class="line">    &quot;version&quot;: 4</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
