@@ -1,0 +1,60 @@
+{
+    "CANDriver": {
+        "canbus_device": "vcan0",
+        "path_to_dbc": "/home/ben/drivebrain_software/config/hytech.dbc"
+    },
+    "SimpleController": {
+        "max_torque": 21,
+        "max_regen_torque": 10.0,
+        "rear_torque_scale": 1.0,
+        "regen_torque_scale": 0.6,
+        "positive_speed_set" : 3
+    }, 
+    "VNDriver": {
+        "device_name": "/dev/ttyUSB0",
+        "baud_rate": 921600, 
+        "port": 1,
+        "freq_divisor": 1
+    },
+    "MatlabMath":
+    {
+        "lmux_fl": 1,
+        "lmuy_fl": 1,
+        "lmux_fr": 1,
+        "lmuy_fr": 1,
+        "lmux_rl": 1,
+        "lmuy_rl": 1,
+        "lmux_rr": 1,
+        "lmuy_rr": 1,
+        "x1_fl": 604,
+        "x2_fl": 1073,
+        "x3_fl": 1320,
+        "y1_fl": 385,
+        "y2_fl": 598,
+        "y3_fl": 718,
+        "x1_fr": 761,
+        "x2_fr": 1276,
+        "x3_fr": 1570,
+        "y1_fr": 440,
+        "y2_fr": 654,
+        "y3_fr": 684,
+        "x1_rl": 906,
+        "x2_rl": 1160,
+        "x3_rl": 1496,
+        "y1_rl": 517,
+        "y2_rl": 637,
+        "y3_rl": 819,
+        "x1_rr": 638,
+        "x2_rr": 855,
+        "x3_rr": 1165,
+        "y1_rr": 451,
+        "y2_rr": 565,
+        "y3_rr": 734,
+        "use_fake_data": false,
+        "Fake_Vx": 3.0,
+        "DriveBiasFront": 1.0,
+        "BrakeBiasFront": 1.0,
+        "fake_psi_dot": 0.2,
+        "integral_gain": 1414
+    }
+}

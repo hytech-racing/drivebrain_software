@@ -1,0 +1,26 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+package db_service.v1.service;
+
+message DesiredController {
+    uint32 requested_controller_index = 1;
+}
+
+message ControllerChangeStatus {
+    string status = 1;
+}
+
+message LoggerStatus
+{
+    bool currently_logging = 1;
+    string active_or_previous_log_file_name = 2;
+}
+
+service DBInterface
+{
+    rpc RequestControllerChange (DesiredController) returns (ControllerChangeStatus);
+    rpc RequestStopLogging (google.protobuf.Empty) returns (LoggerStatus);
+    rpc RequestCurrentLoggerStatus (google.protobuf.Empty) returns (LoggerStatus);
+    rpc RequestStartLogging (google.protobuf.Empty) returns (LoggerStatus);
+}

@@ -29,12 +29,7 @@ class SimpleControllerTest : public testing::Test {
 };
 
 TEST_F(SimpleControllerTest, MaxRPM) {
-    core::VehicleState in = {
-        true, // is_ready_to_drive
-        { 0.0, 0.0 }, // driver input
-        { 0.0, 0.0, 0.0, 0.0 }, // current rpms
-        { 0.0, 0.0, 0.0 } // current velocity body
-    };
+    core::VehicleState in;
     auto res = simple_controller.step_controller(in);
-    ASSERT_LT(res.desired_rpms().fl(), 20000);
+    ASSERT_LT(res.desired_rpms.FL, 20000);
 }

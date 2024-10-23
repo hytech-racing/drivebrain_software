@@ -7,8 +7,6 @@
 #include <boost/signals2.hpp>
 
 #include <string>
-#include <iostream>
-#include <functional>
 #include <mutex>
 #include <unordered_map>
 #include <optional>
@@ -139,7 +137,7 @@ namespace core
                 // Access the specific key within the component's section
                 if (!config[_component_name].contains(key))
                 {
-                    auto log_str = std::string("config file does not contain config: ") + key + std::string("for component: ") + _component_name;
+                    auto log_str = std::string("config file does not contain config: ") + key + std::string(" for component: ") + _component_name;
                     _logger.log_string(log_str, core::LogLevel::WARNING);
 
                     return std::nullopt;

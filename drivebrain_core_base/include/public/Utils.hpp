@@ -24,5 +24,13 @@ struct xyz_vec
     T z;
 };
 
+template <typename T>
+struct ypr_vec 
+{   
+    T yaw;
+    T pitch;
+    T roll;
+};
+
 
 #endif // __UTILS_H__

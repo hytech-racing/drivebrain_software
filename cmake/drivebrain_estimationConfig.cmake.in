@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/drivebrain_estimationTargets.cmake")
+
+find_dependency(matlab_math)
+find_dependency(drivebrain)
+
+check_required_components(drivebrain_estimation)
