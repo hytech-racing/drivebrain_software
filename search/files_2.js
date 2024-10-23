@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['example_5fboost_5fasio_5fcan_2ecpp_0',['example_boost_asio_can.cpp',['../example__boost__asio__can_8cpp.html',1,'']]]
+  ['foxglove_5fserver_2ecpp_0',['foxglove_server.cpp',['../foxglove__server_8cpp.html',1,'']]],
+  ['foxglove_5fserver_2ehpp_1',['foxglove_server.hpp',['../foxglove__server_8hpp.html',1,'']]]
 ];

@@ -77,42 +77,40 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="Controller_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;<a class="code" href="Configurable_8hpp.html">Configurable.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// virtual base class for a controller</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">// STORY:</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// handling inputs:</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// I want to be able to have both &quot;reactionary&quot; or &quot;sample-based&quot; modes of communication between the input and the</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <span class="comment">// reactionary: upon arrival of the data the controller executes ~~</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>        <span class="comment">// this probably wont be a thing for us to do, NOTODO</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="comment">// sample-based: fixed rate per-each controller</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// we need to have a core piece of the controller be that the inputs must be coming in at a reasonable time period</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="comment">// as a part of the config for each controller we need to have a maximum input period that can ellapse before</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="comment">// controller disables output</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// we want to be able to have controllers that require the drivetrain to be in a certain state / control mode</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// we want to be able to output different types of output from each controller.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// the controller should have access to the parameter server and be &quot;Configurable&quot;</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="namespacecontrol.html">   20</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecontrol.html">control</a></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>{</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ControllerResult, <span class="keyword">typename</span> ControllerInput&gt;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html">   23</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcontrol_1_1Controller.html">Controller</a></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00">   26</a></span>        <a class="code hl_function" href="classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00">Controller</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#ab06632501f2dc8d127353846257f597d">   29</a></span>        <span class="keyword">virtual</span> <span class="keywordtype">float</span> <a class="code hl_function" href="classcontrol_1_1Controller.html#ab06632501f2dc8d127353846257f597d">get_dt_sec</a>() = 0;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287">   34</a></span>        <span class="keyword">virtual</span> ControllerResult <a class="code hl_function" href="classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287">step_controller</a>(<span class="keyword">const</span> ControllerInput&amp; in) = 0;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    };</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>}</div>
-<div class="ttc" id="aConfigurable_8hpp_html"><div class="ttname"><a href="Configurable_8hpp.html">Configurable.hpp</a></div></div>
-<div class="ttc" id="aclasscontrol_1_1Controller_html"><div class="ttname"><a href="classcontrol_1_1Controller.html">control::Controller</a></div><div class="ttdef"><b>Definition:</b> Controller.hpp:24</div></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// virtual base class for a controller</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// STORY:</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// handling inputs:</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// I want to be able to have both &quot;reactionary&quot; or &quot;sample-based&quot; modes of communication between the input and the</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <span class="comment">// reactionary: upon arrival of the data the controller executes ~~</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        <span class="comment">// this probably wont be a thing for us to do, NOTODO</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="comment">// sample-based: fixed rate per-each controller</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// we need to have a core piece of the controller be that the inputs must be coming in at a reasonable time period</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <span class="comment">// as a part of the config for each controller we need to have a maximum input period that can ellapse before</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="comment">// controller disables output</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// we want to be able to have controllers that require the drivetrain to be in a certain state / control mode</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// we want to be able to output different types of output from each controller.</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// the controller should have access to the parameter server and be &quot;Configurable&quot;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespacecontrol.html">   19</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecontrol.html">control</a></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>{</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ControllerResult, <span class="keyword">typename</span> ControllerInput&gt;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html">   22</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcontrol_1_1Controller.html">Controller</a></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00">   25</a></span>        <a class="code hl_function" href="classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00">Controller</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#ab06632501f2dc8d127353846257f597d">   28</a></span>        <span class="keyword">virtual</span> <span class="keywordtype">float</span> <a class="code hl_function" href="classcontrol_1_1Controller.html#ab06632501f2dc8d127353846257f597d">get_dt_sec</a>() = 0;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287">   33</a></span>        <span class="keyword">virtual</span> ControllerResult <a class="code hl_function" href="classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287">step_controller</a>(<span class="keyword">const</span> ControllerInput&amp; in) = 0;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    };</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}</div>
+<div class="ttc" id="aclasscontrol_1_1Controller_html"><div class="ttname"><a href="classcontrol_1_1Controller.html">control::Controller</a></div><div class="ttdef"><b>Definition:</b> Controller.hpp:23</div></div>
 <div class="ttc" id="aclasscontrol_1_1Controller_html_a6b1af2cf6fd467ecd46c0651ae6b8287"><div class="ttname"><a href="classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287">control::Controller::step_controller</a></div><div class="ttdeci">virtual ControllerResult step_controller(const ControllerInput &amp;in)=0</div><div class="ttdoc">step the controller</div></div>
 <div class="ttc" id="aclasscontrol_1_1Controller_html_ab06632501f2dc8d127353846257f597d"><div class="ttname"><a href="classcontrol_1_1Controller.html#ab06632501f2dc8d127353846257f597d">control::Controller::get_dt_sec</a></div><div class="ttdeci">virtual float get_dt_sec()=0</div><div class="ttdoc">get the desired time delta / discrete time step length in seconds of the controller</div></div>
 <div class="ttc" id="aclasscontrol_1_1Controller_html_af649641bd99f58e34bd6da34e74c4d00"><div class="ttname"><a href="classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00">control::Controller::Controller</a></div><div class="ttdeci">Controller()=default</div></div>
-<div class="ttc" id="anamespacecontrol_html"><div class="ttname"><a href="namespacecontrol.html">control</a></div><div class="ttdef"><b>Definition:</b> Controller.hpp:21</div></div>
+<div class="ttc" id="anamespacecontrol_html"><div class="ttname"><a href="namespacecontrol.html">control</a></div><div class="ttdef"><b>Definition:</b> Controller.hpp:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

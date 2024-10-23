@@ -1,5 +1,4 @@
 <map id="core::SpeedControlOut" name="core::SpeedControlOut">
-<area shape="rect" id="node1" title=" " alt="" coords="105,137,257,163"/>
-<area shape="rect" id="node2" href="$structveh__vec.html" title=" " alt="" coords="5,5,172,31"/>
-<area shape="rect" id="node3" href="$structveh__vec.html" title=" " alt="" coords="197,5,351,31"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,108,157,133"/>
+<area shape="rect" id="node2" href="$structveh__vec.html" title=" " alt="" coords="23,5,140,31"/>
 </map>

@@ -1,14 +1,18 @@
 var searchData=
 [
-  ['veh_5fvec_0',['veh_vec',['../structveh__vec.html',1,'']]],
-  ['veh_5fvec_3c_20torque_5fnm_20_3e_1',['veh_vec&lt; torque_nm &gt;',['../structveh__vec.html',1,'']]],
-  ['veh_5fvec_3c_20velocity_5frpm_20_3e_2',['veh_vec&lt; velocity_rpm &gt;',['../structveh__vec.html',1,'']]],
-  ['vehicledatatypes_2ehpp_3',['VehicleDataTypes.hpp',['../VehicleDataTypes_8hpp.html',1,'']]],
-  ['vehiclemanager_4',['VehicleManager',['../classVehicleManager.html',1,'VehicleManager'],['../classVehicleManager.html#a2471ae8f5dd7521eaf82c4c453e472db',1,'VehicleManager::VehicleManager()']]],
-  ['vehiclemanager_2ecpp_5',['VehicleManager.cpp',['../VehicleManager_8cpp.html',1,'']]],
-  ['vehiclemanager_2ehpp_6',['VehicleManager.hpp',['../VehicleManager_8hpp.html',1,'']]],
-  ['vehiclemsgconversion_2ecpp_7',['VehicleMsgConversion.cpp',['../VehicleMsgConversion_8cpp.html',1,'']]],
-  ['vehiclespeed_8',['VehicleSpeed',['../classVehicleSpeed.html',1,'VehicleSpeed'],['../classVehicleSpeed.html#aee618973e8d167d5dfed3a658735686f',1,'VehicleSpeed::VehicleSpeed()']]],
-  ['vehiclestate_9',['VehicleState',['../structcore_1_1VehicleState.html',1,'core']]],
-  ['velocity_5frpm_10',['velocity_rpm',['../Literals_8hpp.html#a45b65b80344db3577922c0a60626116e',1,'Literals.hpp']]]
+  ['telemetry_2ehpp_0',['Telemetry.hpp',['../Telemetry_8hpp.html',1,'']]],
+  ['threadsafedeque_1',['ThreadSafeDeque',['../structcore_1_1common_1_1ThreadSafeDeque.html',1,'core::common']]],
+  ['threadsafedeque_3c_20common_3a_3amcapprotobuflogger_3a_3aprotobufrawmessage_20_3e_2',['ThreadSafeDeque&lt; common::MCAPProtobufLogger::ProtobufRawMessage &gt;',['../structcore_1_1common_1_1ThreadSafeDeque.html',1,'core::common']]],
+  ['threadsafeoutput_3',['ThreadSafeOutput',['../structcore_1_1MsgLogger_1_1ThreadSafeOutput.html',1,'core::MsgLogger']]],
+  ['tire_5fdynamics_4',['tire_dynamics',['../structcore_1_1VehicleState.html#aeef1c046c5be0b527d3e10b588d6ab74',1,'core::VehicleState::tire_dynamics()'],['../structcore_1_1MatlabMathResult.html#af05f65006a0d1ff422e7d5306403a565',1,'core::MatlabMathResult::tire_dynamics()']]],
+  ['tire_5fforces_5fn_5',['tire_forces_n',['../structcore_1_1TireDynamics.html#a0eb27776075d98520bbe87b19ed0fc0c',1,'core::TireDynamics']]],
+  ['tire_5fmoments_5fnm_6',['tire_moments_nm',['../structcore_1_1TireDynamics.html#a769f5621131eff10941c37edad66a5b3',1,'core::TireDynamics']]],
+  ['tiredynamics_7',['TireDynamics',['../structcore_1_1TireDynamics.html',1,'core::TireDynamics'],['../structcore_1_1TireDynamics.html#a4e16961f6151fa340d695180054e7146',1,'core::TireDynamics::TireDynamics()']]],
+  ['torque_5fadditional_5fnm_8',['torque_additional_nm',['../structcore_1_1TorqueVectoringStatus.html#a52baeb8f2f21f30315fb0d871441986c',1,'core::TorqueVectoringStatus']]],
+  ['torque_5flim_5fnm_9',['torque_lim_nm',['../structcore_1_1SpeedControlOut.html#af4a29bf362cef06f4925e89ed2ca0179',1,'core::SpeedControlOut']]],
+  ['torque_5fnm_10',['torque_nm',['../Literals_8hpp.html#aadfac7c359c9ccc13db143845b0eb645',1,'Literals.hpp']]],
+  ['torque_5fvectoring_5fstatus_11',['torque_vectoring_status',['../structcore_1_1MatlabMathResult.html#a83f17ffacb2f7a097055487d4457b540',1,'core::MatlabMathResult']]],
+  ['torquecontrolout_12',['TorqueControlOut',['../structcore_1_1TorqueControlOut.html',1,'core']]],
+  ['torquevectoringstatus_13',['TorqueVectoringStatus',['../structcore_1_1TorqueVectoringStatus.html',1,'core']]],
+  ['tsq_14',['tsq',['../classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8',1,'core::StateEstimator']]]
 ];

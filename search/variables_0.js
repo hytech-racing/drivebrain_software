@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['current_5fbody_5fvel_5fms_0',['current_body_vel_ms',['../structcore_1_1VehicleState.html#a51cf72031c00b530625967602c6a485d',1,'core::VehicleState']]],
-  ['current_5frpms_1',['current_rpms',['../structcore_1_1VehicleState.html#a11903ce3be72bd7b5645877bf9b5332c',1,'core::VehicleState']]],
-  ['cv_2',['cv',['../structcore_1_1common_1_1ThreadSafeDeque.html#afa7cad6798195afbf42359c2006353e5',1,'core::common::ThreadSafeDeque']]]
+  ['accel_5fsaturation_5fnm_0',['accel_saturation_nm',['../structcore_1_1TireDynamics.html#acb06008538c91378d30ca68d7468b508',1,'core::TireDynamics']]],
+  ['additional_5fmz_5fmoment_5fnm_1',['additional_mz_moment_nm',['../structcore_1_1TorqueVectoringStatus.html#a6280f59b1756ac5b1fcc9d2c4571c71d',1,'core::TorqueVectoringStatus']]]
 ];

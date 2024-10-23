@@ -87,13 +87,17 @@ $(function() {
 Public Types</h2></td></tr>
 <tr class="memitem:a14a14ab99cfb7aad8563c02fe824eb12"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> = <a class="el" href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque</a>&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt;</td></tr>
 <tr class="separator:a14a14ab99cfb7aad8563c02fe824eb12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af21e924ebc5453fdf08bdbc0ad387928"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">loggertype</a> = <a class="el" href="classcore_1_1MsgLogger.html">core::MsgLogger</a>&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt;</td></tr>
+<tr class="separator:af21e924ebc5453fdf08bdbc0ad387928"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2bb090eefcbdd706e8bac4fe1ae01537"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">MCUETHComms</a> ()=delete</td></tr>
 <tr class="separator:a2bb090eefcbdd706e8bac4fe1ae01537"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19825fc469dadf9358eb6e586a764480"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#a19825fc469dadf9358eb6e586a764480">MCUETHComms</a> (<a class="el" href="classcore_1_1Logger.html">core::Logger</a> &amp;logger, <a class="el" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> &amp;in_deq, <a class="el" href="classcore_1_1StateEstimator.html">core::StateEstimator</a> &amp;state_estimator, boost::asio::io_context &amp;io_context, const std::string &amp;send_ip, uint16_t recv_port, uint16_t send_port)</td></tr>
-<tr class="separator:a19825fc469dadf9358eb6e586a764480"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fbf2878cf76c7d8fec5f208669dab67"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#a5fbf2878cf76c7d8fec5f208669dab67">~MCUETHComms</a> ()</td></tr>
+<tr class="separator:a5fbf2878cf76c7d8fec5f208669dab67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73a8f6477f5b3f2b0472a21a4cc4fc0a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1MCUETHComms.html#a73a8f6477f5b3f2b0472a21a4cc4fc0a">MCUETHComms</a> (<a class="el" href="classcore_1_1Logger.html">core::Logger</a> &amp;logger, <a class="el" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> &amp;in_deq, std::shared_ptr&lt; <a class="el" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">loggertype</a> &gt; message_logger, <a class="el" href="classcore_1_1StateEstimator.html">core::StateEstimator</a> &amp;state_estimator, boost::asio::io_context &amp;io_context, const std::string &amp;send_ip, uint16_t recv_port, uint16_t send_port)</td></tr>
+<tr class="separator:a73a8f6477f5b3f2b0472a21a4cc4fc0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a14a14ab99cfb7aad8563c02fe824eb12" name="a14a14ab99cfb7aad8563c02fe824eb12"></a>
@@ -104,6 +108,20 @@ Public Member Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">comms::MCUETHComms::deqtype</a> =  <a class="el" href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque</a>&lt;std::shared_ptr&lt;google::protobuf::Message&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af21e924ebc5453fdf08bdbc0ad387928" name="af21e924ebc5453fdf08bdbc0ad387928"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af21e924ebc5453fdf08bdbc0ad387928">&#9670;&#160;</a></span>loggertype</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">comms::MCUETHComms::loggertype</a> =  <a class="el" href="classcore_1_1MsgLogger.html">core::MsgLogger</a>&lt;std::shared_ptr&lt;google::protobuf::Message&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -136,8 +154,25 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a19825fc469dadf9358eb6e586a764480" name="a19825fc469dadf9358eb6e586a764480"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19825fc469dadf9358eb6e586a764480">&#9670;&#160;</a></span>MCUETHComms() <span class="overload">[2/2]</span></h2>
+<a id="a5fbf2878cf76c7d8fec5f208669dab67" name="a5fbf2878cf76c7d8fec5f208669dab67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fbf2878cf76c7d8fec5f208669dab67">&#9670;&#160;</a></span>~MCUETHComms()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">comms::MCUETHComms::~MCUETHComms </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a73a8f6477f5b3f2b0472a21a4cc4fc0a" name="a73a8f6477f5b3f2b0472a21a4cc4fc0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73a8f6477f5b3f2b0472a21a4cc4fc0a">&#9670;&#160;</a></span>MCUETHComms() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,6 +188,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> &amp;&#160;</td>
           <td class="paramname"><em>in_deq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">loggertype</a> &gt;&#160;</td>
+          <td class="paramname"><em>message_logger</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -195,8 +236,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>drivebrain_core_impl/drivebrain_comms/car_ETH_driver/include/<a class="el" href="MCUETHComms_8hpp_source.html">MCUETHComms.hpp</a></li>
-<li>drivebrain_core_impl/drivebrain_comms/car_ETH_driver/src/<a class="el" href="MCUETHComms_8cpp.html">MCUETHComms.cpp</a></li>
+<li>drivebrain_core_impl/drivebrain_comms/include/<a class="el" href="MCUETHComms_8hpp_source.html">MCUETHComms.hpp</a></li>
+<li>drivebrain_core_impl/drivebrain_comms/src/<a class="el" href="MCUETHComms_8cpp.html">MCUETHComms.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

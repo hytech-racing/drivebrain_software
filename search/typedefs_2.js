@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['paramtypes_0',['ParamTypes',['../classcore_1_1common_1_1Configurable.html#a0bd7931dd5e09b0db6957ce912b1cbf6',1,'core::common::Configurable']]]
+  ['loggertype_0',['loggertype',['../classcomms_1_1CANDriver.html#a9c6f642ac1c395ecd88d46e764793cc1',1,'comms::CANDriver::loggertype()'],['../classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928',1,'comms::MCUETHComms::loggertype()'],['../VNComms_8hpp.html#af04a702c0a3bbd5d155443199395d33b',1,'loggertype():&#160;VNComms.hpp']]]
 ];

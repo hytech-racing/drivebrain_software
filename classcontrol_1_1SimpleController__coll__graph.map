@@ -1,5 +1,5 @@
 <map id="control::SimpleController" name="control::SimpleController">
-<area shape="rect" id="node1" title=" " alt="" coords="289,52,452,77"/>
-<area shape="rect" id="node2" href="$classcontrol_1_1Controller.html" title=" " alt="" coords="5,5,241,60"/>
-<area shape="rect" id="node3" href="$classcore_1_1common_1_1Configurable.html" title="this is the (partially virtual) class that configurable components inherit from to get parameter acce..." alt="" coords="33,84,213,109"/>
+<area shape="rect" id="node1" title=" " alt="" coords="233,52,396,77"/>
+<area shape="rect" id="node2" href="$classcontrol_1_1Controller.html" title=" " alt="" coords="12,5,179,60"/>
+<area shape="rect" id="node3" href="$classcore_1_1common_1_1Configurable.html" title="this is the (partially virtual) class that configurable components inherit from to get parameter acce..." alt="" coords="5,84,185,109"/>
 </map>

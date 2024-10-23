@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['veh_5fvec_0',['veh_vec',['../structveh__vec.html',1,'']]],
-  ['veh_5fvec_3c_20torque_5fnm_20_3e_1',['veh_vec&lt; torque_nm &gt;',['../structveh__vec.html',1,'']]],
-  ['veh_5fvec_3c_20velocity_5frpm_20_3e_2',['veh_vec&lt; velocity_rpm &gt;',['../structveh__vec.html',1,'']]],
-  ['vehiclemanager_3',['VehicleManager',['../classVehicleManager.html',1,'']]],
-  ['vehiclespeed_4',['VehicleSpeed',['../classVehicleSpeed.html',1,'']]],
-  ['vehiclestate_5',['VehicleState',['../structcore_1_1VehicleState.html',1,'core']]]
+  ['threadsafedeque_0',['ThreadSafeDeque',['../structcore_1_1common_1_1ThreadSafeDeque.html',1,'core::common']]],
+  ['threadsafedeque_3c_20common_3a_3amcapprotobuflogger_3a_3aprotobufrawmessage_20_3e_1',['ThreadSafeDeque&lt; common::MCAPProtobufLogger::ProtobufRawMessage &gt;',['../structcore_1_1common_1_1ThreadSafeDeque.html',1,'core::common']]],
+  ['threadsafeoutput_2',['ThreadSafeOutput',['../structcore_1_1MsgLogger_1_1ThreadSafeOutput.html',1,'core::MsgLogger']]],
+  ['tiredynamics_3',['TireDynamics',['../structcore_1_1TireDynamics.html',1,'core']]],
+  ['torquecontrolout_4',['TorqueControlOut',['../structcore_1_1TorqueControlOut.html',1,'core']]],
+  ['torquevectoringstatus_5',['TorqueVectoringStatus',['../structcore_1_1TorqueVectoringStatus.html',1,'core']]]
 ];

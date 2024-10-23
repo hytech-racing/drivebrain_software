@@ -1,27 +1,7 @@
 var searchData=
 [
-  ['cancomms_2ecpp_0',['CANComms.cpp',['../CANComms_8cpp.html',1,'']]],
-  ['cancomms_2ehpp_1',['CANComms.hpp',['../CANComms_8hpp.html',1,'']]],
-  ['candriver_2',['CANDriver',['../classcomms_1_1CANDriver.html#a620117eeba061116d9dc5694c195099e',1,'comms::CANDriver::CANDriver()'],['../classcomms_1_1CANDriver.html',1,'comms::CANDriver']]],
-  ['cansocket_3',['CanSocket',['../classCanSocket.html',1,'CanSocket'],['../classCanSocket.html#ab712389d9a7cad483123485ed39a1f1a',1,'CanSocket::CanSocket()']]],
-  ['common_4',['common',['../namespacecore_1_1common.html',1,'core']]],
-  ['comms_5',['comms',['../namespacecomms.html',1,'']]],
-  ['config_6',['config',['../structcontrol_1_1SimpleController_1_1config.html',1,'control::SimpleController::config'],['../structcore_1_1StateEstimator_1_1config.html',1,'core::StateEstimator::config']]],
-  ['configurable_7',['Configurable',['../classcore_1_1common_1_1Configurable.html#ab5066378b8bac5eb4726e941f94aa8e5',1,'core::common::Configurable::Configurable()'],['../classcore_1_1common_1_1Configurable.html',1,'core::common::Configurable']]],
-  ['configurable_2ecpp_8',['Configurable.cpp',['../Configurable_8cpp.html',1,'']]],
-  ['configurable_2ehpp_9',['Configurable.hpp',['../Configurable_8hpp.html',1,'']]],
-  ['constants_10',['constants',['../namespaceconstants.html',1,'']]],
-  ['control_11',['control',['../namespacecontrol.html',1,'control'],['../namespacecore_1_1control.html',1,'core::control']]],
-  ['controller_12',['Controller',['../classcontrol_1_1Controller.html',1,'control::Controller&lt; ControllerResult, ControllerInput &gt;'],['../classcontrol_1_1Controller.html#af649641bd99f58e34bd6da34e74c4d00',1,'control::Controller::Controller()']]],
-  ['controller_2ehpp_13',['Controller.hpp',['../Controller_8hpp.html',1,'']]],
-  ['controller_3c_20hytech_5fmsgs_3a_3amcucommanddata_2c_20core_3a_3avehiclestate_20_3e_14',['Controller&lt; hytech_msgs::MCUCommandData, core::VehicleState &gt;',['../classcontrol_1_1Controller.html',1,'control']]],
-  ['controllermanager_15',['ControllerManager',['../classcontrol_1_1ControllerManager.html',1,'control::ControllerManager&lt; ControllerType, NumControllers &gt;'],['../classcontrol_1_1ControllerManager.html#a521165442f339f407600fb0b68bfea4c',1,'control::ControllerManager::ControllerManager()']]],
-  ['controllermanager_2ehpp_16',['ControllerManager.hpp',['../ControllerManager_8hpp.html',1,'']]],
-  ['controllermanagerstatus_17',['ControllerManagerStatus',['../namespacecore_1_1control.html#a920a7c50dbfc8c7cdbfa19d55e145900',1,'core::control']]],
-  ['controlleroutput_18',['ControllerOutput',['../structcore_1_1ControllerOutput.html',1,'core']]],
-  ['controllers_2ehpp_19',['Controllers.hpp',['../Controllers_8hpp.html',1,'']]],
-  ['core_20',['core',['../namespacecore.html',1,'']]],
-  ['current_5fbody_5fvel_5fms_21',['current_body_vel_ms',['../structcore_1_1VehicleState.html#a51cf72031c00b530625967602c6a485d',1,'core::VehicleState']]],
-  ['current_5frpms_22',['current_rpms',['../structcore_1_1VehicleState.html#a11903ce3be72bd7b5645877bf9b5332c',1,'core::VehicleState']]],
-  ['cv_23',['cv',['../structcore_1_1common_1_1ThreadSafeDeque.html#afa7cad6798195afbf42359c2006353e5',1,'core::common::ThreadSafeDeque']]]
+  ['baud_5frate_0',['baud_rate',['../structcomms_1_1VNDriver_1_1config.html#aabd6cbeafdcb33bb06c3014ecb20d6ce',1,'comms::VNDriver::config']]],
+  ['brake_5fsaturation_5fnm_1',['brake_saturation_nm',['../structcore_1_1TireDynamics.html#a34ce76d7ce7851e64710a9b11c847a26',1,'core::TireDynamics']]],
+  ['brakebiasfront_2',['BrakeBiasFront',['../structestimation_1_1MatlabMath_1_1config.html#a5974767922fbeae7738ec471de62349e',1,'estimation::MatlabMath::config']]],
+  ['build_5ffile_5fdescriptor_5fset_3',['build_file_descriptor_set',['../namespaceutil.html#af15efc5674ec2eb10949ee4d8f73f090',1,'util']]]
 ];

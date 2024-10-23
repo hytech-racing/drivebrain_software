@@ -1,0 +1,6 @@
+<map id="core::TireDynamics" name="core::TireDynamics">
+<area shape="rect" id="node1" title=" " alt="" coords="120,240,252,265"/>
+<area shape="rect" id="node2" href="$structveh__vec.html" title=" " alt="" coords="5,137,191,163"/>
+<area shape="rect" id="node3" href="$structxyz__vec.html" title=" " alt="" coords="41,5,155,31"/>
+<area shape="rect" id="node4" href="$structveh__vec.html" title=" " alt="" coords="215,137,333,163"/>
+</map>

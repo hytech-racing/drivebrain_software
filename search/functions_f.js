@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['test_0',['TEST',['../test__can__driver_8cpp.html#afada9f130daa7604c45fb28ac385ab7c',1,'TEST(CANDriver, test_construction):&#160;test_can_driver.cpp'],['../test__can__driver_8cpp.html#a3778fe31d4dcdd598b2349635ef67149',1,'TEST(CANDriver, test_CAN_creation):&#160;test_can_driver.cpp'],['../test__can__driver_8cpp.html#aff844e58b211f5f3da0fe81af3f410ad',1,'TEST(CANDriver, test_CAN_recv):&#160;test_can_driver.cpp']]],
-  ['testcan_1',['TestCAN',['../classTestCAN.html#a73e07fd63c44ccd68093d6a0bcb6078a',1,'TestCAN']]]
+  ['register_5fsubscriber_0',['register_subscriber',['../classcomms_1_1PubSub.html#a29f37f022a6f5b4da15215200429f5fd',1,'comms::PubSub']]],
+  ['run_5fserver_1',['run_server',['../classDBInterfaceImpl.html#a8c524aea31036961ccd5febd1cda145d',1,'DBInterfaceImpl']]]
 ];

@@ -86,10 +86,15 @@ Collaboration diagram for core::VehicleState:</div>
 <div class="dyncontent">
 <div class="center"><img src="structcore_1_1VehicleState__coll__graph.png" border="0" usemap="#acore_1_1VehicleState_coll__map" alt="Collaboration graph"/></div>
 <map name="acore_1_1VehicleState_coll__map" id="acore_1_1VehicleState_coll__map">
-<area shape="rect" title=" " alt="" coords="165,93,292,119"/>
-<area shape="rect" href="structcore_1_1DriverInput.html" title=" " alt="" coords="5,5,121,31"/>
-<area shape="rect" href="structveh__vec.html" title=" " alt="" coords="145,5,312,31"/>
-<area shape="rect" href="structxyz__vec.html" title=" " alt="" coords="337,5,494,31"/>
+<area shape="rect" title=" " alt="" coords="903,225,1029,250"/>
+<area shape="rect" href="structcore_1_1DriverInput.html" title=" " alt="" coords="572,14,688,39"/>
+<area shape="rect" href="structxyz__vec.html" title=" " alt="" coords="5,105,120,130"/>
+<area shape="rect" href="structveh__vec.html" title=" " alt="" coords="188,134,373,159"/>
+<area shape="rect" href="structypr__vec.html" title=" " alt="" coords="573,385,687,410"/>
+<area shape="rect" href="structveh__vec.html" title=" " alt="" coords="222,253,339,278"/>
+<area shape="rect" href="structcore_1_1SpeedControlOut.html" title=" " alt="" coords="554,286,706,311"/>
+<area shape="rect" href="structcore_1_1TireDynamics.html" title=" " alt="" coords="564,158,696,183"/>
+<area shape="rect" href="structcore_1_1ControllerTorqueOut.html" title=" " alt="" coords="545,335,715,361"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -99,34 +104,110 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a78dff0de14d1a4e8e95ff892c7928359"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15a30fa2a55ea3c85e41c61f5bc41ecb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcore_1_1DriverInput.html">DriverInput</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a15a30fa2a55ea3c85e41c61f5bc41ecb">input</a></td></tr>
 <tr class="separator:a15a30fa2a55ea3c85e41c61f5bc41ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11903ce3be72bd7b5645877bf9b5332c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structveh__vec.html">veh_vec</a>&lt; <a class="el" href="Literals_8hpp.html#a45b65b80344db3577922c0a60626116e">velocity_rpm</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a11903ce3be72bd7b5645877bf9b5332c">current_rpms</a></td></tr>
-<tr class="separator:a11903ce3be72bd7b5645877bf9b5332c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51cf72031c00b530625967602c6a485d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt; <a class="el" href="Literals_8hpp.html#a0785b8ced31db65cf9f9dfc5f9c060ab">speed_m_s</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a51cf72031c00b530625967602c6a485d">current_body_vel_ms</a></td></tr>
-<tr class="separator:a51cf72031c00b530625967602c6a485d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76eb7af8f49f5d7f42a47f2083465299"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a76eb7af8f49f5d7f42a47f2083465299">current_body_vel_ms</a></td></tr>
+<tr class="separator:a76eb7af8f49f5d7f42a47f2083465299"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c84cd14a21c75b94c0e7afa99fa8f54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a2c84cd14a21c75b94c0e7afa99fa8f54">current_body_accel_mss</a></td></tr>
+<tr class="separator:a2c84cd14a21c75b94c0e7afa99fa8f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a172d8435e94dae91cb1632a04b597dd7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a172d8435e94dae91cb1632a04b597dd7">current_angular_rate_rads</a></td></tr>
+<tr class="separator:a172d8435e94dae91cb1632a04b597dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7020479677bdfd7c1e61d647c31fc0e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structypr__vec.html">ypr_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a7020479677bdfd7c1e61d647c31fc0e1">current_ypr_rad</a></td></tr>
+<tr class="separator:a7020479677bdfd7c1e61d647c31fc0e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac66b9651ed3ee7552ecaa058a807fd35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structveh__vec.html">veh_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#ac66b9651ed3ee7552ecaa058a807fd35">current_rpms</a></td></tr>
+<tr class="separator:ac66b9651ed3ee7552ecaa058a807fd35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ccf3394a3fac7e3c31cf32ddcfbf537"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a7ccf3394a3fac7e3c31cf32ddcfbf537">state_is_valid</a></td></tr>
+<tr class="separator:a7ccf3394a3fac7e3c31cf32ddcfbf537"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b3aca48d72818cd4f2608ef6d7360eb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a8b3aca48d72818cd4f2608ef6d7360eb">prev_MCU_recv_millis</a></td></tr>
+<tr class="separator:a8b3aca48d72818cd4f2608ef6d7360eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a275ce1716cc86570dbac116021acca26"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a275ce1716cc86570dbac116021acca26">steering_angle_deg</a></td></tr>
+<tr class="separator:a275ce1716cc86570dbac116021acca26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af193fc4d9ef74751cdab500c18b3f59c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcore_1_1SpeedControlOut.html">SpeedControlOut</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#af193fc4d9ef74751cdab500c18b3f59c">prev_controller_output</a></td></tr>
+<tr class="separator:af193fc4d9ef74751cdab500c18b3f59c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeef1c046c5be0b527d3e10b588d6ab74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcore_1_1TireDynamics.html">TireDynamics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#aeef1c046c5be0b527d3e10b588d6ab74">tire_dynamics</a></td></tr>
+<tr class="separator:aeef1c046c5be0b527d3e10b588d6ab74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a81d223cc47eb0c5795467c96d48b0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structveh__vec.html">veh_vec</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a5a81d223cc47eb0c5795467c96d48b0c">driver_torque</a></td></tr>
+<tr class="separator:a5a81d223cc47eb0c5795467c96d48b0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89ec79550335883cbdc614162dba0a2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcore_1_1ControllerTorqueOut.html">ControllerTorqueOut</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcore_1_1VehicleState.html#a89ec79550335883cbdc614162dba0a2e">matlab_math_temp_out</a></td></tr>
+<tr class="separator:a89ec79550335883cbdc614162dba0a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a51cf72031c00b530625967602c6a485d" name="a51cf72031c00b530625967602c6a485d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51cf72031c00b530625967602c6a485d">&#9670;&#160;</a></span>current_body_vel_ms</h2>
+<a id="a172d8435e94dae91cb1632a04b597dd7" name="a172d8435e94dae91cb1632a04b597dd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a172d8435e94dae91cb1632a04b597dd7">&#9670;&#160;</a></span>current_angular_rate_rads</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt;<a class="el" href="Literals_8hpp.html#a0785b8ced31db65cf9f9dfc5f9c060ab">speed_m_s</a>&gt; core::VehicleState::current_body_vel_ms</td>
+          <td class="memname"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt;float&gt; core::VehicleState::current_angular_rate_rads</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a11903ce3be72bd7b5645877bf9b5332c" name="a11903ce3be72bd7b5645877bf9b5332c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11903ce3be72bd7b5645877bf9b5332c">&#9670;&#160;</a></span>current_rpms</h2>
+<a id="a2c84cd14a21c75b94c0e7afa99fa8f54" name="a2c84cd14a21c75b94c0e7afa99fa8f54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c84cd14a21c75b94c0e7afa99fa8f54">&#9670;&#160;</a></span>current_body_accel_mss</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structveh__vec.html">veh_vec</a>&lt;<a class="el" href="Literals_8hpp.html#a45b65b80344db3577922c0a60626116e">velocity_rpm</a>&gt; core::VehicleState::current_rpms</td>
+          <td class="memname"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt;float&gt; core::VehicleState::current_body_accel_mss</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a76eb7af8f49f5d7f42a47f2083465299" name="a76eb7af8f49f5d7f42a47f2083465299"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76eb7af8f49f5d7f42a47f2083465299">&#9670;&#160;</a></span>current_body_vel_ms</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structxyz__vec.html">xyz_vec</a>&lt;float&gt; core::VehicleState::current_body_vel_ms</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac66b9651ed3ee7552ecaa058a807fd35" name="ac66b9651ed3ee7552ecaa058a807fd35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac66b9651ed3ee7552ecaa058a807fd35">&#9670;&#160;</a></span>current_rpms</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structveh__vec.html">veh_vec</a>&lt;float&gt; core::VehicleState::current_rpms</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7020479677bdfd7c1e61d647c31fc0e1" name="a7020479677bdfd7c1e61d647c31fc0e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7020479677bdfd7c1e61d647c31fc0e1">&#9670;&#160;</a></span>current_ypr_rad</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structypr__vec.html">ypr_vec</a>&lt;float&gt; core::VehicleState::current_ypr_rad</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5a81d223cc47eb0c5795467c96d48b0c" name="a5a81d223cc47eb0c5795467c96d48b0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a81d223cc47eb0c5795467c96d48b0c">&#9670;&#160;</a></span>driver_torque</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structveh__vec.html">veh_vec</a>&lt;float&gt; core::VehicleState::driver_torque</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -155,6 +236,90 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool core::VehicleState::is_ready_to_drive</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a89ec79550335883cbdc614162dba0a2e" name="a89ec79550335883cbdc614162dba0a2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89ec79550335883cbdc614162dba0a2e">&#9670;&#160;</a></span>matlab_math_temp_out</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcore_1_1ControllerTorqueOut.html">ControllerTorqueOut</a> core::VehicleState::matlab_math_temp_out</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af193fc4d9ef74751cdab500c18b3f59c" name="af193fc4d9ef74751cdab500c18b3f59c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af193fc4d9ef74751cdab500c18b3f59c">&#9670;&#160;</a></span>prev_controller_output</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcore_1_1SpeedControlOut.html">SpeedControlOut</a> core::VehicleState::prev_controller_output</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8b3aca48d72818cd4f2608ef6d7360eb" name="a8b3aca48d72818cd4f2608ef6d7360eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b3aca48d72818cd4f2608ef6d7360eb">&#9670;&#160;</a></span>prev_MCU_recv_millis</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int core::VehicleState::prev_MCU_recv_millis</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7ccf3394a3fac7e3c31cf32ddcfbf537" name="a7ccf3394a3fac7e3c31cf32ddcfbf537"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ccf3394a3fac7e3c31cf32ddcfbf537">&#9670;&#160;</a></span>state_is_valid</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool core::VehicleState::state_is_valid</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a275ce1716cc86570dbac116021acca26" name="a275ce1716cc86570dbac116021acca26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a275ce1716cc86570dbac116021acca26">&#9670;&#160;</a></span>steering_angle_deg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float core::VehicleState::steering_angle_deg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeef1c046c5be0b527d3e10b588d6ab74" name="aeef1c046c5be0b527d3e10b588d6ab74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeef1c046c5be0b527d3e10b588d6ab74">&#9670;&#160;</a></span>tire_dynamics</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcore_1_1TireDynamics.html">TireDynamics</a> core::VehicleState::tire_dynamics</td>
         </tr>
       </table>
 </div><div class="memdoc">

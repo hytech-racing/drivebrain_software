@@ -1,13 +1,22 @@
 var searchData=
 [
-  ['main_0',['main',['../example__boost__asio__can_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;example_boost_asio_can.cpp'],['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp']]],
-  ['main_2ecpp_1',['main.cpp',['../main_8cpp.html',1,'']]],
-  ['max_5freg_5ftorque_2',['max_reg_torque',['../structcontrol_1_1SimpleController_1_1config.html#a3d11c2e89175b9aefb342ef670d89a17',1,'control::SimpleController::config']]],
-  ['max_5ftorque_3',['max_torque',['../structcontrol_1_1SimpleController_1_1config.html#afd17ead82481809412991c8748bce7b0',1,'control::SimpleController::config']]],
-  ['mcucomms_2ehpp_4',['MCUComms.hpp',['../MCUComms_8hpp.html',1,'']]],
-  ['mcuethcomms_5',['MCUETHComms',['../classcomms_1_1MCUETHComms.html',1,'comms::MCUETHComms'],['../classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537',1,'comms::MCUETHComms::MCUETHComms()=delete'],['../classcomms_1_1MCUETHComms.html#a19825fc469dadf9358eb6e586a764480',1,'comms::MCUETHComms::MCUETHComms(core::Logger &amp;logger, deqtype &amp;in_deq, core::StateEstimator &amp;state_estimator, boost::asio::io_context &amp;io_context, const std::string &amp;send_ip, uint16_t recv_port, uint16_t send_port)']]],
-  ['mcuethcomms_2ecpp_6',['MCUETHComms.cpp',['../MCUETHComms_8cpp.html',1,'']]],
-  ['mcuethcomms_2ehpp_7',['MCUETHComms.hpp',['../MCUETHComms_8hpp.html',1,'']]],
-  ['meters_5fper_5fsecond_5fto_5frpm_8',['METERS_PER_SECOND_TO_RPM',['../namespaceconstants.html#aaf076b8a94921da19791d77311362af1',1,'constants']]],
-  ['mtx_9',['mtx',['../classcore_1_1common_1_1Configurable.html#a373731c52d32c53b3ff5cfa02f3a50e8',1,'core::common::Configurable::mtx()'],['../structcore_1_1common_1_1ThreadSafeDeque.html#a76b78ff71e53031ce63864a3eaa3b094',1,'core::common::ThreadSafeDeque::mtx()']]]
+  ['literals_2ehpp_0',['Literals.hpp',['../Literals_8hpp.html',1,'']]],
+  ['lmux_5ffl_1',['lmux_fl',['../structestimation_1_1MatlabMath_1_1config.html#a611863691297c1bea11ee33f8f10a847',1,'estimation::MatlabMath::config']]],
+  ['lmux_5ffr_2',['lmux_fr',['../structestimation_1_1MatlabMath_1_1config.html#abd9401009f362895d9e8a92c19f3cc85',1,'estimation::MatlabMath::config']]],
+  ['lmux_5frl_3',['lmux_rl',['../structestimation_1_1MatlabMath_1_1config.html#aed0921a4406183fac86539dc4c7c5c79',1,'estimation::MatlabMath::config']]],
+  ['lmux_5frr_4',['lmux_rr',['../structestimation_1_1MatlabMath_1_1config.html#ad9984372e65c87f6487f28d3c023b450',1,'estimation::MatlabMath::config']]],
+  ['lmuy_5ffl_5',['lmuy_fl',['../structestimation_1_1MatlabMath_1_1config.html#a8fdb6e6f212dc7065033a067cc1ce683',1,'estimation::MatlabMath::config']]],
+  ['lmuy_5ffr_6',['lmuy_fr',['../structestimation_1_1MatlabMath_1_1config.html#aa17a7929fa2111b03dd19617d70e5a1e',1,'estimation::MatlabMath::config']]],
+  ['lmuy_5frl_7',['lmuy_rl',['../structestimation_1_1MatlabMath_1_1config.html#aaba358832909b53a3ea904bd8417c04f',1,'estimation::MatlabMath::config']]],
+  ['lmuy_5frr_8',['lmuy_rr',['../structestimation_1_1MatlabMath_1_1config.html#a0f5a79211809cad0e54183f1d283db89',1,'estimation::MatlabMath::config']]],
+  ['log_5fmessage_9',['log_message',['../classcore_1_1MessageLogger.html#a070770d0fdcf0316da4469d294b86bae',1,'core::MessageLogger']]],
+  ['log_5fmsg_10',['log_msg',['../classcore_1_1MsgLogger.html#ab2c9ae8969c85974c4d32d4ad14cc1b7',1,'core::MsgLogger::log_msg()'],['../classcommon_1_1MCAPProtobufLogger.html#a9dc6b74d5fe2de7ee5129a147b1e11c7',1,'common::MCAPProtobufLogger::log_msg()']]],
+  ['log_5fproto_5fmessage_11',['log_proto_message',['../classcomms_1_1VNDriver.html#afd12a2f760aea20c29280c20773c19bf',1,'comms::VNDriver']]],
+  ['log_5fstring_12',['log_string',['../classcore_1_1Logger.html#ab8bb6022bef96d9fb07ad392791be41c',1,'core::Logger']]],
+  ['log_5ftime_13',['log_time',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#a31c0619ab027f99b645bfd7b232f0724',1,'common::MCAPProtobufLogger::ProtobufRawMessage']]],
+  ['logger_14',['Logger',['../classcore_1_1Logger.html',1,'core::Logger'],['../classcore_1_1Logger.html#a397232bb2e14e315491ce0bebc3f8873',1,'core::Logger::Logger()']]],
+  ['logger_2ecpp_15',['Logger.cpp',['../Logger_8cpp.html',1,'']]],
+  ['logger_2ehpp_16',['Logger.hpp',['../Logger_8hpp.html',1,'']]],
+  ['loggertype_17',['loggertype',['../classcomms_1_1CANDriver.html#a9c6f642ac1c395ecd88d46e764793cc1',1,'comms::CANDriver::loggertype()'],['../classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928',1,'comms::MCUETHComms::loggertype()'],['../VNComms_8hpp.html#af04a702c0a3bbd5d155443199395d33b',1,'loggertype():&#160;VNComms.hpp']]],
+  ['loglevel_18',['LogLevel',['../namespacecore.html#aa9b5a444ee11933c91d5e3235aa5b5e3',1,'core']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['log_5fstring_0',['log_string',['../classcore_1_1Logger.html#ab8bb6022bef96d9fb07ad392791be41c',1,'core::Logger']]],
-  ['logger_1',['Logger',['../classcore_1_1Logger.html#a397232bb2e14e315491ce0bebc3f8873',1,'core::Logger']]]
+  ['init_0',['init',['../classcore_1_1common_1_1Configurable.html#aefdcb7597d7f92a05f5fd2712c16a108',1,'core::common::Configurable::init()'],['../classcontrol_1_1ControllerManager.html#a32e3495a61ccc4a7ed5eb6c0c7bd7f96',1,'control::ControllerManager::init()'],['../classcomms_1_1Driver.html#a4e1b53db8767ec22f94e0c3974fdaa7f',1,'comms::Driver::init()'],['../classcomms_1_1CANDriver.html#a56b1e7e4480c2c300ad587f2deb5d505',1,'comms::CANDriver::init()'],['../classcomms_1_1VNDriver.html#afd0663417b9b10141990cec3774a037c',1,'comms::VNDriver::init()'],['../classcontrol_1_1SimpleController.html#a2477197b5f34011095fab23865e55bc8',1,'control::SimpleController::init()'],['../classestimation_1_1MatlabMath.html#ad663dea279c8096f51853436a83f6e49',1,'estimation::MatlabMath::init()']]]
 ];

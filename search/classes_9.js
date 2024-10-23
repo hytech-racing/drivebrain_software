@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['testcan_0',['TestCAN',['../classTestCAN.html',1,'']]],
-  ['threadsafedeque_1',['ThreadSafeDeque',['../structcore_1_1common_1_1ThreadSafeDeque.html',1,'core::common']]],
-  ['torquecontrolout_2',['TorqueControlOut',['../structcore_1_1TorqueControlOut.html',1,'core']]]
+  ['simplecontroller_0',['SimpleController',['../classcontrol_1_1SimpleController.html',1,'control']]],
+  ['speedcontrolout_1',['SpeedControlOut',['../structcore_1_1SpeedControlOut.html',1,'core']]],
+  ['stateestimator_2',['StateEstimator',['../classcore_1_1StateEstimator.html',1,'core']]]
 ];

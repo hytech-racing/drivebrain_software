@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['warning_0',['WARNING',['../namespacecore.html#aa9b5a444ee11933c91d5e3235aa5b5e3a059e9861e0400dfbe05c98a841f3f96b',1,'core']]],
-  ['wheel_5fdiameter_1',['WHEEL_DIAMETER',['../namespaceconstants.html#a19d8942aee8dfdce3aa95bf6de308e28',1,'constants']]]
+  ['use_5ffake_5fdata_0',['use_fake_data',['../structestimation_1_1MatlabMath_1_1config.html#a078e6e02ef025e9a7e290c2b9d6aa1f5',1,'estimation::MatlabMath::config']]],
+  ['util_1',['util',['../namespaceutil.html',1,'']]],
+  ['utils_2ehpp_2',['Utils.hpp',['../Utils_8hpp.html',1,'']]]
 ];
