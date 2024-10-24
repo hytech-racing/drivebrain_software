@@ -1,6 +1,7 @@
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 #include <SimpleController.hpp>
+#include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
@@ -94,8 +95,18 @@ int main(int argc, char *argv[])
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
 
-    control::SimpleController controller(logger, config);
-    configurable_components.push_back(&controller);
+    control::SimpleController controller1(logger, config);
+    control::SimpleController controller2(logger, config, "josh");
+    configurable_components.push_back(&controller1);
+    configurable_components.push_back(&controller2);
+    auto controller_manager = std::make_shared<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>>(logger, config, std::array<control::Controller<core::ControllerOutput, core::VehicleState>*, 2>{ &controller1 , &controller2 });
+    configurable_components.push_back(controller_manager.get());
+
+    // required init, maybe want to call this in the constructor instead
+    bool successful_controller1_init = controller1.init();
+    bool successful_controller2_init = controller2.init();
+    bool successful_manager_init = controller_manager->init();
+
     bool construction_failed = false;
     estimation::MatlabMath matlab_math(logger, config, construction_failed);
 
@@ -117,8 +128,8 @@ int main(int argc, char *argv[])
                                                                                                         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(mcap_logger), std::placeholders::_1),
                                                                                                         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(foxglove_server), std::placeholders::_1));
 
-    core::StateEstimator state_estimator(logger, message_logger, matlab_math);
-    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed, state_estimator);
+    core::StateEstimator* state_estimator_ptr = new core::StateEstimator(logger, message_logger, matlab_math);
+    comms::CANDriver driver(config, logger, message_logger, tx_queue, io_context, dbc_path, construction_failed, *state_estimator_ptr);
 
     // std::cout << "driver init " << driver.init() << std::endl;
     if (construction_failed)
@@ -128,13 +139,10 @@ int main(int argc, char *argv[])
 
     configurable_components.push_back(&driver);
     
-    comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
-    comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
+    comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, *state_estimator_ptr, io_context, "192.168.1.30", 2001, 2000);
+    comms::VNDriver vn_driver(config, logger, message_logger, *state_estimator_ptr, io_context);
 
-    // required init, maybe want to call this in the constructor instead
-    bool successful_controller_init = controller.init();
-
-    DBInterfaceImpl db_service_inst(message_logger);
+    DBInterfaceImpl db_service_inst(message_logger, controller_manager, state_estimator_ptr);
     std::thread db_service_thread([&db_service_inst]()
                                   {
             std::cout <<"started db service thread" <<std::endl;
@@ -159,11 +167,11 @@ int main(int argc, char *argv[])
                 std::cerr << "Error in io_context: " << e.what() << std::endl;
             } });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller_manager, state_estimator_ptr]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
-        auto loop_time = controller.get_dt_sec();
+        auto loop_time = controller_manager->get_active_controller_timestep();
         auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(!stop_signal.load())
@@ -171,42 +179,55 @@ int main(int argc, char *argv[])
             auto start_time = std::chrono::high_resolution_clock::now();
             // samples internal state set by the handle recv functions
             
-            auto state_and_validity = state_estimator.get_latest_state_and_validity();
-            auto out_struct = controller.step_controller(state_and_validity.first);
+            auto state_and_validity = state_estimator_ptr->get_latest_state_and_validity();
+            auto out_struct = controller_manager->step_active_controller(state_and_validity.first);
+            //logic for retrieving whichever type is currently in the variant, idk if we need to check if it has monostate
+            core::SpeedControlOut speed_cmd_out;
+            core::TorqueControlOut torque_cmd_out;
+            if(std::holds_alternative<core::SpeedControlOut>(out_struct.out))
+            {
+                speed_cmd_out = std::get<core::SpeedControlOut>(out_struct.out);
+            }
+            else if(std::holds_alternative<core::TorqueControlOut>(out_struct.out))
+            {
+                torque_cmd_out = std::get<core::TorqueControlOut>(out_struct.out);
+            }
+            //for when we have both controllers the vision is if(speed_cmd_out) -> else 
+
             auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
-            // feedback
-            state_estimator.set_previous_control_output(out_struct);
+            // feedback -> should probably change this to accept controlleroutput struct instead
+            state_estimator_ptr->set_previous_control_output(speed_cmd_out);
             // output
             // if(state_and_validity.second)
             // {
-            out_msg->set_prev_mcu_recv_millis(out_struct.mcu_recv_millis);
+            out_msg->set_prev_mcu_recv_millis(speed_cmd_out.mcu_recv_millis);
 
             if(temp_desired_torques.res_torque_lim_nm.FL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fl(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+                out_msg->mutable_desired_rpms()->set_fl(speed_cmd_out.desired_rpms.FL);
             }
 
             if(temp_desired_torques.res_torque_lim_nm.FR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fr(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
+                out_msg->mutable_desired_rpms()->set_fr(speed_cmd_out.desired_rpms.FR);
             }
 
             if(temp_desired_torques.res_torque_lim_nm.RL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rl(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
+                out_msg->mutable_desired_rpms()->set_rl(speed_cmd_out.desired_rpms.RL);
             }
 
             if(temp_desired_torques.res_torque_lim_nm.RR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rr(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+                out_msg->mutable_desired_rpms()->set_rr(speed_cmd_out.desired_rpms.RR);
             }
             
 

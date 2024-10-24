@@ -1,8 +1,9 @@
 #ifndef __VEHICLESTATE_H__
 #define __VEHICLESTATE_H__
 #include <Utils.hpp>
-#include <variant>
 #include <Literals.hpp>
+#include <variant>
+
 // TODO this will need a one-to-one protobuf message
 namespace core
 {
@@ -71,7 +72,7 @@ namespace core
 
     struct TorqueControlOut
     {
-        veh_vec<torque_nm> desired_torques_nm;
+        veh_vec<float> desired_torques_nm;
     };
     struct VehicleState
     {
@@ -101,12 +102,20 @@ namespace core
     {
         enum class ControllerManagerStatus
         {
-            NO_ERROR,
-            ERROR_CONTROLLER_INDEX_OUT_OF_RANGE,
-            ERROR_SPEED_DIFF_TOO_HIGH,
-            ERROR_TORQUE_DIFF_TOO_HIGH,
-            ERROR_DRIVER_ON_PEDAL,
-            NUM_CONTROLLER_MANAGER_STATUSES
+            NO_ERROR = 0,
+            ERROR_CONTROLLER_INDEX_OUT_OF_RANGE = 1,
+            ERROR_SPEED_TOO_HIGH = 2,
+            ERROR_TORQUE_TOO_HIGH = 3,
+            ERROR_DRIVER_ON_PEDAL = 4,
+            ERROR_CONTROLLER_NO_TORQUE_OR_SPEED_OUTPUT = 5,
+            ERROR_OUTPUT_EXCEEDS_PHYS_LIMITS = 6,
+            NUM_CONTROLLER_MANAGER_STATUSES = 7
+        };
+
+        struct ControllerManagerState
+        {
+            ControllerManagerStatus current_status;
+            ControllerOutput current_controller_output;
         };
     }
 

@@ -125,6 +125,7 @@ target_link_libraries(drivebrain_comms PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     libvncxx::libvncxx
     drivebrain_estimation
+    drivebrain_control
 )
 
 make_cmake_package(drivebrain_comms drivebrain)
@@ -220,6 +221,14 @@ add_executable(test_db_grpc test/test_db_interace_grpc_service.cpp)
 target_link_libraries(test_db_grpc PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     gRPC::grpc++_reflection
+)
+
+add_executable(test_controller_manager tests/test_controller_manager.cpp)
+
+target_link_libraries(test_controller_manager PUBLIC
+    drivebrain_core
+    drivebrain_control
+    GTest::gtest_main
 )
 
 
