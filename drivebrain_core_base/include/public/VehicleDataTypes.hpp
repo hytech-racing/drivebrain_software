@@ -1,6 +1,7 @@
 #ifndef __VEHICLESTATE_H__
 #define __VEHICLESTATE_H__
 #include <Utils.hpp>
+#include <Literals.hpp>
 #include <variant>
 
 // TODO this will need a one-to-one protobuf message
@@ -72,23 +73,6 @@ namespace core
     struct TorqueControlOut
     {
         veh_vec<float> desired_torques_nm;
-    };
-    struct VehicleState
-    {
-        bool is_ready_to_drive;
-        DriverInput input;
-        xyz_vec<float> current_body_vel_ms;
-        xyz_vec<float> current_body_accel_mss;
-        xyz_vec<float> current_angular_rate_rads;
-        ypr_vec<float> current_ypr_rad;
-        veh_vec<float> current_rpms;
-        bool state_is_valid;
-        int prev_MCU_recv_millis;
-        float steering_angle_deg;
-        SpeedControlOut prev_controller_output;
-        TireDynamics tire_dynamics;
-        veh_vec<float> driver_torque;
-        ControllerTorqueOut matlab_math_temp_out;
     };
     struct VehicleState
     {

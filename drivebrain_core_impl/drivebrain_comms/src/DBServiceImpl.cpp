@@ -34,9 +34,23 @@ grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *co
     }
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst) : _logger_inst(logger_inst)
+grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response)
+{
+    if(_ctr_manager_inst->swap_active_controller(static_cast<size_t>(rq->requested_controller_index()), *_in)){
+        response->set_status("switch");
+    }
+    else{
+        response->set_status("no switch");
+    }
+    
+    return grpc::Status::OK;
+}
+
+DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, std::shared_ptr<core::VehicleState> in_inst)
+        : _logger_inst(logger_inst), _ctr_manager_inst(ctr_manager_inst), _in(in_inst)
 {
 }
+
 void DBInterfaceImpl::stop_server() {
     if (_server) {
         std::cout << "Shutting down the server..." << std::endl;

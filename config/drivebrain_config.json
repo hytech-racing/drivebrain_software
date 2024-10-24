@@ -1,7 +1,7 @@
 {
     "CANDriver": {
         "canbus_device": "vcan0",
-        "path_to_dbc": "/home/ben/drivebrain_software/config/hytech.dbc"
+        "path_to_dbc": "./config/hytech.dbc"
     },
     "SimpleController": {
         "max_torque": 21,

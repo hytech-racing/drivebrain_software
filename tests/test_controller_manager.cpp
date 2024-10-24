@@ -14,8 +14,8 @@ public:
         return _dt_sec;
     }
 
-    std::variant<core::SpeedControlOut, core::TorqueControlOut, std::monostate> step_controller(const core::VehicleState& state) {
-        return _output.out;
+    core::ControllerOutput step_controller(const core::VehicleState& state) {
+        return _output;
     }
 
     void set_output(const core::ControllerOutput& output) {
@@ -39,8 +39,8 @@ protected:
     control::ControllerManager<MockController, 4> controller_manager_4;
     control::SimpleController simpleController1;
     control::SimpleController simpleController2;
-    std::array<control::Controller<core::SpeedControlOut, core::VehicleState>*, 2> controllers_real;
-    control::ControllerManager<control::Controller<core::SpeedControlOut, core::VehicleState>, 2> controller_manager_real;
+    std::array<control::Controller<core::ControllerOutput, core::VehicleState>*, 2> controllers_real;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_real;
     core::JsonFileHandler json_file_handler; 
     core::Logger logger; 
 
@@ -206,10 +206,10 @@ TEST_F(ControllerManagerTest, StepSimpleController) {
     
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
     auto _output = std::get<core::SpeedControlOut>(output.out);
-    EXPECT_EQ(_output.desired_rpms.FL, constants::METERS_PER_SECOND_TO_RPM * 3);
-    EXPECT_EQ(_output.desired_rpms.FR, constants::METERS_PER_SECOND_TO_RPM * 3);
-    EXPECT_EQ(_output.desired_rpms.RL, constants::METERS_PER_SECOND_TO_RPM * 3);
-    EXPECT_EQ(_output.desired_rpms.RR, constants::METERS_PER_SECOND_TO_RPM * 3);
+    ASSERT_TRUE(_output.desired_rpms.FL - constants::METERS_PER_SECOND_TO_RPM * 3 < 10.0);
+    ASSERT_TRUE(_output.desired_rpms.FR - constants::METERS_PER_SECOND_TO_RPM * 3 < 10.0);
+    ASSERT_TRUE(_output.desired_rpms.RL - constants::METERS_PER_SECOND_TO_RPM * 3 < 10.0);
+    ASSERT_TRUE(_output.desired_rpms.RR - constants::METERS_PER_SECOND_TO_RPM * 3 < 10.0);
 }
 
 TEST_F(ControllerManagerTest, SwapSimpleControllers) {

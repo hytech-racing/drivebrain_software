@@ -14,7 +14,7 @@ namespace control
 {
 
     // TODO make the output CAN message for the drivetrain, rpms telem is just a standin for now
-    class SimpleController : Controller<core::SpeedControlOut, core::VehicleState>, public core::common::Configurable
+    class SimpleController : public Controller<core::ControllerOutput, core::VehicleState>, public core::common::Configurable
     {
     public:
         // rear_torque_scale:
@@ -36,7 +36,7 @@ namespace control
             return (0.001); 
         }
         bool init() override;
-        core::SpeedControlOut step_controller(const core::VehicleState &in) override;
+        core::ControllerOutput step_controller(const core::VehicleState &in) override;
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);

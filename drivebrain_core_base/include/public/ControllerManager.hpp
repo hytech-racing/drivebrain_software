@@ -100,8 +100,7 @@ namespace control
         /// @return respective controller output to command the drivetrain
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
-            _current_ctr_manager_state.current_controller_output.out = _controllers[_current_controller_index]->step_controller(input);
-            return _current_ctr_manager_state.current_controller_output;
+            return _controllers[_current_controller_index]->step_controller(input);
         }
 
     private:

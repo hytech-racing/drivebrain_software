@@ -125,13 +125,14 @@ target_link_libraries(drivebrain_comms PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     libvncxx::libvncxx
     drivebrain_estimation
+    drivebrain_control
 )
 
 make_cmake_package(drivebrain_comms drivebrain)
 
 
 add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
-
+# drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
 target_include_directories(drivebrain_control PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_control/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_control/include>    
@@ -222,6 +223,14 @@ target_link_libraries(test_db_grpc PUBLIC
     gRPC::grpc++_reflection
 )
 
+add_executable(test_controller_manager tests/test_controller_manager.cpp)
+
+target_link_libraries(test_controller_manager PUBLIC
+    drivebrain_core
+    drivebrain_control
+    GTest::gtest_main
+)
+
 
 # add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
@@ -230,14 +239,6 @@ target_link_libraries(test_db_grpc PUBLIC
 #     protobuf::libprotobuf
 #     mcap::mcap
 # )
-
-add_executable(test_controller_manager test/test_controller_manager.cpp)
-
-target_link_libraries(test_controller_manager PUBLIC
-    drivebrain_core
-    drivebrain_control
-    GTest::gtest_main
-)
 
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
