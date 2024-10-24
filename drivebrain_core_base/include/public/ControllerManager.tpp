@@ -6,8 +6,9 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     std::optional max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
     std::optional max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
     std::optional max_accel_switch_request = get_parameter_value<float>("max_accel_switch_float");
+    std::optional max_requested_rpm = get_parameter_value<float>("max_switch_requested_rpm");
 
-    if (!(max_switch_speed && max_torque_switch && max_accel_switch_request))
+    if (!(max_switch_speed && max_torque_switch && max_accel_switch_request && max_requested_rpm))
     {
         std::cout << "ERROR: couldnt get params" << std::endl;
         return false;
@@ -22,6 +23,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     _max_switch_rpm = ((*max_switch_speed) * constants::METERS_PER_SECOND_TO_RPM);
     _max_torque_switch = *max_torque_switch;
     _max_accel_switch_req = *max_accel_switch_request;
+    _max_requested_rpm = *max_requested_rpm;
 
     _current_ctr_manager_state = {
         .current_status = core::control::ControllerManagerStatus::NO_ERROR,
@@ -59,7 +61,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     // check to see if current drivetrain rpms are too high to switch controller
     if (check_veh_vec(current_state.current_rpms, _max_switch_rpm, true))
     {
-        _current_ctr_manager_state.current_status = status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+        _current_ctr_manager_state.current_status = status_type::ERROR_SPEED_TOO_HIGH;
         return _current_ctr_manager_state.current_status;
     }
 
@@ -80,13 +82,13 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         // check: make sure that either the setpoint rpm is low enough OR (AND?) the torque setpoint is low enough
         if (const core::SpeedControlOut *pval = std::get_if<core::SpeedControlOut>(&controller_output.out))
         {
-            if (check_veh_vec(pval->desired_rpms, _max_switch_rpm, true))
+            if (check_veh_vec(pval->desired_rpms, _max_requested_rpm, true))
             {
-                return status_type::ERROR_SPEED_DIFF_TOO_HIGH;
+                return status_type::ERROR_OUTPUT_EXCEEDS_PHYS_LIMITS;
             }
             else if (check_veh_vec(pval->torque_lim_nm, _max_torque_switch, false))
             {
-                return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
+                return status_type::ERROR_TORQUE_TOO_HIGH;
             } else {
                 return status_type::NO_ERROR;
             }
@@ -97,7 +99,7 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
         {
             if (check_veh_vec(pval->desired_torques_nm, _max_torque_switch, false))
             {
-                return status_type::ERROR_TORQUE_DIFF_TOO_HIGH;
+                return status_type::ERROR_TORQUE_TOO_HIGH;
             }
             else
             {
@@ -137,16 +139,19 @@ bool control::ControllerManager<ControllerType, NumControllers>::swap_active_con
     if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
     {
         _current_ctr_manager_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE;
+        _logger_inst.log_string("switch mode failed with error code: " + std::to_string(static_cast<int>(_current_ctr_manager_state.current_status)), static_cast<core::LogLevel>(1));
         return false;
     }
     
     if(_can_switch_controller(input, {_controllers[_current_controller_index]->step_controller(input)}, {_controllers[new_controller_index]->step_controller(input)}) == status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
+        _logger_inst.log_string("switched mode: " + std::to_string(new_controller_index), static_cast<core::LogLevel>(0));
         return true;
     }
     else
     {
+        _logger_inst.log_string("switch mode failed with error code: " + std::to_string(static_cast<int>(_current_ctr_manager_state.current_status)), static_cast<core::LogLevel>(1));
         return false;
     }
 

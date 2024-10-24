@@ -66,7 +66,7 @@ namespace control
         /// @param controllers list of controllers that the manager will mux between and manager
         /// @param state_estimator instance to allow for direct communication between controllers and state estimator
         ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(logger, json_file_handler, "ControllerManager"),
-                                                                                                                                _controllers(controllers)
+                                                                                                                                _controllers(controllers), _logger_inst(logger)
         {
         }
         ~ControllerManager() = default;
@@ -108,8 +108,9 @@ namespace control
         std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
         core::control::ControllerManagerState _current_ctr_manager_state;
+        core::Logger _logger_inst;
 
-        float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req;
+        float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req, _max_requested_rpm;
     };
 }
 #include "ControllerManager.tpp"

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     auto mcap_logger = common::MCAPProtobufLogger("temp");
 
     control::SimpleController controller1(logger, config);
-    control::SimpleController controller2(logger, config);
+    control::SimpleController controller2(logger, config, "josh");
     configurable_components.push_back(&controller1);
     configurable_components.push_back(&controller2);
     auto controller_manager = std::make_shared<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>>(logger, config, std::array<control::Controller<core::ControllerOutput, core::VehicleState>*, 2>{ &controller1 , &controller2 });

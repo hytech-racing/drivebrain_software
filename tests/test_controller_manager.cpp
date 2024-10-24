@@ -166,7 +166,7 @@ TEST_F(ControllerManagerTest, SwapTorqueTooHigh) {
 
 //switching with different controllers where desired 
 TEST_F(ControllerManagerTest, SwapSpeedTooHigh) {
-    vehicle_state.current_rpms = {100, 100, 100, 100};
+    vehicle_state.current_rpms = {10000, 10000, 10000, 10000};
     set_speedout_too_high(&speedcontroller1);
     ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
 
@@ -185,7 +185,7 @@ TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM) {
     vehicle_state.current_rpms = {100000, 10000, 10000, 10000};
 
     ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_DIFF_TOO_HIGH);
+    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
 }
 
 //test foot on accelerator over/under threshold

@@ -104,11 +104,12 @@ namespace core
         {
             NO_ERROR = 0,
             ERROR_CONTROLLER_INDEX_OUT_OF_RANGE = 1,
-            ERROR_SPEED_DIFF_TOO_HIGH = 2,
-            ERROR_TORQUE_DIFF_TOO_HIGH = 3,
+            ERROR_SPEED_TOO_HIGH = 2,
+            ERROR_TORQUE_TOO_HIGH = 3,
             ERROR_DRIVER_ON_PEDAL = 4,
             ERROR_CONTROLLER_NO_TORQUE_OR_SPEED_OUTPUT = 5,
-            NUM_CONTROLLER_MANAGER_STATUSES = 6
+            ERROR_OUTPUT_EXCEEDS_PHYS_LIMITS = 6,
+            NUM_CONTROLLER_MANAGER_STATUSES = 7
         };
 
         struct ControllerManagerState

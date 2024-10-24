@@ -32,6 +32,7 @@ namespace control
         speed_m_s positive_speed_set;
     };
         SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
+        SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::string config) : Configurable(logger, json_file_handler, config) {}
         float get_dt_sec() override { 
             return (0.001); 
         }
