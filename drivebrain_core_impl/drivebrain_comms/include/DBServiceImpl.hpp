@@ -9,6 +9,7 @@
 #include <MsgLogger.hpp>
 #include <Controllers.hpp>
 #include <ControllerManager.hpp>
+#include <StateEstimator.hpp>
 
 class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {
 
@@ -21,13 +22,13 @@ class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Servi
     grpc::Status RequestControllerChange(grpc::ServerContext* context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response) override; 
     
     public: 
-        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, std::shared_ptr<core::VehicleState> in_inst);
+        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, core::StateEstimator* state_estimator);
         void run_server(); 
         void stop_server();
     private:
         std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _logger_inst;
         std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> _ctr_manager_inst;
-        std::shared_ptr<core::VehicleState> _in;
+        core::StateEstimator* _state_estimator;
         std::unique_ptr<grpc::Server> _server;  // Store server instance here
 
 };

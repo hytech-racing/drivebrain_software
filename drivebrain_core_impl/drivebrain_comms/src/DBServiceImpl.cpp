@@ -36,7 +36,7 @@ grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *co
 
 grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response)
 {
-    if(_ctr_manager_inst->swap_active_controller(static_cast<size_t>(rq->requested_controller_index()), *_in)){
+    if(_ctr_manager_inst->swap_active_controller(static_cast<size_t>(rq->requested_controller_index()), _state_estimator->get_latest_state_and_validity().first)){
         response->set_status("switch");
     }
     else{
@@ -46,8 +46,8 @@ grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *conte
     return grpc::Status::OK;
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, std::shared_ptr<core::VehicleState> in_inst)
-        : _logger_inst(logger_inst), _ctr_manager_inst(ctr_manager_inst), _in(in_inst)
+DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, core::StateEstimator* state_estimator)
+        : _logger_inst(logger_inst), _ctr_manager_inst(ctr_manager_inst), _state_estimator(state_estimator)
 {
 }
 

@@ -44,16 +44,16 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     {
         if (check_with_abs)
         {
-            return (abs(vehicle_vector.FL) > max_val) &&
-                   (abs(vehicle_vector.FR) > max_val) &&
-                   (abs(vehicle_vector.RL) > max_val) &&
+            return (abs(vehicle_vector.FL) > max_val) ||
+                   (abs(vehicle_vector.FR) > max_val) ||
+                   (abs(vehicle_vector.RL) > max_val) ||
                    (abs(vehicle_vector.RR) > max_val);
         }
         else
         {
-            return (vehicle_vector.FL > max_val) &&
-                   (vehicle_vector.FR > max_val) &&
-                   (vehicle_vector.RL > max_val) &&
+            return (vehicle_vector.FL > max_val) ||
+                   (vehicle_vector.FR > max_val) ||
+                   (vehicle_vector.RL > max_val) ||
                    (vehicle_vector.RR > max_val);
         }
     };
