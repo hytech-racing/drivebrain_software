@@ -170,7 +170,13 @@ namespace comms
             vn_gps_msg->set_lon(pos_lla.y);
 
             hytech_msgs::vn_status *vn_ins_msg = msg_out->mutable_status();
-            vn_ins_msg->set_ins_status(hytech_msgs::INSStatus::TRACKING_2);
+            vn_ins_msg->set_ins_mode(static_cast<hytech_msgs::INSMode>(ins_status & 0b11)); 
+            vn_ins_msg->set_gnss_fix((ins_status >> 2) & 0b1); 
+            vn_ins_msg->set_error_imu((ins_status >> 4) & 1);
+            vn_ins_msg->set_error_mag_pres((ins_status >> 5) & 0b1);
+            vn_ins_msg->set_error_gnss((ins_status >> 6) & 0b1);
+            vn_ins_msg->set_gnss_headings_ins((ins_status >> 8) & 0b1); 
+            vn_ins_msg->set_gnss_compass((ins_status >> 9) & 0b1); 
 
             this_instance->log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
         }
