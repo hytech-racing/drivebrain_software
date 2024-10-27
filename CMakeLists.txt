@@ -38,7 +38,7 @@ find_package(cmake_macros REQUIRED)
 find_package(GTest REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
-find_package(matlab_math REQUIRED)
+find_package(codegen REQUIRED)
 
 include(create_package)
 
@@ -177,7 +177,7 @@ target_include_directories(drivebrain_estimation PUBLIC
 target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core 
     drivebrain_common_utils
-    matlab_math::matlab_math_lib
+    codegen::Tire_Model_Codegen
 )
 
 make_cmake_package(drivebrain_estimation drivebrain)

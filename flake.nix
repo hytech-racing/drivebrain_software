@@ -40,10 +40,13 @@
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
-    matlab-math.url = "github:hytech-racing/MATLAB-math";
+    matlab_math = {
+        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz";
+        flake = false;
+    };
 
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab-math, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab_math, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -70,10 +73,22 @@
             };
           };
       };
+      # Create matlab math deriv and overlay
+      matlab_math_derivation = { stdenv, cmake  }: stdenv.mkDerivation {
+        name = "matlab-models-deriv";
+        src = matlab_math;
+        nativeBuildInputs = [ cmake ];
+      };
+
+      matlab_math_overlay = final: prev: {
+        matlab_math = final.callPackage matlab_math_derivation { };
+      };
+
       my_overlays = [
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
+        matlab_math_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
     in
@@ -99,7 +114,6 @@
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
-                matlab-math.overlays.default
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
@@ -153,7 +167,6 @@
               import nixpkgs {
                 inherit system;
                 overlays = [
-                  matlab-math.overlays.default
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
