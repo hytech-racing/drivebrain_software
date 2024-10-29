@@ -188,6 +188,13 @@ TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM) {
     EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
 }
 
+TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM_onewheel) {
+    vehicle_state.current_rpms = {100000, 0, 0, 0};
+
+    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
+    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
+}
+
 //test foot on accelerator over/under threshold
 TEST_F(ControllerManagerTest, SwapAccelerator) {
     vehicle_state.input.requested_accel = .3;
