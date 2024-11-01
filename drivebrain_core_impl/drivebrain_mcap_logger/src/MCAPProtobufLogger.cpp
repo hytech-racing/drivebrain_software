@@ -27,7 +27,8 @@ namespace common
             std::unique_lock lk(_input_deque.mtx);
             _running = true;
         }
-        _options.chunkSize = 1024;
+        // _options.chunkSize = 1024;
+        _options.noChunking = true;
         _log_thread = std::thread(&MCAPProtobufLogger::_handle_log_to_file, this);
     }
     MCAPProtobufLogger::~MCAPProtobufLogger()
@@ -108,7 +109,6 @@ namespace common
                 q.deque = _input_deque.deque;
                 _input_deque.deque.clear();
             }
-
             for (auto &msg : q.deque)
             {
                 mcap::Message msg_to_log;
@@ -123,7 +123,6 @@ namespace common
                     std::unique_lock lk(_logger_mtx);
                     msg_to_log.channelId = _msg_name_id_map[msg.message_name]; // under the mutex we also lookup in the map
                     auto write_res = _writer.write(msg_to_log);
-                    _writer.closeLastChunk();
                     // std::cout << "logging msg" << std::endl;
                 }
             }
