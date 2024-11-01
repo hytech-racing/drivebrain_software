@@ -27,7 +27,6 @@ namespace common
             std::unique_lock lk(_input_deque.mtx);
             _running = true;
         }
-        // _options.chunkSize = 1024;
         _options.noChunking = true;
         _log_thread = std::thread(&MCAPProtobufLogger::_handle_log_to_file, this);
     }
