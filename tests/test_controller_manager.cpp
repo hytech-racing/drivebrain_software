@@ -4,7 +4,6 @@
 #include "Controllers.hpp"
 #include "SimpleController.hpp"
 #include <VehicleDataTypes.hpp>
-#include "VehicleDataTypes.hpp"
 
 class MockController {
 public:
@@ -135,6 +134,15 @@ TEST_F(ControllerManagerTest, StepActiveController) {
 TEST_F(ControllerManagerTest, SwapSameTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
     ASSERT_TRUE(controller_manager_4.swap_active_controller(2, vehicle_state));
+
+    core::ControllerOutput output = controller_manager_4.step_active_controller(vehicle_state);
+    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+}
+
+//swap between same controller outputs
+TEST_F(ControllerManagerTest, SwapSameIndex) {
+    vehicle_state.current_rpms = {100, 100, 100, 100};
+    ASSERT_FALSE(controller_manager_4.swap_active_controller(0, vehicle_state));
 
     core::ControllerOutput output = controller_manager_4.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));

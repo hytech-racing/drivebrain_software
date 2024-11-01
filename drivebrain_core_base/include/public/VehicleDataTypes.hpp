@@ -109,7 +109,8 @@ namespace core
             ERROR_DRIVER_ON_PEDAL = 4,
             ERROR_CONTROLLER_NO_TORQUE_OR_SPEED_OUTPUT = 5,
             ERROR_OUTPUT_EXCEEDS_PHYS_LIMITS = 6,
-            NUM_CONTROLLER_MANAGER_STATUSES = 7
+            ERROR_REQUESTING_SAME_CTR_TYPE = 7,
+            NUM_CONTROLLER_MANAGER_STATUSES = 8
         };
 
         struct ControllerManagerState
