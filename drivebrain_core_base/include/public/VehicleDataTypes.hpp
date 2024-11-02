@@ -33,7 +33,7 @@ namespace core
         veh_vec<float> accel_saturation_nm;
         veh_vec<float> brake_saturation_nm;
         float v_y_lm;
-        float psi_dot_lm_rad_s;
+        float psi_dot_lm_rad_s;  
         TireDynamics()
         {
             tire_forces_n = {};
@@ -54,6 +54,9 @@ namespace core
         float perceived_vx;
         float integral_yaw_rate_err;
         float perceived_psi_dot;
+        float psi_dot_gain;
+        float vy_vn_gain;
+        float perceived_vy;
     };
 
     struct MatlabMathResult

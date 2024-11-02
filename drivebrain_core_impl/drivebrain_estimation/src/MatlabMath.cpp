@@ -88,6 +88,47 @@ namespace estimation
             _config.integral_gain = *pval;
             std::cout << "setting new integral_gain " << _config.integral_gain << std::endl;
         }
+        if (auto pval = std::get_if<float>(&new_param_map.at("psi_dot_gain_slope")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.psi_dot_gain_slope = *pval;
+            std::cout << "setting new psi_dot_gain_slope " << _config.psi_dot_gain_slope << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("psi_dot_gain_intercept")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.psi_dot_gain_intercept = *pval;
+            std::cout << "setting new psi_dot_gain_intercept " << _config.psi_dot_gain_intercept << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("vy_vn_gain_slope")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.vy_vn_gain_slope = *pval;
+            std::cout << "setting new vy_vn_gain_slope " << _config.vy_vn_gain_slope << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("vy_vn_gain_intercept")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.vy_vn_gain_intercept = *pval;
+            std::cout << "setting new vy_vn_gain_intercept " << _config.vy_vn_gain_intercept << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_vy")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_vy = *pval;
+            std::cout << "setting new fake_vy " << _config.fake_vy << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("steering_offset")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.steering_offset = *pval;
+            std::cout << "setting new steering_offset " << _config.steering_offset << std::endl;
+        }
     }
 
     MatlabMath::MatlabMath(core::Logger &logger, core::JsonFileHandler &json_file_handler, bool &construction_failed)
@@ -114,6 +155,12 @@ namespace estimation
         auto BrakeBiasFront = get_live_parameter<float>("BrakeBiasFront");
         auto fake_psi_dot = get_live_parameter<float>("fake_psi_dot");
         auto integral_gain = get_live_parameter<float>("integral_gain");
+        auto psi_dot_gain_slope = get_live_parameter<float>("psi_dot_gain_slope");
+        auto psi_dot_gain_intercept = get_live_parameter<float>("psi_dot_gain_intercept");
+        auto vy_vn_gain_slope = get_live_parameter<float>("vy_vn_gain_slope");
+        auto vy_vn_gain_intercept = get_live_parameter<float>("vy_vn_gain_intercept");
+        auto fake_vy = get_live_parameter<float>("fake_vy");
+        auto steering_offset = get_live_parameter<float>("steering_offset");
 
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
@@ -148,7 +195,8 @@ namespace estimation
         auto y3_rr = get_parameter_value<float>("y3_rr");
 
         if (!(use_fake_data && Fake_Vx && DriveBiasFront && BrakeBiasFront && fake_psi_dot && integral_gain &&
-              lmux_fl && lmuy_fl && lmux_fr && lmuy_fr && lmux_rl && lmuy_rl && lmux_rr && lmuy_rr &&
+              psi_dot_gain_slope && psi_dot_gain_intercept && vy_vn_gain_slope && vy_vn_gain_intercept && fake_vy && steering_offset &&
+              lmux_fl && lmuy_fl && lmux_fr && lmuy_fr && lmux_rl && lmuy_rl && lmux_rr && lmuy_rr && 
               x1_fl && x2_fl && x3_fl && y1_fl && y2_fl && y3_fl &&
               x1_fr && x2_fr && x3_fr && y1_fr && y2_fr && y3_fr &&
               x1_rl && x2_rl && x3_rl && y1_rl && y2_rl && y3_rl &&
@@ -160,6 +208,7 @@ namespace estimation
             std::unique_lock lk(_config_mutex);
             _config = {
                 *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront, *fake_psi_dot, *integral_gain, // live configs (torque vectoring)
+                *psi_dot_gain_slope, *psi_dot_gain_intercept, *vy_vn_gain_slope, *vy_vn_gain_intercept, *fake_vy, *steering_offset,
                 *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr,            // live configs (tire)
                 *x1_fl, *x2_fl, *x3_fl, *y1_fl, *y2_fl, *y3_fl,                                            // file loaded configs (FL)
                 *x1_fr, *x2_fr, *x3_fr, *y1_fr, *y2_fr, *y3_fr,                                            // file loaded configs (FR)
@@ -252,11 +301,19 @@ namespace estimation
 
         _inputs.SteeringWheelAngleDeg = current_state.steering_angle_deg;
         _inputs.Vx_VN = current_state.current_body_vel_ms.x;
+        _inputs.Vy_VN = current_state.current_body_vel_ms.y;
 
+        
         _inputs.useFakeData = cur_config.use_fake_data;
         _inputs.Fake_Vx = cur_config.Fake_Vx;
         _inputs.fake_psi_dot = cur_config.fake_psi_dot;
         _inputs.integral_gain = cur_config.integral_gain;
+        _inputs.psi_dot_gain_slope = cur_config.psi_dot_gain_slope;
+        _inputs.psi_dot_gain_intercept= cur_config.psi_dot_gain_intercept;
+        _inputs.vy_vn_gain_slope= cur_config.vy_vn_gain_slope;
+        _inputs.vy_vn_gain_intercept= cur_config.vy_vn_gain_intercept;
+        _inputs.fake_vy= cur_config.fake_vy;
+        _inputs.steering_offset= cur_config.steering_offset;
 
         _inputs.Psi_dot_VNrads = current_state.current_angular_rate_rads.z;
         _inputs.DriveBiasFront = cur_config.DriveBiasFront;
@@ -305,6 +362,9 @@ namespace estimation
         torque_vectoring_status.perceived_vx = outputs.Perceived_Vx;
         torque_vectoring_status.integral_yaw_rate_err = outputs.Integral_Yaw_Rate_Err;
         torque_vectoring_status.perceived_psi_dot = outputs.perceived_psi_dot;
+        torque_vectoring_status.psi_dot_gain = outputs.psi_dot_gain;
+        torque_vectoring_status.vy_vn_gain = outputs.vy_vn_gain;
+        torque_vectoring_status.perceived_vy = outputs.perceived_vy;
 
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR}; // '<Root>/torq_req_FL'
 

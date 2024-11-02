@@ -30,6 +30,12 @@ namespace estimation
                 float BrakeBiasFront;
                 float fake_psi_dot;
                 float integral_gain;
+                float psi_dot_gain_slope;
+                float psi_dot_gain_intercept;
+                float vy_vn_gain_slope;
+                float vy_vn_gain_intercept;
+                float fake_vy;
+                float steering_offset;
                 // file loaded configs
                 float x1_fl;
                 float x2_fl;
