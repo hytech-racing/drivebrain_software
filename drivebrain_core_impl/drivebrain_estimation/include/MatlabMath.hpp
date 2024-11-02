@@ -16,14 +16,7 @@ namespace estimation
             struct config
             {
                 // live configs
-                float lmux_fl;
-                float lmuy_fl;
-                float lmux_fr;
-                float lmuy_fr;
-                float lmux_rl;
-                float lmuy_rl;
-                float lmux_rr;
-                float lmuy_rr;
+                
                 bool use_fake_data;
                 float Fake_Vx;
                 float DriveBiasFront;
@@ -36,6 +29,21 @@ namespace estimation
                 float vy_vn_gain_intercept;
                 float fake_vy;
                 float steering_offset;
+
+                float lmux_fl;
+                float lmuy_fl;
+                float lmux_fr;
+                float lmuy_fr;
+                float lmux_rl;
+                float lmuy_rl;
+                float lmux_rr;
+                float lmuy_rr;
+                
+                float fake_fz_fl;
+                float fake_fz_fr;
+                float fake_fz_rl;
+                float fake_fz_rr;
+                bool useTV;
                 // file loaded configs
                 float x1_fl;
                 float x2_fl;

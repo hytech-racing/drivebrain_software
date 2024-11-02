@@ -129,6 +129,39 @@ namespace estimation
             _config.steering_offset = *pval;
             std::cout << "setting new steering_offset " << _config.steering_offset << std::endl;
         }
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_fz_fl")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_fz_fl = *pval;
+            std::cout << "setting new fake_fz_fl " << _config.fake_fz_fl << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_fz_fr")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_fz_fr = *pval;
+            std::cout << "setting new fake_fz_fr " << _config.fake_fz_fr << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_fz_rl")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_fz_rl = *pval;
+            std::cout << "setting new fake_fz_rl " << _config.fake_fz_rl << std::endl;
+        }
+
+        if (auto pval = std::get_if<float>(&new_param_map.at("fake_fz_rr")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.fake_fz_rr = *pval;
+            std::cout << "setting new fake_fz_rr " << _config.fake_fz_rr << std::endl;
+        }
+        if (auto pval = std::get_if<bool>(&new_param_map.at("useTV")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.useTV = *pval;
+            std::cout << "setting new useTV " << _config.useTV << std::endl;
+        }
     }
 
     MatlabMath::MatlabMath(core::Logger &logger, core::JsonFileHandler &json_file_handler, bool &construction_failed)
@@ -161,6 +194,12 @@ namespace estimation
         auto vy_vn_gain_intercept = get_live_parameter<float>("vy_vn_gain_intercept");
         auto fake_vy = get_live_parameter<float>("fake_vy");
         auto steering_offset = get_live_parameter<float>("steering_offset");
+
+        auto fake_fz_fl = get_live_parameter<float>("fake_fz_fl");
+        auto fake_fz_fr = get_live_parameter<float>("fake_fz_fr");
+        auto fake_fz_rl = get_live_parameter<float>("fake_fz_rl");
+        auto fake_fz_rr = get_live_parameter<float>("fake_fz_rr");
+        auto useTV = get_live_parameter<bool>("useTV");
 
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
@@ -210,6 +249,7 @@ namespace estimation
                 *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront, *fake_psi_dot, *integral_gain, // live configs (torque vectoring)
                 *psi_dot_gain_slope, *psi_dot_gain_intercept, *vy_vn_gain_slope, *vy_vn_gain_intercept, *fake_vy, *steering_offset,
                 *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr,            // live configs (tire)
+                *fake_fz_fl, *fake_fz_fr, *fake_fz_rl, *fake_fz_rr, *useTV,
                 *x1_fl, *x2_fl, *x3_fl, *y1_fl, *y2_fl, *y3_fl,                                            // file loaded configs (FL)
                 *x1_fr, *x2_fr, *x3_fr, *y1_fr, *y2_fr, *y3_fr,                                            // file loaded configs (FR)
                 *x1_rl, *x2_rl, *x3_rl, *y1_rl, *y2_rl, *y3_rl,                                            // file loaded configs (RL)
@@ -318,6 +358,12 @@ namespace estimation
         _inputs.Psi_dot_VNrads = current_state.current_angular_rate_rads.z;
         _inputs.DriveBiasFront = cur_config.DriveBiasFront;
         _inputs.BrakeBiasFront = cur_config.BrakeBiasFront;
+
+        _inputs.fake_fz_fl = cur_config.fake_fz_fl;
+        _inputs.fake_fz_fr = cur_config.fake_fz_fr;
+        _inputs.fake_fz_rl = cur_config.fake_fz_rl;
+        _inputs.fake_fz_rr = cur_config.fake_fz_rr;
+        _inputs.useTV = cur_config.useTV;
 
         _model.setExternalInputs(&_inputs);
         _model.step();
