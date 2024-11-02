@@ -99,6 +99,7 @@ namespace core
         TireDynamics tire_dynamics;
         veh_vec<float> driver_torque;
         ControllerTorqueOut matlab_math_temp_out;
+        float electrical_power_watts;
     };
 
     // we will have both speed and torque control output controllers

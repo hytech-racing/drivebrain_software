@@ -58,6 +58,15 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_angular_rate_rads = angular_rate_rads;
             _vehicle_state.current_ypr_rad = ypr_rad;
         }
+    } else if(message->GetTypeName() == "em_measurement")
+    {
+        auto in_msg = std::static_pointer_cast<em_measurement>(message);
+        auto current_amps = in_msg->em_current();
+        auto voltage = in_msg->em_voltage();
+
+        std::unique_lock lk(_state_mutex);
+        _vehicle_state.electrical_power_watts = current_amps * voltage;
+
     }
 }
 
@@ -216,7 +225,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_corner_power_kw->set_rl(matlab_math_power_limit_data.corner_power_kw.RL);
     current_corner_power_kw->set_rr(matlab_math_power_limit_data.corner_power_kw.RR);
     current_power_limit_status->set_power_limit_status(matlab_math_power_limit_data.power_limit_status);
-    
+
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -261,6 +270,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     prev_driver_torque_req->set_fr(current_state.prev_controller_output.torque_lim_nm.FL);
     prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.FL);
     prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.FL);
+
+    msg_out->set_electrical_power_watts(current_state.electrical_power_watts);
 
     auto log_start = std::chrono::high_resolution_clock::now();
     _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));

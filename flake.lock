@@ -3,16 +3,16 @@
     "HT_proto": {
       "flake": false,
       "locked": {
-        "lastModified": 1730557126,
-        "narHash": "sha256-Odkdhe8YuKmuybXNAc30i306ehQ+mJAFQLJf7DaL/nU=",
+        "lastModified": 1730569478,
+        "narHash": "sha256-sZpQZ60Uxn9BQlM/23YujebeiJBpTmR6u3FD7NPMfa4=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "14b98140cc4951509fe628ebd144c92b436f754d",
+        "rev": "3441a095a39db12a3d2b6b1b173d7ea49edbebef",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "2024-11-02T14_19_02",
+        "ref": "2024-11-02T17_44_57",
         "repo": "HT_proto",
         "type": "github"
       }
