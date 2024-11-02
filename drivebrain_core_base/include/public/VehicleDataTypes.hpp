@@ -59,10 +59,17 @@ namespace core
         float perceived_vy;
     };
 
+    struct PowerLimitStatus
+    {
+        bool power_limit_status;
+        veh_vec<float> corner_power_kw;
+    };
+
     struct MatlabMathResult
     {
         TireDynamics tire_dynamics;
         TorqueVectoringStatus torque_vectoring_status;
+        PowerLimitStatus power_limit_status;
     };
 
     struct SpeedControlOut

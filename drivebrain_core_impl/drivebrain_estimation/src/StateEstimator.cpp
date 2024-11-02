@@ -119,6 +119,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto matlab_math_tire_data = res_pair.first.tire_dynamics;
 
     auto matlab_math_tv_data  = res_pair.first.torque_vectoring_status;
+    auto matlab_math_power_limit_data = res_pair.first.power_limit_status;
     auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
 
     {
@@ -208,6 +209,14 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_tv_status->set_vy_vn_gain(matlab_math_tv_data.vy_vn_gain);
     current_tv_status->set_perceived_vy(matlab_math_tv_data.perceived_vy);
 
+    hytech_msgs::PowerLimitStatus *current_power_limit_status = msg_out->mutable_power_limit_status();
+    auto current_corner_power_kw = current_power_limit_status->mutable_corner_power_kw();
+    current_corner_power_kw->set_fl(matlab_math_power_limit_data.corner_power_kw.FL);
+    current_corner_power_kw->set_fr(matlab_math_power_limit_data.corner_power_kw.FR);
+    current_corner_power_kw->set_rl(matlab_math_power_limit_data.corner_power_kw.RL);
+    current_corner_power_kw->set_rr(matlab_math_power_limit_data.corner_power_kw.RR);
+    current_power_limit_status->set_power_limit_status(matlab_math_power_limit_data.power_limit_status);
+    
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

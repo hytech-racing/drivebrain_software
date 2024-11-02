@@ -162,6 +162,18 @@ namespace estimation
             _config.useTV = *pval;
             std::cout << "setting new useTV " << _config.useTV << std::endl;
         }
+        if (auto pval = std::get_if<float>(&new_param_map.at("max_mech_power_kw")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.max_mech_power_kw = *pval;
+            std::cout << "setting new max_mech_power_kw " << _config.max_mech_power_kw << std::endl;
+        }
+        if (auto pval = std::get_if<bool>(&new_param_map.at("use_power_limit")))
+        {
+            std::unique_lock lk(_config_mutex);
+            _config.use_power_limit = *pval;
+            std::cout << "setting new use_power_limit " << _config.use_power_limit << std::endl;
+        }
     }
 
     MatlabMath::MatlabMath(core::Logger &logger, core::JsonFileHandler &json_file_handler, bool &construction_failed)
@@ -201,6 +213,9 @@ namespace estimation
         auto fake_fz_rr = get_live_parameter<float>("fake_fz_rr");
         auto useTV = get_live_parameter<bool>("useTV");
 
+        auto max_mech_power_kw = get_live_parameter<float>("max_mech_power_kw");
+        auto use_power_limit = get_live_parameter<bool>("use_power_limit");
+
         auto x1_fl = get_parameter_value<float>("x1_fl");
         auto x2_fl = get_parameter_value<float>("x2_fl");
         auto x3_fl = get_parameter_value<float>("x3_fl");
@@ -235,6 +250,7 @@ namespace estimation
 
         if (!(use_fake_data && Fake_Vx && DriveBiasFront && BrakeBiasFront && fake_psi_dot && integral_gain &&
               psi_dot_gain_slope && psi_dot_gain_intercept && vy_vn_gain_slope && vy_vn_gain_intercept && fake_vy && steering_offset &&
+              max_mech_power_kw && use_power_limit &&
               lmux_fl && lmuy_fl && lmux_fr && lmuy_fr && lmux_rl && lmuy_rl && lmux_rr && lmuy_rr && 
               x1_fl && x2_fl && x3_fl && y1_fl && y2_fl && y3_fl &&
               x1_fr && x2_fr && x3_fr && y1_fr && y2_fr && y3_fr &&
@@ -248,6 +264,7 @@ namespace estimation
             _config = {
                 *use_fake_data, *Fake_Vx, *DriveBiasFront, *BrakeBiasFront, *fake_psi_dot, *integral_gain, // live configs (torque vectoring)
                 *psi_dot_gain_slope, *psi_dot_gain_intercept, *vy_vn_gain_slope, *vy_vn_gain_intercept, *fake_vy, *steering_offset,
+                *max_mech_power_kw, *use_power_limit,
                 *lmux_fl, *lmuy_fl, *lmux_fr, *lmuy_fr, *lmux_rl, *lmuy_rl, *lmux_rr, *lmuy_rr,            // live configs (tire)
                 *fake_fz_fl, *fake_fz_fr, *fake_fz_rl, *fake_fz_rr, *useTV,
                 *x1_fl, *x2_fl, *x3_fl, *y1_fl, *y2_fl, *y3_fl,                                            // file loaded configs (FL)
@@ -364,6 +381,9 @@ namespace estimation
         _inputs.fake_fz_rl = cur_config.fake_fz_rl;
         _inputs.fake_fz_rr = cur_config.fake_fz_rr;
         _inputs.useTV = cur_config.useTV;
+        
+        _inputs.max_mech_power_kw = cur_config.max_mech_power_kw;
+        _inputs.use_power_limit = cur_config.use_power_limit;
 
         _model.setExternalInputs(&_inputs);
         _model.step();
@@ -371,6 +391,7 @@ namespace estimation
 
         core::TireDynamics tire_dynamics_status;
         core::TorqueVectoringStatus torque_vectoring_status;
+        core::PowerLimitStatus power_limit_status;
         core::ControllerTorqueOut control_res;
 
         tire_dynamics_status.tire_forces_n.FL.x = outputs.FXFL;
@@ -412,9 +433,15 @@ namespace estimation
         torque_vectoring_status.vy_vn_gain = outputs.vy_vn_gain;
         torque_vectoring_status.perceived_vy = outputs.perceived_vy;
 
+        power_limit_status.corner_power_kw.FL = outputs.corner_power_kw_fl;
+        power_limit_status.corner_power_kw.FR = outputs.corner_power_kw_fr;
+        power_limit_status.corner_power_kw.RL = outputs.corner_power_kw_rl;
+        power_limit_status.corner_power_kw.RR = outputs.corner_power_kw_rr;
+        power_limit_status.power_limit_status = outputs.power_limit_status;
+
         control_res = {outputs.torq_req_FL, outputs.torq_req_FR, outputs.torq_req_RL, outputs.torq_req_RR}; // '<Root>/torq_req_FL'
 
-        return {{tire_dynamics_status, torque_vectoring_status}, control_res};
+        return {{tire_dynamics_status, torque_vectoring_status, power_limit_status}, control_res};
     }
 
 }

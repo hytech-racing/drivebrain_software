@@ -29,6 +29,8 @@ namespace estimation
                 float vy_vn_gain_intercept;
                 float fake_vy;
                 float steering_offset;
+                float max_mech_power_kw;
+                bool use_power_limit;
 
                 float lmux_fl;
                 float lmuy_fl;
@@ -38,7 +40,7 @@ namespace estimation
                 float lmuy_rl;
                 float lmux_rr;
                 float lmuy_rr;
-                
+
                 float fake_fz_fl;
                 float fake_fz_fr;
                 float fake_fz_rl;
