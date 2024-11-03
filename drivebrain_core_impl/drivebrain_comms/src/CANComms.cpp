@@ -105,7 +105,7 @@ void comms::CANDriver::_do_read() {
                                 } else if (ec) {
                                     // std::cerr << "Error receiving CAN message: " << ec.message()
                                     //           << std::endl;
-                                    spdlog::err("Error receiving CAN message: {}", ec.message())
+                                    spdlog::error("Error receiving CAN message: {}", ec.message())
                                 }
                             });
 }
@@ -116,7 +116,7 @@ void comms::CANDriver::_send_message(const struct can_frame &frame) {
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
             if (ec) {
                 //std::cerr << "Error sending CAN message: " << ec.message() << std::endl;
-                spdlog::err("Error sending CAN message: {}", ec.message());
+                spdlog::error("Error sending CAN message: {}", ec.message());
             }
         });
 }
