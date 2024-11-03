@@ -105,7 +105,7 @@ void comms::CANDriver::_do_read() {
                                 } else if (ec) {
                                     // std::cerr << "Error receiving CAN message: " << ec.message()
                                     //           << std::endl;
-                                    spdlog::error("Error receiving CAN message: {}", ec.message())
+                                    spdlog::error("Error receiving CAN message: {}", ec.message());
                                 }
                             });
 }
