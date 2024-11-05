@@ -51,6 +51,16 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             (in_msg->vn_ypr_rad().pitch()),
             (in_msg->vn_ypr_rad().roll())};
 
+        DataPoint point;
+        point.latitude = in_msg->vn_gps().lat();
+        point.longitude = in_msg->vn_gps().lon();
+        point.orientation = in_msg->vn_ypr_rad().yaw();
+        point.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        double speed = in_msg->vn_vel_m_s().x();
+        std::string raceStatus = _lapTracker.processRaceData(point, speed);
+        _logger.log(raceStatus);
+     
         {
             std::unique_lock lk(_state_mutex);
             _vehicle_state.current_body_vel_ms = body_vel_ms;

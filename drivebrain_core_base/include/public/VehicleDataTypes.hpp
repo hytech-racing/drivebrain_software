@@ -89,6 +89,7 @@ namespace core
         TireDynamics tire_dynamics;
         veh_vec<float> driver_torque;
         ControllerTorqueOut matlab_math_temp_out;
+        GPS_data current_gps_position;
     };
 
     // we will have both speed and torque control output controllers
