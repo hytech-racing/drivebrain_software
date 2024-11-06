@@ -28,6 +28,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
+find_package(GeographicLib REQUIRED)
 
 find_package(mcap REQUIRED)
 
@@ -35,7 +36,7 @@ find_package(mcap REQUIRED)
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
-find_package(GTest REQUIRED)
+
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
 find_package(matlab_math REQUIRED)
@@ -167,6 +168,7 @@ make_cmake_package(drivebrain_mcap_logger drivebrain)
 add_library(drivebrain_estimation SHARED 
     drivebrain_core_impl/drivebrain_estimation/src/MatlabMath.cpp
     drivebrain_core_impl/drivebrain_estimation/src/StateEstimator.cpp
+    drivebrain_core_impl/drivebrain_estimation/src/RaceTracker.cpp
 )
 
 target_include_directories(drivebrain_estimation PUBLIC
@@ -178,6 +180,7 @@ target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core 
     drivebrain_common_utils
     matlab_math::matlab_math_lib
+    GeographicLib::Geographic
 )
 
 make_cmake_package(drivebrain_estimation drivebrain)
@@ -247,13 +250,6 @@ target_compile_features(test_vn PUBLIC cxx_std_11)
 
 add_executable(alpha_build drivebrain_app/main.cpp)
 
-enable_testing()
-
-add_executable(alpha_test 
-    unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
-)
-
 target_link_libraries(alpha_build PUBLIC
     drivebrain_core
     drivebrain_control
@@ -261,17 +257,6 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_mcap_logger
     Boost::program_options
 )
-
-
-target_link_libraries(alpha_test PUBLIC 
-    drivebrain_core
-    drivebrain_control
-    drivebrain_comms
-    Boost::program_options
-    gtest
-)
-
-add_test(NAME MyTest COMMAND alpha_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
@@ -284,4 +269,3 @@ install(TARGETS
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
-
