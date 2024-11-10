@@ -1,3 +1,4 @@
+#include <spdlog/spdlog.h>
 #include <JsonFileHandler.hpp>
 
 void core::JsonFileHandler::save_config() {
@@ -8,7 +9,8 @@ void core::JsonFileHandler::save_config() {
     }
     else
     {
-        std::cerr << "Failed to open config file for writing.\n";
+        //std::cerr << "Failed to open config file for writing.\n";
+        spdlog::error("Failed to open config file for writing.");
     }
 }
 
@@ -21,6 +23,7 @@ void core::JsonFileHandler::_load_config() {
     }
     else
     {
-        std::cerr << "Config file not found, creating new one.\n";
+        //std::cerr << "Config file not found, creating new one.\n";
+        spdlog::error("Config file not found, creating new one.");
     }
 }

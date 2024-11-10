@@ -1,9 +1,11 @@
 #include <DBServiceImpl.hpp>
+#include "spdlog/spdlog.h"
 
 grpc::Status DBInterfaceImpl::RequestStopLogging(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
 {
     {
-        std::cout << "requested stopping of logging" << std::endl;
+        //std::cout << "requested stopping of logging" << std::endl;
+        spdlog::warn("requested stopping of logging");
         _logger_inst->stop_logging_to_file();
         auto status = _logger_inst->get_logger_status();
 
@@ -15,7 +17,8 @@ grpc::Status DBInterfaceImpl::RequestStopLogging(grpc::ServerContext *context, c
 grpc::Status DBInterfaceImpl::RequestStartLogging(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
 {
     {
-        std::cout << "requested start of logging" << std::endl;
+        // std::cout << "requested start of logging" << std::endl;
+        spdlog::warn("requested start of logging");
         _logger_inst->start_logging_to_new_file();
         auto status = _logger_inst->get_logger_status();
         response->set_active_or_previous_log_file_name(std::get<0>(status));
@@ -26,7 +29,8 @@ grpc::Status DBInterfaceImpl::RequestStartLogging(grpc::ServerContext *context, 
 grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
 {
     {
-        std::cout << "requested status of logger" << std::endl;
+        //std::cout << "requested status of logger" << std::endl;
+        spdlog::warn("requested status of logger");
         auto status = _logger_inst->get_logger_status();
         response->set_active_or_previous_log_file_name(std::get<0>(status));
         response->set_currently_logging(std::get<1>(status));
@@ -39,7 +43,9 @@ DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr
 }
 void DBInterfaceImpl::stop_server() {
     if (_server) {
-        std::cout << "Shutting down the server..." << std::endl;
+        //std::cout << "Shutting down the server..." << std::endl;
+        spdlog::warn("Shutting down the server...");
+
         _server->Shutdown();
     }
 }
@@ -56,7 +62,8 @@ void DBInterfaceImpl::run_server()
     builder.RegisterService(this);
     // Finally assemble the server.
     _server = builder.BuildAndStart();
-    std::cout << "Server listening on " << server_address << std::endl;
+    //std::cout << "Server listening on " << server_address << std::endl;
+    spdlog::warn("Server listening on ");
 
     // Wait for the server to shutdown. Note that some other thread must be
     // responsible for shutting down the server for this call to ever return.

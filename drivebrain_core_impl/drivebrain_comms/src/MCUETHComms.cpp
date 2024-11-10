@@ -1,5 +1,7 @@
 #include <MCUETHComms.hpp>
 #include "hytech_msgs.pb.h"
+#include <spdlog/spdlog.h>
+
 
 using boost::asio::ip::udp;
 namespace comms
@@ -32,7 +34,8 @@ namespace comms
         _running = false;
         _input_deque_ref.cv.notify_all();
         _output_thread.join();
-        std::cout <<"destructed MCU ETH COMMS" <<std::endl;
+        // std::cout <<"destructed MCU ETH COMMS" <<std::endl;
+        spdlog::warn("destructed MCU ETH COMMS");
     }
 
     void MCUETHComms::_handle_send_msg_from_queue()

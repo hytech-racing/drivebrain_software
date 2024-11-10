@@ -74,6 +74,7 @@ target_link_libraries(drivebrain_core PUBLIC
     Boost::system
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     hytech_np_proto_cpp::hytech_np_proto_cpp
+    spdlog::spdlog
 )
 
 make_cmake_package(drivebrain_core drivebrain)
@@ -90,6 +91,7 @@ target_include_directories(drivebrain_common_utils PUBLIC
 
 target_link_libraries(drivebrain_common_utils PUBLIC
     protobuf::libprotobuf
+    spdlog::spdlog
 )
 
 make_cmake_package(drivebrain_common_utils drivebrain)

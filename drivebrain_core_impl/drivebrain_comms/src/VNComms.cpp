@@ -12,6 +12,7 @@
 #include "libvncxx/vntime.h"
 #include "libvncxx/packetfinder.h"
 #include "libvncxx/packet.h"
+#include <spdlog/spdlog.h>
 
 namespace comms
 {
@@ -34,7 +35,8 @@ namespace comms
 
         if (ec)
         {
-            std::cout << "error " << ec <<std::endl;
+            // std::cout << "error " << ec << std::endl;
+            spdlog::warn("Error: {}", ec.message());
             _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
             return 1;
         }
@@ -61,7 +63,6 @@ namespace comms
           _message_logger(message_logger),
           _serial(io)
     {
-
         init();
 
         // Starts read
@@ -99,11 +100,13 @@ namespace comms
                                  {
                                      if (!ec)
                                      {
-                                         std::cout << "Successfully sent " << bytes_transferred << " bytes.\n";
+                                         // std::cout << "Successfully sent " << bytes_transferred << " bytes.\n";
+                                         spdlog::warn("Successfully sent {} bytes.", bytes_transferred);
                                      }
                                      else
                                      {
-                                         std::cerr << "Error sending data: " << ec.message() << "\n";
+                                         // std::cerr << "Error sending data: " << ec.message() << "\n";
+                                         spdlog::error("Error sending data: {}", ec.message());
                                      }
                                  });
     }
@@ -123,8 +126,8 @@ namespace comms
                                      (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY),
                                      GpsGroup::GPSGROUP_NONE))
             {
-                // Not the type of binary packet we are expecting.
-                std::cout << "ERROR: packet is not what we want" << std::endl;
+                // std::cout << "ERROR: packet is not what we want" << std::endl;
+                spdlog::warn("ERROR: packet is not what we want");
                 return;
             }
 
@@ -182,7 +185,8 @@ namespace comms
         }
         else
         {
-            std::cout << "packet not correct" << std::endl;
+            // std::cout << "packet not correct" << std::endl;
+            spdlog::warn("Packet not correct");
         }
     }
 
@@ -196,7 +200,8 @@ namespace comms
                 {
                     if (ec != boost::asio::error::operation_aborted)
                     {
-                        std::cerr << "ERROR: " << ec.message() << std::endl;
+                        // std::cerr << "ERROR: " << ec.message() << std::endl;
+                        spdlog::error("ERROR: {}", ec.message());
                     }
                     return;
                 }
