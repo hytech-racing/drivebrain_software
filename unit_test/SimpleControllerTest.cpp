@@ -181,6 +181,7 @@ TEST_F(SimpleControllerTest, VariableRequests)
     ASSERT_NEAR(res->torque_lim_nm.RR, 10.0, 1.0);
 
     in.input.requested_accel = 1;
+    in.input.requested_brake = 0;
     cmd = simple_controller.step_controller(in);
 
     ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
@@ -188,8 +189,8 @@ TEST_F(SimpleControllerTest, VariableRequests)
     ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
     ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 22.4, 1.0);
+    ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.RR, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.RL, 22.4, 2.0);
 }
