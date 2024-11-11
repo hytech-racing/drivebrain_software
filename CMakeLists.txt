@@ -223,14 +223,6 @@ target_link_libraries(test_db_grpc PUBLIC
     gRPC::grpc++_reflection
 )
 
-add_executable(test_controller_manager tests/test_controller_manager.cpp)
-
-target_link_libraries(test_controller_manager PUBLIC
-    drivebrain_core
-    drivebrain_control
-    GTest::gtest_main
-)
-
 
 # add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
@@ -261,6 +253,7 @@ enable_testing()
 add_executable(alpha_test 
     unit_test/main.cpp
     unit_test/SimpleControllerTest.cpp
+    unit_test/test_controller_manager.cpp
 )
 
 target_link_libraries(alpha_build PUBLIC
