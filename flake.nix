@@ -40,13 +40,18 @@
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
-    matlab_math = {
+    db-core-src = {
+      url = "github:hytech-racing/drivebrain_core";
+      flake = false;
+    };
+
+    simulink-automation-src = {
         url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz";
         flake = false;
     };
 
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab_math, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -73,22 +78,21 @@
             };
           };
       };
-      # Create matlab math deriv and overlay
-      matlab_math_derivation = { stdenv, cmake  }: stdenv.mkDerivation {
-        name = "matlab-models-deriv";
-        src = matlab_math;
-        nativeBuildInputs = [ cmake ];
+
+      db_core_overlay = final: prev: {
+        drivebrain_core = final.callPackage ./db-core.nix { inherit db-core-src; };
       };
 
-      matlab_math_overlay = final: prev: {
-        matlab_math = final.callPackage matlab_math_derivation { };
+      simulink_automation_overlay = final: prev: {
+        simulink_automation = final.callPackage ./simulink_automation.nix { inherit simulink-automation-src; };
       };
 
       my_overlays = [
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
-        matlab_math_overlay
+        simulink_automation_overlay
+        db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
     in
@@ -123,6 +127,8 @@
             };
             packages.default = pkgs.drivebrain_software;
             packages.drivebrain_software = pkgs.drivebrain_software;
+            packages.drivebrain_core = pkgs.drivebrain_core;
+            packages.simulink_automation = pkgs.simulink_automation;
 
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
@@ -140,6 +146,20 @@
               packages = [ pkgs.mcap-cli ];
               inputsFrom = [
                 pkgs.drivebrain_software
+              ];
+            };
+
+            devShells.sim_automath = pkgs.mkShell rec {
+              name = "nix-devshell";
+              shellHook =
+                let icon = "f121";
+                in ''
+                  
+                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
+                  
+                '';
+              inputsFrom = [
+                pkgs.simulink_automation
               ];
             };
 

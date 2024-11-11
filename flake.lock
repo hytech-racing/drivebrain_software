@@ -101,6 +101,22 @@
         "type": "github"
       }
     },
+    "db-core-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1731280508,
+        "narHash": "sha256-fU16Nbo9VS16PCwtlYCpUHsbWhkxcfcVaSpvJxwYUS8=",
+        "owner": "hytech-racing",
+        "repo": "drivebrain_core",
+        "rev": "f2ef9eff33c2c8b60be0f37579d566cc1df11dfe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hytech-racing",
+        "repo": "drivebrain_core",
+        "type": "github"
+      }
+    },
     "dbcppp-src": {
       "flake": false,
       "locked": {
@@ -186,11 +202,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1727826117,
-        "narHash": "sha256-K5ZLCyfO/Zj9mPFldf3iwS6oZStJcU4tSpiXTMYaaL0=",
+        "lastModified": 1730504689,
+        "narHash": "sha256-hgmguH29K2fvs9szpq2r3pz2/8cJd2LPS+b4tfNFCwE=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "3d04084d54bedc3d6b8b736c70ef449225c361b1",
+        "rev": "506278e768c2a08bec68eb62932193e341f55c90",
         "type": "github"
       },
       "original": {
@@ -354,19 +370,6 @@
         "owner": "SimonCahill",
         "repo": "libsockcanpp",
         "type": "github"
-      }
-    },
-    "matlab_math": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1730006843,
-        "narHash": "sha256-az6sT+g41jRqmp79/FB8RZO6xleK9Td8iY/JAJQ2HJc=",
-        "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
       }
     },
     "mcap": {
@@ -649,11 +652,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1729691686,
-        "narHash": "sha256-BAuPWW+9fa1moZTU+jFh+1cUtmsuF8asgzFwejM4wac=",
+        "lastModified": 1730963269,
+        "narHash": "sha256-rz30HrFYCHiWEBCKHMffHbMdWJ35hEkcRVU0h7ms3x0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "32e940c7c420600ef0d1ef396dc63b04ee9cad37",
+        "rev": "83fb6c028368e465cd19bb127b86f971a5e41ebc",
         "type": "github"
       },
       "original": {
@@ -699,15 +702,29 @@
       "inputs": {
         "HT_proto": "HT_proto",
         "data_acq": "data_acq",
+        "db-core-src": "db-core-src",
         "easy_cmake": "easy_cmake",
         "flake-parts": "flake-parts",
         "foxglove-schemas-src": "foxglove-schemas-src",
         "ht_can": "ht_can",
-        "matlab_math": "matlab_math",
         "nebs-packages": "nebs-packages",
         "nix-proto": "nix-proto_2",
         "nixpkgs": "nixpkgs_7",
+        "simulink-automation-src": "simulink-automation-src",
         "vn_driver_lib": "vn_driver_lib"
+      }
+    },
+    "simulink-automation-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1730006843,
+        "narHash": "sha256-az6sT+g41jRqmp79/FB8RZO6xleK9Td8iY/JAJQ2HJc=",
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
       }
     },
     "systems": {
