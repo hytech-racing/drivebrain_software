@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-15T07_06_59";
+        ref = "2024-10-28T17_14_30";
         flake = false;
       };
 
@@ -128,6 +128,27 @@
                 pkgs.drivebrain_software
               ];
             };
+
+            devShells.tests = pkgs.mkShell rec {
+              name = "test-devshell";
+        
+              shellHook =
+                let icon = "f121";
+                in ''
+                  dbc_path=${pkgs.ht_can_pkg}
+                  export DBC_PATH=$dbc_path
+                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
+                  alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
+                '';
+
+              nativeBuiltInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
+
+              inputsFrom = [
+                pkgs.drivebrain_software
+              ];
+            
+            };
+
             legacyPackages =
               import nixpkgs {
                 inherit system;
