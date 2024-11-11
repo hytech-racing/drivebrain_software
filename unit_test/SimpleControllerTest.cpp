@@ -16,7 +16,7 @@ protected:
 
     SimpleControllerTest()
         : logger(core::LogLevel::INFO), 
-        config("../config/test_config/can_driver.json"),
+        config("../config/drivebrain_config.json"),
         simple_controller(logger, config),
         fail_controller(logger, config, "no_config_here"),
         in()
@@ -34,7 +34,7 @@ protected:
 
 TEST_F(SimpleControllerTest, ConstructorInitializesProperly) 
 {
-    EXPECT_EQ(simple_controller.get_dt_sec(), 0.01);
+    EXPECT_EQ(simple_controller.get_dt_sec(), 0.001);
 }
 
 TEST_F(SimpleControllerTest, InitHasConfig)
