@@ -18,9 +18,13 @@ protected:
         : logger(core::LogLevel::INFO), 
         config("../config/test_config/can_driver.json"),
         simple_controller(logger, config),
-        fail_controller(logger, "no_config_here"),
-        in(true, { 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 })
+        fail_controller(logger, config, "no_config_here"),
+        in()
     {
+        in.is_ready_to_drive = true;
+        in.current_rpms = { 0.0, 0.0, 0.0, 0.0 };
+        in.current_body_vel_ms = { 0.0 , 0.0 , 0.0 };
+        in.input = { 0.0, 0.0 };
     }
 
     void SetUp() override {

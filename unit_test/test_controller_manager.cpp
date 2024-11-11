@@ -234,8 +234,3 @@ TEST_F(ControllerManagerTest, SwapSimpleControllers) {
     core::ControllerOutput output = controller_manager_real.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
