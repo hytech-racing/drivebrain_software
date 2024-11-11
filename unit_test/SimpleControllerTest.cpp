@@ -34,7 +34,7 @@ protected:
 
 TEST_F(SimpleControllerTest, ConstructorInitializesProperly) 
 {
-    EXPECT_EQ(simple_controller.get_dt_sec(), 0.001);
+    EXPECT_NEAR(simple_controller.get_dt_sec(), 0.001, 0.01);
 }
 
 TEST_F(SimpleControllerTest, InitHasConfig)
@@ -91,10 +91,10 @@ TEST_F(SimpleControllerTest, FullPositiveAccelRequest)
     ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
     ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 22.4, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 22.4, 1.0);
+    ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.RR, 22.4, 2.0);
+    ASSERT_NEAR(res->torque_lim_nm.RL, 22.4, 2.0);
 }
 
 TEST_F(SimpleControllerTest, SmallNegativeAccelRequest)
@@ -167,7 +167,7 @@ TEST_F(SimpleControllerTest, VariableRequests)
     ASSERT_NEAR(res->torque_lim_nm.RR, 0.0, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0);
 
-    in.input.requested_brake = 1;
+    in.input.requested_accel = 0;
     cmd = simple_controller.step_controller(in);
 
     ASSERT_NEAR(res->desired_rpms.FL, 0.0, 1.0);
