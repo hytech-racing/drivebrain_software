@@ -47,7 +47,6 @@ std::atomic<bool> stop_signal{false};
 // Signal handler function
 void signalHandler(int signal)
 {
-    // std::cout << "Interrupt signal (" << signal << ") received. Cleaning up..." << std::endl;
     spdlog::info("Interrupt signal ({}) received. Cleaning up...", signal);
     stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
 }
@@ -87,7 +86,6 @@ int main(int argc, char *argv[])
     po::notify(vm);
     
     if (vm.count("help")) {
-        // std::cout << desc << "\n";
         std::stringstream ss;
 	ss << desc;
         spdlog::info("{}", ss.str());
@@ -145,7 +143,6 @@ int main(int argc, char *argv[])
     DBInterfaceImpl db_service_inst(message_logger);
     std::thread db_service_thread([&db_service_inst]()
                                   {
-            // std::cout <<"started db service thread" <<std::endl;
             spdlog::info("started db service thread");
 
             try {
@@ -154,7 +151,6 @@ int main(int argc, char *argv[])
                     db_service_inst.run_server();  // Run at least one handler, or return immediately if none
                 }
             } catch (const std::exception& e) {
-                //std::cerr << "Error in drivebrain service thread: " << e.what() << std::endl;
                 spdlog::error("Error in drivebrain service thread: {}", e.what());
             }
         }); 
@@ -163,12 +159,10 @@ int main(int argc, char *argv[])
     // if we receive the pedals message, we step the controller and get its output to put intot he tx queue
     std::thread io_context_thread([&io_context]()
                                   {
-            // std::cout <<"started io context thread" <<std::endl;
             spdlog::info("Started io context thread");
             try {
                 io_context.run();
             } catch (const std::exception& e) {
-                //std::cerr << "Error in io_context: " << e.what() << std::endl;
                 spdlog::error("Error in io_context: {}", e.what());
             } });
 
@@ -256,13 +250,11 @@ int main(int argc, char *argv[])
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     process_thread.join();
-    // std::cout << "joined main process" << std::endl;
     spdlog::info("joined main process");
     io_context.stop();
     io_context_thread.join();
     db_service_inst.stop_server();
     db_service_thread.join();
-    // std::cout << "joined io context" << std::endl;
     spdlog::info("joined io context");
     return 0;
 }

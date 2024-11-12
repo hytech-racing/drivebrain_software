@@ -34,7 +34,6 @@ namespace comms
         _running = false;
         _input_deque_ref.cv.notify_all();
         _output_thread.join();
-        // std::cout <<"destructed MCU ETH COMMS" <<std::endl;
         spdlog::warn("destructed MCU ETH COMMS");
     }
 

@@ -12,7 +12,6 @@ namespace util
                 google::protobuf::DescriptorPool::generated_pool()->FindFileByName(name);
             if (!file_descriptor)
             {
-                // std::cerr << "File descriptor not found!" << std::endl;
                 spdlog::error("File descriptor for '{}' not found!", name);
             }
             else

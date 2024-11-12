@@ -11,7 +11,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
         
         std::unique_lock lk(_config_mutex);
         _config.max_torque = *pval;
-        // std::cout << "setting new max torque " << _config.max_torque << std::endl;
         spdlog::info("Setting new max torque: {}", _config.max_torque);
     }
 
@@ -19,7 +18,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     {
         std::unique_lock lk(_config_mutex);
         _config.max_reg_torque = *pval;
-        // std::cout << "setting new max regen torque " << _config.max_reg_torque << std::endl;
         spdlog::info("Setting new max regen torque: {}", _config.max_reg_torque);
     }
 
@@ -27,7 +25,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     {
         std::unique_lock lk(_config_mutex);
         _config.rear_torque_scale = *pval;
-        // std::cout << "setting new rear_torque_scale " << _config.rear_torque_scale << std::endl;
         spdlog::info("Setting new rear torque scale: {}", _config.rear_torque_scale);
     }
 
@@ -35,7 +32,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     {
         std::unique_lock lk(_config_mutex);
         _config.regen_torque_scale = *pval;
-        // std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale << std::endl;
         spdlog::info("Setting new regen torque scale: {}", _config.regen_torque_scale);
     }
 
@@ -43,7 +39,6 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     {
         std::unique_lock lk(_config_mutex);
         _config.positive_speed_set = *pval;
-        // std::cout << "setting new positive_speed_set " << _config.positive_speed_set << std::endl;
         spdlog::info("Setting new positive speed set: {}", _config.positive_speed_set);
     }
 }
