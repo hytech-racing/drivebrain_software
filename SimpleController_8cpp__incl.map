@@ -1,8 +1,9 @@
 <map id="drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp" name="drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="841,5,992,60"/>
+<area shape="rect" id="node1" title=" " alt="" coords="925,5,1076,60"/>
 <area shape="rect" id="node2" href="$SimpleController_8hpp.html" title=" " alt="" coords="497,108,638,133"/>
 <area shape="rect" id="node16" title=" " alt="" coords="1006,255,1067,280"/>
 <area shape="rect" id="node20" href="$VehicleDataTypes_8hpp.html" title=" " alt="" coords="841,181,992,207"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1067,108,1179,133"/>
 <area shape="rect" id="node3" href="$Controller_8hpp.html" title=" " alt="" coords="450,181,551,207"/>
 <area shape="rect" id="node4" href="$Configurable_8hpp.html" title=" " alt="" coords="575,181,693,207"/>
 <area shape="rect" id="node10" href="$Logger_8hpp.html" title=" " alt="" coords="5,255,92,280"/>

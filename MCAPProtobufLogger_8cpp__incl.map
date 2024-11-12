@@ -1,14 +1,15 @@
 <map id="drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp" name="drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="2114,5,2313,60"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2139,5,2338,60"/>
 <area shape="rect" id="node2" href="$MCAPProtobufLogger_8hpp.html" title=" " alt="" coords="1675,108,1848,133"/>
 <area shape="rect" id="node4" title=" " alt="" coords="1222,181,1301,207"/>
 <area shape="rect" id="node8" title=" " alt="" coords="2156,181,2271,207"/>
 <area shape="rect" id="node10" title=" " alt="" coords="1733,255,1790,280"/>
-<area shape="rect" id="node15" title=" " alt="" coords="2323,108,2384,133"/>
+<area shape="rect" id="node15" title=" " alt="" coords="2301,108,2363,133"/>
 <area shape="rect" id="node16" href="$ProtobufUtils_8hpp.html" title=" " alt="" coords="501,108,624,133"/>
 <area shape="rect" id="node22" title=" " alt="" coords="993,181,1119,207"/>
-<area shape="rect" id="node26" title=" " alt="" coords="2409,108,2490,133"/>
-<area shape="rect" id="node27" title=" " alt="" coords="2514,108,2566,133"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2387,108,2469,133"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2493,108,2545,133"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2569,108,2681,133"/>
 <area shape="rect" id="node3" title=" " alt="" coords="1452,181,1631,207"/>
 <area shape="rect" id="node5" title=" " alt="" coords="1655,181,1723,207"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1143,181,1198,207"/>
