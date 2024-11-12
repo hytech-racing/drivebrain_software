@@ -1,4 +1,5 @@
 #include <MatlabMath.hpp>
+#include <spdlog/spdlog.h> 
 
 namespace estimation
 {
@@ -8,85 +9,85 @@ namespace estimation
         {
             std::unique_lock lk(_config_mutex);
             _config.lmux_fl = *pval;
-            std::cout << "setting new lmux_fl " << _config.lmux_fl << std::endl;
+            spdlog::info("Setting new lmux_fl: {}", _config.lmux_fl); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmuy_fl")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmuy_fl = *pval;
-            std::cout << "setting new lmuy_fl " << _config.lmuy_fl << std::endl;
+            spdlog::info("Setting new lmuy_fl: {}", _config.lmuy_fl); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmux_fr")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmux_fr = *pval;
-            std::cout << "setting new lmux_fr " << _config.lmux_fr << std::endl;
+            spdlog::info("Setting new lmux_fr: {}", _config.lmux_fr);
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmuy_fr")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmuy_fr = *pval;
-            std::cout << "setting new lmuy_fr " << _config.lmuy_fr << std::endl;
+            spdlog::info("Setting new lmuy_fr: {}", _config.lmuy_fr); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmux_rl")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmux_rl = *pval;
-            std::cout << "setting new lmux_rl " << _config.lmux_rl << std::endl;
+            spdlog::info("Setting new lmux_rl: {}", _config.lmux_rl); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmuy_rl")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmuy_rl = *pval;
-            std::cout << "setting new lmuy_rl " << _config.lmuy_rl << std::endl;
+            spdlog::info("Setting new lmuy_rl: {}", _config.lmuy_rl); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmux_rr")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmux_rr = *pval;
-            std::cout << "setting new lmux_rr " << _config.lmux_rr << std::endl;
+            spdlog::info("Setting new lmux_rr: {}", _config.lmux_rr); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("lmuy_rr")))
         {
             std::unique_lock lk(_config_mutex);
             _config.lmuy_rr = *pval;
-            std::cout << "setting new lmuy_rr " << _config.lmuy_rr << std::endl;
+            spdlog::info("Setting new lmuy_rr: {}", _config.lmuy_rr); 
         }
         if (auto pval = std::get_if<bool>(&new_param_map.at("use_fake_data")))
         {
             std::unique_lock lk(_config_mutex);
             _config.use_fake_data = *pval;
-            std::cout << "setting new use_fake_data " << _config.use_fake_data << std::endl;
+            spdlog::info("Setting new use_fake_data: {}", _config.use_fake_data); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("Fake_Vx")))
         {
             std::unique_lock lk(_config_mutex);
             _config.Fake_Vx = *pval;
-            std::cout << "setting new Fake_Vx " << _config.Fake_Vx << std::endl;
+            spdlog::info("Setting new Fake_Vx: {}", _config.Fake_Vx); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("DriveBiasFront")))
         {
             std::unique_lock lk(_config_mutex);
             _config.DriveBiasFront = *pval;
-            std::cout << "setting new DriveBiasFront " << _config.DriveBiasFront << std::endl;
+            spdlog::info("Setting new DriveBiasFront: {}", _config.DriveBiasFront); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("BrakeBiasFront")))
         {
             std::unique_lock lk(_config_mutex);
             _config.BrakeBiasFront = *pval;
-            std::cout << "setting new BrakeBiasFront " << _config.BrakeBiasFront << std::endl;
+            spdlog::info("Setting new BrakeBiasFront: {}", _config.BrakeBiasFront);
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("fake_psi_dot")))
         {
             std::unique_lock lk(_config_mutex);
             _config.fake_psi_dot = *pval;
-            std::cout << "setting new fake_psi_dot " << _config.fake_psi_dot << std::endl;
+            spdlog::info("Setting new fake_psi_dot: {}", _config.fake_psi_dot); 
         }
         if (auto pval = std::get_if<float>(&new_param_map.at("integral_gain")))
         {
             std::unique_lock lk(_config_mutex);
             _config.integral_gain = *pval;
-            std::cout << "setting new integral_gain " << _config.integral_gain << std::endl;
+            spdlog::info("Setting new integral_gain: {}", _config.integral_gain); 
         }
     }
 
