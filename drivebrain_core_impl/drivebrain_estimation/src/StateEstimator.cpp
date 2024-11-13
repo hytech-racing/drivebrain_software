@@ -2,6 +2,7 @@
 #include <chrono>
 #include <algorithm>
 #include "hytech_msgs.pb.h"
+#include <Tire_Model_Codegen_MatlabModel.hpp>
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
@@ -114,6 +115,32 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     /// matlab math ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     auto matlab_math_start = std::chrono::high_resolution_clock::now();
+
+    // Convert Vehicle and Raw Data to Tire Model Input
+    bool sign = (current_state.input.requested_accel - current_state.input.requested_brake) >= 0;
+    estimation::Tire_Model_Codegen_MatlabModel::inputs model_inputs = {
+        current_state.driver_torque.FL * (sign ? 1.0f : -1.0f),
+        current_state.driver_torque.FR * (sign ? 1.0f : -1.0f),
+        current_state.driver_torque.RL * (sign ? 1.0f : -1.0f),
+        current_state.driver_torque.RR * (sign ? 1.0f : -1.0f),
+        0.0f,
+        0.0f,
+        0.0f
+        0.0f,
+        raw_input.raw_load_cell_values.FL,
+        raw_input.raw_load_cell_values.FR,
+        raw_input.raw_load_cell_values.RL,
+        raw_input.raw_load_cell_values.RR,
+        current_state.current_rpms.FL;
+        current_state.current_rpms.RL;
+        current_state.current_rpms.FR;
+        current_state.current_rpms.RR;
+        current_state.current_body_vel_ms.x;
+        current_state.current_body_vel_ms.z,
+        current_state.current_body_vel_ms.y
+    };
+
+    
     auto res_pair = _matlab_estimator.evaluate_estimator(current_state, current_raw_data);
     auto matlab_math_end = std::chrono::high_resolution_clock::now();
     auto matlab_math_tire_data = res_pair.first.tire_dynamics;

@@ -104,11 +104,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1731280508,
-        "narHash": "sha256-fU16Nbo9VS16PCwtlYCpUHsbWhkxcfcVaSpvJxwYUS8=",
+        "lastModified": 1731457057,
+        "narHash": "sha256-lh0FwrIh0heg36nR5xdWHyGW77JmeR6HBsdMdGh+Bgw=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "f2ef9eff33c2c8b60be0f37579d566cc1df11dfe",
+        "rev": "80a1d229d412864e9e7154393ef4931aa64643e5",
         "type": "github"
       },
       "original": {
@@ -652,11 +652,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1730963269,
-        "narHash": "sha256-rz30HrFYCHiWEBCKHMffHbMdWJ35hEkcRVU0h7ms3x0=",
+        "lastModified": 1731239293,
+        "narHash": "sha256-q2yjIWFFcTzp5REWQUOU9L6kHdCDmFDpqeix86SOvDc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "83fb6c028368e465cd19bb127b86f971a5e41ebc",
+        "rev": "9256f7c71a195ebe7a218043d9f93390d49e6884",
         "type": "github"
       },
       "original": {
@@ -717,14 +717,14 @@
     "simulink-automation-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1730006843,
-        "narHash": "sha256-az6sT+g41jRqmp79/FB8RZO6xleK9Td8iY/JAJQ2HJc=",
+        "lastModified": 1731456094,
+        "narHash": "sha256-KctA3qVsyrOn4QvBSi1N58O6MsC6NJ0rTpNz7abA7qM=",
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz"
       }
     },
     "systems": {

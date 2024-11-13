@@ -29,7 +29,7 @@
 #include <VehicleDataTypes.hpp>
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
-#include <MatlabMath.hpp>
+#include <Tire_Mode_Codegen_MatlabModel.hpp>
 #include <Configurable.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
@@ -60,7 +60,7 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger, estimation::MatlabMath& matlab_estimator) 
+        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger, estimation::Tire_Model_Codegen_MatlabModel& matlab_estimator) 
         : _logger(shared_logger), _message_logger(message_logger), _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
@@ -90,7 +90,7 @@ namespace core
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 1> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
-        estimation::MatlabMath& _matlab_estimator;
+        estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 
     };
 }

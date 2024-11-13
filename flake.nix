@@ -46,7 +46,7 @@
     };
 
     simulink-automation-src = {
-        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.10.27_05-27/matlab_math.tar.gz";
+        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz";
         flake = false;
     };
 
