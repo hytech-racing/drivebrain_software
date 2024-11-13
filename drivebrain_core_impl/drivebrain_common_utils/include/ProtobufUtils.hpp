@@ -10,7 +10,6 @@
 #include <string>
 
 // TODO figure out if this is the best place to include this or nah
-#include <hytech_msgs.pb.h>
 #include <tuple>
 #include <vector>
 #include <string>

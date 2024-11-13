@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 // virtual base class for a controller
 
 // STORY:
