@@ -1,20 +1,20 @@
 #include <gtest/gtest.h>
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
 #include <VehicleDataTypes.hpp>
 #include <JsonFileHandler.hpp>
 #include <Logger.hpp>
 #include <Utils.hpp>
 
-class SimpleControllerTest : public testing::Test {
+class SimpleSpeedControllerTest : public testing::Test {
 
 protected:
     core::Logger logger;
     core::JsonFileHandler config;
-    control::SimpleController simple_controller;
-    control::SimpleController fail_controller;
+    control::SimpleSpeedController simple_controller;
+    control::SimpleSpeedController fail_controller;
     core::VehicleState in;
 
-    SimpleControllerTest()
+    SimpleSpeedControllerTest()
         : logger(core::LogLevel::INFO), 
         config("../config/drivebrain_config.json"),
         simple_controller(logger, config),
@@ -32,22 +32,22 @@ protected:
     }
 };
 
-TEST_F(SimpleControllerTest, ConstructorInitializesProperly) 
+TEST_F(SimpleSpeedControllerTest, ConstructorInitializesProperly) 
 {
     EXPECT_NEAR(simple_controller.get_dt_sec(), 0.001, 0.01);
 }
 
-TEST_F(SimpleControllerTest, InitHasConfig)
+TEST_F(SimpleSpeedControllerTest, InitHasConfig)
 {
     EXPECT_TRUE(simple_controller.init());
 }
 
-TEST_F(SimpleControllerTest, InitDoesNotHaveConfig)
+TEST_F(SimpleSpeedControllerTest, InitDoesNotHaveConfig)
 {
     EXPECT_FALSE(fail_controller.init());
 }
 
-TEST_F(SimpleControllerTest, NoPedalInput)
+TEST_F(SimpleSpeedControllerTest, NoPedalInput)
 {
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
@@ -63,7 +63,7 @@ TEST_F(SimpleControllerTest, NoPedalInput)
     ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0); 
 }
 
-TEST_F(SimpleControllerTest, SmallPositiveAccelRequest)
+TEST_F(SimpleSpeedControllerTest, SmallPositiveAccelRequest)
 {
     in.input.requested_accel = 0.2;
     auto cmd = simple_controller.step_controller(in);
@@ -80,7 +80,7 @@ TEST_F(SimpleControllerTest, SmallPositiveAccelRequest)
     ASSERT_NEAR(res->torque_lim_nm.RL, 4.48, 1.0);
 }
 
-TEST_F(SimpleControllerTest, FullPositiveAccelRequest)
+TEST_F(SimpleSpeedControllerTest, FullPositiveAccelRequest)
 {
     in.input.requested_accel = 1;
     auto cmd = simple_controller.step_controller(in);
@@ -97,7 +97,7 @@ TEST_F(SimpleControllerTest, FullPositiveAccelRequest)
     ASSERT_NEAR(res->torque_lim_nm.RL, 22.4, 2.0);
 }
 
-TEST_F(SimpleControllerTest, SmallNegativeAccelRequest)
+TEST_F(SimpleSpeedControllerTest, SmallNegativeAccelRequest)
 {
     in.input.requested_accel = 0.2;
     in.input.requested_brake = 0.8;
@@ -115,7 +115,7 @@ TEST_F(SimpleControllerTest, SmallNegativeAccelRequest)
     ASSERT_NEAR(res->torque_lim_nm.RR, 6.0, 1.0);
 }
 
-TEST_F(SimpleControllerTest, FullNegativeAccelRequest)
+TEST_F(SimpleSpeedControllerTest, FullNegativeAccelRequest)
 {
     in.input.requested_brake = 1;
     auto cmd = simple_controller.step_controller(in);
@@ -132,7 +132,7 @@ TEST_F(SimpleControllerTest, FullNegativeAccelRequest)
     ASSERT_NEAR(res->torque_lim_nm.RR, 10.0, 1.0);
 }
 
-TEST_F(SimpleControllerTest, FullBrakeAndAccelRequest)
+TEST_F(SimpleSpeedControllerTest, FullBrakeAndAccelRequest)
 {
     in.input.requested_brake = 1;
     in.input.requested_accel = 1;
@@ -150,7 +150,7 @@ TEST_F(SimpleControllerTest, FullBrakeAndAccelRequest)
     ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0);
 }
 
-TEST_F(SimpleControllerTest, VariableRequests)
+TEST_F(SimpleSpeedControllerTest, VariableRequests)
 {
     in.input.requested_brake = 1;
     in.input.requested_accel = 1;

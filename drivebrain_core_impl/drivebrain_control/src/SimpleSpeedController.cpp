@@ -1,8 +1,8 @@
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
 #include <variant>
 #include <VehicleDataTypes.hpp>
 
-void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
+void control::SimpleSpeedController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
     // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache
     if (auto pval = std::get_if<float>(&new_param_map.at("max_torque")))
@@ -39,7 +39,7 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
     }
 }
 
-bool control::SimpleController::init()
+bool control::SimpleSpeedController::init()
 {
     auto max_torque = get_live_parameter<float>("max_torque");
     auto max_regen_torque = get_live_parameter<float>("max_regen_torque");
@@ -53,12 +53,12 @@ bool control::SimpleController::init()
 
     _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set};
 
-    param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this, std::placeholders::_1));
+    param_update_handler_sig.connect(boost::bind(&control::SimpleSpeedController::_handle_param_updates, this, std::placeholders::_1));
 
     return true;
 }
 
-core::ControllerOutput control::SimpleController::step_controller(const core::VehicleState &in)
+core::ControllerOutput control::SimpleSpeedController::step_controller(const core::VehicleState &in)
 {
     config cur_config;
     {
@@ -69,12 +69,11 @@ core::ControllerOutput control::SimpleController::step_controller(const core::Ve
     // accelRequest goes between 1.0 and -1.0
     float accelRequest = (in.input.requested_accel) - (in.input.requested_brake);
 
-    float torqueRequest;
+    torque_nm torqueRequest;
 
-    // hytech_msgs::MCUCommandData cmd_out;
-    core::SpeedControlOut _out;
+    core::SpeedControlOut type_set;
     core::ControllerOutput cmd_out;
-    cmd_out.out = _out;
+    cmd_out.out = type_set;
     auto& speed_out = std::get<core::SpeedControlOut>(cmd_out.out);
 
     speed_out.mcu_recv_millis = in.prev_MCU_recv_millis; // heartbeat

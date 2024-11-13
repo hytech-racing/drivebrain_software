@@ -2,44 +2,20 @@
 #include "ControllerManager.hpp"
 #include "Controller.hpp"
 #include "Controllers.hpp"
-#include "SimpleController.hpp"
+#include "SimpleSpeedController.hpp"
+#include "SimpleTorqueController.hpp"
+
 #include <VehicleDataTypes.hpp>
-
-class MockController {
-public:
-    MockController(float dt) : _dt_sec(dt), _output({}) {}
-
-    float get_dt_sec() const {
-        return _dt_sec;
-    }
-
-    core::ControllerOutput step_controller(const core::VehicleState& state) {
-        return _output;
-    }
-
-    void set_output(const core::ControllerOutput& output) {
-        _output = output;
-    }
-
-private:
-    float _dt_sec;
-    core::ControllerOutput _output;
-};
 
 class ControllerManagerTest : public ::testing::Test {
 protected:
-    MockController torquecontroller1; 
-    MockController torquecontroller2; 
-    MockController speedcontroller1;
-    MockController speedcontroller2; 
-    std::array<MockController*, 2> controllers;
-    control::ControllerManager<MockController, 2> controller_manager; 
-    std::array<MockController*, 4> controllers4;
-    control::ControllerManager<MockController, 4> controller_manager_4;
-    control::SimpleController simpleController1;
-    control::SimpleController simpleController2;
-    std::array<control::Controller<core::ControllerOutput, core::VehicleState>*, 2> controllers_real;
-    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_real;
+    control::SimpleSpeedController simpleSpeedController1;
+    control::SimpleTorqueController simpleTorqueController1;
+    control::SimpleSpeedController simpleSpeedController2;
+    control::SimpleTorqueController simpletorqueController2;
+    control::ControllerManager controller_manager_2speed;
+    control::ControllerManager controller_manager_2torque;
+    control::ControllerManager controller_manager_diff;
     core::JsonFileHandler json_file_handler; 
     core::Logger logger; 
 
@@ -48,20 +24,15 @@ protected:
     core::ControllerOutput speed_controller_output;
 
     ControllerManagerTest()
-        : torquecontroller1(0.01f),
-          speedcontroller1(0.02f),
-          torquecontroller2(0.03f),
-          speedcontroller2(0.04f),
-          controllers( { &torquecontroller1, &speedcontroller1 } ),
-          controllers4( { &torquecontroller1, &speedcontroller1, &torquecontroller2, &speedcontroller2 } ),
-          logger(core::LogLevel::NONE),
+        : logger(core::LogLevel::NONE),
           json_file_handler("../config/drivebrain_config.json"),
-          controller_manager(logger, json_file_handler, controllers),
-          controller_manager_4(logger, json_file_handler, controllers4),
-          simpleController1(logger, json_file_handler),
-          simpleController2(logger, json_file_handler),
-          controllers_real ({ &simpleController1, &simpleController2 }),
-          controller_manager_real(logger, json_file_handler, controllers_real) 
+          simpleSpeedController1(logger, json_file_handler),
+          simpleSpeedController2(logger, json_file_handler),
+          simpleTorqueController1(logger, json_file_handler),
+          simpletorqueController2(logger, json_file_handler),
+          controller_manager_2speed(logger, json_file_handler),
+          controller_manager_2torque(logger, json_file_handler),
+          controller_manager_diff(logger, json_file_handler)
     {
     }
 
@@ -71,31 +42,22 @@ protected:
         vehicle_state.input.requested_brake = 0.0;
         vehicle_state.current_rpms = {1000, 1000, 1000, 1000};
 
-        torque_controller_output.out = core::TorqueControlOut{{10, 10, 10, 10}};
-        torquecontroller1.set_output(torque_controller_output);
-        torquecontroller2.set_output(torque_controller_output);
-        speed_controller_output.out = core::SpeedControlOut{0, {4, 4, 4, 4}, {10, 10, 10, 10}};
-        speedcontroller1.set_output(speed_controller_output);
-        speedcontroller2.set_output(speed_controller_output);
+        controller_manager_2speed.init();
+        controller_manager_2torque.init();
+        controller_manager_diff.init();
+        simpleSpeedController1.init();
+        simpleSpeedController2.init();
+        simpleTorqueController1.init();
+        simpletorqueController2.init();
 
-        controller_manager.init();
-        controller_manager_4.init();
-        controller_manager_real.init();
-        simpleController1.init();
-        simpleController2.init();
+        controller_manager_2speed.push_back(simpleSpeedController1.get_step_lambda());
+        controller_manager_2speed.push_back(simpleSpeedController2.get_step_lambda());
+        controller_manager_2torque.push_back(simpleTorqueController1.get_step_lambda());
+        controller_manager_2torque.push_back(simpleTorqueController2.get_step_lambda());
+        controller_manager_diff.push_back(simpleSpeedController1.get_step_lambda());
+        controller_manager_diff.push_back(simpleTorqueController1.get_step_lambda());
+        
         // std::cout << "set up" << std::endl;
-    }
-
-    void set_torqueout_too_high(MockController* mock)
-    {
-        torque_controller_output.out = core::TorqueControlOut{{101, 101, 101, 101}};
-        mock->set_output(torque_controller_output);
-    }
-
-    void set_speedout_too_high(MockController* mock)
-    {
-        speed_controller_output.out = core::SpeedControlOut{0, {3000, 3000, 3000, 3000}, {10, 10, 10, 10}};
-        mock->set_output(speed_controller_output);
     }
 
     void TearDown() override {
@@ -105,119 +67,123 @@ protected:
 
 // Test the initialization
 TEST_F(ControllerManagerTest, InitializationSuccess) {
-    ASSERT_TRUE(controller_manager.init());
-    ASSERT_TRUE(controller_manager_4.init());
-    ASSERT_TRUE(controller_manager_real.init());
+    ASSERT_TRUE(controller_manager_2speed.init());
+    ASSERT_TRUE(controller_manager_2torque.init());
+    ASSERT_TRUE(controller_manager_diff.init());
 }
 
 // Test active controller timestep retrieval
 TEST_F(ControllerManagerTest, GetActiveControllerTimestep) {
-    EXPECT_EQ(controller_manager.get_active_controller_timestep(), 0.01f);
-
-    controller_manager.swap_active_controller(1, vehicle_state);
-    EXPECT_EQ(controller_manager.get_active_controller_timestep(), 0.02f);
+    EXPECT_EQ(controller_manager_2speed.get_active_controller_timestep(), 0.001f);
+    EXPECT_EQ(controller_manager_2torque.get_active_controller_timestep(), 0.001f);
+    EXPECT_EQ(controller_manager_diff.get_active_controller_timestep(), 0.001f);
 }
 
 // Test stepping the active controller
-TEST_F(ControllerManagerTest, StepActiveController) {
-    core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
+TEST_F(ControllerManagerTest, StepActiveTorqueController) {
+    vehicle_state.input.requested_accel = 1.0;
+    core::ControllerOutput output = controller_manager_2torque.step_active_controller(vehicle_state);
     
     ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
     auto torque_output = std::get<core::TorqueControlOut>(output.out);
-    EXPECT_EQ(torque_output.desired_torques_nm.FL, 10);
-    EXPECT_EQ(torque_output.desired_torques_nm.FR, 10);
-    EXPECT_EQ(torque_output.desired_torques_nm.RL, 10);
-    EXPECT_EQ(torque_output.desired_torques_nm.RR, 10);
+    EXPECT_EQ(torque_output.desired_torques_nm.FL, 21.0);
+    EXPECT_EQ(torque_output.desired_torques_nm.FR, 21.0);
+    EXPECT_EQ(torque_output.desired_torques_nm.RL, 21.0);
+    EXPECT_EQ(torque_output.desired_torques_nm.RR, 21.0);
+}
+
+TEST_F(ControllerManagerTest, StepActiveSpeedController) {
+    vehicle_state.input.requested_accel = 1.0;
+    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
+    
+    ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
+    auto speed_output = std::get<core::SpeedControlOut>(output.out);
+    EXPECT_EQ(speed_output.torque_lim_nm.FL, 21.0);
+    EXPECT_EQ(speed_output.torque_lim_nm.FR, 21.0);
+    EXPECT_EQ(speed_output.torque_lim_nm.RL, 21.0);
+    EXPECT_EQ(speed_output.torque_lim_nm.RR, 21.0);
 }
 
 //swap between same controller outputs
 TEST_F(ControllerManagerTest, SwapSameTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
-    ASSERT_TRUE(controller_manager_4.swap_active_controller(2, vehicle_state));
+    ASSERT_TRUE(controller_manager_2speed.swap_active_controller(2, vehicle_state));
 
     core::ControllerOutput output = controller_manager_4.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+    ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
 //swap between same controller outputs
 TEST_F(ControllerManagerTest, SwapSameIndex) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
-    ASSERT_FALSE(controller_manager_4.swap_active_controller(0, vehicle_state));
+    ASSERT_FALSE(controller_manager_diff.swap_active_controller(0, vehicle_state));
 
-    core::ControllerOutput output = controller_manager_4.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+    core::ControllerOutput output = controller_manager_diff.step_active_controller(vehicle_state);
+    ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
 // Test switching controllers
 TEST_F(ControllerManagerTest, SwapBetweenTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
-    ASSERT_TRUE(controller_manager.swap_active_controller(1, vehicle_state));
+    ASSERT_TRUE(controller_manager_diff.swap_active_controller(1, vehicle_state));
 
     core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
+    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+
+    ASSERT_TRUE(controller_manager_diff.swap_active_controller(0, vehicle_state));
+
+    output = controller_manager_diff.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
-
-    ASSERT_TRUE(controller_manager.swap_active_controller(0, vehicle_state));
-
-    output = controller_manager.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
-}
-
-//switching with different controllers where current controller torque too high
-TEST_F(ControllerManagerTest, SwapTorqueTooHigh) {
-    vehicle_state.current_rpms = {100, 100, 100, 100};
-    set_torqueout_too_high(&torquecontroller1);
-    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
-
-    core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
 }
 
 //switching with different controllers where desired 
 TEST_F(ControllerManagerTest, SwapSpeedTooHigh) {
     vehicle_state.current_rpms = {10000, 10000, 10000, 10000};
-    set_speedout_too_high(&speedcontroller1);
-    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
+    ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
 
-    core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
 }
 
 // Test out of range index
 TEST_F(ControllerManagerTest, SwapControllerFailure_OutOfRange) {
-    ASSERT_FALSE(controller_manager.swap_active_controller(2, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE);
+    ASSERT_FALSE(controller_manager_diff.swap_active_controller(2, vehicle_state));
+    EXPECT_EQ(controller_manager_diff.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE);
+
+    ASSERT_FALSE(controller_manager_diff.swap_active_controller(-7, vehicle_state));
+    EXPECT_EQ(controller_manager_diff.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE);
 }
 
 // Test high RPM
 TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM) {
     vehicle_state.current_rpms = {100000, 10000, 10000, 10000};
 
-    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
+    ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
+    EXPECT_EQ(controller_manager_2speed.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
 }
 
 TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM_onewheel) {
     vehicle_state.current_rpms = {100000, 0, 0, 0};
 
-    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
+    ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
+    EXPECT_EQ(controller_manager_2speed.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_SPEED_TOO_HIGH);
 }
 
 //test foot on accelerator over/under threshold
 TEST_F(ControllerManagerTest, SwapAccelerator) {
     vehicle_state.input.requested_accel = .3;
-    ASSERT_FALSE(controller_manager.swap_active_controller(1, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_DRIVER_ON_PEDAL);
+    ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
+    EXPECT_EQ(controller_manager_2speed.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_DRIVER_ON_PEDAL);
 
     vehicle_state.input.requested_accel = .1;
-    ASSERT_TRUE(controller_manager.swap_active_controller(1, vehicle_state));
-    EXPECT_EQ(controller_manager.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::NO_ERROR);
+    ASSERT_TRUE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
+    EXPECT_EQ(controller_manager_2speed.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::NO_ERROR);
 }
 
 //real conroller stuff
-TEST_F(ControllerManagerTest, StepSimpleController) {
+TEST_F(ControllerManagerTest, StepSimpleSpeedController) {
     vehicle_state.input.requested_accel = .2;
-    core::ControllerOutput output = controller_manager_real.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
     
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
     auto _output = std::get<core::SpeedControlOut>(output.out);
@@ -227,10 +193,18 @@ TEST_F(ControllerManagerTest, StepSimpleController) {
     ASSERT_TRUE(_output.desired_rpms.RR - constants::METERS_PER_SECOND_TO_RPM * 3 < 10.0);
 }
 
-TEST_F(ControllerManagerTest, SwapSimpleControllers) {
+TEST_F(ControllerManagerTest, SwapSimpleSpeedControllers) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
-    ASSERT_TRUE(controller_manager_real.swap_active_controller(1, vehicle_state));
+    ASSERT_TRUE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
 
-    core::ControllerOutput output = controller_manager_real.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
+}
+
+TEST_F(ControllerManagerTest, SwapDiffSimpleControllers) {
+    vehicle_state.current_rpms = {100, 100, 100, 100};
+    ASSERT_TRUE(controller_manager_diff.swap_active_controller(1, vehicle_state));
+
+    core::ControllerOutput output = controller_manager_diff.step_active_controller(vehicle_state);
+    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
 }

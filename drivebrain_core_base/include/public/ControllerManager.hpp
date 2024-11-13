@@ -56,8 +56,6 @@
 
 namespace control
 {
-    // TODO turn into concept
-    template <typename ControllerType, size_t NumControllers>
     class ControllerManager : public core::common::Configurable
     {
     public:
@@ -65,9 +63,10 @@ namespace control
         /// @param json_file_handler current file handler to handle controller configurations
         /// @param controllers list of controllers that the manager will mux between and manager
         /// @param state_estimator instance to allow for direct communication between controllers and state estimator
-        ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::array<ControllerType *, NumControllers> controllers) : Configurable(logger, json_file_handler, "ControllerManager"),
-                                                                                                                                _controllers(controllers), _logger_inst(logger)
+        ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "ControllerManager"),
+                                                                                                                                    _logger_inst(logger)
         {
+            _num_controllers = 0;
         }
         ~ControllerManager() = default;
 
@@ -100,16 +99,21 @@ namespace control
         /// @return respective controller output to command the drivetrain
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
-            return _controllers[_current_controller_index]->step_controller(input);
+            return controller_steps[_current_controller_index](input);
+        }
+
+        void push_back(std::vector<std::function<core::ControllerOutput(const VehicleState&)>> func)
+        {
+            controller_steps.push_back(func);
         }
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
-        std::array<ControllerType *, NumControllers> _controllers;
         size_t _current_controller_index = 0;
+        size_t _num_controllers;
         core::control::ControllerManagerState _current_ctr_manager_state;
         core::Logger _logger_inst;
-
+        std::vector<std::function<core::ControllerOutput(const VehicleState&)>> controller_steps;
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req, _max_requested_rpm;
     };
 }

@@ -22,10 +22,6 @@ namespace core
         float requested_accel; // float from 0 to 1 representing percent of accel pedal travel
         float requested_brake; // float from 0 to 1 representing pedal travel of brake
     };
-    struct ControllerTorqueOut
-    {
-        veh_vec<float> res_torque_lim_nm;
-    };
 
     struct TireDynamics
     {
@@ -89,7 +85,7 @@ namespace core
         SpeedControlOut prev_controller_output;
         TireDynamics tire_dynamics;
         veh_vec<float> driver_torque;
-        ControllerTorqueOut matlab_math_temp_out;
+        TorqueControlOut matlab_math_temp_out;
     };
 
     // we will have both speed and torque control output controllers

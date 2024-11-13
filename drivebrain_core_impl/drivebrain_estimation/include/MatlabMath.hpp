@@ -62,7 +62,7 @@ namespace estimation
             // TODO
             // hytech_msgs::TireDynamics convert_to_proto()
 
-            std::pair<core::MatlabMathResult, core::ControllerTorqueOut> evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input);
+            std::pair<core::MatlabMathResult, core::TorqueControlOut> evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData& raw_input);
             bool init();
             
         private:

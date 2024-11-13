@@ -26,5 +26,11 @@ namespace control
         // TODO may want to have a default set of controller attributes that we can return (name, time-step, etc.)
         virtual float get_dt_sec() = 0;
         virtual ControllerResult step_controller(const ControllerInput& in) = 0;
+        std::function<ControllerResult(const ControllerInput&)> get_step_lambda()
+        {
+            return [this](const ControllerInput& in) -> ControllerResult {
+            return this->step_controller(in);
+        };
+        }
     };
 }

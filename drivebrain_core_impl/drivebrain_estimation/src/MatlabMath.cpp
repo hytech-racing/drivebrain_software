@@ -172,7 +172,7 @@ namespace estimation
         return true;
     }
 
-    std::pair<core::MatlabMathResult, core::ControllerTorqueOut> MatlabMath::evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData &raw_input)
+    std::pair<core::MatlabMathResult, core::TorqueControlOut> MatlabMath::evaluate_estimator(const core::VehicleState &current_state, const core::RawInputData &raw_input)
     {
         config cur_config;
         {
@@ -268,7 +268,7 @@ namespace estimation
 
         core::TireDynamics tire_dynamics_status;
         core::TorqueVectoringStatus torque_vectoring_status;
-        core::ControllerTorqueOut control_res;
+        core::TorqueControlOut control_res;
 
         tire_dynamics_status.tire_forces_n.FL.x = outputs.FXFL;
         tire_dynamics_status.tire_forces_n.FR.x = outputs.FXFR;
