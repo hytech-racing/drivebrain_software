@@ -9,6 +9,7 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 
 ## hytech's upstream libraries
 
+
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
@@ -112,7 +113,7 @@ target_include_directories(drivebrain_control PUBLIC
 )
 
 target_link_libraries(drivebrain_control PUBLIC 
-    drivebrain::drivebrain_core
+    drivebrain_core::drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
 )
@@ -126,7 +127,7 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 )
 
 target_link_libraries(drivebrain_mcap_logger PUBLIC
-    drivebrain_core 
+    drivebrain_core::drivebrain_core 
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
@@ -139,7 +140,6 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
 add_library(drivebrain_estimation SHARED 
-    drivebrain_core_impl/drivebrain_estimation/src/MatlabMath.cpp
     drivebrain_core_impl/drivebrain_estimation/src/StateEstimator.cpp
 )
 
@@ -149,9 +149,13 @@ target_include_directories(drivebrain_estimation PUBLIC
 )
 
 target_link_libraries(drivebrain_estimation PUBLIC
-    drivebrain_core 
+    drivebrain_core::drivebrain_core 
     drivebrain_common_utils
     codegen::Tire_Model_Codegen
+    codegen::matlab_model
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
 )
 
 make_cmake_package(drivebrain_estimation drivebrain)
@@ -229,7 +233,7 @@ add_executable(alpha_test
 )
 
 target_link_libraries(alpha_build PUBLIC
-    drivebrain_core
+    drivebrain_core::drivebrain_core
     drivebrain_control
     drivebrain_comms
     drivebrain_mcap_logger
@@ -238,7 +242,7 @@ target_link_libraries(alpha_build PUBLIC
 
 
 target_link_libraries(alpha_test PUBLIC 
-    drivebrain_core
+    drivebrain_core::drivebrain_core
     drivebrain_control
     drivebrain_comms
     Boost::program_options

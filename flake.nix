@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-15T07_06_59";
+        ref = "2024-11-08T01_13_42";
         flake = false;
       };
 
@@ -46,7 +46,7 @@
     };
 
     simulink-automation-src = {
-        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz";
+        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
         flake = false;
     };
 

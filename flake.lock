@@ -3,16 +3,16 @@
     "HT_proto": {
       "flake": false,
       "locked": {
-        "lastModified": 1728975993,
-        "narHash": "sha256-phzMiDOer9hp8fl7gBULuezAp+VnoDtOlrlNNHv9cC8=",
+        "lastModified": 1731028403,
+        "narHash": "sha256-4os2JtvGrDJvOxIxsH0HzwnmeQ4EzO5Gge8VDILXdMM=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "256d41199684349534beb3ecba4b2eafba13041c",
+        "rev": "029b34e850986a08ab20bf4818bb6699b333bb1d",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "2024-10-15T07_06_59",
+        "ref": "2024-11-08T01_13_42",
         "repo": "HT_proto",
         "type": "github"
       }
@@ -717,14 +717,14 @@
     "simulink-automation-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1731456094,
-        "narHash": "sha256-KctA3qVsyrOn4QvBSi1N58O6MsC6NJ0rTpNz7abA7qM=",
+        "lastModified": 1731476452,
+        "narHash": "sha256-8/4zg+iiuBELUoujGuklY3vt9inQdHSgurq8mgZbByo=",
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_00-01/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
       }
     },
     "systems": {

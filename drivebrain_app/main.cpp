@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
     bool construction_failed = false;
-    estimation::Tire_Model_Codegen_MatlabMath matlab_math(logger, config, construction_failed);
+    estimation::Tire_Model_Codegen_MatlabModel matlab_math(logger, config, construction_failed);
 
     if (construction_failed)
     {

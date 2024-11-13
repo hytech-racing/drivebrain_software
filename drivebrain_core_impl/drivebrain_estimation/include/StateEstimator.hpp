@@ -18,7 +18,8 @@
 #include <chrono>
 #include <memory>
 
-#include <hytech.pb.h>
+#include "hytech_msgs.pb.h"
+#include "base_msgs.pb.h"
 
 // protobuf
 #include <google/protobuf/any.pb.h>
@@ -29,7 +30,7 @@
 #include <VehicleDataTypes.hpp>
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
-#include <Tire_Mode_Codegen_MatlabModel.hpp>
+#include <Tire_Model_Codegen_MatlabModel.hpp>
 #include <Configurable.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
