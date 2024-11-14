@@ -37,7 +37,7 @@ grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *co
 
 grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response)
 {
-    if(_ctr_manager_inst->swap_active_controller(static_cast<size_t>(rq->requested_controller_index()), _state_getter().first)){
+    if(_mode_switch(static_cast<size_t>(rq->requested_controller_index()))){
         response->set_status("switch");
     }
     else{
@@ -47,8 +47,8 @@ grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *conte
     return grpc::Status::OK;
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager> ctr_manager_inst, std::function<std::pair<core::VehicleState, bool>()> state_get)
-        : _logger_inst(logger_inst), _ctr_manager_inst(ctr_manager_inst), _state_getter(state_get)
+DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch)
+        : _logger_inst(logger_inst), _mode_switch(mode_switch)
 {
 }
 

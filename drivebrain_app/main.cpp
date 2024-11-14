@@ -105,22 +105,12 @@ int main(int argc, char *argv[])
     control::SimpleTorqueController controller2(logger, config);
     configurable_components.push_back(&controller1);
     configurable_components.push_back(&controller2);
-    auto controller_manager = std::make_shared<control::ControllerManager>(logger, config);
-    configurable_components.push_back(controller_manager.get());
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager(logger, config, { &controller1 , &controller2 });
+    configurable_components.push_back(&controller_manager);
 
     bool successful_controller1_init = controller1.init();
     bool successful_controller2_init = controller2.init();
-    bool successful_manager_init = controller_manager->init();
-    if(successful_controller1_init && successful_controller2_init && successful_manager_init)
-    {
-        controller_manager->push_back(&controller1);
-        controller_manager->push_back(&controller2);
-    }
-    else
-    {
-        //in wrapper log that initialization didnt work
-    }
-
+    bool successful_manager_init = controller_manager.init();
 
     bool construction_failed = false;
     estimation::MatlabMath matlab_math(logger, config, construction_failed);
@@ -157,9 +147,11 @@ int main(int argc, char *argv[])
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
     comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
 
-    std::function<std::pair<core::VehicleState, bool>()> state_getter = 
-    [&state_estimator]() -> std::pair<core::VehicleState, bool> { return state_estimator.get_latest_state_and_validity(); };
-    DBInterfaceImpl db_service_inst(message_logger, controller_manager, state_getter);
+    std::function<bool(size_t)> switch_modes = 
+    [&state_estimator, &controller_manager](size_t mode) -> bool {
+        return controller_manager.swap_active_controller(mode, state_estimator.get_latest_state_and_validity().first);
+    };
+    DBInterfaceImpl db_service_inst(message_logger, switch_modes);
     std::thread db_service_thread([&db_service_inst]()
                                   {
             spdlog::info("started db service thread");
@@ -185,11 +177,11 @@ int main(int argc, char *argv[])
                 spdlog::error("Error in io_context: {}", e.what());
             } });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, controller_manager, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller_manager, &state_estimator]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
-        auto loop_time = controller_manager->get_active_controller_timestep();
+        auto loop_time = controller_manager.get_active_controller_timestep();
         auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(!stop_signal.load())
@@ -198,7 +190,7 @@ int main(int argc, char *argv[])
             // samples internal state set by the handle recv functions
             
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
-            auto out_struct = controller_manager->step_active_controller(state_and_validity.first);
+            auto out_struct = controller_manager.step_active_controller(state_and_validity.first);
             //logic for retrieving whichever type is currently in the variant, i dont think we need to check if it has monostate
             core::SpeedControlOut speed_cmd_out;
             core::TorqueControlOut torque_cmd_out;

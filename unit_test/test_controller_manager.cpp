@@ -13,9 +13,9 @@ protected:
     control::SimpleTorqueController simpleTorqueController1;
     control::SimpleSpeedController simpleSpeedController2;
     control::SimpleTorqueController simpleTorqueController2;
-    control::ControllerManager controller_manager_2speed;
-    control::ControllerManager controller_manager_2torque;
-    control::ControllerManager controller_manager_diff;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_2speed;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_2torque;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_diff;
     core::JsonFileHandler json_file_handler; 
     core::Logger logger; 
 
@@ -30,9 +30,9 @@ protected:
           simpleSpeedController2(logger, json_file_handler),
           simpleTorqueController1(logger, json_file_handler),
           simpleTorqueController2(logger, json_file_handler),
-          controller_manager_2speed(logger, json_file_handler),
-          controller_manager_2torque(logger, json_file_handler),
-          controller_manager_diff(logger, json_file_handler)
+          controller_manager_2speed(logger, json_file_handler, {&simpleSpeedController1, &simpleSpeedController2}),
+          controller_manager_2torque(logger, json_file_handler, {&simpleTorqueController1, &simpleTorqueController2}),
+          controller_manager_diff(logger, json_file_handler, {&simpleSpeedController1, &simpleTorqueController1})
     {
     }
 
@@ -49,13 +49,6 @@ protected:
         simpleSpeedController2.init();
         simpleTorqueController1.init();
         simpleTorqueController2.init();
-
-        controller_manager_2speed.push_back(&simpleSpeedController1);
-        controller_manager_2speed.push_back(&simpleSpeedController2);
-        controller_manager_2torque.push_back(&simpleTorqueController1);
-        controller_manager_2torque.push_back(&simpleTorqueController2);
-        controller_manager_diff.push_back(&simpleSpeedController1);
-        controller_manager_diff.push_back(&simpleTorqueController1);
         
         // std::cout << "set up" << std::endl;
     }
