@@ -14,7 +14,7 @@ Socket::Socket(std::string server_ip, uint16_t port) {
 	localAddr.sin_port = htons(port);
 }
 
-bool Socket::send(const std::string& serialized, bool returning){
+bool Socket::send(const std::string& serialized, bool returning) {
 	return sendto(fileDescriptor, serialized.data(), serialized.size(), 0, 
 		(struct sockaddr*)& (returning ? remAddr: localAddr), 
 		sizeof(localAddr)) != -1;

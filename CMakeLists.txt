@@ -223,6 +223,7 @@ target_link_libraries(test_db_grpc PUBLIC
 )
 
 
+# MCAP LOGGER
 # add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
 # target_link_libraries(test_mcap PUBLIC
@@ -230,6 +231,47 @@ target_link_libraries(test_db_grpc PUBLIC
 #     protobuf::libprotobuf
 #     mcap::mcap
 # )
+
+
+# MCAP REPLAY
+set(REPLAY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mcap_replay)
+
+function(set_props target_name)
+    target_include_directories(${target_name} PUBLIC
+        $<INSTALL_INTERFACE:${REPLAY_DIR}/include>
+        $<BUILD_INTERFACE:${REPLAY_DIR}/include>
+        $<INSTALL_INTERFACE:version_header>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>
+    )
+    target_link_libraries(${target_name} PUBLIC
+        # drivebrain_core 
+        # drivebrain_common_utils
+        protobuf::libprotobuf
+        mcap::mcap
+        nlohmann_json::nlohmann_json 
+        socket
+        helper
+    )
+endfunction()
+
+add_library(socket ${REPLAY_DIR}/src/socket.cpp)
+add_library(helper ${REPLAY_DIR}/src/helper.cpp)
+
+add_executable(test_mcap_replay_client ${REPLAY_DIR}/src/client.cpp)
+#add_executable(test_mcap_replay_server ${REPLAY_DIR}/src/server.cpp)
+
+target_include_directories(socket PUBLIC ${REPLAY_DIR}/include)
+target_include_directories(helper PUBLIC ${REPLAY_DIR}/include)
+
+set_props(test_mcap_replay_client)
+#set_props(test_mcap_replay_server)
+
+install(TARGETS test_mcap_replay_client 
+    #test_mcap_replay_server
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+
 
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
