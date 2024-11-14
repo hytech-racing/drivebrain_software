@@ -8,6 +8,8 @@
 #include <mutex>
 #include <versions.h>
 #include <utility>
+#include <spdlog/spdlog.h> 
+
 namespace common
 {
     MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir)
@@ -16,18 +18,18 @@ namespace common
         auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
         if (optional_map)
         {
-            std::cout << "opend mcap" << std::endl;
+            spdlog::info("Opened MCAP"); 
             _msg_name_id_map = *optional_map;
         }
         else
         {
-            std::cout << "error: no map gend" << std::endl;
+            spdlog::error("Error: No map generated"); 
         }
         {
             std::unique_lock lk(_input_deque.mtx);
             _running = true;
         }
-        _options.chunkSize = 1024;
+        _options.noChunking = true;
         _log_thread = std::thread(&MCAPProtobufLogger::_handle_log_to_file, this);
     }
     MCAPProtobufLogger::~MCAPProtobufLogger()
@@ -42,13 +44,12 @@ namespace common
 
     void MCAPProtobufLogger::open_new_mcap(const std::string &name)
     {
-        std::cout << "opend mcap ran func" << std::endl;
+        spdlog::info("Open MCAP function called"); 
 
         const auto res = _writer.open(name.c_str(), _options);
         if (!res.ok())
         {
-            std::cerr << "Failed to open " << name << " for writing: " << res.message
-                      << std::endl;
+            spdlog::error("Failed to open {} for writing: {}", name, res.message);
         }
         // TODO handle message name de-confliction for messages of the same name
         // message-receiving .protos (non-base .proto files)
@@ -79,13 +80,12 @@ namespace common
         // TODO log a version message with the versions specified at opening of new mcap file
         // hytech_msgs::
         // _msg_name_id_map[""]
-
-        std::cout << "added message descriptions to mcap" << std::endl;
+        spdlog::info("Added message descriptions to MCAP"); 
     }
 
     void MCAPProtobufLogger::close_current_mcap()
     {
-        std::cout << "closing" << std::endl;
+        spdlog::info("Closing MCAP"); 
         _writer.close();
     }
 
@@ -108,7 +108,6 @@ namespace common
                 q.deque = _input_deque.deque;
                 _input_deque.deque.clear();
             }
-
             for (auto &msg : q.deque)
             {
                 mcap::Message msg_to_log;
@@ -123,8 +122,9 @@ namespace common
                     std::unique_lock lk(_logger_mtx);
                     msg_to_log.channelId = _msg_name_id_map[msg.message_name]; // under the mutex we also lookup in the map
                     auto write_res = _writer.write(msg_to_log);
-                    _writer.closeLastChunk();
+
                     // std::cout << "logging msg" << std::endl;
+                    spdlog::info("Logging message: {}", msg.message_name); 
                 }
             }
             q.deque.clear();

@@ -8,6 +8,9 @@ set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
+
 
 
 ### generated via nix-proto from hytech's generated CAN protobufs
@@ -49,7 +52,6 @@ include(create_package)
 # created libraries #
 #####################
 
-
 # utils
 add_library(drivebrain_common_utils SHARED 
     drivebrain_core_impl/drivebrain_common_utils/src/ProtobufUtils.cpp
@@ -62,6 +64,7 @@ target_include_directories(drivebrain_common_utils PUBLIC
 
 target_link_libraries(drivebrain_common_utils PUBLIC
     protobuf::libprotobuf
+    spdlog::spdlog
 )
 
 make_cmake_package(drivebrain_common_utils drivebrain)
@@ -100,6 +103,7 @@ target_link_libraries(drivebrain_comms PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     libvncxx::libvncxx
     drivebrain_estimation
+    spdlog::spdlog
 )
 
 make_cmake_package(drivebrain_comms drivebrain)
@@ -262,4 +266,3 @@ install(TARGETS
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
-

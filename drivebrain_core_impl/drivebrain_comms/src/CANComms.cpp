@@ -14,6 +14,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <variant>
+// logging includes
+#include "spdlog/spdlog.h"
 
 // https://docs.kernel.org/networking/can.html
 
@@ -101,8 +103,7 @@ void comms::CANDriver::_do_read() {
                                     _handle_recv_CAN_frame(_frame);
                                     _do_read(); // Continue reading for the next frame
                                 } else if (ec) {
-                                    std::cerr << "Error receiving CAN message: " << ec.message()
-                                              << std::endl;
+                                    spdlog::error("Error receiving CAN message: {}", ec.message());
                                 }
                             });
 }
@@ -112,7 +113,7 @@ void comms::CANDriver::_send_message(const struct can_frame &frame) {
         _socket, boost::asio::buffer(&frame, sizeof(frame)),
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
             if (ec) {
-                std::cerr << "Error sending CAN message: " << ec.message() << std::endl;
+                spdlog::error("Error sending CAN message: {}", ec.message());
             }
         });
 }
@@ -137,7 +138,8 @@ comms::CANDriver::_get_pb_msg_by_name(const std::string &name) {
         prototype_message.reset(
             google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
         if (!prototype_message) {
-            std::cerr << "Failed to create prototype message" << std::endl;
+            spdlog::error("Failed to create prototype message");
+
             return nullptr;
         }
         // delete desc;
@@ -165,7 +167,7 @@ void comms::CANDriver::set_field_values_of_pb_msg(
         if (it != field_values.end()) {
             // Set field values based on field type
             if (field->is_repeated()) {
-                std::cerr << "Unsupported field type for field: " << field_name << std::endl;
+                spdlog::warn("Unsupported field type for field: {}", field_name);
                 continue;
             }
             switch (field->type()) {
@@ -221,7 +223,7 @@ comms::CANDriver::FieldVariant
 comms::CANDriver::get_field_value(std::shared_ptr<google::protobuf::Message> message,
                                   const std::string &field_name) {
     if (!message) {
-        std::cerr << "Message is null" << std::endl;
+        spdlog::error("Message is null");
         return std::monostate{};
     }
 
@@ -230,7 +232,7 @@ comms::CANDriver::get_field_value(std::shared_ptr<google::protobuf::Message> mes
     const google::protobuf::FieldDescriptor *field = descriptor->FindFieldByName(field_name);
 
     if (field == nullptr) {
-        std::cerr << "Field not found: " << field_name << std::endl;
+        spdlog::warn("Field not found: {}", field_name);
         return std::monostate{};
     }
 
@@ -255,10 +257,10 @@ comms::CANDriver::get_field_value(std::shared_ptr<google::protobuf::Message> mes
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
         return reflection->GetEnum(*message, field)->name();
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-        std::cerr << "Nested messages not supported" << std::endl;
+        spdlog::warn("Nested messages not supported");
         return std::monostate{};
     default:
-        std::cerr << "Unsupported field type" << std::endl;
+        spdlog::warn("Unsupported field type");
         return std::monostate{};
     }
 }
@@ -266,7 +268,6 @@ comms::CANDriver::get_field_value(std::shared_ptr<google::protobuf::Message> mes
 std::optional<can_frame>
 comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg) {
     // - [x] get an associated CAN message based on the name of the input message
-
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
@@ -282,7 +283,7 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
             std::visit(
                 [&sig, &frame](const FieldVariant &arg) {
                     if (std::holds_alternative<std::monostate>(arg)) {
-                        std::cout << "No value found or unsupported field" << std::endl;
+                        spdlog::warn("No value found or unsupported field");
                     } else if (std::holds_alternative<float>(arg)) {
                         auto val = std::get<float>(arg);
                         sig.Encode(sig.PhysToRaw(val), frame.data);
@@ -299,14 +300,13 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
                         auto val = std::get<bool>(arg);
                         sig.Encode(val, frame.data);
                     } else {
-                        std::cout << "uh not supported yet" << std::endl;
+                        spdlog::warn("uh not supported yet");
                     }
                 },
                 field_value);
         }
     } else {
-        std::cout << "WARNING: not creating a frame to send due to not finding frame name"
-                  << std::endl;
+        spdlog::warn("WARNING: not creating a frame to send due to not finding frame name");
         return std::nullopt;
     }
 

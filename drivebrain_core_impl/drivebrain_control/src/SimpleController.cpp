@@ -1,6 +1,7 @@
 #include <SimpleController.hpp>
 #include <variant>
 #include <VehicleDataTypes.hpp>
+#include <spdlog/spdlog.h>
 
 void control::SimpleController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
@@ -10,32 +11,35 @@ void control::SimpleController::_handle_param_updates(const std::unordered_map<s
         
         std::unique_lock lk(_config_mutex);
         _config.max_torque = *pval;
-        std::cout << "setting new max torque " << _config.max_torque << std::endl;
+        spdlog::info("Setting new max torque: {}", _config.max_torque);
     }
 
     if (auto pval = std::get_if<float>(&new_param_map.at("max_regen_torque")))
     {
         std::unique_lock lk(_config_mutex);
         _config.max_reg_torque = *pval;
-        std::cout << "setting new max regen torque " << _config.max_reg_torque << std::endl;
+        spdlog::info("Setting new max regen torque: {}", _config.max_reg_torque);
     }
+
     if (auto pval = std::get_if<float>(&new_param_map.at("rear_torque_scale")))
     {
         std::unique_lock lk(_config_mutex);
         _config.rear_torque_scale = *pval;
-        std::cout << "setting new rear_torque_scale " << _config.rear_torque_scale << std::endl;
+        spdlog::info("Setting new rear torque scale: {}", _config.rear_torque_scale);
     }
+
     if (auto pval = std::get_if<float>(&new_param_map.at("regen_torque_scale")))
     {
         std::unique_lock lk(_config_mutex);
         _config.regen_torque_scale = *pval;
-        std::cout << "setting new regen_torque_scale " << _config.regen_torque_scale << std::endl;
+        spdlog::info("Setting new regen torque scale: {}", _config.regen_torque_scale);
     }
+
     if (auto pval = std::get_if<float>(&new_param_map.at("positive_speed_set")))
     {
         std::unique_lock lk(_config_mutex);
         _config.positive_speed_set = *pval;
-        std::cout << "setting new positive_speed_set " << _config.positive_speed_set << std::endl;
+        spdlog::info("Setting new positive speed set: {}", _config.positive_speed_set);
     }
 }
 
@@ -66,6 +70,7 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
         std::unique_lock lk(_config_mutex);
         cur_config = _config;
     }
+
     // Both pedals are not pressed and no implausibility has been detected
     // accelRequest goes between 1.0 and -1.0
     float accelRequest = (in.input.requested_accel) - (in.input.requested_brake);
