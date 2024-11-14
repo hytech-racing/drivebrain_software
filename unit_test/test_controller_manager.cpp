@@ -12,7 +12,7 @@ protected:
     control::SimpleSpeedController simpleSpeedController1;
     control::SimpleTorqueController simpleTorqueController1;
     control::SimpleSpeedController simpleSpeedController2;
-    control::SimpleTorqueController simpletorqueController2;
+    control::SimpleTorqueController simpleTorqueController2;
     control::ControllerManager controller_manager_2speed;
     control::ControllerManager controller_manager_2torque;
     control::ControllerManager controller_manager_diff;
@@ -29,7 +29,7 @@ protected:
           simpleSpeedController1(logger, json_file_handler),
           simpleSpeedController2(logger, json_file_handler),
           simpleTorqueController1(logger, json_file_handler),
-          simpletorqueController2(logger, json_file_handler),
+          simpleTorqueController2(logger, json_file_handler),
           controller_manager_2speed(logger, json_file_handler),
           controller_manager_2torque(logger, json_file_handler),
           controller_manager_diff(logger, json_file_handler)
@@ -48,14 +48,14 @@ protected:
         simpleSpeedController1.init();
         simpleSpeedController2.init();
         simpleTorqueController1.init();
-        simpletorqueController2.init();
+        simpleTorqueController2.init();
 
-        controller_manager_2speed.push_back(simpleSpeedController1.get_step_lambda());
-        controller_manager_2speed.push_back(simpleSpeedController2.get_step_lambda());
-        controller_manager_2torque.push_back(simpleTorqueController1.get_step_lambda());
-        controller_manager_2torque.push_back(simpleTorqueController2.get_step_lambda());
-        controller_manager_diff.push_back(simpleSpeedController1.get_step_lambda());
-        controller_manager_diff.push_back(simpleTorqueController1.get_step_lambda());
+        controller_manager_2speed.push_back(&simpleSpeedController1);
+        controller_manager_2speed.push_back(&simpleSpeedController2);
+        controller_manager_2torque.push_back(&simpleTorqueController1);
+        controller_manager_2torque.push_back(&simpleTorqueController2);
+        controller_manager_diff.push_back(&simpleSpeedController1);
+        controller_manager_diff.push_back(&simpleTorqueController1);
         
         // std::cout << "set up" << std::endl;
     }
@@ -109,7 +109,7 @@ TEST_F(ControllerManagerTest, SwapSameTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
     ASSERT_TRUE(controller_manager_2speed.swap_active_controller(2, vehicle_state));
 
-    core::ControllerOutput output = controller_manager_4.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
@@ -127,7 +127,7 @@ TEST_F(ControllerManagerTest, SwapBetweenTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
     ASSERT_TRUE(controller_manager_diff.swap_active_controller(1, vehicle_state));
 
-    core::ControllerOutput output = controller_manager.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_diff.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
 
     ASSERT_TRUE(controller_manager_diff.swap_active_controller(0, vehicle_state));

@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     control::SimpleTorqueController controller2(logger, config);
     configurable_components.push_back(&controller1);
     configurable_components.push_back(&controller2);
-    auto controller_manager = std::make_shared<control::ControllerManager(logger, config);
+    auto controller_manager = std::make_shared<control::ControllerManager>(logger, config);
     configurable_components.push_back(controller_manager.get());
 
     bool successful_controller1_init = controller1.init();
@@ -113,8 +113,8 @@ int main(int argc, char *argv[])
     bool successful_manager_init = controller_manager->init();
     if(successful_controller1_init && successful_controller2_init && successful_manager_init)
     {
-        controller_manager.push_back(controller1.get_step_lambda());
-        controller_manager.push_back(controller2.get_step_lambda());
+        controller_manager->push_back(&controller1);
+        controller_manager->push_back(&controller2);
     }
     else
     {
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
                 spdlog::error("Error in io_context: {}", e.what());
             } });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller_manager, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, controller_manager, &state_estimator]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
@@ -214,34 +214,34 @@ int main(int argc, char *argv[])
 
             auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
             // feedback -> should probably change this to accept controlleroutput struct instead
-            state_estimator_ptr.set_previous_control_output(speed_cmd_out);
+            state_estimator.set_previous_control_output(speed_cmd_out);
             // output
             // if(state_and_validity.second)
             // {
             out_msg->set_prev_mcu_recv_millis(speed_cmd_out.mcu_recv_millis);
 
-            if(temp_desired_torques.res_torque_lim_nm.FL < 0)
+            if(temp_desired_torques.desired_torques_nm.FL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fl(0);
             } else {
                 out_msg->mutable_desired_rpms()->set_fl(speed_cmd_out.desired_rpms.FL);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.FR < 0)
+            if(temp_desired_torques.desired_torques_nm.FR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fr(0);
             } else {
                 out_msg->mutable_desired_rpms()->set_fr(speed_cmd_out.desired_rpms.FR);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.RL < 0)
+            if(temp_desired_torques.desired_torques_nm.RL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rl(0);
             } else {
                 out_msg->mutable_desired_rpms()->set_rl(speed_cmd_out.desired_rpms.RL);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.RR < 0)
+            if(temp_desired_torques.desired_torques_nm.RR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rr(0);
             } else {
@@ -249,10 +249,10 @@ int main(int argc, char *argv[])
             }
             
 
-            out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-            out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-            out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-            out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.res_torque_lim_nm.RR));
+            out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.desired_torques_nm.FL));
+            out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.desired_torques_nm.FR));
+            out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.desired_torques_nm.RL));
+            out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.desired_torques_nm.RR));
 
             {
                 std::unique_lock lk(eth_tx_queue.mtx);

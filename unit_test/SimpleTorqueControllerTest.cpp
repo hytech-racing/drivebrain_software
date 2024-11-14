@@ -52,10 +52,10 @@ TEST_F(SimpleTorqueControllerTest, NoPedalInput)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0); 
+    ASSERT_NEAR(res->desired_torques_nm.FR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 0.0, 1.0); 
 }
 
 TEST_F(SimpleTorqueControllerTest, SmallPositiveAccelRequest)
@@ -64,10 +64,10 @@ TEST_F(SimpleTorqueControllerTest, SmallPositiveAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 4.48, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 4.48, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 4.48, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 4.48, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 4.48, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 4.48, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 4.48, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 4.48, 1.0);
 }
 
 TEST_F(SimpleTorqueControllerTest, FullPositiveAccelRequest)
@@ -76,10 +76,10 @@ TEST_F(SimpleTorqueControllerTest, FullPositiveAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 21, 2.0);
 }
 
 TEST_F(SimpleTorqueControllerTest, SmallNegativeAccelRequest)
@@ -89,10 +89,10 @@ TEST_F(SimpleTorqueControllerTest, SmallNegativeAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FL, 6.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FR, 6.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 6.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 6.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 6.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 6.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 6.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 6.0, 1.0);
 }
 
 TEST_F(SimpleTorqueControllerTest, FullNegativeAccelRequest)
@@ -101,10 +101,10 @@ TEST_F(SimpleTorqueControllerTest, FullNegativeAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FL, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FR, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 10.0, 1.0);
 }
 
 TEST_F(SimpleTorqueControllerTest, FullBrakeAndAccelRequest)
@@ -114,10 +114,10 @@ TEST_F(SimpleTorqueControllerTest, FullBrakeAndAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 0.0, 1.0);
 }
 
 TEST_F(SimpleTorqueControllerTest, VariableRequests)
@@ -127,25 +127,25 @@ TEST_F(SimpleTorqueControllerTest, VariableRequests)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::TorqueControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 0.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 0.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 0.0, 1.0);
 
     in.input.requested_accel = 0;
     cmd = simple_controller.step_controller(in);
 
-    ASSERT_NEAR(res->torque_lim_nm.FL, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.FR, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 10.0, 1.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 10.0, 1.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 10.0, 1.0);
 
     in.input.requested_accel = 1;
     in.input.requested_brake = 0;
     cmd = simple_controller.step_controller(in);
 
-    ASSERT_NEAR(res->torque_lim_nm.FR, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.FL, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.RR, 21, 2.0);
-    ASSERT_NEAR(res->torque_lim_nm.RL, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.FR, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.FL, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.RR, 21, 2.0);
+    ASSERT_NEAR(res->desired_torques_nm.RL, 21, 2.0);
 }

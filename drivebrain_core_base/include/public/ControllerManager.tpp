@@ -1,7 +1,6 @@
 #include <ControllerManager.hpp>
 
-template <typename ControllerType, size_t NumControllers>
-bool control::ControllerManager<ControllerType, NumControllers>::init()
+bool control::ControllerManager::init()
 {
     std::optional max_switch_speed = get_parameter_value<float>("max_controller_switch_speed_ms");
     std::optional max_torque_switch = get_parameter_value<float>("max_torque_switch_nm");
@@ -33,8 +32,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::init()
     return true;
 }
 
-template <typename ControllerType, size_t NumControllers>
-core::control::ControllerManagerStatus control::ControllerManager<ControllerType, NumControllers>::_can_switch_controller(const core::VehicleState &current_state,
+core::control::ControllerManagerStatus control::ControllerManager::_can_switch_controller(const core::VehicleState &current_state,
                                                                                                                        const core::ControllerOutput &previous_output,
                                                                                                                        const core::ControllerOutput &next_controller_output)
 {
@@ -131,12 +129,10 @@ core::control::ControllerManagerStatus control::ControllerManager<ControllerType
     return _current_ctr_manager_state.current_status;
 }
 
-template <typename ControllerType, size_t NumControllers>
-bool control::ControllerManager<ControllerType, NumControllers>::swap_active_controller(size_t new_controller_index, const core::VehicleState& input)
+bool control::ControllerManager::swap_active_controller(size_t new_controller_index, const core::VehicleState& input)
 {   
     using status_type = core::control::ControllerManagerStatus;
-    static const size_t num_controllers = _controllers.size();
-    if (new_controller_index > (num_controllers - 1) || new_controller_index < 0)
+    if (new_controller_index > (_num_controllers - 1) || new_controller_index < 0)
     {
         _current_ctr_manager_state.current_status = status_type::ERROR_CONTROLLER_INDEX_OUT_OF_RANGE;
         _logger_inst.log_string("switch mode failed with error code: " + std::to_string(static_cast<int>(_current_ctr_manager_state.current_status)), static_cast<core::LogLevel>(1));
@@ -150,7 +146,7 @@ bool control::ControllerManager<ControllerType, NumControllers>::swap_active_con
 
     }
     
-    if(_can_switch_controller(input, {_controllers[_current_controller_index]->step_controller(input)}, {_controllers[new_controller_index]->step_controller(input)}) == status_type::NO_ERROR)
+    if(_can_switch_controller(input, _controllers[_current_controller_index]->step_controller(input), _controllers[new_controller_index]->step_controller(input)) == status_type::NO_ERROR)
     {
         _current_controller_index = new_controller_index;
         _logger_inst.log_string("switched mode: " + std::to_string(new_controller_index), static_cast<core::LogLevel>(0));

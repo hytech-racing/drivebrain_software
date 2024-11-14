@@ -66,7 +66,6 @@ namespace control
         ControllerManager(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "ControllerManager"),
                                                                                                                                     _logger_inst(logger)
         {
-            _num_controllers = 0;
         }
         ~ControllerManager() = default;
 
@@ -99,21 +98,22 @@ namespace control
         /// @return respective controller output to command the drivetrain
         core::ControllerOutput step_active_controller(const core::VehicleState& input)
         {   
-            return controller_steps[_current_controller_index](input);
+            return _controllers[_current_controller_index]->step_controller(input);
         }
 
-        void push_back(std::vector<std::function<core::ControllerOutput(const VehicleState&)>> func)
+        void push_back(Controller<core::ControllerOutput, core::VehicleState> *ctr)
         {
-            controller_steps.push_back(func);
+            _controllers.push_back(ctr);
+            _num_controllers += 1;
         }
 
     private:
         core::control::ControllerManagerStatus _can_switch_controller(const core::VehicleState &current_state, const core::ControllerOutput &previous_output, const core::ControllerOutput &next_controller_output);
         size_t _current_controller_index = 0;
-        size_t _num_controllers;
+        size_t _num_controllers = 0;
         core::control::ControllerManagerState _current_ctr_manager_state;
         core::Logger _logger_inst;
-        std::vector<std::function<core::ControllerOutput(const VehicleState&)>> controller_steps;
+        std::vector<control::Controller<core::ControllerOutput, core::VehicleState> *> _controllers;
         float _max_switch_rpm, _max_torque_switch, _max_accel_switch_req, _max_requested_rpm;
     };
 }

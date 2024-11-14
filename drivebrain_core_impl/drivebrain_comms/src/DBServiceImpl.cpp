@@ -47,7 +47,7 @@ grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *conte
     return grpc::Status::OK;
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2>> ctr_manager_inst, std::function<std::pair<core::VehicleState, bool>()> state_get)
+DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::shared_ptr<control::ControllerManager> ctr_manager_inst, std::function<std::pair<core::VehicleState, bool>()> state_get)
         : _logger_inst(logger_inst), _ctr_manager_inst(ctr_manager_inst), _state_getter(state_get)
 {
 }
