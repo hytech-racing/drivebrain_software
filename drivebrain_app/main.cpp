@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
 {
 
     // io context for boost async io. gets given to the drivers working with all system peripherals
+    spdlog::set_level(spdlog::level::warn); // Set global log level to debug
+
     boost::asio::io_context io_context;
     auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
     control::SimpleController controller(logger, config);
     configurable_components.push_back(&controller);
     bool construction_failed = false;
-    estimation::MatlabMath matlab_math(logger, config, construction_failed);
+    estimation::Tire_Model_Codegen_MatlabModel matlab_math(logger, config, construction_failed);
 
     if (construction_failed)
     {

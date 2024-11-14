@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-10-28T17_14_30";
+        ref = "2024-11-08T01_13_42";
         flake = false;
       };
 
@@ -40,10 +40,18 @@
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
-    matlab-math.url = "github:hytech-racing/MATLAB-math";
+    db-core-src = {
+      url = "github:hytech-racing/drivebrain_core";
+      flake = false;
+    };
+
+    simulink-automation-src = {
+        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
+        flake = false;
+    };
 
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, matlab-math, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -70,10 +78,21 @@
             };
           };
       };
+
+      db_core_overlay = final: prev: {
+        drivebrain_core = final.callPackage ./db-core.nix { inherit db-core-src; };
+      };
+
+      simulink_automation_overlay = final: prev: {
+        simulink_automation = final.callPackage ./simulink_automation.nix { inherit simulink-automation-src; };
+      };
+
       my_overlays = [
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
+        simulink_automation_overlay
+        db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
     in
@@ -99,7 +118,6 @@
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
-                matlab-math.overlays.default
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
@@ -109,6 +127,8 @@
             };
             packages.default = pkgs.drivebrain_software;
             packages.drivebrain_software = pkgs.drivebrain_software;
+            packages.drivebrain_core = pkgs.drivebrain_core;
+            packages.simulink_automation = pkgs.simulink_automation;
 
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
@@ -126,6 +146,20 @@
               packages = [ pkgs.mcap-cli ];
               inputsFrom = [
                 pkgs.drivebrain_software
+              ];
+            };
+
+            devShells.sim_automath = pkgs.mkShell rec {
+              name = "nix-devshell";
+              shellHook =
+                let icon = "f121";
+                in ''
+                  
+                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
+                  
+                '';
+              inputsFrom = [
+                pkgs.simulink_automation
               ];
             };
 
@@ -153,7 +187,6 @@
               import nixpkgs {
                 inherit system;
                 overlays = [
-                  matlab-math.overlays.default
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
