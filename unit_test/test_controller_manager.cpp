@@ -107,9 +107,9 @@ TEST_F(ControllerManagerTest, StepActiveSpeedController) {
 //swap between same controller outputs
 TEST_F(ControllerManagerTest, SwapSameTypes) {
     vehicle_state.current_rpms = {100, 100, 100, 100};
-    ASSERT_TRUE(controller_manager_2speed.swap_active_controller(2, vehicle_state));
+    ASSERT_FALSE(controller_manager_diff.swap_active_controller(2, vehicle_state));
 
-    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
+    core::ControllerOutput output = controller_manager_diff.step_active_controller(vehicle_state);
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
@@ -136,13 +136,13 @@ TEST_F(ControllerManagerTest, SwapBetweenTypes) {
     ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
-//switching with different controllers where desired 
+//switching where kachow
 TEST_F(ControllerManagerTest, SwapSpeedTooHigh) {
     vehicle_state.current_rpms = {10000, 10000, 10000, 10000};
-    ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
+    ASSERT_FALSE(controller_manager_diff.swap_active_controller(1, vehicle_state));
 
-    core::ControllerOutput output = controller_manager_2speed.step_active_controller(vehicle_state);
-    ASSERT_TRUE(std::holds_alternative<core::TorqueControlOut>(output.out));
+    core::ControllerOutput output = controller_manager_diff.step_active_controller(vehicle_state);
+    ASSERT_TRUE(std::holds_alternative<core::SpeedControlOut>(output.out));
 }
 
 // Test out of range index
