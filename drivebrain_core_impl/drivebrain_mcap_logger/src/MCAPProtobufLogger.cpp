@@ -123,7 +123,6 @@ namespace common
                     msg_to_log.channelId = _msg_name_id_map[msg.message_name]; // under the mutex we also lookup in the map
                     auto write_res = _writer.write(msg_to_log);
 
-                    // std::cout << "logging msg" << std::endl;
                     spdlog::info("Logging message: {}", msg.message_name); 
                 }
             }

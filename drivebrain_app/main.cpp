@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
 {
 
     // io context for boost async io. gets given to the drivers working with all system peripherals
+    spdlog::set_level(spdlog::level::warn); // Set global log level to debug
+
     boost::asio::io_context io_context;
     auto logger = core::Logger(core::LogLevel::INFO);
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue;
