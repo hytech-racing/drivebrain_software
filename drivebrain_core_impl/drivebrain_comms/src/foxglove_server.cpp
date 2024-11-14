@@ -12,6 +12,9 @@
 
 #include <algorithm>
 
+#include <spdlog/spdlog.h>
+
+
 static uint64_t nanosecondsSinceEpoch()
 {
     return uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -23,7 +26,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
     {
-        std::cout << msg << std::endl;
+        spdlog::warn("{}", msg);
     };
 
     _server_options.capabilities.push_back("parameters");
@@ -57,13 +60,13 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
     hdlrs.subscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle)
     {
         const auto clientStr = _server->remoteEndpointString(clientHandle);
-        std::cout << "Client " << clientStr << " subscribed to " << chanId << std::endl;
+        spdlog::warn("Client {} subscribed to {}", clientStr, chanId);
     };
 
     hdlrs.unsubscribeHandler = [&](foxglove::ChannelId chanId, foxglove::ConnHandle clientHandle)
     {
         const auto clientStr = _server->remoteEndpointString(clientHandle);
-        std::cout << "Client " << clientStr << " unsubscribed from " << chanId << std::endl;
+        spdlog::warn("Client {} unsubscribed from {}", clientStr, chanId);
     };
 
     // TODO make the .proto file name a parameter
@@ -115,7 +118,8 @@ foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::strin
 {
     if (std::holds_alternative<bool>(param))
     {
-        std::cout << set_name << " Variant holds an bool: " << std::get<bool>(param) << std::endl;
+        spdlog::warn("{} Variant holds a bool: {}", set_name, std::get<bool>(param));
+
         return foxglove::Parameter(set_name, std::get<bool>(param));
     }
     else if (std::holds_alternative<int>(param))
@@ -140,7 +144,7 @@ foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::strin
     }
     else
     {
-        std::cout << set_name << " unknown param variant type" << std::endl;
+        spdlog::warn("{} unknown param variant type", set_name);
     }
 
     return {};
@@ -167,7 +171,7 @@ core::common::Configurable::ParamTypes core::FoxgloveWSServer::_get_db_param(fox
     }
     else
     {
-        std::cout << "unsupported param type" << std::endl;
+        spdlog::warn("unsupported param type");
     }
 
     return std::monostate();
@@ -193,7 +197,7 @@ std::optional<foxglove::Parameter> core::FoxgloveWSServer::_convert_foxglove_par
     }
     else
     {
-        std::cout << "WARNING: unsupported type input, not setting" << std::endl;
+        spdlog::warn("WARNING: unsupported type input, not setting");
         return std::nullopt;
     }
 }
@@ -220,7 +224,8 @@ void core::FoxgloveWSServer::_set_db_param(foxglove::Parameter param_update)
             return;
         }
     }
-    std::cout << "WARNING: could not find component " << component_name << std::endl;
+    spdlog::warn("WARNING: could not find component {}", component_name);
+
 }
 
 std::vector<foxglove::Parameter> core::FoxgloveWSServer::_get_current_params()
