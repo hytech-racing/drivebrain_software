@@ -83,12 +83,12 @@ $(function() {
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;variant&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// from drivebrain_core</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="Configurable_8hpp.html">Configurable.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;Configurable.hpp&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;websocket/base64.hpp&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;websocket/server_factory.hpp&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;websocket/websocket_notls.hpp&gt;</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;websocket/websocket_server.hpp&gt;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;<a class="code" href="DriverBus_8hpp.html">DriverBus.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;DriverBus.hpp&gt;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;google/protobuf/message.h&gt;</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
@@ -98,7 +98,7 @@ $(function() {
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// - [ ] write tests for type conversion between foxgloe and drivebrain types and the conditions that they need to handle</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// - [ ] write tests for properly handling namespaced cache of parameters</span></div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecore.html">core</a></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="namespacecore.html">   23</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecore.html">core</a></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>{</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classcore_1_1FoxgloveWSServer.html">   25</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1FoxgloveWSServer.html">FoxgloveWSServer</a></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    {</div>
@@ -115,13 +115,13 @@ $(function() {
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keyword">private</span>:</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        std::vector&lt;foxglove::Parameter&gt; _get_current_params();</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        foxglove::Parameter _get_foxglove_param(<span class="keyword">const</span> std::string&amp; set_name, <a class="code hl_typedef" href="classcore_1_1common_1_1Configurable.html#a0bd7931dd5e09b0db6957ce912b1cbf6">core::common::Configurable::ParamTypes</a> param);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        foxglove::Parameter _get_foxglove_param(<span class="keyword">const</span> std::string&amp; set_name, core::common::Configurable::ParamTypes param);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <a class="code hl_typedef" href="classcore_1_1common_1_1Configurable.html#a0bd7931dd5e09b0db6957ce912b1cbf6">core::common::Configurable::ParamTypes</a> _get_db_param(foxglove::Parameter param);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        core::common::Configurable::ParamTypes _get_db_param(foxglove::Parameter param);</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="keywordtype">void</span> _set_db_param(foxglove::Parameter param_update);</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        std::optional&lt;foxglove::Parameter&gt; _convert_foxglove_param(<a class="code hl_typedef" href="classcore_1_1common_1_1Configurable.html#a0bd7931dd5e09b0db6957ce912b1cbf6">core::common::Configurable::ParamTypes</a> curr_param_val, foxglove::Parameter incoming_param);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        std::optional&lt;foxglove::Parameter&gt; _convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param);</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordtype">void</span> _handle_foxglove_send();</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">private</span>:</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        std::vector&lt;core::common::Configurable *&gt; _components;</div>
@@ -132,14 +132,11 @@ $(function() {
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    };</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>}</div>
-<div class="ttc" id="aConfigurable_8hpp_html"><div class="ttname"><a href="Configurable_8hpp.html">Configurable.hpp</a></div></div>
-<div class="ttc" id="aDriverBus_8hpp_html"><div class="ttname"><a href="DriverBus_8hpp.html">DriverBus.hpp</a></div></div>
 <div class="ttc" id="aclasscore_1_1FoxgloveWSServer_html"><div class="ttname"><a href="classcore_1_1FoxgloveWSServer.html">core::FoxgloveWSServer</a></div><div class="ttdef"><b>Definition:</b> foxglove_server.hpp:26</div></div>
 <div class="ttc" id="aclasscore_1_1FoxgloveWSServer_html_a255b7f9f35fe2163cb0cf0a229f1ed1a"><div class="ttname"><a href="classcore_1_1FoxgloveWSServer.html#a255b7f9f35fe2163cb0cf0a229f1ed1a">core::FoxgloveWSServer::FoxgloveWSServer</a></div><div class="ttdeci">FoxgloveWSServer()=delete</div></div>
 <div class="ttc" id="aclasscore_1_1FoxgloveWSServer_html_a9930139a7fadcd2ac37cdceef24b9774"><div class="ttname"><a href="classcore_1_1FoxgloveWSServer.html#a9930139a7fadcd2ac37cdceef24b9774">core::FoxgloveWSServer::send_live_telem_msg</a></div><div class="ttdeci">void send_live_telem_msg(std::shared_ptr&lt; google::protobuf::Message &gt; msg)</div><div class="ttdef"><b>Definition:</b> foxglove_server.cpp:104</div></div>
 <div class="ttc" id="aclasscore_1_1FoxgloveWSServer_html_aba93ddb8eece91ac2f98880b55419663"><div class="ttname"><a href="classcore_1_1FoxgloveWSServer.html#aba93ddb8eece91ac2f98880b55419663">core::FoxgloveWSServer::~FoxgloveWSServer</a></div><div class="ttdeci">~FoxgloveWSServer()</div><div class="ttdef"><b>Definition:</b> foxglove_server.hpp:32</div></div>
-<div class="ttc" id="aclasscore_1_1common_1_1Configurable_html_a0bd7931dd5e09b0db6957ce912b1cbf6"><div class="ttname"><a href="classcore_1_1common_1_1Configurable.html#a0bd7931dd5e09b0db6957ce912b1cbf6">core::common::Configurable::ParamTypes</a></div><div class="ttdeci">std::variant&lt; bool, int, float, double, std::string, std::monostate &gt; ParamTypes</div><div class="ttdoc">helper type alias</div><div class="ttdef"><b>Definition:</b> Configurable.hpp:57</div></div>
-<div class="ttc" id="anamespacecore_html"><div class="ttname"><a href="namespacecore.html">core</a></div><div class="ttdef"><b>Definition:</b> Configurable.hpp:48</div></div>
+<div class="ttc" id="anamespacecore_html"><div class="ttname"><a href="namespacecore.html">core</a></div><div class="ttdef"><b>Definition:</b> foxglove_server.hpp:24</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

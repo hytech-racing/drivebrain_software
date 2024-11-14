@@ -1,7 +1,14 @@
 var searchData=
 [
-  ['baud_5frate_0',['baud_rate',['../structcomms_1_1VNDriver_1_1config.html#aabd6cbeafdcb33bb06c3014ecb20d6ce',1,'comms::VNDriver::config']]],
-  ['brake_5fsaturation_5fnm_1',['brake_saturation_nm',['../structcore_1_1TireDynamics.html#a34ce76d7ce7851e64710a9b11c847a26',1,'core::TireDynamics']]],
-  ['brakebiasfront_2',['BrakeBiasFront',['../structestimation_1_1MatlabMath_1_1config.html#a5974767922fbeae7738ec471de62349e',1,'estimation::MatlabMath::config']]],
-  ['build_5ffile_5fdescriptor_5fset_3',['build_file_descriptor_set',['../namespaceutil.html#af15efc5674ec2eb10949ee4d8f73f090',1,'util']]]
+  ['can_20driver_0',['CAN driver',['../md_drivebrain_core_impl_drivebrain_comms_README_CAN_driver.html',1,'']]],
+  ['cancomms_2ecpp_1',['CANComms.cpp',['../CANComms_8cpp.html',1,'']]],
+  ['cancomms_2ehpp_2',['CANComms.hpp',['../CANComms_8hpp.html',1,'']]],
+  ['candriver_3',['CANDriver',['../classcomms_1_1CANDriver.html#ab6f47cb878c51c0ebd1ce96b8d32d31f',1,'comms::CANDriver::CANDriver()'],['../classcomms_1_1CANDriver.html',1,'comms::CANDriver']]],
+  ['close_5fcurrent_5fmcap_4',['close_current_mcap',['../classcommon_1_1MCAPProtobufLogger.html#ac9d555e8a17ca299b91b7bc7cd90257a',1,'common::MCAPProtobufLogger']]],
+  ['common_5',['common',['../namespacecommon.html',1,'']]],
+  ['comms_6',['comms',['../namespacecomms.html',1,'']]],
+  ['config_7',['config',['../structcomms_1_1VNDriver_1_1config.html',1,'comms::VNDriver::config'],['../structcontrol_1_1SimpleController_1_1config.html',1,'control::SimpleController::config']]],
+  ['control_8',['control',['../namespacecontrol.html',1,'']]],
+  ['controllers_2ehpp_9',['Controllers.hpp',['../Controllers_8hpp.html',1,'']]],
+  ['core_10',['core',['../namespacecore.html',1,'']]]
 ];

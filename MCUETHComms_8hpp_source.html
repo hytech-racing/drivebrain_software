@@ -79,9 +79,9 @@ $(function() {
 <a href="MCUETHComms_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef __ETHCOMMS_H__</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define __ETHCOMMS_H__</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="code" href="Logger_8hpp.html">Logger.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;Logger.hpp&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="StateEstimator_8hpp.html">StateEstimator.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="MsgLogger_8hpp.html">MsgLogger.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;MsgLogger.hpp&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;boost/asio.hpp&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;boost/bind.hpp&gt;</span></div>
@@ -105,12 +105,12 @@ $(function() {
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html">   27</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcomms_1_1MCUETHComms.html">MCUETHComms</a></div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    {</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">   30</a></span>        <span class="keyword">using </span><a class="code hl_struct" href="structcore_1_1common_1_1ThreadSafeDeque.html">deqtype</a> = <a class="code hl_struct" href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque&lt;std::shared_ptr&lt;google::protobuf::Message&gt;</a>&gt;;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">   31</a></span>        <span class="keyword">using </span><a class="code hl_class" href="classcore_1_1MsgLogger.html">loggertype</a> = <a class="code hl_class" href="classcore_1_1MsgLogger.html">core::MsgLogger&lt;std::shared_ptr&lt;google::protobuf::Message&gt;</a>&gt;;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">   30</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> = core::common::ThreadSafeDeque&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">   31</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">loggertype</a> = core::MsgLogger&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">   32</a></span>        <a class="code hl_function" href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">MCUETHComms</a>() = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <a class="code hl_function" href="classcomms_1_1MCUETHComms.html#a5fbf2878cf76c7d8fec5f208669dab67">~MCUETHComms</a>();</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <a class="code hl_function" href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">MCUETHComms</a>(<a class="code hl_class" href="classcore_1_1Logger.html">core::Logger</a> &amp;logger,</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                    <a class="code hl_struct" href="structcore_1_1common_1_1ThreadSafeDeque.html">deqtype</a> &amp;in_deq,</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <a class="code hl_function" href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">MCUETHComms</a>(core::Logger &amp;logger,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                    <a class="code hl_typedef" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> &amp;in_deq,</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                    std::shared_ptr&lt;loggertype&gt; message_logger,</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                    <a class="code hl_class" href="classcore_1_1StateEstimator.html">core::StateEstimator</a> &amp;state_estimator,</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                    boost::asio::io_context &amp;io_context,</div>
@@ -128,7 +128,7 @@ $(function() {
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                          std::size_t <span class="comment">/*bytes_transferred*/</span>);</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <a class="code hl_class" href="classcore_1_1Logger.html">core::Logger</a> &amp;_logger;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        core::Logger &amp;_logger;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        std::shared_ptr&lt;loggertype&gt; _message_logger;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <a class="code hl_class" href="classcore_1_1StateEstimator.html">core::StateEstimator</a> &amp;_state_estimator;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        std::array&lt;uint8_t, 2048&gt; _recv_buffer;</div>
@@ -139,7 +139,7 @@ $(function() {
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        boost::asio::ip::udp::socket _socket;</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        boost::asio::ip::udp::endpoint _remote_endpoint;</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        std::shared_ptr&lt;hytech_msgs::MCUOutputData&gt; _mcu_msg;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <a class="code hl_struct" href="structcore_1_1common_1_1ThreadSafeDeque.html">deqtype</a> &amp;_input_deque_ref; <span class="comment">// &quot;input&quot; = the messages that get input to the ethernet comms driver to send out</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <a class="code hl_typedef" href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">deqtype</a> &amp;_input_deque_ref; <span class="comment">// &quot;input&quot; = the messages that get input to the ethernet comms driver to send out</span></div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordtype">bool</span> _running = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        std::thread _output_thread;</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    };</div>
@@ -147,17 +147,14 @@ $(function() {
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>}</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#endif </span><span class="comment">// __ETHCOMMS_H__</span></div>
-<div class="ttc" id="aLogger_8hpp_html"><div class="ttname"><a href="Logger_8hpp.html">Logger.hpp</a></div></div>
-<div class="ttc" id="aMsgLogger_8hpp_html"><div class="ttname"><a href="MsgLogger_8hpp.html">MsgLogger.hpp</a></div></div>
 <div class="ttc" id="aStateEstimator_8hpp_html"><div class="ttname"><a href="StateEstimator_8hpp.html">StateEstimator.hpp</a></div></div>
 <div class="ttc" id="aclasscomms_1_1MCUETHComms_html"><div class="ttname"><a href="classcomms_1_1MCUETHComms.html">comms::MCUETHComms</a></div><div class="ttdef"><b>Definition:</b> MCUETHComms.hpp:28</div></div>
+<div class="ttc" id="aclasscomms_1_1MCUETHComms_html_a14a14ab99cfb7aad8563c02fe824eb12"><div class="ttname"><a href="classcomms_1_1MCUETHComms.html#a14a14ab99cfb7aad8563c02fe824eb12">comms::MCUETHComms::deqtype</a></div><div class="ttdeci">core::common::ThreadSafeDeque&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; deqtype</div><div class="ttdef"><b>Definition:</b> MCUETHComms.hpp:30</div></div>
 <div class="ttc" id="aclasscomms_1_1MCUETHComms_html_a2bb090eefcbdd706e8bac4fe1ae01537"><div class="ttname"><a href="classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537">comms::MCUETHComms::MCUETHComms</a></div><div class="ttdeci">MCUETHComms()=delete</div></div>
 <div class="ttc" id="aclasscomms_1_1MCUETHComms_html_a5fbf2878cf76c7d8fec5f208669dab67"><div class="ttname"><a href="classcomms_1_1MCUETHComms.html#a5fbf2878cf76c7d8fec5f208669dab67">comms::MCUETHComms::~MCUETHComms</a></div><div class="ttdeci">~MCUETHComms()</div><div class="ttdef"><b>Definition:</b> MCUETHComms.cpp:32</div></div>
-<div class="ttc" id="aclasscore_1_1Logger_html"><div class="ttname"><a href="classcore_1_1Logger.html">core::Logger</a></div><div class="ttdef"><b>Definition:</b> Logger.hpp:18</div></div>
-<div class="ttc" id="aclasscore_1_1MsgLogger_html"><div class="ttname"><a href="classcore_1_1MsgLogger.html">core::MsgLogger</a></div><div class="ttdef"><b>Definition:</b> MsgLogger.hpp:21</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html"><div class="ttname"><a href="classcore_1_1StateEstimator.html">core::StateEstimator</a></div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:57</div></div>
-<div class="ttc" id="anamespacecomms_html"><div class="ttname"><a href="namespacecomms.html">comms</a></div><div class="ttdef"><b>Definition:</b> Driver.hpp:4</div></div>
-<div class="ttc" id="astructcore_1_1common_1_1ThreadSafeDeque_html"><div class="ttname"><a href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque</a></div><div class="ttdef"><b>Definition:</b> DriverBus.hpp:21</div></div>
+<div class="ttc" id="aclasscomms_1_1MCUETHComms_html_af21e924ebc5453fdf08bdbc0ad387928"><div class="ttname"><a href="classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928">comms::MCUETHComms::loggertype</a></div><div class="ttdeci">core::MsgLogger&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; loggertype</div><div class="ttdef"><b>Definition:</b> MCUETHComms.hpp:31</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html"><div class="ttname"><a href="classcore_1_1StateEstimator.html">core::StateEstimator</a></div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:58</div></div>
+<div class="ttc" id="anamespacecomms_html"><div class="ttname"><a href="namespacecomms.html">comms</a></div><div class="ttdef"><b>Definition:</b> CANComms.hpp:57</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

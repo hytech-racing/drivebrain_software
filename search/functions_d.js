@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['open_5fnew_5fmcap_0',['open_new_mcap',['../classcommon_1_1MCAPProtobufLogger.html#a7712eb48ad7d30a9f23e5350ade4f4aa',1,'common::MCAPProtobufLogger']]],
-  ['operator_22_22_5fkph_1',['operator&quot;&quot;_kph',['../Literals_8hpp.html#aa86605a8920ea3933932eabf2b78b80f',1,'Literals.hpp']]],
-  ['operator_22_22_5fm_5fs_2',['operator&quot;&quot;_m_s',['../Literals_8hpp.html#a3d530c408aa76714667bc9fd5b269eda',1,'Literals.hpp']]],
-  ['operator_22_22_5fmph_3',['operator&quot;&quot;_mph',['../Literals_8hpp.html#a34aabf1b0840c4d80e450276bdedf79f',1,'Literals.hpp']]],
-  ['operator_22_22_5frad_5fs_4',['operator&quot;&quot;_rad_s',['../Literals_8hpp.html#aa429bd713d7401781f69c9e380e0ecb5',1,'Literals.hpp']]],
-  ['operator_22_22_5frpm_5',['operator&quot;&quot;_rpm',['../Literals_8hpp.html#a25273d7ce5ed15f894de823e4b2fbec1',1,'Literals.hpp']]],
-  ['operator_22_22_5fw_5frad_5fs_6',['operator&quot;&quot;_w_rad_s',['../Literals_8hpp.html#ae31d3074185322753abb833231b525f6',1,'Literals.hpp']]],
-  ['operator_22_22_5fw_5frpm_7',['operator&quot;&quot;_w_rpm',['../Literals_8hpp.html#aebcc8f67c026460bedf4c511457519a9',1,'Literals.hpp']]]
+  ['send_5flive_5ftelem_5fmsg_0',['send_live_telem_msg',['../classcore_1_1FoxgloveWSServer.html#a9930139a7fadcd2ac37cdceef24b9774',1,'core::FoxgloveWSServer']]],
+  ['set_5ffield_5fvalues_5fof_5fpb_5fmsg_1',['set_field_values_of_pb_msg',['../classcomms_1_1CANDriver.html#a1c1baff628374bf8df93f0560eb4abf5',1,'comms::CANDriver']]],
+  ['set_5fprevious_5fcontrol_5foutput_2',['set_previous_control_output',['../classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716',1,'core::StateEstimator']]],
+  ['signalhandler_3',['signalHandler',['../main_8cpp.html#ad2e59c7203b3bddc1bc9a2224b52e8e7',1,'main.cpp']]],
+  ['simplecontroller_4',['SimpleController',['../classcontrol_1_1SimpleController.html#af39715f94e27921a9d4873b4079bdd00',1,'control::SimpleController']]],
+  ['stateestimator_5',['StateEstimator',['../classcore_1_1StateEstimator.html#a4697bc21e323b5ad437772589166c6ee',1,'core::StateEstimator']]],
+  ['step_5fcontroller_6',['step_controller',['../classcontrol_1_1SimpleController.html#a134d880d239bf59e49c5d1d654b4741d',1,'control::SimpleController']]],
+  ['stop_5fserver_7',['stop_server',['../classDBInterfaceImpl.html#ab4970001b38a918750ab5dbcc69a02e5',1,'DBInterfaceImpl']]]
 ];

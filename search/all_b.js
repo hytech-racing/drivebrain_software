@@ -1,22 +1,9 @@
 var searchData=
 [
-  ['literals_2ehpp_0',['Literals.hpp',['../Literals_8hpp.html',1,'']]],
-  ['lmux_5ffl_1',['lmux_fl',['../structestimation_1_1MatlabMath_1_1config.html#a611863691297c1bea11ee33f8f10a847',1,'estimation::MatlabMath::config']]],
-  ['lmux_5ffr_2',['lmux_fr',['../structestimation_1_1MatlabMath_1_1config.html#abd9401009f362895d9e8a92c19f3cc85',1,'estimation::MatlabMath::config']]],
-  ['lmux_5frl_3',['lmux_rl',['../structestimation_1_1MatlabMath_1_1config.html#aed0921a4406183fac86539dc4c7c5c79',1,'estimation::MatlabMath::config']]],
-  ['lmux_5frr_4',['lmux_rr',['../structestimation_1_1MatlabMath_1_1config.html#ad9984372e65c87f6487f28d3c023b450',1,'estimation::MatlabMath::config']]],
-  ['lmuy_5ffl_5',['lmuy_fl',['../structestimation_1_1MatlabMath_1_1config.html#a8fdb6e6f212dc7065033a067cc1ce683',1,'estimation::MatlabMath::config']]],
-  ['lmuy_5ffr_6',['lmuy_fr',['../structestimation_1_1MatlabMath_1_1config.html#aa17a7929fa2111b03dd19617d70e5a1e',1,'estimation::MatlabMath::config']]],
-  ['lmuy_5frl_7',['lmuy_rl',['../structestimation_1_1MatlabMath_1_1config.html#aaba358832909b53a3ea904bd8417c04f',1,'estimation::MatlabMath::config']]],
-  ['lmuy_5frr_8',['lmuy_rr',['../structestimation_1_1MatlabMath_1_1config.html#a0f5a79211809cad0e54183f1d283db89',1,'estimation::MatlabMath::config']]],
-  ['log_5fmessage_9',['log_message',['../classcore_1_1MessageLogger.html#a070770d0fdcf0316da4469d294b86bae',1,'core::MessageLogger']]],
-  ['log_5fmsg_10',['log_msg',['../classcore_1_1MsgLogger.html#ab2c9ae8969c85974c4d32d4ad14cc1b7',1,'core::MsgLogger::log_msg()'],['../classcommon_1_1MCAPProtobufLogger.html#a9dc6b74d5fe2de7ee5129a147b1e11c7',1,'common::MCAPProtobufLogger::log_msg()']]],
-  ['log_5fproto_5fmessage_11',['log_proto_message',['../classcomms_1_1VNDriver.html#afd12a2f760aea20c29280c20773c19bf',1,'comms::VNDriver']]],
-  ['log_5fstring_12',['log_string',['../classcore_1_1Logger.html#ab8bb6022bef96d9fb07ad392791be41c',1,'core::Logger']]],
-  ['log_5ftime_13',['log_time',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#a31c0619ab027f99b645bfd7b232f0724',1,'common::MCAPProtobufLogger::ProtobufRawMessage']]],
-  ['logger_14',['Logger',['../classcore_1_1Logger.html',1,'core::Logger'],['../classcore_1_1Logger.html#a397232bb2e14e315491ce0bebc3f8873',1,'core::Logger::Logger()']]],
-  ['logger_2ecpp_15',['Logger.cpp',['../Logger_8cpp.html',1,'']]],
-  ['logger_2ehpp_16',['Logger.hpp',['../Logger_8hpp.html',1,'']]],
-  ['loggertype_17',['loggertype',['../classcomms_1_1CANDriver.html#a9c6f642ac1c395ecd88d46e764793cc1',1,'comms::CANDriver::loggertype()'],['../classcomms_1_1MCUETHComms.html#af21e924ebc5453fdf08bdbc0ad387928',1,'comms::MCUETHComms::loggertype()'],['../VNComms_8hpp.html#af04a702c0a3bbd5d155443199395d33b',1,'loggertype():&#160;VNComms.hpp']]],
-  ['loglevel_18',['LogLevel',['../namespacecore.html#aa9b5a444ee11933c91d5e3235aa5b5e3',1,'core']]]
+  ['parameter_20server_0',['parameter server',['../md_drivebrain_core_impl_drivebrain_comms_README_foxglove_server.html',1,'']]],
+  ['pb_5fmsg_5frecv_1',['pb_msg_recv',['../classcomms_1_1CANDriver.html#a81eda165cf465a6bcae266f73d81a7fd',1,'comms::CANDriver']]],
+  ['positive_5fspeed_5fset_2',['positive_speed_set',['../structcontrol_1_1SimpleController_1_1config.html#a4ddc4b6cfdbf484cd67f155d322301d7',1,'control::SimpleController::config']]],
+  ['protobufrawmessage_3',['ProtobufRawMessage',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html',1,'common::MCAPProtobufLogger']]],
+  ['protobufutils_2ecpp_4',['ProtobufUtils.cpp',['../ProtobufUtils_8cpp.html',1,'']]],
+  ['protobufutils_2ehpp_5',['ProtobufUtils.hpp',['../ProtobufUtils_8hpp.html',1,'']]]
 ];

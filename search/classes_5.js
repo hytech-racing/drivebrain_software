@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['logger_0',['Logger',['../classcore_1_1Logger.html',1,'core']]]
+  ['simplecontroller_0',['SimpleController',['../classcontrol_1_1SimpleController.html',1,'control']]],
+  ['stateestimator_1',['StateEstimator',['../classcore_1_1StateEstimator.html',1,'core']]]
 ];

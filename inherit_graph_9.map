@@ -1,9 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classcore_1_1common_1_1Configurable.html" title="this is the (partially virtual) class that configurable components inherit from to get parameter acce..." alt="" coords="5,112,185,137"/>
-<area shape="rect" id="node2" href="$classcomms_1_1CANDriver.html" title=" " alt="" coords="279,5,412,31"/>
-<area shape="rect" id="node3" href="$classcomms_1_1VNDriver.html" title=" " alt="" coords="283,55,407,80"/>
-<area shape="rect" id="node4" href="$classcontrol_1_1ControllerManager.html" title=" " alt="" coords="233,105,457,145"/>
-<area shape="rect" id="node5" href="$classcontrol_1_1SimpleController.html" title=" " alt="" coords="264,219,427,244"/>
-<area shape="rect" id="node6" href="$classestimation_1_1MatlabMath.html" title=" " alt="" coords="267,169,423,195"/>
-<area shape="rect" id="node7" href="$classcontrol_1_1Controller.html" title=" " alt="" coords="12,204,179,259"/>
-</map>

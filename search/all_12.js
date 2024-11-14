@@ -1,27 +1,8 @@
 var searchData=
 [
-  ['save_5fconfig_0',['save_config',['../classcore_1_1JsonFileHandler.html#acfa9002820ef181c05d3791f81ed923a',1,'core::JsonFileHandler']]],
-  ['send_5flive_5ftelem_5fmsg_1',['send_live_telem_msg',['../classcore_1_1FoxgloveWSServer.html#a9930139a7fadcd2ac37cdceef24b9774',1,'core::FoxgloveWSServer']]],
-  ['serialized_5fdata_2',['serialized_data',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#a50a4ddca8a6dfc5bf60ede2f751f3f29',1,'common::MCAPProtobufLogger::ProtobufRawMessage']]],
-  ['serialport_3',['SerialPort',['../VNComms_8hpp.html#a68b61d989608a4e0a877bd7d1bf2b807',1,'VNComms.hpp']]],
-  ['set_5ffield_5fvalues_5fof_5fpb_5fmsg_4',['set_field_values_of_pb_msg',['../classcomms_1_1CANDriver.html#a1c1baff628374bf8df93f0560eb4abf5',1,'comms::CANDriver']]],
-  ['set_5fprevious_5fcontrol_5foutput_5',['set_previous_control_output',['../classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716',1,'core::StateEstimator']]],
-  ['signalhandler_6',['signalHandler',['../main_8cpp.html#ad2e59c7203b3bddc1bc9a2224b52e8e7',1,'main.cpp']]],
-  ['simplecontroller_7',['SimpleController',['../classcontrol_1_1SimpleController.html',1,'control::SimpleController'],['../classcontrol_1_1SimpleController.html#af39715f94e27921a9d4873b4079bdd00',1,'control::SimpleController::SimpleController()']]],
-  ['simplecontroller_2ecpp_8',['SimpleController.cpp',['../SimpleController_8cpp.html',1,'']]],
-  ['simplecontroller_2ehpp_9',['SimpleController.hpp',['../SimpleController_8hpp.html',1,'']]],
-  ['speed_5fm_5fs_10',['speed_m_s',['../Literals_8hpp.html#a0785b8ced31db65cf9f9dfc5f9c060ab',1,'Literals.hpp']]],
-  ['speedcontrolout_11',['SpeedControlOut',['../structcore_1_1SpeedControlOut.html',1,'core']]],
-  ['start_5flogging_5fto_5fnew_5ffile_12',['start_logging_to_new_file',['../classcore_1_1MsgLogger.html#ae61056c0fbcceed058ab9830513e8a85',1,'core::MsgLogger']]],
-  ['start_5fvehicle_13',['start_vehicle',['../VehicleManager_8cpp.html#a2e6e0c50f0f410f875f2e8e6e6468569',1,'VehicleManager.cpp']]],
-  ['state_5fis_5fvalid_14',['state_is_valid',['../structcore_1_1VehicleState.html#a7ccf3394a3fac7e3c31cf32ddcfbf537',1,'core::VehicleState']]],
-  ['stateestimator_15',['StateEstimator',['../classcore_1_1StateEstimator.html',1,'core::StateEstimator'],['../classcore_1_1StateEstimator.html#a6162b636424785b9f65a59fb9078b94d',1,'core::StateEstimator::StateEstimator()']]],
-  ['stateestimator_2ecpp_16',['StateEstimator.cpp',['../StateEstimator_8cpp.html',1,'']]],
-  ['stateestimator_2ehpp_17',['StateEstimator.hpp',['../StateEstimator_8hpp.html',1,'']]],
-  ['steering_5fangle_5fdeg_18',['steering_angle_deg',['../structcore_1_1VehicleState.html#a275ce1716cc86570dbac116021acca26',1,'core::VehicleState']]],
-  ['step_5factive_5fcontroller_19',['step_active_controller',['../classcontrol_1_1ControllerManager.html#ac71af2611a503b52be4b110b558c8dcc',1,'control::ControllerManager']]],
-  ['step_5fcontroller_20',['step_controller',['../classcontrol_1_1Controller.html#a6b1af2cf6fd467ecd46c0651ae6b8287',1,'control::Controller::step_controller()'],['../classcontrol_1_1SimpleController.html#a134d880d239bf59e49c5d1d654b4741d',1,'control::SimpleController::step_controller()']]],
-  ['stop_5flogging_5fto_5ffile_21',['stop_logging_to_file',['../classcore_1_1MsgLogger.html#a4b1f955a4624754116f528afc98b5a24',1,'core::MsgLogger']]],
-  ['stop_5fserver_22',['stop_server',['../classDBInterfaceImpl.html#ab4970001b38a918750ab5dbcc69a02e5',1,'DBInterfaceImpl']]],
-  ['stop_5fsignal_23',['stop_signal',['../main_8cpp.html#aad20d5ca3f4debe1b619d0cd361be72b',1,'main.cpp']]]
+  ['_7ecandriver_0',['~CANDriver',['../classcomms_1_1CANDriver.html#a0ed25074cff759e55eb28338bda21af8',1,'comms::CANDriver']]],
+  ['_7efoxglovewsserver_1',['~FoxgloveWSServer',['../classcore_1_1FoxgloveWSServer.html#aba93ddb8eece91ac2f98880b55419663',1,'core::FoxgloveWSServer']]],
+  ['_7emcapprotobuflogger_2',['~MCAPProtobufLogger',['../classcommon_1_1MCAPProtobufLogger.html#ac4b25aaff4ef13d20afb7ed02c95fb95',1,'common::MCAPProtobufLogger']]],
+  ['_7emcuethcomms_3',['~MCUETHComms',['../classcomms_1_1MCUETHComms.html#a5fbf2878cf76c7d8fec5f208669dab67',1,'comms::MCUETHComms']]],
+  ['_7estateestimator_4',['~StateEstimator',['../classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a',1,'core::StateEstimator']]]
 ];

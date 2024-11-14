@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['dbinterfaceimpl_0',['DBInterfaceImpl',['../classDBInterfaceImpl.html#a8189f47d4195db16db30152a700aceae',1,'DBInterfaceImpl']]],
-  ['driver_1',['Driver',['../classcomms_1_1Driver.html#a9e6bafe29341bd458f283ec85c9e20be',1,'comms::Driver']]]
+  ['foxglovewsserver_0',['FoxgloveWSServer',['../classcore_1_1FoxgloveWSServer.html#a255b7f9f35fe2163cb0cf0a229f1ed1a',1,'core::FoxgloveWSServer::FoxgloveWSServer()=delete'],['../classcore_1_1FoxgloveWSServer.html#a8f5257134dc0c31812eb0586914b4c00',1,'core::FoxgloveWSServer::FoxgloveWSServer(std::vector&lt; core::common::Configurable * &gt; configurable_components)']]]
 ];

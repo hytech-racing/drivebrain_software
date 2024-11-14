@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['error_0',['ERROR',['../namespacecore.html#aa9b5a444ee11933c91d5e3235aa5b5e3abb1ca97ec761fc37101737ba0aa2e7c5',1,'core']]],
-  ['error_5fcontroller_5findex_5fout_5fof_5frange_1',['ERROR_CONTROLLER_INDEX_OUT_OF_RANGE',['../namespacecore_1_1control.html#a920a7c50dbfc8c7cdbfa19d55e145900a2fc17fe2a413bdc823356ad9f921831f',1,'core::control']]],
-  ['error_5fdriver_5fon_5fpedal_2',['ERROR_DRIVER_ON_PEDAL',['../namespacecore_1_1control.html#a920a7c50dbfc8c7cdbfa19d55e145900acd49c8da0e656cbe3585e8b5702d7161',1,'core::control']]],
-  ['error_5fspeed_5fdiff_5ftoo_5fhigh_3',['ERROR_SPEED_DIFF_TOO_HIGH',['../namespacecore_1_1control.html#a920a7c50dbfc8c7cdbfa19d55e145900ad46efa8267691383966460acb54aefaf',1,'core::control']]],
-  ['error_5ftorque_5fdiff_5ftoo_5fhigh_4',['ERROR_TORQUE_DIFF_TOO_HIGH',['../namespacecore_1_1control.html#a920a7c50dbfc8c7cdbfa19d55e145900af38080c32a39ffa5eab7f9dc770a8869',1,'core::control']]],
-  ['estimation_5',['estimation',['../namespaceestimation.html',1,'']]],
-  ['evaluate_5festimator_6',['evaluate_estimator',['../classestimation_1_1MatlabMath.html#abb0c2de4a6d7e87454afcc66566905fd',1,'estimation::MatlabMath']]]
+  ['generate_5fname_5fto_5fid_5fmap_0',['generate_name_to_id_map',['../namespaceutil.html#a3fb6120d626ba3ba90cd19fb2d3d505a',1,'util']]],
+  ['get_5fdt_5fsec_1',['get_dt_sec',['../classcontrol_1_1SimpleController.html#ac12196cbff1f23619e0fbbe777c04dbf',1,'control::SimpleController']]],
+  ['get_5ffield_5fvalue_2',['get_field_value',['../classcomms_1_1CANDriver.html#a12f97fcea0a8adae3460836a3f673822',1,'comms::CANDriver']]],
+  ['get_5flatest_5fstate_5fand_5fvalidity_3',['get_latest_state_and_validity',['../classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06',1,'core::StateEstimator']]],
+  ['get_5fpb_5fdescriptors_4',['get_pb_descriptors',['../namespaceutil.html#a2f8a85090d6b2814546b9a5f2a48496d',1,'util']]]
 ];

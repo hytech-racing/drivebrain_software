@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['build_5ffile_5fdescriptor_5fset_0',['build_file_descriptor_set',['../namespaceutil.html#af15efc5674ec2eb10949ee4d8f73f090',1,'util']]]
+  ['candriver_0',['CANDriver',['../classcomms_1_1CANDriver.html#ab6f47cb878c51c0ebd1ce96b8d32d31f',1,'comms::CANDriver']]],
+  ['close_5fcurrent_5fmcap_1',['close_current_mcap',['../classcommon_1_1MCAPProtobufLogger.html#ac9d555e8a17ca299b91b7bc7cd90257a',1,'common::MCAPProtobufLogger']]]
 ];

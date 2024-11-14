@@ -87,7 +87,7 @@ $(function() {
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;mcap/writer.hpp&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;mcap/mcap.hpp&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;<a class="code" href="DriverBus_8hpp.html">DriverBus.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;DriverBus.hpp&gt;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespacecommon.html">   15</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecommon.html">common</a></div>
@@ -114,7 +114,7 @@ $(function() {
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keyword">private</span>:</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="keywordtype">void</span> _handle_log_to_file();</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <a class="code hl_struct" href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque&lt;ProtobufRawMessage&gt;</a> _input_deque;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        core::common::ThreadSafeDeque&lt;ProtobufRawMessage&gt; _input_deque;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        std::thread _log_thread;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="keywordtype">bool</span> _running = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        mcap::McapWriterOptions _options;</div>
@@ -126,10 +126,9 @@ $(function() {
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#endif </span><span class="comment">// __MCAPPROTOBUFLOGGER_H__</span></div>
-<div class="ttc" id="aDriverBus_8hpp_html"><div class="ttname"><a href="DriverBus_8hpp.html">DriverBus.hpp</a></div></div>
 <div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html">common::MCAPProtobufLogger</a></div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.hpp:18</div></div>
 <div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html_a7712eb48ad7d30a9f23e5350ade4f4aa"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html#a7712eb48ad7d30a9f23e5350ade4f4aa">common::MCAPProtobufLogger::open_new_mcap</a></div><div class="ttdeci">void open_new_mcap(const std::string &amp;name)</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.cpp:45</div></div>
-<div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html_a9dc6b74d5fe2de7ee5129a147b1e11c7"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html#a9dc6b74d5fe2de7ee5129a147b1e11c7">common::MCAPProtobufLogger::log_msg</a></div><div class="ttdeci">void log_msg(std::shared_ptr&lt; google::protobuf::Message &gt; out_msg)</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.cpp:134</div></div>
+<div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html_a9dc6b74d5fe2de7ee5129a147b1e11c7"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html#a9dc6b74d5fe2de7ee5129a147b1e11c7">common::MCAPProtobufLogger::log_msg</a></div><div class="ttdeci">void log_msg(std::shared_ptr&lt; google::protobuf::Message &gt; out_msg)</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.cpp:133</div></div>
 <div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html_ac4b25aaff4ef13d20afb7ed02c95fb95"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html#ac4b25aaff4ef13d20afb7ed02c95fb95">common::MCAPProtobufLogger::~MCAPProtobufLogger</a></div><div class="ttdeci">~MCAPProtobufLogger()</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.cpp:35</div></div>
 <div class="ttc" id="aclasscommon_1_1MCAPProtobufLogger_html_ac9d555e8a17ca299b91b7bc7cd90257a"><div class="ttname"><a href="classcommon_1_1MCAPProtobufLogger.html#ac9d555e8a17ca299b91b7bc7cd90257a">common::MCAPProtobufLogger::close_current_mcap</a></div><div class="ttdeci">void close_current_mcap()</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.cpp:86</div></div>
 <div class="ttc" id="anamespacecommon_html"><div class="ttname"><a href="namespacecommon.html">common</a></div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.hpp:16</div></div>
@@ -137,7 +136,6 @@ $(function() {
 <div class="ttc" id="astructcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage_html_a31c0619ab027f99b645bfd7b232f0724"><div class="ttname"><a href="structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#a31c0619ab027f99b645bfd7b232f0724">common::MCAPProtobufLogger::ProtobufRawMessage::log_time</a></div><div class="ttdeci">uint64_t log_time</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.hpp:24</div></div>
 <div class="ttc" id="astructcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage_html_a50a4ddca8a6dfc5bf60ede2f751f3f29"><div class="ttname"><a href="structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#a50a4ddca8a6dfc5bf60ede2f751f3f29">common::MCAPProtobufLogger::ProtobufRawMessage::serialized_data</a></div><div class="ttdeci">std::string serialized_data</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.hpp:22</div></div>
 <div class="ttc" id="astructcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage_html_adbbf46ea639f68888b9fc68ecc242830"><div class="ttname"><a href="structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#adbbf46ea639f68888b9fc68ecc242830">common::MCAPProtobufLogger::ProtobufRawMessage::message_name</a></div><div class="ttdeci">std::string message_name</div><div class="ttdef"><b>Definition:</b> MCAPProtobufLogger.hpp:23</div></div>
-<div class="ttc" id="astructcore_1_1common_1_1ThreadSafeDeque_html"><div class="ttname"><a href="structcore_1_1common_1_1ThreadSafeDeque.html">core::common::ThreadSafeDeque</a></div><div class="ttdef"><b>Definition:</b> DriverBus.hpp:21</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

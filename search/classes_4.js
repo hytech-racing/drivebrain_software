@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jsonfilehandler_0',['JsonFileHandler',['../classcore_1_1JsonFileHandler.html',1,'core']]]
+  ['protobufrawmessage_0',['ProtobufRawMessage',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html',1,'common::MCAPProtobufLogger']]]
 ];

@@ -1,27 +1,4 @@
 var searchData=
 [
-  ['main_0',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
-  ['main_2ecpp_1',['main.cpp',['../main_8cpp.html',1,'']]],
-  ['matlab_5fmath_5ftemp_5fout_2',['matlab_math_temp_out',['../structcore_1_1VehicleState.html#a89ec79550335883cbdc614162dba0a2e',1,'core::VehicleState']]],
-  ['matlabmath_3',['MatlabMath',['../classestimation_1_1MatlabMath.html',1,'estimation::MatlabMath'],['../classestimation_1_1MatlabMath.html#a276ccda69a5140a7f49bcf1e9620fc2e',1,'estimation::MatlabMath::MatlabMath()']]],
-  ['matlabmath_2ecpp_4',['MatlabMath.cpp',['../MatlabMath_8cpp.html',1,'']]],
-  ['matlabmath_2ehpp_5',['MatlabMath.hpp',['../MatlabMath_8hpp.html',1,'']]],
-  ['matlabmathresult_6',['MatlabMathResult',['../structcore_1_1MatlabMathResult.html',1,'core']]],
-  ['max_5freg_5ftorque_7',['max_reg_torque',['../structcontrol_1_1SimpleController_1_1config.html#a3d11c2e89175b9aefb342ef670d89a17',1,'control::SimpleController::config']]],
-  ['max_5ftorque_8',['max_torque',['../structcontrol_1_1SimpleController_1_1config.html#afd17ead82481809412991c8748bce7b0',1,'control::SimpleController::config']]],
-  ['mcap_5fimplementation_9',['MCAP_IMPLEMENTATION',['../MCAPProtobufLogger_8cpp.html#a138129934b2b05a5c06f53bd1ef5f938',1,'MCAPProtobufLogger.cpp']]],
-  ['mcapprotobuflogger_10',['MCAPProtobufLogger',['../classcommon_1_1MCAPProtobufLogger.html',1,'common::MCAPProtobufLogger'],['../classcommon_1_1MCAPProtobufLogger.html#a6279e686a388a138b307174ced51af33',1,'common::MCAPProtobufLogger::MCAPProtobufLogger()']]],
-  ['mcapprotobuflogger_2ecpp_11',['MCAPProtobufLogger.cpp',['../MCAPProtobufLogger_8cpp.html',1,'']]],
-  ['mcapprotobuflogger_2ehpp_12',['MCAPProtobufLogger.hpp',['../MCAPProtobufLogger_8hpp.html',1,'']]],
-  ['mcu_5frecv_5fmillis_13',['mcu_recv_millis',['../structcore_1_1SpeedControlOut.html#a75e59dfe00876293548d2c3142333c2e',1,'core::SpeedControlOut']]],
-  ['mcuethcomms_14',['MCUETHComms',['../classcomms_1_1MCUETHComms.html',1,'comms::MCUETHComms'],['../classcomms_1_1MCUETHComms.html#a73a8f6477f5b3f2b0472a21a4cc4fc0a',1,'comms::MCUETHComms::MCUETHComms(core::Logger &amp;logger, deqtype &amp;in_deq, std::shared_ptr&lt; loggertype &gt; message_logger, core::StateEstimator &amp;state_estimator, boost::asio::io_context &amp;io_context, const std::string &amp;send_ip, uint16_t recv_port, uint16_t send_port)'],['../classcomms_1_1MCUETHComms.html#a2bb090eefcbdd706e8bac4fe1ae01537',1,'comms::MCUETHComms::MCUETHComms()=delete']]],
-  ['mcuethcomms_2ecpp_15',['MCUETHComms.cpp',['../MCUETHComms_8cpp.html',1,'']]],
-  ['mcuethcomms_2ehpp_16',['MCUETHComms.hpp',['../MCUETHComms_8hpp.html',1,'']]],
-  ['message_5fname_17',['message_name',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html#adbbf46ea639f68888b9fc68ecc242830',1,'common::MCAPProtobufLogger::ProtobufRawMessage']]],
-  ['messagelogger_18',['MessageLogger',['../classcore_1_1MessageLogger.html',1,'core::MessageLogger'],['../classcore_1_1MessageLogger.html#ac1a7c086055a371750fd59d187f14f51',1,'core::MessageLogger::MessageLogger()']]],
-  ['messagelogger_2ehpp_19',['MessageLogger.hpp',['../MessageLogger_8hpp.html',1,'']]],
-  ['meters_5fper_5fsecond_5fto_5frpm_20',['METERS_PER_SECOND_TO_RPM',['../namespaceconstants.html#aaf076b8a94921da19791d77311362af1',1,'constants']]],
-  ['msglogger_21',['MsgLogger',['../classcore_1_1MsgLogger.html',1,'core::MsgLogger&lt; MsgType &gt;'],['../classcore_1_1MsgLogger.html#a06291be5a842f1991e09d83270034e8d',1,'core::MsgLogger::MsgLogger()']]],
-  ['msglogger_2ehpp_22',['MsgLogger.hpp',['../MsgLogger_8hpp.html',1,'']]],
-  ['mtx_23',['mtx',['../classcore_1_1common_1_1Configurable.html#a373731c52d32c53b3ff5cfa02f3a50e8',1,'core::common::Configurable::mtx()'],['../structcore_1_1common_1_1ThreadSafeDeque.html#a76b78ff71e53031ce63864a3eaa3b094',1,'core::common::ThreadSafeDeque::mtx()'],['../structcore_1_1MsgLogger_1_1ThreadSafeOutput.html#a311d5a3c185ed2e6e416aa21adaf421d',1,'core::MsgLogger::ThreadSafeOutput::mtx()']]]
+  ['quickstart_0',['quickstart',['../index.html',1,'']]]
 ];
