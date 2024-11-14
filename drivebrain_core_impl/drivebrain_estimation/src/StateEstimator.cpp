@@ -179,27 +179,27 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     rr_xyz->set_y(res.FYRR);
     rr_xyz->set_z(res.FZRR);
 
-    // auto current_tire_moments_nm = current_tire_dynamics->mutable_tire_moments_nm();
+    auto current_tire_moments_nm = current_tire_dynamics->mutable_tire_moments_nm();
 
-    // auto fl_xyz_moments = current_tire_moments_nm->mutable_fl();
-    // fl_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.FL.x);
-    // fl_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.FL.y);
-    // fl_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.FL.z);
+    auto fl_xyz_moments = current_tire_moments_nm->mutable_fl();
+    fl_xyz_moments->set_x(0);
+    fl_xyz_moments->set_y(0);
+    fl_xyz_moments->set_z(res.MZFL);
 
-    // auto fr_xyz_moments = current_tire_moments_nm->mutable_fr();
-    // fr_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.FR.x);
-    // fr_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.FR.y);
-    // fr_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.FR.z);
+    auto fr_xyz_moments = current_tire_moments_nm->mutable_fr();
+    fr_xyz_moments->set_x(0);
+    fr_xyz_moments->set_y(0);
+    fr_xyz_moments->set_z(res.MZFR);
 
-    // auto rl_xyz_moments = current_tire_moments_nm->mutable_rl();
-    // rl_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.RL.x);
-    // rl_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.RL.y);
-    // rl_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.RL.z);
+    auto rl_xyz_moments = current_tire_moments_nm->mutable_rl();
+    rl_xyz_moments->set_x(0);
+    rl_xyz_moments->set_y(0);
+    rl_xyz_moments->set_z(res.MZRL);
 
-    // auto rr_xyz_moments = current_tire_moments_nm->mutable_rr();
-    // rr_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.RR.x);
-    // rr_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.RR.y);
-    // rr_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.RR.z);
+    auto rr_xyz_moments = current_tire_moments_nm->mutable_rr();
+    rr_xyz_moments->set_x(0);
+    rr_xyz_moments->set_y(0);
+    rr_xyz_moments->set_z(res.MZRR);
 
     auto current_accel_saturation_nm = current_tire_dynamics->mutable_accel_saturation_nm();
 
@@ -225,12 +225,6 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     torque_add->set_fr(res.Torq_Add_FR);
     torque_add->set_rl(res.Torq_Add_RL);
     torque_add->set_rr(res.Torq_Add_RR);
-
-    auto torque_add_nms = current_tv_status->mutable_torque_additional_nm();
-    torque_add_nms->set_fl(res.Torq_Add_FL);
-    torque_add_nms->set_fr(res.Torq_Add_FR);
-    torque_add_nms->set_rl(res.Torq_Add_RL);
-    torque_add_nms->set_rr(res.Torq_Add_RR);
     current_tv_status->set_additional_mz_moment_nm(res.AdditionalMzNm);
     current_tv_status->set_des_psi_dot(res.DesiredYawRaterads);
     current_tv_status->set_psi_dot_err(res.Yaw_Rate_Err);
