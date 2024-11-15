@@ -24,8 +24,15 @@ using SchemaMap = std::unordered_map<std::string, mcap::SchemaPtr>;
 
 namespace utils {
     bool loadSchema(const mcap::SchemaPtr schema, gp::SimpleDescriptorDatabase* protoDb);
+
     std::optional<std::string> errorCheckInput(int argc, char** argv);
+
+    Json getJson(std::string fileName);
+
+    std::vector<std::string> getJsonStrings(std::string fileName, std::string key);
+
     std::vector<std::string> getTopics(std::string fileName);
+
     mcap::SchemaPtr topicToSchema(mcap::McapReader& reader, const std::string& channelTopic, gp::SimpleDescriptorDatabase* protoDb);
     SchemaMap generateSchemaMap(
         mcap::McapReader& reader,

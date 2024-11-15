@@ -9,9 +9,6 @@
 #include <unistd.h>
 #include <stdexcept>
 
-static const std::string DEFAULT_IP = "127.0.0.1";
-static const uint16_t DEFAULT_PORT = 1153;
-
 class Socket {
 private:
     int fileDescriptor;

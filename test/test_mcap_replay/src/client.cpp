@@ -15,9 +15,9 @@
 #include <iterator>
 #include <thread>
 
-#define SEC_TO_NANO 1'000'000'000
-constexpr bool DEBUG_OUT = true;
+constexpr unsigned int SEC_TO_NANO = 1'000'000'000;
 
+// This is only used for debugging purposes
 void printTimePoint(const std::chrono::system_clock::time_point& time_point) {
     std::time_t time = std::chrono::system_clock::to_time_t(time_point);
     std::tm* local_time = std::localtime(&time);
@@ -27,20 +27,32 @@ void printTimePoint(const std::chrono::system_clock::time_point& time_point) {
     std::cout << '.' << std::setfill('0') << std::setw(9) << nanoseconds.count() << std::endl;
 }
 
+// This is only used for debugging purposes
 void printTimePoint(mcap::Timestamp logTime) {
     printTimePoint(std::chrono::system_clock::time_point(std::chrono::nanoseconds(logTime)));
 }
 
 
 int main(int argc, char** argv) {
-    Socket socket(DEFAULT_IP, DEFAULT_PORT);
-
     const std::optional<std::string> inputFileName_o = utils::errorCheckInput(argc, argv);
     if (!inputFileName_o.has_value()) {
         return 1;
     }
 
-    std::vector<std::string> channelTopics = utils::getTopics("test/test_mcap_replay/res/test_input.json");
+    // default values
+    std::string jsonConfig = "test/test_mcap_replay/res/test_input.json"; // TODO: Add json file as a required console arg
+    bool DEBUG_OUT = true;
+    std::string remoteIP = "127.0.0.1";
+    int port = 1153;
+    // init params
+    {
+        Json j = utils::getJson(jsonConfig);
+        if (j.contains("remoteIP")) remoteIP = j["remoteIP"];
+        if (j.contains("port")) port = j["port"];
+        if (j.contains("debugOut")) DEBUG_OUT = j["debugOut"];
+    }
+    Socket socket(remoteIP, port);
+    std::vector<std::string> channelTopics = utils::getTopics(jsonConfig);
     
     gp::SimpleDescriptorDatabase protoDb;
     gp::DescriptorPool protoPool(&protoDb);
@@ -94,7 +106,7 @@ int main(int argc, char** argv) {
 
 
         auto message = std::unique_ptr<gp::Message>(protoFactory.GetPrototype(descriptor)->New());
-        if (!message->ParseFromArray(it->message.data, static_cast<int>(it->message.dataSize))) { // SEG FAULT HERE
+        if (!message->ParseFromArray(it->message.data, static_cast<int>(it->message.dataSize))) { 
             std::cerr << "ERROR: failed to parse message using included schema" << std::endl;
             reader.close();
             return 1;

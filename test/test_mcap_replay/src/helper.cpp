@@ -1,5 +1,6 @@
 #include "helper.hpp"
 #include <optional>
+#include <type_traits>
 
 namespace utils {
 
@@ -38,26 +39,36 @@ namespace utils {
         }
     }
 
-    // Will assume that provided JSON is valid
-    // Note: vector might not be great for this use case.
-    std::vector<std::string> getTopics(std::string fileName) {
+    Json getJson(std::string fileName) {
         std::ifstream f(fileName);
         Json jsonData = Json::parse(f);
-        std::vector<std::string> channelTopics;
-        const std::string key = "channelTopics";
+        return jsonData;
+    }
 
+    // Will assume that provided JSON is valid, and string array
+    // Note: vector might not be great for this use case.
+    std::vector<std::string> getJsonStrings(std::string fileName, std::string key) {
+        Json jsonData = getJson(fileName);
+        std::vector<std::string> strVec;
+
+        // Doesn't ensure data is string bc assumes valid input
         if (jsonData.contains(key) 
             && jsonData[key].is_array()) {
             size_t topicCount = jsonData[key].size();
             for (size_t i = 0; i < topicCount; ++i) {
                 std::cout << i << std::endl;
-                channelTopics.push_back(jsonData[key][i]);
+                strVec.push_back(jsonData[key][i]);
             }
         } else {
-            std::cerr << "JSON ERROR: channelTopics key is missing or not an array." << std::endl;
+            std::cerr << "JSON ERROR: key is missing or not an array." << std::endl;
         }
-        return channelTopics;
+        return strVec;
     }
+
+    std::vector<std::string> getTopics(std::string fileName) {
+        return getJsonStrings(fileName, "channelTopics");
+    }
+
 
     mcap::SchemaPtr topicToSchema(mcap::McapReader& reader, const std::string& channelTopic, gp::SimpleDescriptorDatabase* protoDb) {
         auto messageView = reader.readMessages();

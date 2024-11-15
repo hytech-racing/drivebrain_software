@@ -4,5 +4,8 @@
     ],
     "channelTopics": [
         "front_thermistors_data"
-    ]
+    ],
+    "debugOut": true,
+    "remoteIP": "127.0.0.1",
+    "port": 1153
 }
