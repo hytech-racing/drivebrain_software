@@ -245,8 +245,6 @@ target_include_directories(helper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/test/test_m
 target_include_directories(test_mcap_replay_client PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/test_mcap_replay/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/test_mcap_replay/include>
-    # $<INSTALL_INTERFACE:version_header>
-    # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/version_header>
 )
 target_link_libraries(test_mcap_replay_client PUBLIC
     protobuf::libprotobuf

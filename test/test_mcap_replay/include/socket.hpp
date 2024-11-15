@@ -10,11 +10,6 @@
 #include <stdexcept>
 
 class Socket {
-private:
-    int fileDescriptor;
-    struct sockaddr_in localAddr;
-    struct sockaddr_in remAddr;
-
 public:
     Socket (std::string server_ip, uint16_t port);
 
@@ -22,6 +17,11 @@ public:
     bool send (const std::string&, bool returning);
     bool receive (std::string&);
     bool bind();
+
+private:
+    int _fileDescriptor;
+    struct sockaddr_in _localAddr;
+    struct sockaddr_in _remAddr;
 };
 
 #endif

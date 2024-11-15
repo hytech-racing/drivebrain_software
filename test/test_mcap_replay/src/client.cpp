@@ -41,8 +41,9 @@ int main(int argc, char** argv) {
 
     // default values
     std::string jsonConfig = "test/test_mcap_replay/res/test_input.json"; // TODO: Add json file as a required console arg
+    // Debug, IP, and port could also be command args?
     bool DEBUG_OUT = true;
-    std::string remoteIP = "127.0.0.1";
+    std::string remoteIP = "127.0.0.1"; 
     int port = 1153;
     // init params
     {

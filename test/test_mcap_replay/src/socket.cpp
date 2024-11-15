@@ -3,29 +3,29 @@
 #include "socket.hpp"
 
 Socket::Socket(std::string server_ip, uint16_t port) {
-	if ((fileDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	if ((_fileDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		exit(1);
 	}
 
-	memset((char *)&localAddr, 0, sizeof(localAddr));
-	localAddr.sin_family = AF_INET;
-	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	inet_pton(AF_INET, server_ip.c_str(), &localAddr.sin_addr);
-	localAddr.sin_port = htons(port);
+	memset((char *)&_localAddr, 0, sizeof(_localAddr));
+	_localAddr.sin_family = AF_INET;
+	_localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	inet_pton(AF_INET, server_ip.c_str(), &_localAddr.sin_addr);
+	_localAddr.sin_port = htons(port);
 }
 
 bool Socket::send(const std::string& serialized, bool returning) {
-	return sendto(fileDescriptor, serialized.data(), serialized.size(), 0, 
-		(struct sockaddr*)& (returning ? remAddr: localAddr), 
-		sizeof(localAddr)) != -1;
+	return sendto(_fileDescriptor, serialized.data(), serialized.size(), 0, 
+		(struct sockaddr*)& (returning ? _remAddr: _localAddr), 
+		sizeof(_localAddr)) != -1;
 }
 
 bool Socket::receive(std::string& serialized) {
 	const int bufferSize = 1024;
-    socklen_t addrlen = sizeof(remAddr);
+    socklen_t addrlen = sizeof(_remAddr);
     unsigned char buf[bufferSize];  
 
-    int recvlen = recvfrom(fileDescriptor, buf, bufferSize, 0, (struct sockaddr *)&remAddr, &addrlen);
+    int recvlen = recvfrom(_fileDescriptor, buf, bufferSize, 0, (struct sockaddr *)&_remAddr, &addrlen);
     if (recvlen < 0) {
         return false;
     } else {
@@ -37,9 +37,9 @@ bool Socket::receive(std::string& serialized) {
 
 
 void Socket::close() {
-	::close(fileDescriptor);
+	::close(_fileDescriptor);
 }
 
 bool Socket::bind() {
-	return ::bind(fileDescriptor, (struct sockaddr*)& localAddr, sizeof(localAddr)) >= 0;
+	return ::bind(_fileDescriptor, (struct sockaddr*)& _localAddr, sizeof(_localAddr)) >= 0;
 }
