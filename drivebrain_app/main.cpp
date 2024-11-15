@@ -1,6 +1,7 @@
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
+#include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
@@ -102,8 +103,17 @@ int main(int argc, char *argv[])
 
     auto mcap_logger = common::MCAPProtobufLogger("temp");
 
-    control::SimpleController controller(logger, config);
-    configurable_components.push_back(&controller);
+    control::SimpleSpeedController controller1(logger, config);
+    control::SimpleTorqueController controller2(logger, config);
+    configurable_components.push_back(&controller1);
+    configurable_components.push_back(&controller2);
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager(logger, config, { &controller1 , &controller2 });
+    configurable_components.push_back(&controller_manager);
+
+    bool successful_controller1_init = controller1.init();
+    bool successful_controller2_init = controller2.init();
+    bool successful_manager_init = controller_manager.init();
+
     bool construction_failed = false;
     estimation::Tire_Model_Codegen_MatlabModel matlab_math(logger, config, construction_failed);
 
@@ -139,10 +149,11 @@ int main(int argc, char *argv[])
     comms::MCUETHComms eth_driver(logger, eth_tx_queue, message_logger, state_estimator, io_context, "192.168.1.30", 2001, 2000);
     comms::VNDriver vn_driver(config, logger, message_logger, state_estimator, io_context);
 
-    // required init, maybe want to call this in the constructor instead
-    bool successful_controller_init = controller.init();
-
-    DBInterfaceImpl db_service_inst(message_logger);
+    std::function<bool(size_t)> switch_modes = 
+    [&state_estimator, &controller_manager](size_t mode) -> bool {
+        return controller_manager.swap_active_controller(mode, state_estimator.get_latest_state_and_validity().first);
+    };
+    DBInterfaceImpl db_service_inst(message_logger, switch_modes);
     std::thread db_service_thread([&db_service_inst]()
                                   {
             spdlog::info("started db service thread");
@@ -168,11 +179,11 @@ int main(int argc, char *argv[])
                 spdlog::error("Error in io_context: {}", e.what());
             } });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller_manager, &state_estimator]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
-        auto loop_time = controller.get_dt_sec();
+        auto loop_time = controller_manager.get_active_controller_timestep();
         auto loop_time_micros = (int)(loop_time * 1000000.0f);
         std::chrono::microseconds loop_chrono_time(loop_time_micros);
         while(!stop_signal.load())
@@ -181,48 +192,61 @@ int main(int argc, char *argv[])
             // samples internal state set by the handle recv functions
             
             auto state_and_validity = state_estimator.get_latest_state_and_validity();
-            auto out_struct = controller.step_controller(state_and_validity.first);
+            auto out_struct = controller_manager.step_active_controller(state_and_validity.first);
+            //logic for retrieving whichever type is currently in the variant, i dont think we need to check if it has monostate
+            core::SpeedControlOut speed_cmd_out;
+            core::TorqueControlOut torque_cmd_out;
+            if(std::holds_alternative<core::SpeedControlOut>(out_struct.out))
+            {
+                speed_cmd_out = std::get<core::SpeedControlOut>(out_struct.out);
+            }
+            else if(std::holds_alternative<core::TorqueControlOut>(out_struct.out))
+            {
+                torque_cmd_out = std::get<core::TorqueControlOut>(out_struct.out);
+            }
+            //for when we have both controllers the vision is if(speed_cmd_out) -> else 
+
             auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
-            // feedback
-            state_estimator.set_previous_control_output(out_struct);
+            // feedback -> should probably change this to accept controlleroutput struct instead
+            state_estimator.set_previous_control_output(speed_cmd_out);
             // output
             // if(state_and_validity.second)
             // {
-            out_msg->set_prev_mcu_recv_millis(out_struct.mcu_recv_millis);
+            out_msg->set_prev_mcu_recv_millis(speed_cmd_out.mcu_recv_millis);
 
-            if(temp_desired_torques.res_torque_lim_nm.FL < 0)
+            if(temp_desired_torques.desired_torques_nm.FL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fl(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+                out_msg->mutable_desired_rpms()->set_fl(speed_cmd_out.desired_rpms.FL);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.FR < 0)
+            if(temp_desired_torques.desired_torques_nm.FR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_fr(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
+                out_msg->mutable_desired_rpms()->set_fr(speed_cmd_out.desired_rpms.FR);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.RL < 0)
+            if(temp_desired_torques.desired_torques_nm.RL < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rl(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
+                out_msg->mutable_desired_rpms()->set_rl(speed_cmd_out.desired_rpms.RL);
             }
 
-            if(temp_desired_torques.res_torque_lim_nm.RR < 0)
+            if(temp_desired_torques.desired_torques_nm.RR < 0)
             {
                 out_msg->mutable_desired_rpms()->set_rr(0);
             } else {
-                out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+                out_msg->mutable_desired_rpms()->set_rr(speed_cmd_out.desired_rpms.RR);
             }
             
 
-            out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-            out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-            out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-            out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.res_torque_lim_nm.RR));
+            out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.desired_torques_nm.FL));
+            out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.desired_torques_nm.FR));
+            out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.desired_torques_nm.RL));
+            out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.desired_torques_nm.RR));
 
             {
                 std::unique_lock lk(eth_tx_queue.mtx);
