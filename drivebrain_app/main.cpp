@@ -31,6 +31,9 @@
 #include <csignal>
 #include <cstdlib>
 
+#include <versions.h>
+
+#include "hytech_msgs.pb.h"
 #include <iostream>
 #include <sstream>
 
@@ -96,6 +99,7 @@ int main(int argc, char *argv[])
     if (vm.count("dbc-path")) {
         dbc_path = vm["dbc-path"].as<std::string>();
     }
+
 
     // config file handler that gets given to all configurable components.
     core::JsonFileHandler config(param_path);
@@ -168,7 +172,9 @@ int main(int argc, char *argv[])
                 spdlog::error("Error in io_context: {}", e.what());
             } });
 
-    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator]()
+    std::chrono::high_resolution_clock::time_point last_sent_versions = std::chrono::high_resolution_clock::now();
+
+    std::thread process_thread([&rx_queue, &eth_tx_queue, &controller, &state_estimator, &message_logger, &last_sent_versions]()
                                {
         auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
 
@@ -195,6 +201,17 @@ int main(int argc, char *argv[])
                 out_msg->mutable_desired_rpms()->set_fl(0);
             } else {
                 out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+            }
+
+            // Log versions every second
+            const auto time_from_last_version_send = std::chrono::duration_cast<std::chrono::seconds>(start_time - last_sent_versions);
+            if (time_from_last_version_send.count() > 1.0) 
+            {
+                std::shared_ptr<hytech_msgs::Versions> vmsg = std::make_shared<hytech_msgs::Versions>();
+                vmsg->set_ht_can_version(HYTECH_NP_PROTO_CPP_VERSION);
+                vmsg->set_ht_proto_version(DRIVEBRAIN_CORE_MSGS_PROTO_CPP_VERSION);
+                message_logger->log_msg(vmsg);
+                last_sent_versions = start_time;
             }
 
             if(temp_desired_torques.res_torque_lim_nm.FR < 0)
@@ -248,7 +265,7 @@ int main(int argc, char *argv[])
     std::signal(SIGINT, signalHandler);
 
     while (!stop_signal.load())
-    {
+    {   
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     process_thread.join();
