@@ -188,6 +188,7 @@
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
                   ht_can.overlays.default
+                  self.overlays.default
                 ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };

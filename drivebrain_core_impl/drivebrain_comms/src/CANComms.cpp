@@ -168,23 +168,53 @@ void comms::CANDriver::set_field_values_of_pb_msg(
                 spdlog::warn("Unsupported field type for field: {}", field_name);
                 continue;
             }
+            
             switch (field->type()) 
             {
             case google::protobuf::FieldDescriptor::TYPE_ENUM:
-                reflection->SetEnumValue(message.get(), field, (int)std::get<int>(it->second));
+                
+                reflection->SetEnumValue(message.get(), field, (int)std::get<int32_t>(it->second));
+                
                 break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-
-                reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
+                
+                if (std::holds_alternative<double>(it->second))
+                {
+                    reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));    
+                    
+                } else if (std::holds_alternative<int32_t>(it->second))
+                {
+                    reflection->SetFloat(message.get(), field, (float)std::get<int32_t>(it->second));    
+                    
+                } else {
+                    spdlog::warn("unable to parse float for field name {}. unknown field variant type", field_name);
+                }
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
-                reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
+                
+                if (std::holds_alternative<double>(it->second))
+                {
+                    reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));    
+                    
+                } else if (std::holds_alternative<int32_t>(it->second))
+                {
+                    reflection->SetBool(message.get(), field, (bool)std::get<int32_t>(it->second));    
+                    
+                } else {
+                    spdlog::warn("unable to parse bool for field name {}. unknown field variant type", field_name);
+                }
+                
+                
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
+                
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
+                
                 break;
             case google::protobuf::FieldDescriptor::TYPE_INT32:
+                
                 reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
+                
                 break;
             default:
                 break;
@@ -213,12 +243,12 @@ std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const c
                 auto raw_value = sig.Decode(frame.data);
 
                 // Check if the signal has enum descriptions (ValueEncodingDescriptions)
-                if (sig.ValueEncodingDescriptions_Size() > 0)
+                if (sig.ValueEncodingDescriptions_Size() > 1)
                 {
                     // Enum signal: Cast the decoded raw value to an integer and store it
                     msg_field_map[sig.Name()] = static_cast<int>(raw_value);
                 }
-                else{
+                else {
                     // TODO get correct type from raw signal and store it in the map. right now they are all doubles
                     msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
                 }
