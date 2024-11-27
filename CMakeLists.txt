@@ -227,7 +227,15 @@ target_compile_features(test_vn PUBLIC cxx_std_11)
 ### system executable ###
 ###                   ###
 
-add_executable(alpha_build drivebrain_app/main.cpp)
+add_executable(alpha_build 
+    drivebrain_app/main.cpp
+    drivebrain_app/DriveBrainApp.cpp
+)
+
+# Add include directory for DriveBrainApp header
+target_include_directories(alpha_build PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
+)
 
 enable_testing()
 
