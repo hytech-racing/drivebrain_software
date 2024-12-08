@@ -1,0 +1,95 @@
+#ifndef __PERFORMANCETRACKER_H__
+#define __PERFORMANCETRACKER_H__
+
+#include <optional>
+#include <vector>
+// goals:
+// - [ ] be able to track lap times
+//      - skid pad
+//      - accel
+//      - autox
+//      - endurance
+
+// - be able to create the lap visualizations
+//      - current position on track
+//      - display the skidpad track in foxglove (create the foxglove schema protobuf
+//        messages containing the associated viz)
+
+// TODOs:
+
+/*
+// - [ ] handle geodesic / geographiclib calculations for associated events
+//      - [ ] get geopoints for finish line for accel
+            
+            for the accel event I want to create the accel event bounding 
+            box as well with the left and right side of the track estimated from the resting position of
+            the car itself, assuming it to be in the middle of left and right barriers.
+
+            accel event definition:
+
+            D.9.2.3 "The foremost part of the vehicle will be staged at 0.30 m behind the starting line"
+                - this tells us where in front of the vehicle the start is W.R.T the resting position of the car.
+                    - would be interesting to see how fast we are going when we actually are starting on the start line 
+
+            D.9.1.2 "Course width will be minimum 4.9 m wide as measured between the inner edges of the bases
+                    of the course edge cones"
+                - 4.9m is the width
+
+            - [ ] get ecef from GEOID forward for the accel-local coordinate system, use the starting rest position 
+                    for the 0,0 in x/y. assume flat ground, z=0 and / or same altitude. 
+                    This position will be the ecef offset for the translation.
+            - [ ] get the online transformation of the current position of the car for accel-centric position 
+                  for visualization and timing purposes.
+            - [ ] timing shall start the moment having crossed the starting line 
+                - our vectornav only has the accuracy ~1m, we will need to see how good it compares to the regular lap timer
+                    - if it is not nearly as good we will need to incorporate the lap timer as a remote input potentially
+        - [ ] handle skidpad event tracking w/ lap time estimates and visualization of estimated track
+                
+//      - [ ] lap completion logic
+
+// - [ ] create the foxglove schema messages with reference overlays for accel / autox / endurance /
+// skidpad
+
+*/
+
+class PerformanceTracker {
+  public:
+  
+    struct GeoPoint {
+        double lat;
+        double lon;
+    };
+
+    struct settings
+    {
+        float accel_track_length;
+        float accel_track_width;
+        float accel_starting_line_lead_in_dist;
+    };
+
+    struct EventTime
+    {
+        /// @brief signifies if an event is currently being timed or not.
+        bool timing_event; 
+        /// @brief the current event time in seconds
+        float current_event_time;
+
+        /// @brief optional previous times recorded event times. for endurance this 
+        //         will contain previous lap times and for skid pad it will contain the previous completion time
+        std::optional<std::vector<float>> previous_event_times;
+    };
+    
+
+    PerformanceTracker(settings tracker_settings);
+
+    
+
+  private:
+
+    
+    EventTime _current_event_timing;
+    
+    
+};
+
+#endif // __PERFORMANCETRACKER_H__

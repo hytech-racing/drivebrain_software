@@ -11,7 +11,6 @@ struct DataPoint {
     double orientation;
 };
 
-
 class LapTracker {
 public:
     LapTracker();
