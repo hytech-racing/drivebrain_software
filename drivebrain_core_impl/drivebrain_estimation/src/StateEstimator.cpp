@@ -2,6 +2,7 @@
 #include <chrono>
 #include <algorithm>
 #include "hytech_msgs.pb.h"
+#include <Tire_Model_Codegen_MatlabModel.hpp>
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
@@ -20,10 +21,10 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
             _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
             _raw_input_data.raw_load_cell_values = {
-                in_msg->load_cell_data().fl(),
-                in_msg->load_cell_data().fr(),
-                in_msg->load_cell_data().rl(),
-                in_msg->load_cell_data().rr(),
+                static_cast<float>(in_msg->load_cell_data().fl()),
+                static_cast<float>(in_msg->load_cell_data().fr()),
+                static_cast<float>(in_msg->load_cell_data().rl()),
+                static_cast<float>(in_msg->load_cell_data().rr()),
             };
         }
     }
@@ -51,15 +52,15 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             (in_msg->vn_ypr_rad().pitch()),
             (in_msg->vn_ypr_rad().roll())};
 
-        DataPoint point;
-        point.latitude = in_msg->vn_gps().lat();
-        point.longitude = in_msg->vn_gps().lon();
-        point.orientation = in_msg->vn_ypr_rad().yaw();
-        point.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        // DataPoint point;
+        // point.latitude = in_msg->vn_gps().lat();
+        // point.longitude = in_msg->vn_gps().lon();
+        // point.orientation = in_msg->vn_ypr_rad().yaw();
+        // point.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            // std::chrono::high_resolution_clock::now().time_since_epoch()).count();
         double speed = in_msg->vn_vel_m_s().x();
-        std::string raceStatus = _lapTracker.processRaceData(point, speed);
-        _logger.log(raceStatus);
+        // std::string raceStatus = _lapTracker.processRaceData(point, speed);
+        // _logger.log(raceStatus);
      
         {
             std::unique_lock lk(_state_mutex);
@@ -124,96 +125,131 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     /// matlab math ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     auto matlab_math_start = std::chrono::high_resolution_clock::now();
-    auto res_pair = _matlab_estimator.evaluate_estimator(current_state, current_raw_data);
+
+    // Convert Vehicle and Raw Data to Tire Model Input
+    bool sign = (current_state.input.requested_accel - current_state.input.requested_brake) >= 0;
+    estimation::Tire_Model_Codegen_MatlabModel::inputs model_inputs = {
+        current_state.prev_controller_output.torque_lim_nm.FL * (sign ? 1.0f : -1.0f),
+        current_state.prev_controller_output.torque_lim_nm.FR * (sign ? 1.0f : -1.0f),
+        current_state.prev_controller_output.torque_lim_nm.RL * (sign ? 1.0f : -1.0f),
+        current_state.prev_controller_output.torque_lim_nm.RR * (sign ? 1.0f : -1.0f),
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        current_raw_data.raw_load_cell_values.FL,
+        current_raw_data.raw_load_cell_values.FR,
+        current_raw_data.raw_load_cell_values.RL,
+        current_raw_data.raw_load_cell_values.RR,
+        current_state.current_rpms.FL,
+        current_state.current_rpms.RL,
+        current_state.current_rpms.FR,
+        current_state.current_rpms.RR,
+        current_state.steering_angle_deg,
+        current_state.current_body_vel_ms.x,
+        current_state.current_angular_rate_rads.z,
+        current_state.current_body_vel_ms.y
+    };
+
+    
+    auto res = _matlab_estimator.evaluate_estimator(model_inputs);
     auto matlab_math_end = std::chrono::high_resolution_clock::now();
-    auto matlab_math_tire_data = res_pair.first.tire_dynamics;
-
-    auto matlab_math_tv_data  = res_pair.first.torque_vectoring_status;
     auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
-
     {
         std::unique_lock lk(_state_mutex);
-        _vehicle_state.matlab_math_temp_out = res_pair.second;
+            _vehicle_state.matlab_math_temp_out = {
+                static_cast<float>(res.torq_req_FL),
+                static_cast<float>(res.torq_req_FR),
+                static_cast<float>(res.torq_req_RL),
+                static_cast<float>(res.torq_req_RR)
+            };
     }
     auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
 
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
-
     auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();
 
+
     auto fl_xyz = current_tire_forces->mutable_fl();
-    fl_xyz->set_x(matlab_math_tire_data.tire_forces_n.FL.x);
-    fl_xyz->set_y(matlab_math_tire_data.tire_forces_n.FL.y);
-    fl_xyz->set_z(matlab_math_tire_data.tire_forces_n.FL.z);
+    fl_xyz->set_x(res.FXFL);
+    fl_xyz->set_y(res.FYFL);
+    fl_xyz->set_z(res.FZFL);
 
     auto fr_xyz = current_tire_forces->mutable_fr();
-    fr_xyz->set_x(matlab_math_tire_data.tire_forces_n.FR.x);
-    fr_xyz->set_y(matlab_math_tire_data.tire_forces_n.FR.y);
-    fr_xyz->set_z(matlab_math_tire_data.tire_forces_n.FR.z);
+    fr_xyz->set_x(res.FXFR);
+    fr_xyz->set_y(res.FYFR);
+    fr_xyz->set_z(res.FZFR);
 
     auto rl_xyz = current_tire_forces->mutable_rl();
-    rl_xyz->set_x(matlab_math_tire_data.tire_forces_n.RL.x);
-    rl_xyz->set_y(matlab_math_tire_data.tire_forces_n.RL.y);
-    rl_xyz->set_z(matlab_math_tire_data.tire_forces_n.RL.z);
+    rl_xyz->set_x(res.FXRL);
+    rl_xyz->set_y(res.FYRL);
+    rl_xyz->set_z(res.FZRL);
 
     auto rr_xyz = current_tire_forces->mutable_rr();
-    rr_xyz->set_x(matlab_math_tire_data.tire_forces_n.RR.x);
-    rr_xyz->set_y(matlab_math_tire_data.tire_forces_n.RR.y);
-    rr_xyz->set_z(matlab_math_tire_data.tire_forces_n.RR.z);
+    rr_xyz->set_x(res.FXRR);
+    rr_xyz->set_y(res.FYRR);
+    rr_xyz->set_z(res.FZRR);
 
     auto current_tire_moments_nm = current_tire_dynamics->mutable_tire_moments_nm();
 
     auto fl_xyz_moments = current_tire_moments_nm->mutable_fl();
-    fl_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.FL.x);
-    fl_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.FL.y);
-    fl_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.FL.z);
+    fl_xyz_moments->set_x(0);
+    fl_xyz_moments->set_y(0);
+    fl_xyz_moments->set_z(res.MZFL);
 
     auto fr_xyz_moments = current_tire_moments_nm->mutable_fr();
-    fr_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.FR.x);
-    fr_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.FR.y);
-    fr_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.FR.z);
+    fr_xyz_moments->set_x(0);
+    fr_xyz_moments->set_y(0);
+    fr_xyz_moments->set_z(res.MZFR);
 
     auto rl_xyz_moments = current_tire_moments_nm->mutable_rl();
-    rl_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.RL.x);
-    rl_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.RL.y);
-    rl_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.RL.z);
+    rl_xyz_moments->set_x(0);
+    rl_xyz_moments->set_y(0);
+    rl_xyz_moments->set_z(res.MZRL);
 
     auto rr_xyz_moments = current_tire_moments_nm->mutable_rr();
-    rr_xyz_moments->set_x(matlab_math_tire_data.tire_moments_nm.RR.x);
-    rr_xyz_moments->set_y(matlab_math_tire_data.tire_moments_nm.RR.y);
-    rr_xyz_moments->set_z(matlab_math_tire_data.tire_moments_nm.RR.z);
+    rr_xyz_moments->set_x(0);
+    rr_xyz_moments->set_y(0);
+    rr_xyz_moments->set_z(res.MZRR);
 
     auto current_accel_saturation_nm = current_tire_dynamics->mutable_accel_saturation_nm();
 
-    current_accel_saturation_nm->set_fl(matlab_math_tire_data.accel_saturation_nm.FL);
-    current_accel_saturation_nm->set_fr(matlab_math_tire_data.accel_saturation_nm.FR);
-    current_accel_saturation_nm->set_rl(matlab_math_tire_data.accel_saturation_nm.RL);
-    current_accel_saturation_nm->set_rr(matlab_math_tire_data.accel_saturation_nm.RR);
+    current_accel_saturation_nm->set_fl(res.satAccelTFL);
+    current_accel_saturation_nm->set_fr(res.satAccelTFR);
+    current_accel_saturation_nm->set_rl(res.satAccelTRL);
+    current_accel_saturation_nm->set_rr(res.satAccelTRR);
 
     auto current_brake_saturation_nm = current_tire_dynamics->mutable_brake_saturation_nm();
 
-    current_brake_saturation_nm->set_fl(matlab_math_tire_data.brake_saturation_nm.FL);
-    current_brake_saturation_nm->set_fr(matlab_math_tire_data.brake_saturation_nm.FR);
-    current_brake_saturation_nm->set_rl(matlab_math_tire_data.brake_saturation_nm.RL);
-    current_brake_saturation_nm->set_rr(matlab_math_tire_data.brake_saturation_nm.RR);
+    current_brake_saturation_nm->set_fl(res.satBrakeTFL);
+    current_brake_saturation_nm->set_fr(res.satBrakeTFR);
+    current_brake_saturation_nm->set_rl(res.satBrakeTRL);
+    current_brake_saturation_nm->set_rr(res.satBrakeTRR);
 
-    msg_out->set_v_y_lm(matlab_math_tire_data.v_y_lm);
-    msg_out->set_psi_dot_lm_rad_s(matlab_math_tire_data.psi_dot_lm_rad_s);
-
+    msg_out->set_v_y_lm(res.Vy_LM);
+    msg_out->set_psi_dot_lm_rad_s(res.Psi_dot_LMrads);
 
     hytech_msgs::TorqueVectoringStatus *current_tv_status = msg_out->mutable_tv_status();
-    auto torque_add = current_tv_status->mutable_torque_additional_nm();
-    torque_add->set_fl(matlab_math_tv_data.torque_additional_nm.FL);
-    torque_add->set_fr(matlab_math_tv_data.torque_additional_nm.FR);
-    torque_add->set_rl(matlab_math_tv_data.torque_additional_nm.RL);
-    torque_add->set_rr(matlab_math_tv_data.torque_additional_nm.RR);
 
-    current_tv_status->set_additional_mz_moment_nm(matlab_math_tv_data.additional_mz_moment_nm);
-    current_tv_status->set_des_psi_dot(matlab_math_tv_data.des_psi_dot);
-    current_tv_status->set_psi_dot_err(matlab_math_tv_data.psi_dot_err);
-    current_tv_status->set_perceived_vx(matlab_math_tv_data.perceived_vx);
-    current_tv_status->set_integral_yaw_rate_err(matlab_math_tv_data.integral_yaw_rate_err);
-    current_tv_status->set_perceived_psi_dot(matlab_math_tv_data.perceived_psi_dot);
+    auto torque_add = current_tv_status->mutable_torque_additional_nm();
+    torque_add->set_fl(res.Torq_Add_FL);
+    torque_add->set_fr(res.Torq_Add_FR);
+    torque_add->set_rl(res.Torq_Add_RL);
+    torque_add->set_rr(res.Torq_Add_RR);
+    current_tv_status->set_additional_mz_moment_nm(res.AdditionalMzNm);
+    current_tv_status->set_des_psi_dot(res.DesiredYawRaterads);
+    current_tv_status->set_psi_dot_err(res.Yaw_Rate_Err);
+    current_tv_status->set_perceived_vx(res.Perceived_Vx);
+    current_tv_status->set_integral_yaw_rate_err(res.Integral_Yaw_Rate_Err);
+    current_tv_status->set_perceived_psi_dot(res.perceived_psi_dot);
+    current_tv_status->set_vy_vn_gain(res.vy_vn_gain);
+    current_tv_status->set_psi_dot_gain(res.psi_dot_gain);
+    current_tv_status->set_perceived_vy(res.perceived_vy);
+
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -256,9 +292,9 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
 
     auto prev_driver_torque_req = msg_out->mutable_driver_torque();
     prev_driver_torque_req->set_fl(current_state.prev_controller_output.torque_lim_nm.FL);
-    prev_driver_torque_req->set_fr(current_state.prev_controller_output.torque_lim_nm.FL);
-    prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.FL);
-    prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.FL);
+    prev_driver_torque_req->set_fr(current_state.prev_controller_output.torque_lim_nm.FR);
+    prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.RL);
+    prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.RR);
 
     auto log_start = std::chrono::high_resolution_clock::now();
     _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));

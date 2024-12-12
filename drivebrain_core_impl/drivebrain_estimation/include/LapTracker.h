@@ -5,11 +5,11 @@
 #include <chrono>
 #include <VehicleDataTypes.hpp>
 
-struct DataPoint {
-    double latitude;
-    double longitude;
-    double orientation;
-};
+// struct DataPoint {
+//     double latitude;
+//     double longitude;
+//     double orientation;
+// };
 
 class LapTracker {
 public:
