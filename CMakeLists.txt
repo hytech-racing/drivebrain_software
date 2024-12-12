@@ -168,7 +168,6 @@ make_cmake_package(drivebrain_mcap_logger drivebrain)
 add_library(drivebrain_estimation SHARED 
     drivebrain_core_impl/drivebrain_estimation/src/MatlabMath.cpp
     drivebrain_core_impl/drivebrain_estimation/src/StateEstimator.cpp
-    drivebrain_core_impl/drivebrain_estimation/src/RaceTracker.cpp
 )
 
 target_include_directories(drivebrain_estimation PUBLIC
