@@ -135,13 +135,13 @@ comms::CANDriver::_get_pb_msg_by_name(const std::string &name) {
 
     const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName("hytech." + name);
     if (!desc) {
-        std::cerr << "Prototype message does not exist in descriptor pool" << std::endl;
+        spdlog::error("Prototype message does not exist in descriptor pool");
         return nullptr;
     }
     prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
     if (!prototype_message)
     {
-        std::cerr << "Failed to create prototype message" << std::endl;
+        spdlog::error("Failed to create prototype message");
         return nullptr;
     }
     return prototype_message;
@@ -323,13 +323,12 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
         frame.len = msg->MessageSize();
         for (const auto &sig : msg->Signals())
         {
-            std::cout << sig.Name() << std::endl;
             auto field_value = get_field_value(pb_msg, sig.Name());
 
             std::visit([&sig, &frame](const FieldVariant &arg)
                        {
             if (std::holds_alternative<std::monostate>(arg)) {
-                std::cout << "No value found or unsupported field" << std::endl;
+                spdlog::info("No value found or unsupported field");
             } else if (std::holds_alternative<float>(arg)){
                 auto val = std::get<float>(arg);
                 sig.Encode(sig.PhysToRaw(val), frame.data);
@@ -363,10 +362,10 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
 
                 if (!found)
                 {
-                    std::cout << "enum not found " << std::endl;
+                    spdlog::info("enum not found");
                 }
             } else {
-                std::cout <<"uh not supported yet" <<std::endl;
+                spdlog::info("uh not supported yet");
             } },
                        field_value);
         }
