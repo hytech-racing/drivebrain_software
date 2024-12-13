@@ -35,6 +35,7 @@ bool comms::CANDriver::init() {
 
     auto dbc_file_path = _dbc_path ? _dbc_path : get_parameter_value<std::string>("path_to_dbc");
 
+
     if (!(canbus_device && dbc_file_path)) {
         _logger.log_string("couldnt get params", core::LogLevel::ERROR);
         return false;
@@ -130,20 +131,17 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
 std::shared_ptr<google::protobuf::Message>
 comms::CANDriver::_get_pb_msg_by_name(const std::string &name) {
     // Create a dynamic message factory
-
     std::shared_ptr<google::protobuf::Message> prototype_message;
-    const google::protobuf::Descriptor *desc =
-        google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-    if (desc) {
-        prototype_message.reset(
-            google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
-        if (!prototype_message) {
-            spdlog::error("Failed to create prototype message");
 
-            return nullptr;
-        }
-        // delete desc;
-    } else {
+    const google::protobuf::Descriptor *desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName("hytech." + name);
+    if (!desc) {
+        spdlog::error("Prototype message does not exist in descriptor pool");
+        return nullptr;
+    }
+    prototype_message.reset(google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New());
+    if (!prototype_message)
+    {
+        spdlog::error("Failed to create prototype message");
         return nullptr;
     }
     return prototype_message;
@@ -170,19 +168,53 @@ void comms::CANDriver::set_field_values_of_pb_msg(
                 spdlog::warn("Unsupported field type for field: {}", field_name);
                 continue;
             }
-            switch (field->type()) {
+            
+            switch (field->type()) 
+            {
+            case google::protobuf::FieldDescriptor::TYPE_ENUM:
+                
+                reflection->SetEnumValue(message.get(), field, (int)std::get<int32_t>(it->second));
+                
+                break;
             case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-
-                reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));
+                
+                if (std::holds_alternative<double>(it->second))
+                {
+                    reflection->SetFloat(message.get(), field, (float)std::get<double>(it->second));    
+                    
+                } else if (std::holds_alternative<int32_t>(it->second))
+                {
+                    reflection->SetFloat(message.get(), field, (float)std::get<int32_t>(it->second));    
+                    
+                } else {
+                    spdlog::warn("unable to parse float for field name {}. unknown field variant type", field_name);
+                }
                 break;
             case google::protobuf::FieldDescriptor::TYPE_BOOL:
-                reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));
+                
+                if (std::holds_alternative<double>(it->second))
+                {
+                    reflection->SetBool(message.get(), field, (bool)std::get<double>(it->second));    
+                    
+                } else if (std::holds_alternative<int32_t>(it->second))
+                {
+                    reflection->SetBool(message.get(), field, (bool)std::get<int32_t>(it->second));    
+                    
+                } else {
+                    spdlog::warn("unable to parse bool for field name {}. unknown field variant type", field_name);
+                }
+                
+                
                 break;
             case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
+                
                 reflection->SetDouble(message.get(), field, std::get<double>(it->second));
+                
                 break;
             case google::protobuf::FieldDescriptor::TYPE_INT32:
+                
                 reflection->SetInt32(message.get(), field, (int32_t)std::get<double>(it->second));
+                
                 break;
             default:
                 break;
@@ -193,27 +225,38 @@ void comms::CANDriver::set_field_values_of_pb_msg(
 
 std::shared_ptr<google::protobuf::Message> comms::CANDriver::pb_msg_recv(const can_frame &frame) {
     auto iter = _messages.find(frame.can_id);
-    if (iter != _messages.end()) {
+    if (iter != _messages.end())
+    {
         auto msg = iter->second->Clone();
         auto msg_to_populate = _get_pb_msg_by_name(_to_lowercase(msg->Name()));
-        if (msg_to_populate) {
-
-            std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
-            for (const dbcppp::ISignal &sig : msg->Signals()) {
-                const dbcppp::ISignal *mux_sig = msg->MuxSignal();
-
-                if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
-                    (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue())) {
-                    // TODO get correct type from raw signal and store it in the map.
-                    // right now they are all doubles
-                    msg_field_map[sig.Name()] = sig.RawToPhys(sig.Decode(frame.data));
-                }
-            }
-            set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
-            return msg_to_populate;
-        } else {
+        if (!msg_to_populate) {
             return nullptr;
         }
+
+        std::unordered_map<std::string, comms::CANDriver::FieldVariant> msg_field_map;
+        for (const dbcppp::ISignal &sig : msg->Signals()) {
+            const dbcppp::ISignal *mux_sig = msg->MuxSignal();
+
+            if (sig.MultiplexerIndicator() != dbcppp::ISignal::EMultiplexer::MuxValue ||
+                (mux_sig && mux_sig->Decode(frame.data) == sig.MultiplexerSwitchValue()))
+            {
+                auto raw_value = sig.Decode(frame.data);
+
+                // Check if the signal has enum descriptions (ValueEncodingDescriptions)
+                if (sig.ValueEncodingDescriptions_Size() > 1)
+                {
+                    // Enum signal: Cast the decoded raw value to an integer and store it
+                    msg_field_map[sig.Name()] = static_cast<int>(raw_value);
+                }
+                else {
+                    // TODO get correct type from raw signal and store it in the map. right now they are all doubles
+                    msg_field_map[sig.Name()] = sig.RawToPhys(raw_value);
+                }
+
+            }
+        } 
+        set_field_values_of_pb_msg(msg_field_map, msg_to_populate);
+        return msg_to_populate;
     }
 
     return nullptr;
@@ -272,38 +315,59 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
 
-    if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end()) {
-        uint64_t id = _messages_names_and_ids[messageTypeName];
-        std::unique_ptr<dbcppp::IMessage> msg = _messages[id]->Clone();
+    if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
+    {
+        auto id = _messages_names_and_ids[messageTypeName];
+        auto msg = _messages[id]->Clone();
         frame.can_id = id;
         frame.len = msg->MessageSize();
-        for (const auto &sig : msg->Signals()) {
-            comms::CANDriver::FieldVariant field_value = get_field_value(pb_msg, sig.Name());
+        for (const auto &sig : msg->Signals())
+        {
+            auto field_value = get_field_value(pb_msg, sig.Name());
 
-            std::visit(
-                [&sig, &frame](const FieldVariant &arg) {
-                    if (std::holds_alternative<std::monostate>(arg)) {
-                        spdlog::warn("No value found or unsupported field");
-                    } else if (std::holds_alternative<float>(arg)) {
-                        auto val = std::get<float>(arg);
-                        sig.Encode(sig.PhysToRaw(val), frame.data);
-                    } else if (std::holds_alternative<int32_t>(arg)) {
-                        auto val = std::get<int32_t>(arg);
-                        sig.Encode(sig.PhysToRaw(val), frame.data);
-                    } else if (std::holds_alternative<int64_t>(arg)) {
-                        auto val = std::get<int64_t>(arg);
-                        sig.Encode(sig.PhysToRaw(val), frame.data);
-                    } else if (std::holds_alternative<uint64_t>(arg)) {
-                        auto val = std::get<uint64_t>(arg);
-                        sig.Encode(sig.PhysToRaw(val), frame.data);
-                    } else if (std::holds_alternative<bool>(arg)) {
-                        auto val = std::get<bool>(arg);
-                        sig.Encode(val, frame.data);
-                    } else {
-                        spdlog::warn("uh not supported yet");
+            std::visit([&sig, &frame](const FieldVariant &arg)
+                       {
+            if (std::holds_alternative<std::monostate>(arg)) {
+                spdlog::info("No value found or unsupported field");
+            } else if (std::holds_alternative<float>(arg)){
+                auto val = std::get<float>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<int32_t>(arg)){
+                auto val = std::get<int32_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<int64_t>(arg)){
+                auto val = std::get<int64_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<uint64_t>(arg)){
+                auto val = std::get<uint64_t>(arg);
+                sig.Encode(sig.PhysToRaw(val), frame.data);
+            } else if(std::holds_alternative<bool>(arg)){
+                auto val = std::get<bool>(arg);
+                sig.Encode(val, frame.data);
+            
+            } else if (std::holds_alternative<std::string>(arg)){
+                auto enum_name = std::get<std::string>(arg);
+                bool found = false;
+
+                // iterating to find correct value
+                for (const auto &enc : sig.ValueEncodingDescriptions())
+                {
+                    if (enc.Description() == enum_name)
+                    {
+                        sig.Encode(enc.Value(), frame.data);
+                        found = true;
+                        break;
                     }
-                },
-                field_value);
+                }
+
+                if (!found)
+                {
+                    spdlog::info("enum not found");
+                }
+            } else {
+                spdlog::info("uh not supported yet");
+            } },
+                       field_value);
         }
     } else {
         spdlog::warn("WARNING: not creating a frame to send due to not finding frame name");
@@ -332,16 +396,13 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
             _input_deque_ref.deque.clear();
         }
 
-        for (const auto &msg : q.deque) {
-            if (msg) {
-                std::optional<can_frame> can_msg = _get_CAN_msg(msg);
-                if (can_msg) {
-                    auto can_msg = _get_CAN_msg(msg);
-                    if (can_msg) {
-                        _send_message(*can_msg);
-                        _message_logger->log_msg(msg);
-                    }
-                }
+        for (const auto &msg : q.deque)
+        {
+            auto can_msg = _get_CAN_msg(msg);
+            if (can_msg)
+            {
+                _send_message(*can_msg);
+                _message_logger->log_msg(msg);
             }
         }
         q.deque.clear();

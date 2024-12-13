@@ -30,14 +30,10 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/132";
+    ht_can.url = "github:hytech-racing/ht_can/enums";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
-
-    data_acq.url = "github:hytech-racing/data_acq/feature/proto_gen_packaging_fix";
-    data_acq.inputs.ht_can_pkg_flake.follows = "ht_can";
-    data_acq.inputs.nix-proto.follows = "nix-proto";
-    data_acq.inputs.nixpkgs.follows = "nixpkgs";
-
+    ht_can.inputs.nix-proto.follows = "nix-proto";
+  
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
@@ -51,7 +47,7 @@
     };
 
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, data_acq, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -121,8 +117,9 @@
                 vn_driver_lib.overlays.default
                 nebs-packages.overlays.default
                 easy_cmake.overlays.default
+                ht_can.overlays.default
                 self.overlays.default
-              ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+              ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               config = { };
             };
             packages.default = pkgs.drivebrain_software;
@@ -190,8 +187,9 @@
                   vn_driver_lib.overlays.default
                   nebs-packages.overlays.default
                   easy_cmake.overlays.default
+                  ht_can.overlays.default
                   self.overlays.default
-                ] ++ data_acq.overlays.x86_64-linux ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+                ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
               };
           };
       };
