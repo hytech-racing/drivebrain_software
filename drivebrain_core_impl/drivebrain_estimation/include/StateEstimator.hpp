@@ -40,8 +40,6 @@
 // TODO:
 // - [ ] write tests for the timestamp checking / verification of the state data
 
-
-
 // user story:
 // i want the ability to add in new estimation components by composition or construction
     // how will we know what the estimator is changing / adding as far as state variables? -> this will get annoying 

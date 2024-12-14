@@ -3,9 +3,10 @@
 
 #include <optional>
 #include <vector>
-
-#include <VehicleDataTypes.hpp>
 #include <chrono>
+
+#include <Literals.hpp>
+#include <VehicleDataTypes.hpp>
 // goals:
 // - [ ] be able to track lap times
 //      - skid pad
@@ -57,9 +58,13 @@ track
 //      - [ ] lap completion logic
 
 // - [ ] create the foxglove schema messages with reference overlays for accel / autox / endurance /
+
+// - [ ] track the ackermann radius of the curvature 
 // skidpad
 */
 
+
+// - [ ] TODO derive from configurable base class
 /**
  * @class PerformanceTracker
  * @brief
@@ -67,17 +72,23 @@ track
  */
 class PerformanceTracker {
   public:
-    enum class TrackerMode { NOT_TRACKING, TRACKING_ACCEL, TRACKING_SKIDPAD, TRACKING_AUTOCROSS };
-
-    struct GeoPoint {
-        double lat;
-        double lon;
+    enum class TrackerMode { NOT_TRACKING, TRACKING_ACCEL, TRACKING_LAP_MANUAL, TRACKING_LAP_DETECT_START };
+    
+    struct AccelSettings {
+        meters track_length;
+        meters track_width;
+        meters starting_line_lead_in_dist;
+    };
+    
+    struct LapTrackingSettings
+    {
+        /// @brief // minimum distance between points to be considered two different points on the driven path in meters.
+        meters sample_distance; 
     };
 
-    struct settings {
-        float accel_track_length;
-        float accel_track_width;
-        float accel_starting_line_lead_in_dist;
+    struct Settings {
+        AccelSettings accel_settings;
+        LapTrackingSettings lap_tracking_settings
     };
 
     /**
@@ -98,8 +109,8 @@ class PerformanceTracker {
         //         completion time
         std::optional<std::vector<float>> previous_event_times;
     };
-
-    PerformanceTracker(settings tracker_settings);
+    
+    PerformanceTracker(Settings tracker_settings);
 
     EventTime evaluate_tracker(const core::VehicleState &state);
 
@@ -111,9 +122,20 @@ class PerformanceTracker {
     void set_tracker_mode(TrackerMode mode);
 
   private:
+    
+    enum class InternalState {
+        NOT_ATTEMPTING_LAP,
+        START_LINE_NOT_CROSSED,
+        TIMER_STARTED,
+        FINISHED
+    };
+
     std::chrono::time_point<std::chrono::high_resolution_clock> _lap_time;
-    settings _settings;
+    Settings _settings;
     EventTime _current_event_timing;
+    InternalState _state;
+
+    std::vector<core::GeoPose> _driven_path;
 };
 
 #endif // __PERFORMANCETRACKER_H__
