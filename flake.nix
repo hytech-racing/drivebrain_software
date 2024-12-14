@@ -140,7 +140,7 @@
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli ];
+              packages = [ pkgs.mcap-cli pkgs.geographiclib ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

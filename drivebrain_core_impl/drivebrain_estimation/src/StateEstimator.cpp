@@ -21,10 +21,10 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
             _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
             _raw_input_data.raw_load_cell_values = {
-                in_msg->load_cell_data().fl(),
-                in_msg->load_cell_data().fr(),
-                in_msg->load_cell_data().rl(),
-                in_msg->load_cell_data().rr(),
+                static_cast<float>(in_msg->load_cell_data().fl()),
+                static_cast<float>(in_msg->load_cell_data().fr()),
+                static_cast<float>(in_msg->load_cell_data().rl()),
+                static_cast<float>(in_msg->load_cell_data().rr()),
             };
         }
     }
@@ -52,6 +52,16 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             (in_msg->vn_ypr_rad().pitch()),
             (in_msg->vn_ypr_rad().roll())};
 
+        // DataPoint point;
+        // point.latitude = in_msg->vn_gps().lat();
+        // point.longitude = in_msg->vn_gps().lon();
+        // point.orientation = in_msg->vn_ypr_rad().yaw();
+        // point.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            // std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        double speed = in_msg->vn_vel_m_s().x();
+        // std::string raceStatus = _lapTracker.processRaceData(point, speed);
+        // _logger.log(raceStatus);
+     
         {
             std::unique_lock lk(_state_mutex);
             _vehicle_state.current_body_vel_ms = body_vel_ms;
@@ -151,7 +161,12 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
     {
         std::unique_lock lk(_state_mutex);
-        _vehicle_state.matlab_math_temp_out = {res.torq_req_FL,res.torq_req_FR,res.torq_req_RL,res.torq_req_RR};
+            _vehicle_state.matlab_math_temp_out = {
+                static_cast<float>(res.torq_req_FL),
+                static_cast<float>(res.torq_req_FR),
+                static_cast<float>(res.torq_req_RL),
+                static_cast<float>(res.torq_req_RR)
+            };
     }
     auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
 

@@ -32,14 +32,13 @@
 #include <MsgLogger.hpp>
 #include <Tire_Model_Codegen_MatlabModel.hpp>
 #include <Configurable.hpp>
+// #include <LapTracker.h>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
 // that can update pieces of the state that would be optimal.
 
 // TODO:
 // - [ ] write tests for the timestamp checking / verification of the state data
-
-
 
 // user story:
 // i want the ability to add in new estimation components by composition or construction
@@ -91,6 +90,7 @@ namespace core
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 1> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
+        // LapTracker _lapTracker;
         estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 
     };
