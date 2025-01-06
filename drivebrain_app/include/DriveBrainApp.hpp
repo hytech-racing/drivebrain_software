@@ -14,79 +14,70 @@
 #include <foxglove_server.hpp>
 #include <DBServiceImpl.hpp>
 
-#include <thread> // std::this_thread::sleep_for
-#include <chrono> // std::chrono::seconds
+#include <thread>
+#include <chrono>
 #include <condition_variable>
-
 #include <cassert>
-
-
 #include <boost/program_options.hpp>
 #include <boost/asio.hpp>
-
-
 #include <memory>
 #include <optional>
-
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-
 #include <spdlog/spdlog.h>
 #include <atomic>
 
-
+struct DriveBrainSettings {
+    bool run_db_service{true};
+    bool run_io_context{true};
+    bool run_process_loop{true};
+};
 
 class DriveBrainApp {
 public:
-    DriveBrainApp(int argc, char* argv[]);
+    DriveBrainApp(int argc, char* argv[],  const DriveBrainSettings& settings = DriveBrainSettings{});
     ~DriveBrainApp();
 
-    bool initialize();
     void run();
     void stop();
 
 private:
-    
-    std::string getParamPathFromArgs(int argc, char* argv[]);
-    void parseCommandLine(int argc, char* argv[]);
-    void setupSignalHandler();
-    void startThreads();
-    void processLoop();
-    void ioContextLoop();
-    void dbServiceLoop();
+    // Private member functions
+    std::string _get_param_path_from_args(int argc, char* argv[]);
+    void _parse_command_line(int argc, char* argv[]);
+    void _process_loop();
 
+private:
+    // Private member variables
+    static std::atomic<bool> _stop_signal;
+    const std::string _param_path;
+    core::Logger _logger;
+    core::JsonFileHandler _config;
+    std::optional<std::string> _dbc_path;
+    boost::asio::io_context _io_context;
     
-    const std::string param_path_;
-    core::Logger logger_;
-    core::JsonFileHandler config_;
-    std::optional<std::string> dbc_path_;
-    boost::asio::io_context io_context_;
-    static std::atomic<bool> stop_signal_;
-    bool construction_failed_{false};
-    
-    
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> rx_queue_;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> tx_queue_;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> eth_tx_queue_;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> live_telem_queue_;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 
+    std::vector<core::common::Configurable*> _configurable_components;
+    std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
+    std::unique_ptr<control::SimpleController> _controller;
+    std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
+    std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
+    std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
+    std::unique_ptr<core::StateEstimator> _state_estimator;
+    std::unique_ptr<comms::CANDriver> _driver;
+    std::unique_ptr<comms::MCUETHComms> _eth_driver;
+    std::unique_ptr<comms::VNDriver> _vn_driver;
+    std::unique_ptr<DBInterfaceImpl> _db_service;
     
-    std::vector<core::common::Configurable*> configurable_components_;
-    std::unique_ptr<common::MCAPProtobufLogger> mcap_logger_;
-    std::unique_ptr<control::SimpleController> controller_;
-    std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> matlab_math_;
-    std::unique_ptr<core::FoxgloveWSServer> foxglove_server_;
-    std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger_;
-    std::unique_ptr<core::StateEstimator> state_estimator_;
-    std::unique_ptr<comms::CANDriver> driver_;
-    std::unique_ptr<comms::MCUETHComms> eth_driver_;
-    std::unique_ptr<comms::VNDriver> vn_driver_;
-    std::unique_ptr<DBInterfaceImpl> db_service_;
-    
-    
-    std::unique_ptr<std::thread> process_thread_;
-    std::unique_ptr<std::thread> io_context_thread_;
-    std::unique_ptr<std::thread> db_service_thread_;
+    std::thread _process_thread;
+    std::thread _io_context_thread;
+    std::thread _db_service_thread;
+
+    const DriveBrainSettings _settings;
 };

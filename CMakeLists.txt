@@ -159,7 +159,7 @@ add_library(drivebrain_app SHARED
 )
 
 target_include_directories(drivebrain_app PUBLIC
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:drivebrain_app/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app/include>
 )
 
