@@ -1,5 +1,7 @@
 <map id="drivebrain_core_impl/drivebrain_mcap_logger/include/MCAPProtobufLogger.hpp" name="drivebrain_core_impl/drivebrain_mcap_logger/include/MCAPProtobufLogger.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="78,5,301,60"/>
-<area shape="rect" id="node2" href="$main_8cpp.html" title=" " alt="" coords="5,123,168,148"/>
-<area shape="rect" id="node3" href="$MCAPProtobufLogger_8cpp.html" title=" " alt="" coords="193,108,391,163"/>
+<area shape="rect" id="node1" title=" " alt="" coords="89,5,311,60"/>
+<area shape="rect" id="node2" href="$DriveBrainApp_8hpp.html" title=" " alt="" coords="125,115,275,155"/>
+<area shape="rect" id="node3" href="$main_8cpp.html" title=" " alt="" coords="5,218,168,243"/>
+<area shape="rect" id="node5" href="$MCAPProtobufLogger_8cpp.html" title=" " alt="" coords="299,108,498,163"/>
+<area shape="rect" id="node4" href="$DriveBrainApp_8cpp.html" title=" " alt="" coords="192,211,325,251"/>
 </map>
