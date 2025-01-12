@@ -3,48 +3,9 @@
 
 std::atomic<bool> DriveBrainApp::_stop_signal{false};
 
-std::string DriveBrainApp::_get_param_path_from_args(int argc, char* argv[]) {
-    namespace po = boost::program_options;
-    po::options_description desc("Allowed options");
-    std::string param_path;
-    
-    desc.add_options()
-        ("param-path,p", po::value<std::string>(&param_path)->default_value("config/drivebrain_config.json"), 
-         "Path to the parameter JSON file");
-
-    po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
-    po::notify(vm);
-    
-    return param_path;
-}
-
-void DriveBrainApp::_parse_command_line(int argc, char* argv[]) {
-    namespace po = boost::program_options;
-    po::options_description desc("Allowed options");
-    
-    desc.add_options()
-        ("help,h", "produce help message")
-        ("dbc-path,d", po::value<std::string>(), "Path to the DBC file (optional)");
-
-    po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
-    po::notify(vm);
-    
-    if (vm.count("help")) {
-        std::stringstream ss;
-        ss << desc;
-        spdlog::info("{}", ss.str());
-        throw std::runtime_error("Help requested");
-    }
-    
-    if (vm.count("dbc-path")) {
-        _dbc_path = vm["dbc-path"].as<std::string>();
-    }
-}
-
-DriveBrainApp::DriveBrainApp(int argc, char* argv[], const DriveBrainSettings& settings)
-    : _param_path(_get_param_path_from_args(argc, argv))
+DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& dbc_path, const DriveBrainSettings& settings)
+    : _param_path(param_path)
+    , _dbc_path(dbc_path)
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
@@ -73,7 +34,7 @@ DriveBrainApp::DriveBrainApp(int argc, char* argv[], const DriveBrainSettings& s
         _process_loop();
     })
 {
-    _parse_command_line(argc, argv);
+
     spdlog::set_level(spdlog::level::warn);
 
     _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");

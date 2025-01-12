@@ -37,7 +37,7 @@ struct DriveBrainSettings {
 
 class DriveBrainApp {
 public:
-    DriveBrainApp(int argc, char* argv[],  const DriveBrainSettings& settings = DriveBrainSettings{});
+    DriveBrainApp(const std::string& param_path, const std::string& dbc_path,  const DriveBrainSettings& settings = DriveBrainSettings{});
     ~DriveBrainApp();
 
     void run();
@@ -45,8 +45,6 @@ public:
 
 private:
     // Private member functions
-    std::string _get_param_path_from_args(int argc, char* argv[]);
-    void _parse_command_line(int argc, char* argv[]);
     void _process_loop();
 
 private:
