@@ -152,6 +152,25 @@ target_include_directories(drivebrain_estimation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_estimation/include>    
 )
 
+make_cmake_package(drivebrain_estimation drivebrain)
+
+add_library(drivebrain_app SHARED
+    drivebrain_app/src/DriveBrainApp.cpp
+)
+
+target_include_directories(drivebrain_app PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_app/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app/include>
+)
+
+target_link_libraries(drivebrain_app PUBLIC
+    drivebrain_core::drivebrain_core
+    drivebrain_control
+    drivebrain_comms
+    drivebrain_mcap_logger
+    Boost::program_options
+)
+
 target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core::drivebrain_core 
     drivebrain_common_utils
@@ -162,7 +181,7 @@ target_link_libraries(drivebrain_estimation PUBLIC
     protobuf::libprotobuf
 )
 
-make_cmake_package(drivebrain_estimation drivebrain)
+make_cmake_package(drivebrain_app drivebrain)
 
 ###############
 # executables #
@@ -227,7 +246,14 @@ target_compile_features(test_vn PUBLIC cxx_std_11)
 ### system executable ###
 ###                   ###
 
-add_executable(alpha_build drivebrain_app/main.cpp)
+add_executable(alpha_build 
+    drivebrain_app/main.cpp
+)
+
+# Add include directory for DriveBrainApp header
+target_include_directories(alpha_build PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
+)
 
 enable_testing()
 
@@ -237,6 +263,7 @@ add_executable(alpha_test
 )
 
 target_link_libraries(alpha_build PUBLIC
+    drivebrain_app
     drivebrain_core::drivebrain_core
     drivebrain_control
     drivebrain_comms
