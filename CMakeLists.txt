@@ -219,15 +219,15 @@ add_executable(test_swcomms test/test_swcomms.cpp)
 
 
 target_link_libraries(test_swcomms PUBLIC
-    drivebrain_core::drivebrain_core  # Core drivebrain library
-    drivebrain_comms                  # Communication library
-    drivebrain_common_utils           # Common utilities
+    drivebrain_core::drivebrain_core 
+    drivebrain_comms             
+    drivebrain_common_utils         
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf             # Protobuf library
-    Boost::system                     # Boost system library
-    Boost::program_options            # Boost program options
-    spdlog::spdlog                    # Logging library
+    protobuf::libprotobuf         
+    Boost::system                   
+    Boost::program_options          
+    spdlog::spdlog              
 )
 
 
