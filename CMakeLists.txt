@@ -288,3 +288,9 @@ install(TARGETS
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
+install(TARGETS 
+    test_swcomms
+    RUNTIME 
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
