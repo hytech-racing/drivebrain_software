@@ -18,10 +18,7 @@
 
     HT_proto =
       {
-        type = "github";
-        owner = "hytech-racing";
-        repo = "HT_proto";
-        ref = "2024-11-08T01_13_42";
+        url = "github:hytech-racing/HT_proto/SWData";
         flake = false;
       };
 
