@@ -213,6 +213,28 @@ target_link_libraries(test_db_grpc PUBLIC
 #     mcap::mcap
 # )
 
+
+
+add_executable(test_swcomms test/test_swcomms.cpp)
+
+
+target_link_libraries(test_swcomms PUBLIC
+    drivebrain_core::drivebrain_core  # Core drivebrain library
+    drivebrain_comms                  # Communication library
+    drivebrain_common_utils           # Common utilities
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf             # Protobuf library
+    Boost::system                     # Boost system library
+    Boost::program_options            # Boost program options
+    spdlog::spdlog                    # Logging library
+)
+
+
+add_test(NAME swcommstest COMMAND test_swcomms)
+
+
+
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
 target_link_libraries(test_vn PUBLIC
