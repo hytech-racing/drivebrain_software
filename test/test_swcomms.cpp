@@ -105,19 +105,8 @@ private:
         msg_out->set_weight_rf(weight_rf);
         msg_out->set_weight_rr(weight_rr);
         msg_out->set_weight_total(weight_total);
-        msg_out->set_weight_lf(weight_lf);
-        msg_out->set_weight_lr(weight_lr);
-        msg_out->set_weight_rf(weight_rf);
-        msg_out->set_weight_rr(weight_rr);
-        msg_out->set_weight_total(weight_total);
 
         _state_estimator.handle_recv_process(msg_out);
-        std::cout << "Protobuf message logged successfully:\n"
-                  << "  LF: " << weight_lf << "\n"
-                  << "  LR: " << weight_lr << "\n"
-                  << "  RF: " << weight_rf << "\n"
-                  << "  RR: " << weight_rr << "\n"
-                  << "  TOTAL: " << weight_total << "\n";
         std::cout << "Protobuf message logged successfully:\n"
                   << "  LF: " << weight_lf << "\n"
                   << "  LR: " << weight_lr << "\n"
