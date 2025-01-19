@@ -177,11 +177,6 @@ void SWDriver::_start_receive()
             msg_out->set_weight_rf(weight_rf);
             msg_out->set_weight_rr(weight_rr);
             msg_out->set_weight_total(weight_total);
-            msg_out->set_weight_lf(weight_lf);
-            msg_out->set_weight_lr(weight_lr);
-            msg_out->set_weight_rf(weight_rf);
-            msg_out->set_weight_rr(weight_rr);
-            msg_out->set_weight_total(weight_total);
 
             log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
 
