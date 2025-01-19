@@ -128,9 +128,55 @@ void SWDriver::_start_receive()
                     std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
                     return;
                 }
+
+            float weight_lf = 0.0f;
+            float weight_lr = 0.0f;
+            float weight_rf = 0.0f;
+            float weight_rr = 0.0f;
+            float weight_total = 0.0f;
+
+            while (std::getline(input_stream, line))
+            {
+                try
+                {
+                    if (line.find("1:") == 0)
+                    {
+                        weight_lf = std::stof(line.substr(2));
+                    }
+                    else if (line.find("2:") == 0)
+                    {
+                        weight_lr = std::stof(line.substr(2));
+                    }
+                    else if (line.find("3:") == 0)
+                    {
+                        weight_rf = std::stof(line.substr(2));
+                    }
+                    else if (line.find("4:") == 0)
+                    {
+                        weight_rr = std::stof(line.substr(2));
+                    }
+                    else if (line.find("TOTAL") != std::string::npos)
+                    {
+                        size_t pos = line.find(" ");
+                        if (pos != std::string::npos)
+                        {
+                            weight_total = std::stof(line.substr(0, pos));
+                        }
+                    }
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
+                    return;
+                }
             }
 
             std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
+            msg_out->set_weight_lf(weight_lf);
+            msg_out->set_weight_lr(weight_lr);
+            msg_out->set_weight_rf(weight_rf);
+            msg_out->set_weight_rr(weight_rr);
+            msg_out->set_weight_total(weight_total);
             msg_out->set_weight_lf(weight_lf);
             msg_out->set_weight_lr(weight_lr);
             msg_out->set_weight_rf(weight_rf);
@@ -142,5 +188,3 @@ void SWDriver::_start_receive()
             _start_receive();
         });
 }
-
-

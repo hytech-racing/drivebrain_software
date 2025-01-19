@@ -227,7 +227,7 @@ target_link_libraries(test_swcomms PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf         
     Boost::system                   
-    Boost::program_options          
+    Boost::program_options         
     spdlog::spdlog              
 )
 
