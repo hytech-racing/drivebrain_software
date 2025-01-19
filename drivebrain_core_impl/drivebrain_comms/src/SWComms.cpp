@@ -87,52 +87,60 @@ void SWDriver::_start_receive()
 
             std::istringstream input_stream(input_data);
             std::string line;
-            std::array<float, 13> parsed_data = {0};
 
+            float weight_lf = 0.0f;
+            float weight_lr = 0.0f;
+            float weight_rf = 0.0f;
+            float weight_rr = 0.0f;
+            float weight_total = 0.0f;
 
-            std::unordered_map<char, int> identifier_to_index = {
-                {'0', 0}, {'1', 1}, {'2', 2}, {'3', 3},
-                {'4', 4}, {'5', 5}, {'6', 6}, {'7', 7},
-                {'8', 8}, {'9', 9}, {':', 10}, {';', 11}, {'<', 12}
-            };
-
-
-            int line_count = 0;
-            while (std::getline(input_stream, line) && line_count < 13)
+            while (std::getline(input_stream, line))
             {
-                    try
+                try
+                {
+                    if (line.find("1:") == 0)
                     {
-                        float value = std::stof(line.substr(2));
-                        parsed_data[identifier_to_index[line[0]]] = value;
+                        weight_lf = std::stof(line.substr(2));
                     }
-                    catch (const std::invalid_argument &e)
+                    else if (line.find("2:") == 0)
                     {
-                        std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
-                        return;
+                        weight_lr = std::stof(line.substr(2));
                     }
-                
-                line_count++;
+                    else if (line.find("3:") == 0)
+                    {
+                        weight_rf = std::stof(line.substr(2));
+                    }
+                    else if (line.find("4:") == 0)
+                    {
+                        weight_rr = std::stof(line.substr(2));
+                    }
+                    else if (line.find("TOTAL") != std::string::npos)
+                    {
+                        size_t pos = line.find(" ");
+                        if (pos != std::string::npos)
+                        {
+                            weight_total = std::stof(line.substr(0, pos));
+                        }
+                    }
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
+                    return;
+                }
             }
 
             std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
-            msg_out->set_weight_lf(parsed_data[0]);
-            msg_out->set_weight_rf(parsed_data[1]);
-            msg_out->set_weight_lr(parsed_data[2]);
-            msg_out->set_weight_rr(parsed_data[3]);
-            msg_out->set_weight_left(parsed_data[4]);
-            msg_out->set_weight_right(parsed_data[5]);
-            msg_out->set_weight_front(parsed_data[6]);
-            msg_out->set_weight_rear(parsed_data[7]);
-            msg_out->set_weight_front_bite(parsed_data[8]);
-            msg_out->set_weight_rear_bite(parsed_data[9]);
-            msg_out->set_weight_cross(parsed_data[10]);
-            msg_out->set_weight_total(parsed_data[11]);
-            msg_out->set_weight_total_selected(parsed_data[12]);
+            msg_out->set_weight_lf(weight_lf);
+            msg_out->set_weight_lr(weight_lr);
+            msg_out->set_weight_rf(weight_rf);
+            msg_out->set_weight_rr(weight_rr);
+            msg_out->set_weight_total(weight_total);
 
             log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
 
             _start_receive();
         });
 }
-}
+
 

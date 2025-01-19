@@ -214,6 +214,7 @@ target_link_libraries(test_db_grpc PUBLIC
 # )
 
 
+<<<<<<< HEAD
 
 add_executable(test_swcomms test/test_swcomms.cpp)
 
@@ -232,6 +233,38 @@ target_link_libraries(test_swcomms PUBLIC
 
 
 add_test(NAME swcommstest COMMAND test_swcomms)
+=======
+add_executable(SWDriver drivebrain_core_impl/drivebrain_comms/src/SWComms.cpp)
+
+target_link_libraries(SWDriver PUBLIC
+    drivebrain_core
+    drivebrain_common_utils
+    drivebrain_estimation
+    Boost::system
+    Boost::program_options
+    protobuf::libprotobuf
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+)
+
+add_executable(test_SWDriver test/test_SWDriver.cpp)
+
+target_link_libraries(test_SWDriver PUBLIC
+    drivebrain_comms
+    drivebrain_core::drivebrain_core
+    drivebrain_common_utils
+    drivebrain_estimation
+    Boost::system
+    Boost::program_options
+    protobuf::libprotobuf
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    GTest::gtest_main
+)
+
+add_test(NAME TestSWDriver COMMAND test_SWDriver)
+
+>>>>>>> b582bea (lol)
 
 
 
