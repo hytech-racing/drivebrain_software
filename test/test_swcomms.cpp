@@ -88,9 +88,6 @@ private:
                     weight_rr = std::stof(line.substr(2));
                 }
                 }
-            } catch (const std::invalid_argument&) {
-                std::cerr << "Invalid data format: unable to parse line: " << line << std::endl;
-                return;
             }
         }
 
