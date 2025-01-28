@@ -12,6 +12,8 @@ find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 
 
+find_package(drivebrain_core REQUIRED)
+
 
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
@@ -32,6 +34,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
+find_package(GeographicLib REQUIRED COMPONENTS SHARED)
 
 find_package(mcap REQUIRED)
 
@@ -39,7 +42,7 @@ find_package(mcap REQUIRED)
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
-find_package(GTest REQUIRED)
+
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
 find_package(codegen REQUIRED)
@@ -117,9 +120,11 @@ target_include_directories(drivebrain_control PUBLIC
 )
 
 target_link_libraries(drivebrain_control PUBLIC 
+    drivebrain_common_utils
     drivebrain_core::drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
+
 )
 
 make_cmake_package(drivebrain_control drivebrain)
@@ -174,6 +179,7 @@ target_link_libraries(drivebrain_app PUBLIC
 target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core::drivebrain_core 
     drivebrain_common_utils
+    GeographicLib::GeographicLib_SHARED
     codegen::Tire_Model_Codegen
     codegen::matlab_model
     hytech_np_proto_cpp::hytech_np_proto_cpp
@@ -255,13 +261,6 @@ target_include_directories(alpha_build PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
 
-enable_testing()
-
-add_executable(alpha_test 
-    unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
-)
-
 target_link_libraries(alpha_build PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
@@ -271,6 +270,10 @@ target_link_libraries(alpha_build PUBLIC
     Boost::program_options
 )
 
+add_executable(alpha_test 
+    unit_test/main.cpp
+    unit_test/SimpleControllerTest.cpp
+)
 
 target_link_libraries(alpha_test PUBLIC 
     drivebrain_core::drivebrain_core

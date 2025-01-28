@@ -176,7 +176,7 @@ namespace comms
             vn_ins_msg->set_error_gnss((ins_status >> 6) & 0b1);
             vn_ins_msg->set_gnss_heading_ins((ins_status >> 8) & 0b1); 
             vn_ins_msg->set_gnss_compass((ins_status >> 9) & 0b1); 
-
+            
             this_instance->log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
         }
         else
