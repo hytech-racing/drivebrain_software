@@ -63,7 +63,7 @@ private:
     void process_data(std::size_t bytes_transferred) {
         std::string input_data;
         for (std::size_t i = 0; i < bytes_transferred; ++i) {
-            if (std::isprint(_input_buff[i]) || std::isspace(_input_buff[i])) {
+            if (std::isprint(_input_buff[i])) {
                 input_data += static_cast<char>(_input_buff[i]);
             }
         }
@@ -75,7 +75,6 @@ private:
         float weight_lr = 0.0f;
         float weight_rf = 0.0f;
         float weight_rr = 0.0f;
-        float weight_total = 0.0f;
 
         while (std::getline(input_stream, line)) {
             try {
@@ -87,11 +86,7 @@ private:
                     weight_rf = std::stof(line.substr(2));
                 } else if (line.find("4:") == 0) {
                     weight_rr = std::stof(line.substr(2));
-                } else if (line.find("TOTAL") != std::string::npos) {
-                    size_t pos = line.find(" ");
-                    if (pos != std::string::npos) {
-                        weight_total = std::stof(line.substr(0, pos));
-                    }
+                }
                 }
             } catch (const std::invalid_argument&) {
                 std::cerr << "Invalid data format: unable to parse line: " << line << std::endl;
@@ -104,15 +99,13 @@ private:
         msg_out->set_weight_lr(weight_lr);
         msg_out->set_weight_rf(weight_rf);
         msg_out->set_weight_rr(weight_rr);
-        msg_out->set_weight_total(weight_total);
 
         _state_estimator.handle_recv_process(msg_out);
         std::cout << "Protobuf message logged successfully:\n"
                   << "  LF: " << weight_lf << "\n"
                   << "  LR: " << weight_lr << "\n"
                   << "  RF: " << weight_rf << "\n"
-                  << "  RR: " << weight_rr << "\n"
-                  << "  TOTAL: " << weight_total << "\n";
+                  << "  RR: " << weight_rr << "\n";
     }
 
     boost::asio::serial_port _serial;
