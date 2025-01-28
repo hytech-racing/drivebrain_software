@@ -87,11 +87,12 @@ private:
                 } else if (line.find("4:") == 0) {
                     weight_rr = std::stof(line.substr(2));
                 }
-                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error parsing data: " << e.what() << std::endl;
             }
         }
 
-        std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
+        auto msg_out = std::make_shared<hytech_msgs::SWData>();
         msg_out->set_weight_lf(weight_lf);
         msg_out->set_weight_lr(weight_lr);
         msg_out->set_weight_rf(weight_rf);
