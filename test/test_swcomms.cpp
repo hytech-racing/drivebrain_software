@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "hytech_msgs.pb.h"
 #include <regex>
+#include <chrono>
 
 class MockLogger {
 public:
@@ -62,25 +63,34 @@ public:
 
 private:
     void process_data(std::size_t bytes_transferred) {
-        std::string input_data;
-        for (std::size_t i = 0; i < bytes_transferred; ++i) {
-            if (std::isprint(_input_buff[i])) {
-                input_data += static_cast<char>(_input_buff[i]);
-            }
+    static auto last_time = std::chrono::steady_clock::now();
+    auto current_time = std::chrono::steady_clock::now();
+    double time_diff = std::chrono::duration<double>(current_time - last_time).count();
+    last_time = current_time;
+
+    if (time_diff > 0) {
+        std::cout << "Message Rate: " << 1.0 / time_diff << " Hz\n";
+    }
+
+    std::string input_data;
+    for (std::size_t i = 0; i < bytes_transferred; ++i) {
+        if (std::isprint(_input_buff[i])) {
+            input_data += static_cast<char>(_input_buff[i]);
         }
+    }
 
-        std::istringstream input_stream(input_data);
-        std::string line;
+    std::istringstream input_stream(input_data);
+    std::string line;
 
-        float weight_lf = 0.0f;
-        float weight_lr = 0.0f;
-        float weight_rf = 0.0f;
-        float weight_rr = 0.0f;
+    float weight_lf = 0.0f;
+    float weight_lr = 0.0f;
+    float weight_rf = 0.0f;
+    float weight_rr = 0.0f;
 
-        std::regex number_regex(R"([-+]?\d*\.?\d+)");
+    std::regex number_regex(R"([-+]?\d*\.?\d+)");
 
-        while (std::getline(input_stream, line)) {
-            std::vector<float> weights;
+    while (std::getline(input_stream, line)) {
+        std::vector<float> weights;
         std::sregex_iterator it(line.begin(), line.end(), number_regex);
         std::sregex_iterator end;
 
@@ -90,12 +100,12 @@ private:
         }
 
         if (weights.size() >= 4) {
-            weight_lf = weights[0];
-            weight_lr = weights[1];
-            weight_rf = weights[2];
-            weight_rr = weights[3];
-        }
-        }
+            weight_lf = weights[1];
+            weight_lr = weights[3];
+            weight_rf = weights[5];
+            weight_rr = weights[7];
+        } 
+    }
 
         auto msg_out = std::make_shared<hytech_msgs::SWData>();
         msg_out->set_weight_lf(weight_lf);
