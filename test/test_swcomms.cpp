@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <iomanip>
 #include "hytech_msgs.pb.h"
+#include <regex>
 
 class MockLogger {
 public:
@@ -76,20 +77,24 @@ private:
         float weight_rf = 0.0f;
         float weight_rr = 0.0f;
 
+        std::regex number_regex(R"([-+]?\d*\.?\d+)");
+
         while (std::getline(input_stream, line)) {
-            try {
-                if (line.find("1:") == 0) {
-                    weight_lf = std::stof(line.substr(2));
-                } else if (line.find("2:") == 0) {
-                    weight_lr = std::stof(line.substr(2));
-                } else if (line.find("3:") == 0) {
-                    weight_rf = std::stof(line.substr(2));
-                } else if (line.find("4:") == 0) {
-                    weight_rr = std::stof(line.substr(2));
-                }
-            } catch (const std::exception& e) {
-                std::cerr << "Error parsing data: " << e.what() << std::endl;
-            }
+            std::vector<float> weights;
+        std::sregex_iterator it(line.begin(), line.end(), number_regex);
+        std::sregex_iterator end;
+
+        while (it != end) {
+            weights.push_back(std::stof(it->str()));
+            ++it;
+        }
+
+        if (weights.size() >= 4) {
+            weight_lf = weights[0];
+            weight_lr = weights[1];
+            weight_rf = weights[2];
+            weight_rr = weights[3];
+        }
         }
 
         auto msg_out = std::make_shared<hytech_msgs::SWData>();
