@@ -4,6 +4,8 @@
 #include <cstring>
 #include <cerrno>
 #include <cctype>
+#include <regex>
+#include <chrono>
 
 #include "hytech_msgs.pb.h"
 #include "base_msgs.pb.h"
@@ -16,7 +18,6 @@ namespace comms {
 
         auto device_name = get_parameter_value<std::string>("device_name");
         _config.baud_rate = get_parameter_value<int>("baud_rate").value();
-        auto port = get_parameter_value<int>("port");
 
         boost::system::error_code ec;
         _serial.open(device_name.value(), ec);
@@ -34,9 +35,6 @@ namespace comms {
         _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
         _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
 
-
-        
-
         return true;
     }
 
@@ -48,138 +46,87 @@ namespace comms {
           _serial(io)
     {
         init();
-
         _logger.log_string("Starting SW driver receive.", core::LogLevel::INFO);
-
         _start_receive();
     }
 
     void SWDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)
     {
-        _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
-        _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+        _state_estimator.handle_recv_process(msg);
+        _message_logger->log_msg(msg);
     }
 
-
-void SWDriver::_start_receive()
-{
-    _serial.async_read_some(
-        boost::asio::buffer(_input_buff),
-        [&](const boost::system::error_code &ec, std::size_t bytesCount)
-        {
-            if (ec)
+    void SWDriver::_start_receive()
+    {
+        _serial.async_read_some(
+            boost::asio::buffer(_input_buff),
+            [&](const boost::system::error_code &ec, std::size_t bytesCount)
             {
-                if (ec != boost::asio::error::operation_aborted)
+                if (ec)
                 {
-                    std::cerr << "ERROR: " << ec.message() << std::endl;
-                }
-                return;
-            }
-
-            std::string input_data;
-            for (std::size_t i = 0; i < bytesCount; ++i)
-            {
-                if (std::isprint(_input_buff[i]) || std::isspace(_input_buff[i]))
-                {
-                    input_data += static_cast<char>(_input_buff[i]);
-                }
-            }
-
-            std::istringstream input_stream(input_data);
-            std::string line;
-
-            float weight_lf = 0.0f;
-            float weight_lr = 0.0f;
-            float weight_rf = 0.0f;
-            float weight_rr = 0.0f;
-            float weight_total = 0.0f;
-
-            while (std::getline(input_stream, line))
-            {
-                try
-                {
-                    if (line.find("1:") == 0)
+                    if (ec != boost::asio::error::operation_aborted)
                     {
-                        weight_lf = std::stof(line.substr(2));
+                        std::cerr << "ERROR: " << ec.message() << std::endl;
                     }
-                    else if (line.find("2:") == 0)
-                    {
-                        weight_lr = std::stof(line.substr(2));
-                    }
-                    else if (line.find("3:") == 0)
-                    {
-                        weight_rf = std::stof(line.substr(2));
-                    }
-                    else if (line.find("4:") == 0)
-                    {
-                        weight_rr = std::stof(line.substr(2));
-                    }
-                    else if (line.find("TOTAL") != std::string::npos)
-                    {
-                        size_t pos = line.find(" ");
-                        if (pos != std::string::npos)
-                        {
-                            weight_total = std::stof(line.substr(0, pos));
-                        }
-                    }
-                }
-                catch (const std::invalid_argument &e)
-                {
-                    std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
                     return;
                 }
 
-            float weight_lf = 0.0f;
-            float weight_lr = 0.0f;
-            float weight_rf = 0.0f;
-            float weight_rr = 0.0f;
-            float weight_total = 0.0f;
+                static auto last_time = std::chrono::steady_clock::now();
+                auto current_time = std::chrono::steady_clock::now();
+                double time_diff = std::chrono::duration<double>(current_time - last_time).count();
+                last_time = current_time;
 
-            while (std::getline(input_stream, line))
-            {
-                try
+                if (time_diff > 0)
                 {
-                    if (line.find("1:") == 0)
+                    std::cout << "Message Rate: " << 1.0 / time_diff << " Hz\n";
+                }
+
+                std::string input_data;
+                for (std::size_t i = 0; i < bytesCount; ++i)
+                {
+                    if (std::isprint(_input_buff[i]))
                     {
-                        weight_lf = std::stof(line.substr(2));
-                    }
-                    else if (line.find("2:") == 0)
-                    {
-                        weight_lr = std::stof(line.substr(2));
-                    }
-                    else if (line.find("3:") == 0)
-                    {
-                        weight_rf = std::stof(line.substr(2));
-                    }
-                    else if (line.find("4:") == 0)
-                    {
-                        weight_rr = std::stof(line.substr(2));
-                    }
-                    else if (line.find("TOTAL") != std::string::npos)
-                    {
-                        size_t pos = line.find(" ");
-                        if (pos != std::string::npos)
-                        {
-                            weight_total = std::stof(line.substr(0, pos));
-                        }
+                        input_data += static_cast<char>(_input_buff[i]);
                     }
                 }
-                catch (const std::invalid_argument &e)
+
+                std::istringstream input_stream(input_data);
+                std::string line;
+                float weight_lf = 0.0f, weight_lr = 0.0f, weight_rf = 0.0f, weight_rr = 0.0f;
+
+                std::regex number_regex(R"([-+]?\d*\.?\d+)");
+                while (std::getline(input_stream, line))
                 {
-                    std::cerr << "Invalid data format: unable to parse float from line '" << line << "'" << std::endl;
-                    return;
+                    std::vector<float> weights;
+                    std::sregex_iterator it(line.begin(), line.end(), number_regex);
+                    std::sregex_iterator end;
+
+                    while (it != end)
+                    {
+                        weights.push_back(std::stof(it->str()));
+                        ++it;
+                    }
+
+                    if (weights.size() >= 4)
+                    {
+                        weight_lf = weights[1];
+                        weight_lr = weights[3];
+                        weight_rf = weights[5];
+                        weight_rr = weights[7];
+                    }
                 }
-            }
 
-            std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
-            msg_out->set_weight_lf(weight_lf);
-            msg_out->set_weight_lr(weight_lr);
-            msg_out->set_weight_rf(weight_rf);
-            msg_out->set_weight_rr(weight_rr);
-            msg_out->set_weight_total(weight_total);
+                std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
+                msg_out->set_weight_lf(weight_lf);
+                msg_out->set_weight_lr(weight_lr);
+                msg_out->set_weight_rf(weight_rf);
+                msg_out->set_weight_rr(weight_rr);
 
-            log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+                log_proto_message(msg_out);
 
-            _start_receive();
-        });
+                log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+
+                _start_receive();
+            });
+    }
 }
