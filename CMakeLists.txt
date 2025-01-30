@@ -232,6 +232,26 @@ target_link_libraries(test_db_grpc PUBLIC
 #     mcap::mcap
 # )
 
+
+
+
+add_executable(test_swcomms test/test_swcomms.cpp)
+
+
+target_link_libraries(test_swcomms PUBLIC
+    drivebrain_core::drivebrain_core 
+    drivebrain_comms             
+    drivebrain_common_utils         
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf         
+    Boost::system                   
+    Boost::program_options         
+    spdlog::spdlog              
+)
+
+
+
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
 target_link_libraries(test_vn PUBLIC
@@ -291,5 +311,11 @@ target_link_libraries(mcu_standin PUBLIC
 include(GNUInstallDirs)
 install(TARGETS 
         alpha_build
+    RUNTIME 
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
+install(TARGETS 
+    test_swcomms
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
