@@ -266,3 +266,24 @@ install(TARGETS
         alpha_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
+add_executable(test_aero test/test_aero.cpp)
+
+
+target_link_libraries(test_aero PUBLIC
+    drivebrain_core::drivebrain_core 
+    drivebrain_comms             
+    drivebrain_common_utils         
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf         
+    Boost::system                   
+    Boost::program_options         
+    spdlog::spdlog              
+)
+
+install(TARGETS 
+    test_aero
+    RUNTIME 
+        DESTINATION ${CMAKE_INSTALL_BINDIR})

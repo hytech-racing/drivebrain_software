@@ -18,7 +18,7 @@
 
     HT_proto =
       {
-        url = "github:hytech-racing/HT_proto/SWData";
+        url = "github:hytech-racing/HT_proto/AeroData";
         flake = false;
       };
 
