@@ -12,7 +12,7 @@
 
 namespace common
 {
-    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir)
+    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir, std::function<std::string()> get_json_schema)
         : _options(mcap::McapWriterOptions(""))
     {
         auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
@@ -32,6 +32,7 @@ namespace common
         _options.noChunking = true;
         _log_thread = std::thread(&MCAPProtobufLogger::_handle_log_to_file, this);
     }
+
     MCAPProtobufLogger::~MCAPProtobufLogger()
     {
         {
@@ -76,6 +77,8 @@ namespace common
         };
         add_schema_func(schema_only_descriptors, true);
         add_schema_func(receiving_descriptors, false);
+
+        
 
         spdlog::info("Added message descriptions to MCAP"); 
     }
@@ -130,7 +133,7 @@ namespace common
     void MCAPProtobufLogger::log_msg(std::shared_ptr<google::protobuf::Message> msg_out)
     {
         mcap::Timestamp log_time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        MCAPProtobufLogger::ProtobufRawMessage msg_to_enque;
+        MCAPProtobufLogger::RawMessage msg_to_enque;
         msg_to_enque.serialized_data = msg_out->SerializeAsString();
         msg_to_enque.message_name = msg_out->GetDescriptor()->name();
         msg_to_enque.log_time = log_time;
@@ -140,7 +143,8 @@ namespace common
             _input_deque.deque.push_back(msg_to_enque);
             _input_deque.cv.notify_all();
         }
-
         
     }
+
+    void MCAPProtobufLogger::log_parameters()
 }

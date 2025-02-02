@@ -96,6 +96,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable 
         }
     }
 
+    
     auto res_ids = _server->addChannels(channels);
     _server->setHandlers(std::move(hdlrs));
     _server->start("0.0.0.0", 5555);

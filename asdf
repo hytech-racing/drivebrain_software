@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "properties": {
+        "member_1": { 
+            "type": "object" ,
+            "properties": {
+                "y": { "type": "number" },
+                "z": { "type": "number" }
+            }
+        },
+       "member_2": { 
+            "type": "object" ,
+            "properties": {
+                "y": { "type": "number" },
+                "z": { "type": "number" }
+            }
+        }
+    },
+    "required": ["member_1", "member_2"]
+}
