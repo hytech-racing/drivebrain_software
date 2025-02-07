@@ -280,7 +280,7 @@ target_link_libraries(alpha_test PUBLIC
     gtest
 )
 
-add_test(NAME MyTest COMMAND alpha_test)
+add_test(NAME Drivebrain_Tests COMMAND alpha_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
