@@ -75,6 +75,8 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
     // accelRequest goes between 1.0 and -1.0
     float accelRequest = (in.input.requested_accel) - (in.input.requested_brake);
 
+    veh_vec<float> current_rpms = in.current_rpms;
+
     torque_nm torqueRequest;
 
     // hytech_msgs::MCUCommandData cmd_out;
@@ -111,6 +113,62 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
         cmd_out.torque_lim_nm.RL = (torqueRequest * cur_config.rear_torque_scale);
         cmd_out.torque_lim_nm.RR = (torqueRequest * cur_config.rear_torque_scale);
     }
+
+    // Apply power limit (basically a re-implementation of MCU)
+    float net_torque_mag = 0;
+    float net_power = 0;
+
+    net_torque_mag += abs(cmd_out.torque_lim_nm.FL);
+    net_torque_mag += abs(cmd_out.torque_lim_nm.FR);
+    net_torque_mag += abs(cmd_out.torque_lim_nm.RL);
+    net_torque_mag += abs(cmd_out.torque_lim_nm.RR);
+
+    net_power += abs(cmd_out.torque_lim_nm.FL) * (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += abs(cmd_out.torque_lim_nm.FR) * (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += abs(cmd_out.torque_lim_nm.RL) * (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += abs(cmd_out.torque_lim_nm.RR) * (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND);
+
+    if (net_power > constants::POWER_LIMIT) {
+
+        /* FL */
+        // 1. Calculate the torque percent (individual torque/total torque)
+        // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
+        float torque_percent_FL = abs(cmd_out.torque_lim_nm.FL / net_torque_mag);
+        float power_per_corner_FL = (torque_percent_FL * constants::POWER_LIMIT);
+
+        // 3. Divide power by rads per seconds to get torque per corner
+        cmd_out.torque_lim_nm.FL = abs(power_per_corner_FL / (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND));
+
+        /* FR */
+        // 1. Calculate the torque percent (individual torque/total torque)
+        // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
+        float torque_percent_FR = abs(cmd_out.torque_lim_nm.FR / net_torque_mag);
+        float power_per_corner_FR = (torque_percent_FR * constants::POWER_LIMIT);
+
+        // 3. Divide power by rads per seconds to get torque per corner
+        cmd_out.torque_lim_nm.FR = abs(power_per_corner_FR / (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND));
+
+        /* RL */
+        // 1. Calculate the torque percent (individual torque/total torque)
+        // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
+        float torque_percent_RL = abs(cmd_out.torque_lim_nm.RL / net_torque_mag);
+        float power_per_corner_RL = (torque_percent_RL * constants::POWER_LIMIT);
+
+        // 3. Divide power by rads per seconds to get torque per corner
+        cmd_out.torque_lim_nm.RL = abs(power_per_corner_RL / (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND));
+
+        /* RR */
+        // 1. Calculate the torque percent (individual torque/total torque)
+        // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
+        float torque_percent_RR = abs(cmd_out.torque_lim_nm.RR / net_torque_mag);
+        float power_per_corner_RR = (torque_percent_RR * constants::POWER_LIMIT);
+
+        // 3. Divide power by rads per seconds to get torque per corner
+        cmd_out.torque_lim_nm.RR = abs(power_per_corner_RR / (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND));
+
+    }
+
+
 
     return cmd_out;
 }

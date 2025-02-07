@@ -52,11 +52,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1731609678,
-        "narHash": "sha256-AC96vyQBl/h6/4o1QuNGimJywy2T7p6tfe2ePWLwkqM=",
+        "lastModified": 1738910731,
+        "narHash": "sha256-yJQkdoHPzZynNtk8N4H6GHN92/DjurF9yyW8pjNeMh8=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "945279a1b4da90b4aab78346d8e1155c43c94281",
+        "rev": "791a6207e863521bc8f488c54e5c323d432151da",
         "type": "github"
       },
       "original": {
@@ -150,11 +150,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1730504689,
-        "narHash": "sha256-hgmguH29K2fvs9szpq2r3pz2/8cJd2LPS+b4tfNFCwE=",
+        "lastModified": 1738453229,
+        "narHash": "sha256-7H9XgNiGLKN1G1CgRh0vUL4AheZSYzPm+zmZ7vxbJdo=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "506278e768c2a08bec68eb62932193e341f55c90",
+        "rev": "32ea77a06711b758da0ad9bd6a844c5740a87abd",
         "type": "github"
       },
       "original": {
@@ -173,6 +173,24 @@
         "owner": "hercules-ci",
         "repo": "flake-parts",
         "rev": "bcef6817a8b2aa20a5a6dbb19b43e63c5bf8619a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-parts_3": {
+      "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib_2"
+      },
+      "locked": {
+        "lastModified": 1736143030,
+        "narHash": "sha256-+hu54pAoLDEZT9pjHlqL9DNzWz0NbUn8NEAHP7PQPzU=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "b905f6fc23a9051a6e1b741e1438dbfc0634c6de",
         "type": "github"
       },
       "original": {
@@ -216,11 +234,11 @@
     "foxglove-schemas-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1721832154,
-        "narHash": "sha256-Jp47MYWu3Sh60prjNALs1OaFnPZb7tXRNzFbSRZBXU0=",
+        "lastModified": 1738884246,
+        "narHash": "sha256-2o0oVc3GUUFrwktcVzYoshVcLjLam/6unaY6MgrmVAM=",
         "owner": "foxglove",
         "repo": "schemas",
-        "rev": "f028ba1154faa1226a9993cc2223855123dbf817",
+        "rev": "ce1ffa651a01277fdb43b86ac3f42e5b755c6869",
         "type": "github"
       },
       "original": {
@@ -232,16 +250,33 @@
     "foxglove-ws-protocol-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1723342974,
-        "narHash": "sha256-H3+xOxcKwHyrbT1d5P4KvpoMCfj3mCK9mxeegeFIHmA=",
+        "lastModified": 1726702470,
+        "narHash": "sha256-Ke2QydcCwnTeR0tiR5xe2FYb4yklSbn883CH6E0cSAc=",
         "owner": "RCMast3r",
         "repo": "ws-protocol",
-        "rev": "bdae89350a6d0b463fa648023171d10b6eb5d594",
+        "rev": "8c2b06a315d03f2d3b395bba5d97b03cf63ed908",
         "type": "github"
       },
       "original": {
         "owner": "RCMast3r",
         "repo": "ws-protocol",
+        "type": "github"
+      }
+    },
+    "gtsam-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1693794078,
+        "narHash": "sha256-HjpGrHclpm2XsicZty/rX/RM/762wzmj4AAoEfni8es=",
+        "owner": "borglab",
+        "repo": "gtsam",
+        "rev": "4f66a491ffc83cf092d0d818b11dc35135521612",
+        "type": "github"
+      },
+      "original": {
+        "owner": "borglab",
+        "ref": "4.2.0",
+        "repo": "gtsam",
         "type": "github"
       }
     },
@@ -296,18 +331,20 @@
         "flow-ipc-src": "flow-ipc-src",
         "foxglove-mcap-src": "foxglove-mcap-src",
         "foxglove-ws-protocol-src": "foxglove-ws-protocol-src",
+        "gtsam-src": "gtsam-src",
         "libsocketcanpp-src": "libsocketcanpp-src",
         "nix-proto": "nix-proto",
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "soem-src": "soem-src"
       },
       "locked": {
-        "lastModified": 1728342286,
-        "narHash": "sha256-BiaoZV0F8yvmM3P4rKxEM8RWZw6JZs/zIdx1RjieOLw=",
+        "lastModified": 1738120152,
+        "narHash": "sha256-TQATVFi6pNa4C4i3JT+VkWv07h2O+olYxABMNlHl/9Y=",
         "owner": "RCMast3r",
         "repo": "nebs_packages",
-        "rev": "2d0f791a05fe5e3d1fb241d574be1624bbcff2ca",
+        "rev": "0b6409851032e9eb364b149e971d0565d57a0bd7",
         "type": "github"
       },
       "original": {
@@ -333,11 +370,11 @@
     },
     "nix-filter_2": {
       "locked": {
-        "lastModified": 1710156097,
-        "narHash": "sha256-1Wvk8UP7PXdf8bCCaEoMnOT1qe5/Duqgj+rL8sRQsSM=",
+        "lastModified": 1731533336,
+        "narHash": "sha256-oRam5PS1vcrr5UPgALW0eo1m/5/pls27Z/pabHNy2Ms=",
         "owner": "numtide",
         "repo": "nix-filter",
-        "rev": "3342559a24e85fc164b295c3444e8a139924675b",
+        "rev": "f7653272fd234696ae94229839a99b73c9ab7de0",
         "type": "github"
       },
       "original": {
@@ -368,18 +405,20 @@
     },
     "nix-proto_2": {
       "inputs": {
+        "flake-parts": "flake-parts_3",
         "nix-filter": "nix-filter_2",
         "nix-std": "nix-std_2",
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1723991236,
-        "narHash": "sha256-gGzv9rJaq/tTYuQOVlXgtSblfr66qWNthBvwTPjSRto=",
+        "lastModified": 1737939731,
+        "narHash": "sha256-4/cB3MxV38yTDfs+iNjJl0d0EBN3A0505CKC5IZQZWI=",
         "owner": "notalltim",
         "repo": "nix-proto",
-        "rev": "0b579a596058d5f9ec423379f973ae34b6cb59f6",
+        "rev": "fe40ca85ecc6217d3625c5477000e72d323be9e0",
         "type": "github"
       },
       "original": {
@@ -446,6 +485,18 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/356624c12086a18f2ea2825fed34523d60ccc4e3.tar.gz"
       }
     },
+    "nixpkgs-lib_2": {
+      "locked": {
+        "lastModified": 1735774519,
+        "narHash": "sha256-CewEm1o2eVAnoqb6Ml+Qi9Gg/EfNAxbRx1lANGVyoLI=",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1719426051,
@@ -464,11 +515,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1731386116,
-        "narHash": "sha256-lKA770aUmjPHdTaJWnP3yQ9OI1TigenUqVC3wweqZuI=",
+        "lastModified": 1735563628,
+        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "689fed12a013f56d4c4d3f612489634267d86529",
+        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
         "type": "github"
       },
       "original": {
@@ -538,6 +589,22 @@
         "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
       }
     },
+    "soem-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1737971577,
+        "narHash": "sha256-DK+fymGO4Q7XdXRLdVrGTU89zazMuL8+fNttFYCtS/o=",
+        "owner": "OpenEtherCATsociety",
+        "repo": "SOEM",
+        "rev": "2752dc25882ab24d7cfcad674226b65270fb0c61",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OpenEtherCATsociety",
+        "repo": "SOEM",
+        "type": "github"
+      }
+    },
     "systems": {
       "locked": {
         "lastModified": 1681028828,
@@ -595,6 +662,27 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nix-proto",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1737483750,
+        "narHash": "sha256-5An1wq5U8sNycOBBg3nsDDgpwBmR9liOpDGlhliA6Xo=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "f2cc121df15418d028a59c9737d38e3a90fbaf8f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
         "type": "github"
       }
     },

@@ -58,21 +58,24 @@
             root = "${foxglove-schemas-src}/schemas/proto";
             namespace = "foxglove";
           };
+          
+          
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
           version = HT_proto.rev;
           src = "${HT_proto}/proto";
-        };
-        db_service = nix-proto.mkProtoDerivation
-          {
-            name = "db_service";
-            version = "0.0.1";
-            src = nix-proto.lib.srcFromNamespace {
-              root = ./proto;
-              namespace = "db_service";
-            };
           };
+        db_service = nix-proto.mkProtoDerivation
+            {
+              name = "db_service";
+              version = "0.0.1";
+              src = nix-proto.lib.srcFromNamespace {
+                root = ./proto;
+                namespace = "db_service";
+              };
+            };
+        
       };
 
       db_core_overlay = final: prev: {
