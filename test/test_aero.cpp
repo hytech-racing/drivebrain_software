@@ -7,8 +7,9 @@
 #include <iomanip>
 #include <vector>
 #include <array>
-#include <cstring> 
-#include <cstdint> 
+#include <cstring>
+#include <cstdint>
+#include <mutex>
 
 class MockLogger {
 public:
@@ -31,7 +32,7 @@ public:
 
     bool init(const std::string& device_name1, const std::string& device_name2, int baud_rate) {
         boost::system::error_code ec;
-        
+
         _serial1.open(device_name1, ec);
         if (ec) {
             std::cerr << "Error opening " << device_name1 << ": " << ec.message() << std::endl;
@@ -65,6 +66,9 @@ private:
     boost::asio::serial_port _serial2;
     std::array<uint8_t, 47> _input_buff1;
     std::array<uint8_t, 47> _input_buff2;
+    std::vector<float> pressures_port1;
+    std::vector<float> pressures_port2;
+    std::mutex output_mutex;
     MockLogger _logger;
     MockStateEstimator _state_estimator;
 
@@ -90,44 +94,58 @@ private:
     void start_receive_port1() {
         _serial1.async_read_some(
             boost::asio::buffer(_input_buff1),
-            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+            [this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
                 if (!ec && bytes_transferred >= 47) {
-                    process_data(_input_buff1, "Port 1");
+                    pressures_port1 = extract_pressures(_input_buff1);
+                    print_combined_output();
                 } else {
-                    std::cerr << "Error reading from Port 1: " << ec.message() << std::endl;
+                    std::cerr << "Error reading from Port 1: " << ec.message() << " (Bytes received: " << bytes_transferred << ")\n";
                 }
-                start_receive_port1(); 
+                this->start_receive_port1();
             });
     }
 
     void start_receive_port2() {
         _serial2.async_read_some(
             boost::asio::buffer(_input_buff2),
-            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+            [this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
                 if (!ec && bytes_transferred >= 47) {
-                    process_data(_input_buff2, "Port 2");
+                    pressures_port2 = extract_pressures(_input_buff2);
+                    print_combined_output();
                 } else {
-                    std::cerr << "Error reading from Port 2: " << ec.message() << std::endl;
+                    std::cerr << "Error reading from Port 2: " << ec.message() << " (Bytes received: " << bytes_transferred << ")\n";
                 }
-                start_receive_port2();
+                this->start_receive_port2();
             });
     }
 
-    void process_data(const std::array<uint8_t, 47>& buffer, const std::string& port_name) {
+    std::vector<float> extract_pressures(const std::array<uint8_t, 47>& buffer) {
+        std::vector<float> pressures(8);
         if (buffer[0] != '#') {
-            std::cerr << "Invalid frame received on " << port_name << std::endl;
-            return;
+            std::cerr << "Invalid frame received\n";
+            return pressures;
         }
 
-        std::vector<float> pressures(8);
         for (int i = 0; i < 8; ++i) {
             std::memcpy(&pressures[i], &buffer[1 + i * 4], sizeof(float));
         }
+        return pressures;
+    }
 
-        std::cout << port_name << " | Pressures: ";
-        for (const auto& p : pressures) {
-            std::cout << std::fixed << std::setprecision(2) << p << " Pa  ";
+    void print_combined_output() {
+        std::lock_guard<std::mutex> lock(output_mutex);
+        if (pressures_port1.empty() || pressures_port2.empty()) return;
+
+        std::cout << "Pressure Readings | Port 1: ";
+        for (const auto& p : pressures_port1) {
+            std::cout << std::fixed << std::setprecision(2) << p << "  ";
         }
+
+        std::cout << "| Port 2: ";
+        for (const auto& p : pressures_port2) {
+            std::cout << std::fixed << std::setprecision(2) << p << "  ";
+        }
+
         std::cout << std::endl;
     }
 };
