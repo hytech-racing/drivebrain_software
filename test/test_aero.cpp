@@ -5,9 +5,10 @@
 #include <memory>
 #include <sstream>
 #include <iomanip>
-#include <regex>
-#include <chrono>
 #include <vector>
+#include <array>
+#include <cstring> 
+#include <cstdint> 
 
 class MockLogger {
 public:
@@ -62,8 +63,8 @@ public:
 private:
     boost::asio::serial_port _serial1;
     boost::asio::serial_port _serial2;
-    boost::array<char, 512> _input_buff1;
-    boost::array<char, 512> _input_buff2;
+    std::array<uint8_t, 47> _input_buff1;
+    std::array<uint8_t, 47> _input_buff2;
     MockLogger _logger;
     MockStateEstimator _state_estimator;
 
@@ -90,12 +91,12 @@ private:
         _serial1.async_read_some(
             boost::asio::buffer(_input_buff1),
             [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
-                if (!ec) {
-                    process_data(bytes_transferred, "Port 1");
-                    start_receive_port1();
+                if (!ec && bytes_transferred >= 47) {
+                    process_data(_input_buff1, "Port 1");
                 } else {
                     std::cerr << "Error reading from Port 1: " << ec.message() << std::endl;
                 }
+                start_receive_port1(); 
             });
     }
 
@@ -103,42 +104,29 @@ private:
         _serial2.async_read_some(
             boost::asio::buffer(_input_buff2),
             [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
-                if (!ec) {
-                    process_data(bytes_transferred, "Port 2");
-                    start_receive_port2();
+                if (!ec && bytes_transferred >= 47) {
+                    process_data(_input_buff2, "Port 2");
                 } else {
                     std::cerr << "Error reading from Port 2: " << ec.message() << std::endl;
                 }
+                start_receive_port2();
             });
     }
 
-    void process_data(std::size_t bytes_transferred, const std::string& port_name) {
-        std::string input_data;
-        for (std::size_t i = 0; i < bytes_transferred; ++i) {
-            if (std::isprint(_input_buff1[i])) {
-                input_data += static_cast<char>(_input_buff1[i]);
-            }
+    void process_data(const std::array<uint8_t, 47>& buffer, const std::string& port_name) {
+        if (buffer[0] != '#') {
+            std::cerr << "Invalid frame received on " << port_name << std::endl;
+            return;
         }
 
-        std::regex number_regex(R"([-+]?\d*\.?\d+)");
-        std::vector<float> readings;
-        std::sregex_iterator it(input_data.begin(), input_data.end(), number_regex);
-        std::sregex_iterator end;
-        while (it != end) {
-            readings.push_back(std::stof(it->str()));
-            ++it;
+        std::vector<float> pressures(8);
+        for (int i = 0; i < 8; ++i) {
+            std::memcpy(&pressures[i], &buffer[1 + i * 4], sizeof(float));
         }
 
-        auto msg_out = std::make_shared<hytech_msgs::AeroData>();
-        for (float value : readings) {
-            msg_out->add_readings_pa(value);
-        }
-
-        _state_estimator.handle_recv_process(msg_out);
-
-        std::cout << port_name << " received data: ";
-        for (const auto& val : readings) {
-            std::cout << val << " ";
+        std::cout << port_name << " | Pressures: ";
+        for (const auto& p : pressures) {
+            std::cout << std::fixed << std::setprecision(2) << p << " Pa  ";
         }
         std::cout << std::endl;
     }
