@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <regex>
 #include <chrono>
+#include <vector>
 
 class MockLogger {
 public:
@@ -29,60 +30,93 @@ public:
 
     bool init(const std::string& device_name1, const std::string& device_name2, int baud_rate) {
         boost::system::error_code ec;
+        
         _serial1.open(device_name1, ec);
-        _serial2.open(device_name2, ec);
-
         if (ec) {
-            std::cerr << "Error opening serial ports: " << ec.message() << std::endl;
+            std::cerr << "Error opening " << device_name1 << ": " << ec.message() << std::endl;
             return false;
         }
 
-        _serial1.set_option(boost::asio::serial_port::baud_rate(baud_rate));
-        _serial1.set_option(boost::asio::serial_port::character_size(8));
-        _serial1.set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
-        _serial1.set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
-        _serial1.set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
+        _serial2.open(device_name2, ec);
+        if (ec) {
+            std::cerr << "Error opening " << device_name2 << ": " << ec.message() << std::endl;
+            return false;
+        }
 
-        _serial2.set_option(boost::asio::serial_port::baud_rate(baud_rate));
-        _serial2.set_option(boost::asio::serial_port::character_size(8));
-        _serial2.set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
-        _serial2.set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
-        _serial2.set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
+        configure_serial_port(_serial1, baud_rate);
+        configure_serial_port(_serial2, baud_rate);
 
         std::cout << "Serial ports initialized successfully.\n";
+
+        send_command(_serial1, "@D");
+        send_command(_serial2, "@D");
+
         return true;
     }
 
     void start_receive() {
-        _serial1.async_read_some(
-            boost::asio::buffer(_input_buff),
-            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
-                if (ec) {
-                    std::cerr << "Error reading data: " << ec.message() << std::endl;
-                    return;
-                }
-                process_data(bytes_transferred, "Port 1");
-                start_receive();
-            });
-        
-        _serial2.async_read_some(
-            boost::asio::buffer(_input_buff),
-            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
-                if (ec) {
-                    std::cerr << "Error reading data: " << ec.message() << std::endl;
-                    return;
-                }
-                process_data(bytes_transferred, "Port 2");
-                start_receive();
-            });
+        start_receive_port1();
+        start_receive_port2();
     }
 
 private:
+    boost::asio::serial_port _serial1;
+    boost::asio::serial_port _serial2;
+    boost::array<char, 512> _input_buff1;
+    boost::array<char, 512> _input_buff2;
+    MockLogger _logger;
+    MockStateEstimator _state_estimator;
+
+    void configure_serial_port(boost::asio::serial_port& serial, int baud_rate) {
+        serial.set_option(boost::asio::serial_port::baud_rate(baud_rate));
+        serial.set_option(boost::asio::serial_port::character_size(8));
+        serial.set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
+        serial.set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
+        serial.set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
+    }
+
+    void send_command(boost::asio::serial_port& serial, const std::string& command) {
+        boost::system::error_code ec;
+        boost::asio::write(serial, boost::asio::buffer(command), ec);
+
+        if (ec) {
+            std::cerr << "Error sending command '" << command << "': " << ec.message() << std::endl;
+        } else {
+            std::cout << "Successfully sent command: " << command << std::endl;
+        }
+    }
+
+    void start_receive_port1() {
+        _serial1.async_read_some(
+            boost::asio::buffer(_input_buff1),
+            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+                if (!ec) {
+                    process_data(bytes_transferred, "Port 1");
+                    start_receive_port1();
+                } else {
+                    std::cerr << "Error reading from Port 1: " << ec.message() << std::endl;
+                }
+            });
+    }
+
+    void start_receive_port2() {
+        _serial2.async_read_some(
+            boost::asio::buffer(_input_buff2),
+            [&](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+                if (!ec) {
+                    process_data(bytes_transferred, "Port 2");
+                    start_receive_port2();
+                } else {
+                    std::cerr << "Error reading from Port 2: " << ec.message() << std::endl;
+                }
+            });
+    }
+
     void process_data(std::size_t bytes_transferred, const std::string& port_name) {
         std::string input_data;
         for (std::size_t i = 0; i < bytes_transferred; ++i) {
-            if (std::isprint(_input_buff[i])) {
-                input_data += static_cast<char>(_input_buff[i]);
+            if (std::isprint(_input_buff1[i])) {
+                input_data += static_cast<char>(_input_buff1[i]);
             }
         }
 
@@ -101,19 +135,13 @@ private:
         }
 
         _state_estimator.handle_recv_process(msg_out);
-        
-        std::cout << "Protobuf message sent from " << port_name << " containing values: ";
+
+        std::cout << port_name << " received data: ";
         for (const auto& val : readings) {
             std::cout << val << " ";
         }
-        std::cout << "\n";
+        std::cout << std::endl;
     }
-
-    boost::asio::serial_port _serial1;
-    boost::asio::serial_port _serial2;
-    boost::array<char, 512> _input_buff;
-    MockLogger _logger;
-    MockStateEstimator _state_estimator;
 };
 
 int main() {
