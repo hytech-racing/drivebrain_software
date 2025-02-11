@@ -3,16 +3,16 @@
     "HT_proto": {
       "flake": false,
       "locked": {
-        "lastModified": 1731028403,
-        "narHash": "sha256-4os2JtvGrDJvOxIxsH0HzwnmeQ4EzO5Gge8VDILXdMM=",
+        "lastModified": 1739180551,
+        "narHash": "sha256-8H4dJEhShNt1Ms2kQEFS0C5wvkJs3Q27c7te/behN8g=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "029b34e850986a08ab20bf4818bb6699b333bb1d",
+        "rev": "ef1f192151f1aa6d67ab5e906e0627db27eb340d",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "2024-11-08T01_13_42",
+        "ref": "2025-02-10T09_42_47",
         "repo": "HT_proto",
         "type": "github"
       }
@@ -181,6 +181,24 @@
         "type": "github"
       }
     },
+    "flake-parts_3": {
+      "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib_2"
+      },
+      "locked": {
+        "lastModified": 1736143030,
+        "narHash": "sha256-+hu54pAoLDEZT9pjHlqL9DNzWz0NbUn8NEAHP7PQPzU=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "b905f6fc23a9051a6e1b741e1438dbfc0634c6de",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
     "flow-ipc-src": {
       "flake": false,
       "locked": {
@@ -286,6 +304,22 @@
         "type": "github"
       }
     },
+    "nanopb-proto-api": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1736537572,
+        "narHash": "sha256-+vIvF7t58oB+QrxUBlHoQxLpbkOKv1Oy07ggyXnn4go=",
+        "owner": "nanopb",
+        "repo": "nanopb",
+        "rev": "fc7d53c3fea3ce04af5b98234feaa1c7400f73d6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nanopb",
+        "repo": "nanopb",
+        "type": "github"
+      }
+    },
     "nebs-packages": {
       "inputs": {
         "commsdsl-src": "commsdsl-src",
@@ -333,11 +367,11 @@
     },
     "nix-filter_2": {
       "locked": {
-        "lastModified": 1710156097,
-        "narHash": "sha256-1Wvk8UP7PXdf8bCCaEoMnOT1qe5/Duqgj+rL8sRQsSM=",
+        "lastModified": 1731533336,
+        "narHash": "sha256-oRam5PS1vcrr5UPgALW0eo1m/5/pls27Z/pabHNy2Ms=",
         "owner": "numtide",
         "repo": "nix-filter",
-        "rev": "3342559a24e85fc164b295c3444e8a139924675b",
+        "rev": "f7653272fd234696ae94229839a99b73c9ab7de0",
         "type": "github"
       },
       "original": {
@@ -368,18 +402,20 @@
     },
     "nix-proto_2": {
       "inputs": {
+        "flake-parts": "flake-parts_3",
         "nix-filter": "nix-filter_2",
         "nix-std": "nix-std_2",
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1723991236,
-        "narHash": "sha256-gGzv9rJaq/tTYuQOVlXgtSblfr66qWNthBvwTPjSRto=",
+        "lastModified": 1737939731,
+        "narHash": "sha256-4/cB3MxV38yTDfs+iNjJl0d0EBN3A0505CKC5IZQZWI=",
         "owner": "notalltim",
         "repo": "nix-proto",
-        "rev": "0b579a596058d5f9ec423379f973ae34b6cb59f6",
+        "rev": "fe40ca85ecc6217d3625c5477000e72d323be9e0",
         "type": "github"
       },
       "original": {
@@ -444,6 +480,18 @@
       "original": {
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs/archive/356624c12086a18f2ea2825fed34523d60ccc4e3.tar.gz"
+      }
+    },
+    "nixpkgs-lib_2": {
+      "locked": {
+        "lastModified": 1735774519,
+        "narHash": "sha256-CewEm1o2eVAnoqb6Ml+Qi9Gg/EfNAxbRx1lANGVyoLI=",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz"
       }
     },
     "nixpkgs_2": {
@@ -518,6 +566,7 @@
         "flake-parts": "flake-parts",
         "foxglove-schemas-src": "foxglove-schemas-src",
         "ht_can": "ht_can",
+        "nanopb-proto-api": "nanopb-proto-api",
         "nebs-packages": "nebs-packages",
         "nix-proto": "nix-proto_2",
         "nixpkgs": "nixpkgs_3",
@@ -595,6 +644,27 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nix-proto",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1737483750,
+        "narHash": "sha256-5An1wq5U8sNycOBBg3nsDDgpwBmR9liOpDGlhliA6Xo=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "f2cc121df15418d028a59c9737d38e3a90fbaf8f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
         "type": "github"
       }
     },
