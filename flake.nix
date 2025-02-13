@@ -42,8 +42,8 @@
     };
 
     simulink-automation-src = {
-        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
-        flake = false;
+      url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
+      flake = false;
     };
 
   };
@@ -140,7 +140,7 @@
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli ];
+              packages = [ pkgs.mcap-cli pkgs.ethercat ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

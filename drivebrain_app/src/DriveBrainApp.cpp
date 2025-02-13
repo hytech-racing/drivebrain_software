@@ -82,6 +82,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!_controller->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
+
+    // TODO add here the creation of the config logger
 }
 
 DriveBrainApp::~DriveBrainApp() {

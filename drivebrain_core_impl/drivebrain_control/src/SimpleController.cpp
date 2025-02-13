@@ -59,7 +59,7 @@ bool control::SimpleController::init()
     _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set};
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this, std::placeholders::_1));
-
+    _configured = true;
     return true;
 }
 

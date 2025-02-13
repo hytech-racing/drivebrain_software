@@ -37,7 +37,7 @@ namespace comms
         {
             spdlog::warn("Error: {}", ec.message());
             _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
-            return 1;
+            return false;
         }
 
         // Set the baud rate of the device along with other configs
@@ -52,22 +52,27 @@ namespace comms
 
         _configure_binary_outputs();
 
-        return 0;
+        _configured = true;
+        return true;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io, bool &init_successful)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
           _logger(logger),
           _state_estimator(state_estimator),
           _message_logger(message_logger),
           _serial(io)
     {
-        init();
+        init_successful = init();
 
         // Starts read
-        _logger.log_string("Starting vn driver recieve.", core::LogLevel::INFO);
+        if(init_successful)
+        {
+            _logger.log_string("Starting vn driver recieve.", core::LogLevel::INFO);
 
-        _start_recieve();
+            _start_recieve();
+        }
+        
     }
 
     void VNDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)

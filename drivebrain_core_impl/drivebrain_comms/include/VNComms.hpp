@@ -41,7 +41,7 @@ namespace comms {
     class VNDriver : public core::common::Configurable
     {
         public:
-            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator, boost::asio::io_context &io_context);
+            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator, boost::asio::io_context &io_context, bool &init_successful); 
             bool init();
             struct config {
                 int baud_rate;
