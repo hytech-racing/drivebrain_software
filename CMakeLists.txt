@@ -297,5 +297,6 @@ target_link_libraries(mcu_standin PUBLIC
 include(GNUInstallDirs)
 install(TARGETS 
         alpha_build
+        test_param_server
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
