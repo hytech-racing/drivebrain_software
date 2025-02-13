@@ -44,6 +44,10 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
 find_package(codegen REQUIRED)
 
+find_package(ZLIB REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(zstd REQUIRED)
+
 find_package(drivebrain_core REQUIRED)
 
 include(create_package)
@@ -203,11 +207,13 @@ make_cmake_package(drivebrain_app drivebrain)
 #     Boost::boost
 # )
 
-# add_executable(test_foxglove_server test/test_foxglove_server.cpp)
+add_executable(test_param_server test/test_param_server.cpp)
 
-# target_link_libraries(test_foxglove_server PUBLIC 
-#     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
-#     foxglove_websocket::foxglove_websocket)
+target_link_libraries(test_param_server PUBLIC 
+    foxglove_websocket::foxglove_websocket
+    PkgConfig::lz4
+    zstd::libzstd_shared
+)
 
 add_executable(mcu_standin test/test_mcu.cpp)
 

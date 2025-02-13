@@ -10,7 +10,7 @@
 #include <unordered_set>
 
 #include <foxglove/websocket/server_factory.hpp>
-#include <foxglove/websocket/websocket_notls.hpp>
+// #include <foxglove/websocket/websocket_notls.hpp>
 #include <foxglove/websocket/websocket_server.hpp>
 
 std::atomic<bool> running = true;
@@ -53,6 +53,9 @@ int main()
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
         test_param = params.at(0);
+
+        std::cout << "param " << params.at(0).getName() << " has been changed to: "<< params.at(0).getValue().getValue<std::string>() <<std::endl;
+
         server->publishParameterValues(clientHandle, {test_param}, request_id);
     };
 

@@ -250,16 +250,33 @@
     "foxglove-ws-protocol-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1723342974,
-        "narHash": "sha256-H3+xOxcKwHyrbT1d5P4KvpoMCfj3mCK9mxeegeFIHmA=",
+        "lastModified": 1739446424,
+        "narHash": "sha256-WaVgddlE5sDAP2Z7ICy3IB38L7YN3XzGOakEPBvz+PE=",
         "owner": "RCMast3r",
         "repo": "ws-protocol",
-        "rev": "bdae89350a6d0b463fa648023171d10b6eb5d594",
+        "rev": "8ff400492ddfadc026bb24faf211697e8b59468c",
         "type": "github"
       },
       "original": {
         "owner": "RCMast3r",
         "repo": "ws-protocol",
+        "type": "github"
+      }
+    },
+    "gtsam-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1693794078,
+        "narHash": "sha256-HjpGrHclpm2XsicZty/rX/RM/762wzmj4AAoEfni8es=",
+        "owner": "borglab",
+        "repo": "gtsam",
+        "rev": "4f66a491ffc83cf092d0d818b11dc35135521612",
+        "type": "github"
+      },
+      "original": {
+        "owner": "borglab",
+        "ref": "4.2.0",
+        "repo": "gtsam",
         "type": "github"
       }
     },
@@ -330,18 +347,20 @@
         "flow-ipc-src": "flow-ipc-src",
         "foxglove-mcap-src": "foxglove-mcap-src",
         "foxglove-ws-protocol-src": "foxglove-ws-protocol-src",
+        "gtsam-src": "gtsam-src",
         "libsocketcanpp-src": "libsocketcanpp-src",
         "nix-proto": "nix-proto",
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "soem-src": "soem-src"
       },
       "locked": {
-        "lastModified": 1728342286,
-        "narHash": "sha256-BiaoZV0F8yvmM3P4rKxEM8RWZw6JZs/zIdx1RjieOLw=",
+        "lastModified": 1739446508,
+        "narHash": "sha256-ARAcuJ1twR7tUQGzqn+UGyFzuoX+wVpyrOvZ4yrgqYo=",
         "owner": "RCMast3r",
         "repo": "nebs_packages",
-        "rev": "2d0f791a05fe5e3d1fb241d574be1624bbcff2ca",
+        "rev": "803448c63e96783ef4b280318a276cc63ba00f09",
         "type": "github"
       },
       "original": {
@@ -585,6 +604,22 @@
       "original": {
         "type": "tarball",
         "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
+      }
+    },
+    "soem-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1737971577,
+        "narHash": "sha256-DK+fymGO4Q7XdXRLdVrGTU89zazMuL8+fNttFYCtS/o=",
+        "owner": "OpenEtherCATsociety",
+        "repo": "SOEM",
+        "rev": "2752dc25882ab24d7cfcad674226b65270fb0c61",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OpenEtherCATsociety",
+        "repo": "SOEM",
+        "type": "github"
       }
     },
     "systems": {
