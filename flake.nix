@@ -31,7 +31,7 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/enums";
+    ht_can.url = "github:hytech-racing/ht_can/140";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
   
@@ -117,6 +117,7 @@
         systems = [
           "x86_64-linux"
           "aarch64-linux"
+          "aarch64-darwin"
         ];
         imports = [
           # inputs.flake-parts.flakeModules.easyOverlay
