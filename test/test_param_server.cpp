@@ -54,11 +54,16 @@ int main()
 
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
-        test_param = params.at(0);
-        double_param = params.at(1);
-
-        std::cout << "param " << params.at(0).getName() << " has been changed to: "<< params.at(0).getValue().getValue<std::string>() <<std::endl;
-        std::cout << "param " << params.at(1).getName() << " has been changed to: "<< params.at(1).getValue().getValue<std::string>() <<std::endl;
+        for(auto param : params)
+        {
+            if(param.getName() == test_param.getName())
+            {
+                test_param = param;
+            } else if (param.getName() == double_param.getName()) 
+            {
+                double_param = param;
+            }
+        }
 
         server->publishParameterValues(clientHandle, {test_param, double_param}, request_id);
     };
