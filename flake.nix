@@ -106,6 +106,20 @@
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
+        (self: super: {
+          python311 = super.python311.override {
+            packageOverrides = pyself: pysuper: {
+              crccheck = pysuper.crccheck.overrideAttrs (oldAttrs: {
+                meta.platforms = nixpkgs.lib.platforms.all;
+              });
+              cantools = pysuper.cantools.overrideAttrs (oldAttrs: {
+                doCheck = false;
+                disabledTests = [ "test_plot_style test_plot_tz" ];
+              });
+            };
+          };
+        }
+        )
         simulink_automation_overlay
         db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
