@@ -30,6 +30,8 @@ int main()
         "C++ Protobuf example server", logHandler, serverOptions);
 
     foxglove::Parameter test_param("test_param", "yo");
+    
+    foxglove::Parameter double_param("float_param", foxglove::ParameterValue((double) 3.0));
 
     foxglove::ServerHandlers<foxglove::ConnHandle> hdlrs;
 
@@ -40,7 +42,7 @@ int main()
         {
             std::cout << name <<std::endl;
         }
-        server->publishParameterValues(clientHandle, {test_param}, request_id);
+        server->publishParameterValues(clientHandle, {test_param, double_param}, request_id);
     };
 
     hdlrs.parameterSubscriptionHandler = [&](const std::vector<std::string> &params_to_subscribe,
@@ -53,10 +55,12 @@ int main()
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
         test_param = params.at(0);
+        double_param = params.at(1);
 
         std::cout << "param " << params.at(0).getName() << " has been changed to: "<< params.at(0).getValue().getValue<std::string>() <<std::endl;
+        std::cout << "param " << params.at(1).getName() << " has been changed to: "<< params.at(1).getValue().getValue<std::string>() <<std::endl;
 
-        server->publishParameterValues(clientHandle, {test_param}, request_id);
+        server->publishParameterValues(clientHandle, {test_param, double_param}, request_id);
     };
 
     server->setHandlers(std::move(hdlrs));
