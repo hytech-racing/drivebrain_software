@@ -120,6 +120,7 @@ void DriveBrainApp::_process_loop() {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
+        // TODO handle invalid state. need tc mux
         auto out_struct = _controller->step_controller(state_and_validity.first);
         auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
         _state_estimator->set_previous_control_output(out_struct);
