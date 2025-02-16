@@ -31,10 +31,10 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/enums";
+    ht_can.url = "github:hytech-racing/ht_can/140";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
-  
+
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
@@ -43,8 +43,8 @@
     };
 
     simulink-automation-src = {
-        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
-        flake = false;
+      url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
+      flake = false;
     };
 
     nanopb-proto-api = {
@@ -55,21 +55,21 @@
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, nanopb-proto-api, ... }@inputs:
     let
       nanopb-api = nix-proto.mkProtoDerivation {
-          name = "nanopb-api";
-          version = "0.0.0";
-          # need to remove the makefile from the proto boi because nix will attempt to build that shit
-          src = builtins.filterSource (path: _: baseNameOf path !="Makefile") "${nanopb-proto-api}/generator/proto";
-        };
-      
+        name = "nanopb-api";
+        version = "0.0.0";
+        # need to remove the makefile from the proto boi because nix will attempt to build that shit
+        src = builtins.filterSource (path: _: baseNameOf path != "Makefile") "${nanopb-proto-api}/generator/proto";
+      };
+
       drivebrain_core_msgs = { nanopb-api }: nix-proto.mkProtoDerivation {
         name = "drivebrain_core_msgs";
         version = HT_proto.rev;
         src = "${HT_proto}/proto";
         protoDeps = [ nanopb-api ];
       };
-      
+
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
-        
+
         inherit nanopb-api;
         inherit drivebrain_core_msgs;
 
@@ -82,7 +82,7 @@
           };
         };
 
-        
+
         db_service = nix-proto.mkProtoDerivation
           {
             name = "db_service";
@@ -108,6 +108,20 @@
           # drivebrain_software = final.callPackage ./default.nix { inherit ideTools; };
           drivebrain_software = final.callPackage ./default.nix { };
         })
+        (self: super: {
+          python311 = super.python311.override {
+            packageOverrides = pyself: pysuper: {
+              crccheck = pysuper.crccheck.overrideAttrs (oldAttrs: {
+                meta.platforms = nixpkgs.lib.platforms.all;
+              });
+              cantools = pysuper.cantools.overrideAttrs (oldAttrs: {
+                doCheck = false;
+                disabledTests = [ "test_plot_style test_plot_tz" ];
+              });
+            };
+          };
+        }
+        )
         simulink_automation_overlay
         db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
@@ -119,6 +133,7 @@
         systems = [
           "x86_64-linux"
           "aarch64-linux"
+          "aarch64-darwin"
         ];
         imports = [
           # inputs.flake-parts.flakeModules.easyOverlay
@@ -184,7 +199,7 @@
 
             devShells.tests = pkgs.mkShell rec {
               name = "test-devshell";
-        
+
               shellHook =
                 let icon = "f121";
                 in ''
@@ -199,7 +214,7 @@
               inputsFrom = [
                 pkgs.drivebrain_software
               ];
-            
+
             };
 
             legacyPackages =

@@ -79,6 +79,7 @@ namespace core
         void set_previous_control_output(SpeedControlOut prev_control_output);
 
     private:
+        void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
         template <size_t arr_len>
         bool _validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr);
 

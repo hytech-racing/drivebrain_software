@@ -2,31 +2,33 @@
 #include <chrono>
 #include <algorithm>
 #include "hytech_msgs.pb.h"
+#include "hytech.pb.h" // from HT_CAN
 #include <Tire_Model_Codegen_MatlabModel.hpp>
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
+
     if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
     {
-        auto in_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(message);
-        core::DriverInput input = {(in_msg->accel_percent()), (in_msg->brake_percent())};
-        int prev_MCU_recv_millis = in_msg->mcu_recv_millis();
-        veh_vec<float> rpms = {in_msg->rpm_data().fl(), in_msg->rpm_data().fr(), in_msg->rpm_data().rl(), in_msg->rpm_data().rr()};
-        {
-            std::unique_lock lk(_state_mutex);
-            _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-            _vehicle_state.input = input;
-            _vehicle_state.current_rpms = rpms;
-            _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
-            _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
-            _raw_input_data.raw_load_cell_values = {
-                in_msg->load_cell_data().fl(),
-                in_msg->load_cell_data().fr(),
-                in_msg->load_cell_data().rl(),
-                in_msg->load_cell_data().rr(),
-            };
-        }
+        // auto in_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(message);
+        // core::DriverInput input = {(in_msg->accel_percent()), (in_msg->brake_percent())};
+        // int prev_MCU_recv_millis = in_msg->mcu_recv_millis();
+        // veh_vec<float> rpms = {in_msg->rpm_data().fl(), in_msg->rpm_data().fr(), in_msg->rpm_data().rl(), in_msg->rpm_data().rr()};
+        // {
+        //     std::unique_lock lk(_state_mutex);
+        //     _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+        //     _vehicle_state.input = input;
+        //     _vehicle_state.current_rpms = rpms;
+        //     _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
+        //     _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
+        //     _raw_input_data.raw_load_cell_values = {
+        //         in_msg->load_cell_data().fl(),
+        //         in_msg->load_cell_data().fr(),
+        //         in_msg->load_cell_data().rl(),
+        //         in_msg->load_cell_data().rr(),
+        //     };
+        // }
     }
 
     else if (message->GetTypeName() == "hytech_msgs.VNData")
@@ -60,8 +62,54 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_ypr_rad = ypr_rad;
         }
     }
+    else {
+        _recv_low_level_state(message);
+    }
 }
 
+void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Message> message)
+{
+    if (message->GetTypeName() == "hytech.rear_suspension") {
+        auto in_msg = std::static_pointer_cast<hytech::rear_suspension>(message);        
+        {
+            std::unique_lock lk(_state_mutex);
+            _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+            _raw_input_data.raw_load_cell_values.RL = in_msg->rl_load_cell();
+            _raw_input_data.raw_load_cell_values.RR = in_msg->rr_load_cell();
+            _raw_input_data.raw_shock_pot_values.RL = in_msg->rl_shock_pot();
+            _raw_input_data.raw_shock_pot_values.RR = in_msg->rr_shock_pot();
+        }
+    } else if(message->GetTypeName() == "hytech.front_suspension")
+    {
+        auto in_msg = std::static_pointer_cast<hytech::front_suspension>(message);
+        {
+            std::unique_lock lk(_state_mutex);
+            _timestamp_array[1] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+            _raw_input_data.raw_load_cell_values.FL = in_msg->fl_load_cell();
+            _raw_input_data.raw_load_cell_values.FR = in_msg->fr_load_cell();
+            _raw_input_data.raw_shock_pot_values.FL = in_msg->fl_shock_pot();
+            _raw_input_data.raw_shock_pot_values.FR = in_msg->fr_shock_pot();
+        }
+    } else if(message->GetTypeName() == "hytech.pedals_system_data")
+    {
+        auto in_msg = std::static_pointer_cast<hytech::pedals_system_data>(message);
+        core::DriverInput input = {(in_msg->accel_pedal()), (in_msg->brake_pedal())};
+        {
+            std::unique_lock lk(_state_mutex);
+            _timestamp_array[2] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+            _vehicle_state.input = input;
+        }
+    } else if(message->GetTypeName() == "hytech.steering_data")
+    {
+        auto in_msg = std::static_pointer_cast<hytech::steering_data>(message);
+        {
+            std::unique_lock lk(_state_mutex);
+            _timestamp_array[3] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+            _raw_input_data.raw_steering_analog = in_msg->steering_analog_raw();
+            _raw_input_data.raw_steering_digital = in_msg->steering_digital_raw();
+        }
+    }
+}
 // TODO parameterize the timeout threshold
 template <size_t arr_len>
 bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr)
