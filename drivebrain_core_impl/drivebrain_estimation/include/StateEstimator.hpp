@@ -70,7 +70,7 @@ namespace core
             _vehicle_state.prev_MCU_recv_millis = -1; // init the last mcu recv millis to < 0
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
-            _timestamp_array = {zero_start_time};
+            _timestamp_array = {zero_start_time, zero_start_time, zero_start_time, zero_start_time};
         }
         ~StateEstimator() = default;
 
@@ -80,6 +80,13 @@ namespace core
 
     private:
         void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
+        
+        Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);
+
+        std::shared_ptr<hytech_msgs::VehicleData> _set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
+        std::shared_ptr<hytech_msgs::VehicleData> _set_tv_status(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
+        std::shared_ptr<hytech_msgs::VehicleData> _set_ins_state_data(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out);
+
         template <size_t arr_len>
         bool _validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr);
 
@@ -90,7 +97,7 @@ namespace core
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;
         core::RawInputData _raw_input_data;
-        std::array<std::chrono::microseconds, 1> _timestamp_array;
+        std::array<std::chrono::microseconds, 4> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
         estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 

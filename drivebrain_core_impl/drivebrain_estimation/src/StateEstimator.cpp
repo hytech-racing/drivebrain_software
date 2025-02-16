@@ -1,9 +1,13 @@
 #include <StateEstimator.hpp>
+#include <Tire_Model_Codegen.h>
+#include <VehicleDataTypes.hpp>
+#include <base_msgs.pb.h>
 #include <chrono>
 #include <algorithm>
 #include "hytech_msgs.pb.h"
 #include "hytech.pb.h" // from HT_CAN
 #include <Tire_Model_Codegen_MatlabModel.hpp>
+#include <memory>
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
@@ -142,35 +146,15 @@ void StateEstimator::set_previous_control_output(SpeedControlOut prev_control_ou
     _vehicle_state.prev_controller_output = prev_control_output;
 }
 
-std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
+Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T StateEstimator::_eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data)
 {
-    // auto state_is_valid = _validate_stamps(_timestamp_array);
-    auto state_estim_start = std::chrono::high_resolution_clock::now();
-    core::VehicleState current_state;
-    core::RawInputData current_raw_data;
-    auto state_mutex_start = std::chrono::high_resolution_clock::now();
-    {
-        std::unique_lock lk(_state_mutex);
-        current_state = _vehicle_state;
-        current_raw_data = _raw_input_data;
-    }
-    auto state_mutex_end = std::chrono::high_resolution_clock::now();
-
-    // Create the proto message to send
-    std::shared_ptr<hytech_msgs::VehicleData> msg_out = std::make_shared<hytech_msgs::VehicleData>();
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// matlab math ////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    auto matlab_math_start = std::chrono::high_resolution_clock::now();
-
     // Convert Vehicle and Raw Data to Tire Model Input
-    bool sign = (current_state.input.requested_accel - current_state.input.requested_brake) >= 0;
+    bool sign = (vehicle_state.input.requested_accel - vehicle_state.input.requested_brake) >= 0;
     estimation::Tire_Model_Codegen_MatlabModel::inputs model_inputs = {
-        current_state.prev_controller_output.torque_lim_nm.FL * (sign ? 1.0f : -1.0f),
-        current_state.prev_controller_output.torque_lim_nm.FR * (sign ? 1.0f : -1.0f),
-        current_state.prev_controller_output.torque_lim_nm.RL * (sign ? 1.0f : -1.0f),
-        current_state.prev_controller_output.torque_lim_nm.RR * (sign ? 1.0f : -1.0f),
+        vehicle_state.prev_controller_output.torque_lim_nm.FL * (sign ? 1.0f : -1.0f),
+        vehicle_state.prev_controller_output.torque_lim_nm.FR * (sign ? 1.0f : -1.0f),
+        vehicle_state.prev_controller_output.torque_lim_nm.RL * (sign ? 1.0f : -1.0f),
+        vehicle_state.prev_controller_output.torque_lim_nm.RR * (sign ? 1.0f : -1.0f),
         0.0f,
         0.0f,
         0.0f,
@@ -179,30 +163,28 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         0.0f,
         0.0f,
         0.0f,
-        current_raw_data.raw_load_cell_values.FL,
-        current_raw_data.raw_load_cell_values.FR,
-        current_raw_data.raw_load_cell_values.RL,
-        current_raw_data.raw_load_cell_values.RR,
-        current_state.current_rpms.FL,
-        current_state.current_rpms.RL,
-        current_state.current_rpms.FR,
-        current_state.current_rpms.RR,
-        current_state.steering_angle_deg,
-        current_state.current_body_vel_ms.x,
-        current_state.current_angular_rate_rads.z,
-        current_state.current_body_vel_ms.y
+        raw_input_data.raw_load_cell_values.FL,
+        raw_input_data.raw_load_cell_values.FR,
+        raw_input_data.raw_load_cell_values.RL,
+        raw_input_data.raw_load_cell_values.RR,
+        vehicle_state.current_rpms.FL,
+        vehicle_state.current_rpms.RL,
+        vehicle_state.current_rpms.FR,
+        vehicle_state.current_rpms.RR,
+        vehicle_state.steering_angle_deg,
+        vehicle_state.current_body_vel_ms.x,
+        vehicle_state.current_angular_rate_rads.z,
+        vehicle_state.current_body_vel_ms.y
     };
 
     
     auto res = _matlab_estimator.evaluate_estimator(model_inputs);
-    auto matlab_math_end = std::chrono::high_resolution_clock::now();
-    auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
-    {
-        std::unique_lock lk(_state_mutex);
-        _vehicle_state.matlab_math_temp_out = {res.torq_req_FL,res.torq_req_FR,res.torq_req_RL,res.torq_req_RR};
-    }
-    auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
 
+    return res;
+}
+
+std::shared_ptr<hytech_msgs::VehicleData> StateEstimator::_set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res)
+{
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
     auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();
 
@@ -266,6 +248,11 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     msg_out->set_v_y_lm(res.Vy_LM);
     msg_out->set_psi_dot_lm_rad_s(res.Psi_dot_LMrads);
 
+    return msg_out;
+}
+
+std::shared_ptr<hytech_msgs::VehicleData> StateEstimator::_set_tv_status(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res)
+{
     hytech_msgs::TorqueVectoringStatus *current_tv_status = msg_out->mutable_tv_status();
 
     auto torque_add = current_tv_status->mutable_torque_additional_nm();
@@ -282,18 +269,12 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_tv_status->set_vy_vn_gain(res.vy_vn_gain);
     current_tv_status->set_psi_dot_gain(res.psi_dot_gain);
     current_tv_status->set_perceived_vy(res.perceived_vy);
+    return msg_out;
 
+}
 
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-
-    msg_out->set_is_ready_to_drive(true);
-
-    hytech_msgs::SpeedControlIn *current_inputs = msg_out->mutable_current_inputs();
-    current_inputs->set_accel_percent(current_state.input.requested_accel);
-    current_inputs->set_brake_percent(current_state.input.requested_brake);
-
+std::shared_ptr<hytech_msgs::VehicleData> StateEstimator::_set_ins_state_data(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out)
+{
     hytech_msgs::xyz_vector *current_body_vel_ms = msg_out->mutable_current_body_vel_ms();
     current_body_vel_ms->set_x(current_state.current_body_vel_ms.x);
     current_body_vel_ms->set_y(current_state.current_body_vel_ms.y);
@@ -313,6 +294,56 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     current_ypr_rad->set_yaw(current_state.current_ypr_rad.yaw);
     current_ypr_rad->set_pitch(current_state.current_ypr_rad.pitch);
     current_ypr_rad->set_roll(current_state.current_ypr_rad.roll);
+}
+
+std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()
+{
+    auto state_is_valid = _validate_stamps(_timestamp_array);
+    auto state_estim_start = std::chrono::high_resolution_clock::now();
+    core::VehicleState current_state;
+    core::RawInputData current_raw_data;
+    auto state_mutex_start = std::chrono::high_resolution_clock::now();
+    {
+        std::unique_lock lk(_state_mutex);
+        current_state = _vehicle_state;
+        current_raw_data = _raw_input_data;
+    }
+    auto state_mutex_end = std::chrono::high_resolution_clock::now();
+
+    // Create the proto message to send
+    std::shared_ptr<hytech_msgs::VehicleData> msg_out = std::make_shared<hytech_msgs::VehicleData>();
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// matlab math ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    auto matlab_math_start = std::chrono::high_resolution_clock::now();
+
+    auto res = _eval_estimator(current_state, current_raw_data);
+    
+    auto matlab_math_end = std::chrono::high_resolution_clock::now();
+
+    auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
+    {
+        std::unique_lock lk(_state_mutex);
+        _vehicle_state.matlab_math_temp_out = {static_cast<float>(res.torq_req_FL),static_cast<float>(res.torq_req_FR), static_cast<float>(res.torq_req_RL),static_cast<float>(res.torq_req_RR)};
+    }
+
+    auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
+
+    msg_out = _set_tire_dynamics(msg_out, res);
+    msg_out = _set_tire_dynamics(msg_out, res);
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
+    msg_out->set_is_ready_to_drive(true);
+
+    hytech_msgs::SpeedControlIn *current_inputs = msg_out->mutable_current_inputs();
+    current_inputs->set_accel_percent(current_state.input.requested_accel);
+    current_inputs->set_brake_percent(current_state.input.requested_brake);
+
+    msg_out = _set_ins_state_data(current_state, msg_out);
 
     hytech_msgs::veh_vec_float *curr_rpms = msg_out->mutable_current_rpms();
     curr_rpms->set_fl(current_state.current_rpms.FL);
@@ -320,7 +351,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     curr_rpms->set_rl(current_state.current_rpms.RL);
     curr_rpms->set_rr(current_state.current_rpms.RR);
 
-    msg_out->set_state_is_valid(true);
+    msg_out->set_state_is_valid(state_is_valid);
     msg_out->set_steering_angle_deg(current_state.steering_angle_deg);
 
     auto prev_driver_torque_req = msg_out->mutable_driver_torque();
@@ -335,17 +366,18 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     
     auto state_estim_end = std::chrono::high_resolution_clock::now();
 
-    // auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(state_estim_end - state_estim_start);
-    // if (elapsed > std::chrono::microseconds(6000))
-    // {
-    //     // std::cout << "WARNING: timing" << std::endl;
-    //     // std::cout << "total: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count())) << " us\n";
-    //     // std::cout << "state mutex: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_end - state_mutex_start).count())) << " us\n";
-    //     // std::cout << "state mutex 2: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_2_end - state_mutex_2_start).count())) << " us\n";
-    //     // std::cout << "matlab math: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(matlab_math_end - matlab_math_start).count())) << " us\n";
-    //     // std::cout << "log time: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start).count())) << " us\n";
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(state_estim_end - state_estim_start);
+    
+    constexpr bool debug = false;
+    if ( (elapsed > std::chrono::microseconds(6000)) && debug ) // 6ms
+    {
+        std::cout << "WARNING: timing" << std::endl;
+        std::cout << "total: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count())) << " us\n";
+        std::cout << "state mutex: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_end - state_mutex_start).count())) << " us\n";
+        std::cout << "state mutex 2: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_2_end - state_mutex_2_start).count())) << " us\n";
+        std::cout << "matlab math: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(matlab_math_end - matlab_math_start).count())) << " us\n";
+        std::cout << "log time: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start).count())) << " us\n";
+    }
 
-    // }
-
-    return {current_state, true};
+    return {current_state, state_is_valid};
 }

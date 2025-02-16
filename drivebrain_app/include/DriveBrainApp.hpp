@@ -57,7 +57,7 @@ private:
     boost::asio::io_context _io_context;
     
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 
