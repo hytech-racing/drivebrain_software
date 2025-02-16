@@ -5,6 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 
+# THIS FUCKING FINALLY FIXED IT HOLY SHIT FUCK YESSSSSSS
+# fixes the bug in compile commands generation where system libs are not seen libs that need include dirs included
+# https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_IMPLICIT_INCLUDE_DIRECTORIES.html#variable:CMAKE_%3CLANG%3E_IMPLICIT_INCLUDE_DIRECTORIES
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries

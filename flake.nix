@@ -156,15 +156,16 @@
                   dbc_path=${pkgs.ht_can_pkg}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-                  alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
+                  alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make VERBOSE=1 -j && cd .."
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli ];
-              inputsFrom = [
-                pkgs.drivebrain_software
-              ];
+              packages = [ pkgs.mcap-cli ] ++ pkgs.drivebrain_software.propagatedBuildInputs;
+              # inputsFrom = [
+              #   pkgs.drivebrain_software
+              # ];
+
             };
 
             devShells.sim_automath = pkgs.mkShell rec {
