@@ -5,6 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 
+# THIS FUCKING FINALLY FIXED IT HOLY SHIT FUCK YESSSSSSS
+# fixes the bug in compile commands generation where system libs are not seen libs that need include dirs included
+# https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_IMPLICIT_INCLUDE_DIRECTORIES.html#variable:CMAKE_%3CLANG%3E_IMPLICIT_INCLUDE_DIRECTORIES
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
@@ -43,6 +48,10 @@ find_package(GTest REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
 find_package(codegen REQUIRED)
+
+find_package(ZLIB REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(zstd REQUIRED)
 
 find_package(drivebrain_core REQUIRED)
 
@@ -203,11 +212,13 @@ make_cmake_package(drivebrain_app drivebrain)
 #     Boost::boost
 # )
 
-# add_executable(test_foxglove_server test/test_foxglove_server.cpp)
+add_executable(test_param_server test/test_param_server.cpp)
 
-# target_link_libraries(test_foxglove_server PUBLIC 
-#     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
-#     foxglove_websocket::foxglove_websocket)
+target_link_libraries(test_param_server PUBLIC 
+    foxglove_websocket::foxglove_websocket
+    PkgConfig::lz4
+    zstd::libzstd_shared
+)
 
 add_executable(mcu_standin test/test_mcu.cpp)
 
@@ -291,5 +302,6 @@ target_link_libraries(mcu_standin PUBLIC
 include(GNUInstallDirs)
 install(TARGETS 
         alpha_build
+        test_param_server
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
