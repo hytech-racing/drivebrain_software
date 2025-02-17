@@ -21,8 +21,8 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        # ref = "2024-11-08T01_13_42";
-        ref = "2025-02-10T09_42_47";
+        ref = "2024-10-08T00_48_56";
+        # ref = "2025-01-15T02_56_40";
         flake = false;
       };
 
@@ -31,7 +31,7 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/140";
+    ht_can.url = "github:hytech-racing/ht_can/141";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
 
@@ -171,7 +171,7 @@
                   dbc_path=${pkgs.ht_can_pkg}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-                  alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make VERBOSE=1 -j && cd .."
+                  alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';

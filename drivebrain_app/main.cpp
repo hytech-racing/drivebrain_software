@@ -89,9 +89,11 @@ int main(int argc, char *argv[])
         DriveBrainSettings settings{
             .run_db_service = true,
             .run_io_context = true,
-            .run_process_loop = true
+            .run_process_loop = true,
+            .use_vectornav = false
         };
         
+        std::cout <<"creating app" <<std::endl;
         DriveBrainApp app(param_path, dbc_path, settings);
 
         app.run();

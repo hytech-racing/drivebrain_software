@@ -80,7 +80,11 @@ namespace core
 
     private:
         void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
-        
+        void _recv_inverter_states(std::shared_ptr<google::protobuf::Message> msg);
+
+        template <size_t ind, typename inverter_dynamics_msg>
+        void _handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg);
+
         Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);
 
         std::shared_ptr<hytech_msgs::VehicleData> _set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);

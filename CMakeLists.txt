@@ -200,12 +200,6 @@ make_cmake_package(drivebrain_app drivebrain)
 ### testing executables ###
 ###                     ###
 
-# add_executable(test_CAN_driver drivebrain_core_impl/drivebrain_comms/car_CAN_driver/test/test_can_driver.cpp)
-# target_link_libraries(test_CAN_driver PUBLIC
-#     CAN_driver
-#     GTest::gtest_main
-# )
-
 # add_executable(test_boost_asio_CAN drivebrain_app/example_boost_asio_can.cpp)
 
 # target_link_libraries(test_boost_asio_CAN PUBLIC
@@ -213,6 +207,18 @@ make_cmake_package(drivebrain_app drivebrain)
 # )
 
 add_executable(test_param_server test/test_param_server.cpp)
+
+target_link_libraries(test_param_server PUBLIC 
+    foxglove_websocket::foxglove_websocket
+    PkgConfig::lz4
+    zstd::libzstd_shared
+)
+
+# add_executable(test_dbcan test/test_dbcan.cpp)
+
+# target_link_libraries(test_dbcan PUBLIC
+#     drivebrain_comms
+# )
 
 target_link_libraries(test_param_server PUBLIC 
     foxglove_websocket::foxglove_websocket
@@ -235,13 +241,13 @@ target_link_libraries(test_db_grpc PUBLIC
 )
 
 
-# add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
-# target_link_libraries(test_mcap PUBLIC
-#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-#     protobuf::libprotobuf
-#     mcap::mcap
-# )
+target_link_libraries(test_mcap PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    # protobuf::libprotobuf
+    mcap::mcap
+)
 
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)

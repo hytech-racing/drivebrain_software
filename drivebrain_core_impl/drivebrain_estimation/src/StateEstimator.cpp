@@ -7,35 +7,14 @@
 #include "hytech_msgs.pb.h"
 #include "hytech.pb.h" // from HT_CAN
 #include <Tire_Model_Codegen_MatlabModel.hpp>
+#include <google/protobuf/message.h>
 #include <memory>
+#include <mutex>
 using namespace core;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
-
-    if (message->GetTypeName() == "hytech_msgs.MCUOutputData")
-    {
-        // auto in_msg = std::static_pointer_cast<hytech_msgs::MCUOutputData>(message);
-        // core::DriverInput input = {(in_msg->accel_percent()), (in_msg->brake_percent())};
-        // int prev_MCU_recv_millis = in_msg->mcu_recv_millis();
-        // veh_vec<float> rpms = {in_msg->rpm_data().fl(), in_msg->rpm_data().fr(), in_msg->rpm_data().rl(), in_msg->rpm_data().rr()};
-        // {
-        //     std::unique_lock lk(_state_mutex);
-        //     _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-        //     _vehicle_state.input = input;
-        //     _vehicle_state.current_rpms = rpms;
-        //     _vehicle_state.prev_MCU_recv_millis = prev_MCU_recv_millis;
-        //     _vehicle_state.steering_angle_deg = in_msg->steering_angle_deg();
-        //     _raw_input_data.raw_load_cell_values = {
-        //         in_msg->load_cell_data().fl(),
-        //         in_msg->load_cell_data().fr(),
-        //         in_msg->load_cell_data().rl(),
-        //         in_msg->load_cell_data().rr(),
-        //     };
-        // }
-    }
-
-    else if (message->GetTypeName() == "hytech_msgs.VNData")
+    if (message->GetTypeName() == "hytech_msgs.VNData")
     {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
         xyz_vec<float> body_vel_ms = {
@@ -112,8 +91,50 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
             _raw_input_data.raw_steering_analog = in_msg->steering_analog_raw();
             _raw_input_data.raw_steering_digital = in_msg->steering_digital_raw();
         }
+    } else {
+        _recv_inverter_states(message);
     }
 }
+
+// INV1_STATUS INV1_TEMPS INV1_DYNAMICS INV1_POWER INV1_FEEDBACK
+void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Message> msg)
+{
+    auto name = msg->GetTypeName();
+    if( name == "hytech.inv1_status" )
+    {
+
+    } else if(name == "hytech.inv2_status")
+    {
+
+    } else if(name == "hytech.inv1_dynamics")
+    {
+        _handle_set_inverter_dynamics<0, hytech::inv1_dynamics>(msg);
+    } else if(name == "hytech.inv2_dynamics")
+    {
+        _handle_set_inverter_dynamics<1, hytech::inv2_dynamics>(msg);
+    } else if(name == "hytech.inv3_dynamics")
+    {
+        _handle_set_inverter_dynamics<2, hytech::inv3_dynamics>(msg);
+    } else if(name == "hytech.inv4_dynamics")
+    {
+        _handle_set_inverter_dynamics<3, hytech::inv4_dynamics>(msg);
+    }
+}
+
+template <size_t ind, typename inverter_dynamics_msg>
+void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg) {
+    auto in_msg = std::static_pointer_cast<inverter_dynamics_msg>(msg);
+    {
+        std::unique_lock lk(_state_mutex);
+        _raw_input_data.raw_inverter_torques.set_from_index<ind>(in_msg->actual_torque_nm());
+        _raw_input_data.raw_inverter_power.set_from_index<ind>(in_msg->actual_power_w());
+        _vehicle_state.current_rpms.set_from_index<ind>(in_msg->actual_speed_rpm());
+    }
+}
+
+
+
+
 // TODO parameterize the timeout threshold
 template <size_t arr_len>
 bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr)
@@ -294,6 +315,7 @@ std::shared_ptr<hytech_msgs::VehicleData> StateEstimator::_set_ins_state_data(co
     current_ypr_rad->set_yaw(current_state.current_ypr_rad.yaw);
     current_ypr_rad->set_pitch(current_state.current_ypr_rad.pitch);
     current_ypr_rad->set_roll(current_state.current_ypr_rad.roll);
+    return msg_out;
 }
 
 std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validity()

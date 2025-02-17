@@ -75,9 +75,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
-    
-    _vn_driver = std::make_unique<comms::VNDriver>(
-        _config, _logger, _message_logger, *_state_estimator, _io_context);
+    if(_settings.use_vectornav)
+    {
+        _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
+    }
     
     _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
     
