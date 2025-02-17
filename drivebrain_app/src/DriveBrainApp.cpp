@@ -3,6 +3,8 @@
 
 #include "hytech.pb.h"
 #include <mutex>
+#include <thread>
+
 std::atomic<bool> DriveBrainApp::_stop_signal{false};
 
 DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& dbc_path, const DriveBrainSettings& settings)
@@ -11,30 +13,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-    , _db_service_thread([this]() {
-        if (!_settings.run_db_service) return;
-        spdlog::info("started db service thread");
-        try {
-            while (!_stop_signal.load()) {
-                _db_service->run_server();
-            }
-        } catch (const std::exception& e) {
-            spdlog::error("Error in drivebrain service thread: {}", e.what());
-        }
-    })
-    , _io_context_thread([this]() {
-        if (!_settings.run_io_context) return;
-        spdlog::info("Started io context thread");
-        try {
-            _io_context.run();
-        } catch (const std::exception& e) {
-            spdlog::error("Error in io_context: {}", e.what());
-        }
-    })
-    , _process_thread([this]() {
-        if (!_settings.run_process_loop) return;
-        _process_loop();
-    })
+
 {
 
     spdlog::set_level(spdlog::level::warn);
@@ -80,7 +59,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
     }
     
-    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+    
     
     if (!_controller->init()) {
         throw std::runtime_error("Failed to initialize controller");
@@ -171,6 +150,37 @@ void DriveBrainApp::_process_loop() {
 }
 
 void DriveBrainApp::run() {
+    _db_service_thread = std::thread([this]() {
+        
+        if (!_settings.run_db_service) return;
+        
+        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+        spdlog::info("started db service thread");
+        try {
+            while (!_stop_signal.load()) {
+                _db_service->run_server();
+            }
+        } catch (const std::exception& e) {
+            spdlog::error("Error in drivebrain service thread: {}", e.what());
+        }
+    });
+
+    _io_context_thread = std::thread([this]() {
+        if (!_settings.run_io_context) return;
+        spdlog::info("Started io context thread");
+        try {
+            _io_context.run();
+        } catch (const std::exception& e) {
+            spdlog::error("Error in io_context: {}", e.what());
+        }
+    });
+
+    _process_thread = std::thread([this]() {
+        if (!_settings.run_process_loop) return;
+        _process_loop();
+    });
+
+    
     while (!_stop_signal.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

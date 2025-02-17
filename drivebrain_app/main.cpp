@@ -90,12 +90,12 @@ int main(int argc, char *argv[])
             .run_db_service = true,
             .run_io_context = true,
             .run_process_loop = true,
-            .use_vectornav = false
+            .use_vectornav = true
         };
         
         std::cout <<"creating app" <<std::endl;
         DriveBrainApp app(param_path, dbc_path, settings);
-
+        std::cout <<"app created" <<std::endl;
         app.run();
     } catch (const std::exception& e) {
         spdlog::error("Error in main: {}", e.what());
