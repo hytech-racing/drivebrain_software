@@ -23,11 +23,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     _controller = std::make_unique<control::SimpleController>(_logger, _config);
     _configurable_components.push_back(_controller.get());
     
-    bool matlab_construction_failed = false;
-    _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
-        _logger, _config, matlab_construction_failed);
+    // bool matlab_construction_failed = false;
+    // _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
+    //     _logger, _config, matlab_construction_failed);
     
-    _configurable_components.push_back(_matlab_math.get());
+    // _configurable_components.push_back(_matlab_math.get());
     
     _foxglove_server = std::make_unique<core::FoxgloveWSServer>(_configurable_components);
     
@@ -38,7 +38,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(*_mcap_logger), std::placeholders::_1),
         std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(*_foxglove_server), std::placeholders::_1));
     
-    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger, *_matlab_math);
+    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
     
     bool construction_failed = false;
     _driver = std::make_unique<comms::CANDriver>(
@@ -147,7 +147,17 @@ void DriveBrainApp::_process_loop() {
     }
 }
 
+
+std::atomic<bool> stop_signal{false};
+void signal_handler(int signal)
+{
+    spdlog::info("Interrupt signal ({}) received. Cleaning up...", signal);
+    stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
+}
+
 void DriveBrainApp::run() {
+
+    std::signal(SIGINT, signal_handler);
     _db_service_thread = std::thread([this]() {
         
         if (!_settings.run_db_service) return;
@@ -155,7 +165,7 @@ void DriveBrainApp::run() {
         _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
         spdlog::info("started db service thread");
         try {
-            while (!_stop_signal.load()) {
+            while (!stop_signal.load()) {
                 _db_service->run_server();
             }
         } catch (const std::exception& e) {
@@ -179,7 +189,7 @@ void DriveBrainApp::run() {
     });
 
     
-    while (!_stop_signal.load()) {
+    while (!stop_signal.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }

@@ -132,9 +132,6 @@ void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::proto
     }
 }
 
-
-
-
 // TODO parameterize the timeout threshold
 template <size_t arr_len>
 bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr)
@@ -154,10 +151,11 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
     auto max_stamp = timestamp_array_to_sort.back();
 
     bool within_threshold = (max_stamp - min_stamp) <= threshold;
-
+    
     auto curr_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-    bool all_members_received = min_stamp.count() > 0;
+    bool all_members_received = min_stamp.count() > 0; // count here is the count in microseconds
     bool last_update_recent_enough = (std::chrono::duration_cast<std::chrono::microseconds>(curr_time - max_stamp)) < threshold;
+
     return within_threshold && all_members_received && last_update_recent_enough;
 }
 
@@ -199,9 +197,9 @@ Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T StateEstimator::_eval_estimator(co
     };
 
     
-    auto res = _matlab_estimator.evaluate_estimator(model_inputs);
+    // auto res = _matlab_estimator.evaluate_estimator(model_inputs);
 
-    return res;
+    return {};
 }
 
 std::shared_ptr<hytech_msgs::VehicleData> StateEstimator::_set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res)
@@ -338,22 +336,22 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     ////////////////////////////////////////////////////////////////////////////
     /// matlab math ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    auto matlab_math_start = std::chrono::high_resolution_clock::now();
+    // auto matlab_math_start = std::chrono::high_resolution_clock::now();
 
-    auto res = _eval_estimator(current_state, current_raw_data);
+    // auto res = _eval_estimator(current_state, current_raw_data);
     
-    auto matlab_math_end = std::chrono::high_resolution_clock::now();
+    // auto matlab_math_end = std::chrono::high_resolution_clock::now();
 
-    auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
-    {
-        std::unique_lock lk(_state_mutex);
-        _vehicle_state.matlab_math_temp_out = {static_cast<float>(res.torq_req_FL),static_cast<float>(res.torq_req_FR), static_cast<float>(res.torq_req_RL),static_cast<float>(res.torq_req_RR)};
-    }
+    // auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
+    // {
+    //     std::unique_lock lk(_state_mutex);
+    //     _vehicle_state.matlab_math_temp_out = {static_cast<float>(res.torq_req_FL),static_cast<float>(res.torq_req_FR), static_cast<float>(res.torq_req_RL),static_cast<float>(res.torq_req_RR)};
+    // }
 
-    auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
+    // auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
 
-    msg_out = _set_tire_dynamics(msg_out, res);
-    msg_out = _set_tire_dynamics(msg_out, res);
+    // msg_out = _set_tire_dynamics(msg_out, res);
+    // msg_out = _set_tv_status(msg_out, res);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -396,8 +394,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         std::cout << "WARNING: timing" << std::endl;
         std::cout << "total: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count())) << " us\n";
         std::cout << "state mutex: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_end - state_mutex_start).count())) << " us\n";
-        std::cout << "state mutex 2: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_2_end - state_mutex_2_start).count())) << " us\n";
-        std::cout << "matlab math: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(matlab_math_end - matlab_math_start).count())) << " us\n";
+        // std::cout << "state mutex 2: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_2_end - state_mutex_2_start).count())) << " us\n";
+        // std::cout << "matlab math: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(matlab_math_end - matlab_math_start).count())) << " us\n";
         std::cout << "log time: " << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start).count())) << " us\n";
     }
 

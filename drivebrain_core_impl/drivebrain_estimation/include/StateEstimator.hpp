@@ -59,8 +59,9 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger, estimation::Tire_Model_Codegen_MatlabModel& matlab_estimator) 
-        : _logger(shared_logger), _message_logger(message_logger), _matlab_estimator(matlab_estimator)
+        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger)
+        : _logger(shared_logger), _message_logger(message_logger)
+        //  _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
             _raw_input_data = {};
@@ -101,7 +102,7 @@ namespace core
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 4> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
-        estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
+        // estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 
     };
 }

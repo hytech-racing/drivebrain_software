@@ -271,14 +271,6 @@ add_executable(alpha_build
 target_include_directories(alpha_build PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
-
-enable_testing()
-
-add_executable(alpha_test 
-    unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
-)
-
 target_link_libraries(alpha_build PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
@@ -287,6 +279,27 @@ target_link_libraries(alpha_build PUBLIC
     drivebrain_mcap_logger
     Boost::program_options
 )
+
+add_executable(test_build 
+    drivebrain_app/debug_main.cpp
+)
+target_link_libraries(test_build PUBLIC
+    drivebrain_app
+    drivebrain_core::drivebrain_core
+    drivebrain_control
+    drivebrain_comms
+    drivebrain_mcap_logger
+    Boost::program_options
+)
+
+enable_testing()
+
+add_executable(alpha_test 
+    unit_test/main.cpp
+    unit_test/SimpleControllerTest.cpp
+)
+
+
 
 
 target_link_libraries(alpha_test PUBLIC 

@@ -22,7 +22,6 @@
         owner = "hytech-racing";
         repo = "HT_proto";
         ref = "2025-02-17T06_32_03";
-        # ref = "2025-01-15T02_56_40";
         flake = false;
       };
 

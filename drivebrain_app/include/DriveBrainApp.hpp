@@ -47,7 +47,7 @@ public:
 private:
     // Private member functions
     void _process_loop();
-
+    void _signal_handler(int signal);
 private:
     // Private member variables
     static std::atomic<bool> _stop_signal;
@@ -65,7 +65,7 @@ private:
     std::vector<core::common::Configurable*> _configurable_components;
     std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
     std::unique_ptr<control::SimpleController> _controller;
-    std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
+    // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
     std::unique_ptr<core::StateEstimator> _state_estimator;
