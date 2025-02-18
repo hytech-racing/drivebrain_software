@@ -59,8 +59,6 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
     }
     
-    
-    
     if (!_controller->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
