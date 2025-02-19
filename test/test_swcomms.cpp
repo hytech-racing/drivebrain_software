@@ -6,23 +6,24 @@
 #include "hytech_msgs.pb.h"
 
 class MockLogger : public core::Logger {
-    public:
-        void log_string(const std::string& message, core::LogLevel level) override {
-            std::cout << "[LOG]: " << message << " [Level: " << static_cast<int>(level) << "]" << std::endl;
-        }
-    };
-    
+public:
+    MockLogger() : core::Logger(core::LogLevel::INFO) {}  
 
-class MockStateEstimator {
+    void log_string(const std::string &message, core::LogLevel lvl) {
+        std::cout << "[MOCK LOGGER] " << message << " [Level: " << static_cast<int>(lvl) << "]" << std::endl;
+    }
+};
+
+class MockStateEstimator : public core::StateEstimator {
 public:
     void handle_recv_process(std::shared_ptr<google::protobuf::Message> msg) {
-        auto sw_data = std::dynamic_pointer_cast<hytech_msgs::SWData>(msg);
-        if (sw_data) {
-            std::cout << "[STATE ESTIMATOR]: Received SWData Message\n";
-            std::cout << "  LF: " << sw_data->weight_lf() << "\n";
-            std::cout << "  LR: " << sw_data->weight_lr() << "\n";
-            std::cout << "  RF: " << sw_data->weight_rf() << "\n";
-            std::cout << "  RR: " << sw_data->weight_rr() << "\n";
+        auto scale_data = std::dynamic_pointer_cast<hytech_msgs::WeighScaleData>(msg);
+        if (scale_data) {
+            std::cout << "[STATE ESTIMATOR]: Received WeighScaleData Message\n";
+            std::cout << "  LF: " << scale_data->weight_lf() << "\n";
+            std::cout << "  LR: " << scale_data->weight_lr() << "\n";
+            std::cout << "  RF: " << scale_data->weight_rf() << "\n";
+            std::cout << "  RR: " << scale_data->weight_rr() << "\n";
         } else {
             std::cerr << "[ERROR]: Invalid Protobuf message received in MockStateEstimator!\n";
         }
@@ -31,18 +32,18 @@ public:
 
 int main() {
     boost::asio::io_context io;
-    core::JsonFileHandler json_handler;
-    MockLogger logger;
 
+    core::JsonFileHandler json_handler("config.json"); 
+    MockLogger logger;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger =
-    std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
-        "log_extension",
-        false,
-        [](std::shared_ptr<google::protobuf::Message> msg) { std::cout << "Logging message\n"; },
-        []() { std::cout << "Flush triggered\n"; },
-        [](const std::string &msg) { std::cout << "Error: " << msg << "\n"; },
-        [](std::shared_ptr<google::protobuf::Message> msg) { std::cout << "Message stored\n"; }
-    );
+        std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
+            "log_extension",
+            false,
+            [](std::shared_ptr<google::protobuf::Message> msg) { std::cout << "Logging message\n"; },
+            []() { std::cout << "Flush triggered\n"; },
+            [](const std::string &msg) { std::cout << "Error: " << msg << "\n"; },
+            [](std::shared_ptr<google::protobuf::Message> msg) { std::cout << "Message stored\n"; }
+        );
 
     MockStateEstimator state_estimator;
 
