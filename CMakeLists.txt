@@ -76,6 +76,7 @@ add_library(drivebrain_comms SHARED
     drivebrain_core_impl/drivebrain_comms/src/VNComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/MCUETHComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
+    drivebrain_core_impl/drivebrain_comms/src/SWComms.cpp
 )
 
 target_compile_features(drivebrain_comms PUBLIC cxx_std_17)
