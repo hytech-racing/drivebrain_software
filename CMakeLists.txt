@@ -322,5 +322,6 @@ include(GNUInstallDirs)
 install(TARGETS 
         alpha_build
         test_param_server
+        test_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
