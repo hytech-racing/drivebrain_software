@@ -4,7 +4,10 @@
 #include <thread>
 #include "SWComms.hpp"
 #include "hytech_msgs.pb.h"
+#include "StateEstimator.hpp"
+#include "Tire_Model_Codegen_MatlabModel.hpp"
 
+// Mock Logger
 class MockLogger : public core::Logger {
 public:
     MockLogger() : core::Logger(core::LogLevel::INFO) {}  
@@ -14,8 +17,14 @@ public:
     }
 };
 
+// Mock State Estimator
 class MockStateEstimator : public core::StateEstimator {
 public:
+    MockStateEstimator(core::Logger &logger, 
+                       std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger, 
+                       estimation::Tire_Model_Codegen_MatlabModel &matlab_estimator)
+        : core::StateEstimator(logger, message_logger, matlab_estimator) {}
+
     void handle_recv_process(std::shared_ptr<google::protobuf::Message> msg) {
         auto scale_data = std::dynamic_pointer_cast<hytech_msgs::WeighScaleData>(msg);
         if (scale_data) {
@@ -33,8 +42,10 @@ public:
 int main() {
     boost::asio::io_context io;
 
-    core::JsonFileHandler json_handler("config.json"); 
+    core::JsonFileHandler json_handler("config.json");  // Ensure this file exists
     MockLogger logger;
+    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator;  // Required for StateEstimator
+
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger =
         std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
             "log_extension",
@@ -45,7 +56,7 @@ int main() {
             [](std::shared_ptr<google::protobuf::Message> msg) { std::cout << "Message stored\n"; }
         );
 
-    MockStateEstimator state_estimator;
+    MockStateEstimator state_estimator(logger, message_logger, matlab_estimator);
 
     comms::SWDriver sw_driver(json_handler, logger, message_logger, state_estimator, io);
 
