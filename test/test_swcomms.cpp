@@ -7,7 +7,6 @@
 #include "StateEstimator.hpp"
 #include "Tire_Model_Codegen_MatlabModel.hpp"
 
-// Mock Logger
 class MockLogger : public core::Logger {
 public:
     MockLogger() : core::Logger(core::LogLevel::INFO) {}  
@@ -17,7 +16,6 @@ public:
     }
 };
 
-// Mock State Estimator
 class MockStateEstimator : public core::StateEstimator {
 public:
     MockStateEstimator(core::Logger &logger, 
@@ -42,9 +40,11 @@ public:
 int main() {
     boost::asio::io_context io;
 
-    core::JsonFileHandler json_handler("config.json");  // Ensure this file exists
+    core::JsonFileHandler json_handler("config.json");  
     MockLogger logger;
-    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator;  // Required for StateEstimator
+    bool construction_failed = false;
+
+    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator(logger, json_handler, construction_failed);
 
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger =
         std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
