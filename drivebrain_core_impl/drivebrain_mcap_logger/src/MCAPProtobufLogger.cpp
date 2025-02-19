@@ -54,7 +54,7 @@ namespace common
         // TODO handle message name de-confliction for messages of the same name
         // message-receiving .protos (non-base .proto files)
         auto receiving_descriptors = util::get_pb_descriptors({"hytech_msgs.proto", "hytech.proto"});
-        auto schema_only_descriptors = util::get_pb_descriptors({"base_msgs.proto"});
+        // auto schema_only_descriptors = util::get_pb_descriptors({"base_msgs.proto"});
 
         auto add_schema_func = [this](const std::vector<const google::protobuf::FileDescriptor *> &descriptors, bool skip_channel)
         {
@@ -74,7 +74,7 @@ namespace common
                 }
             }
         };
-        add_schema_func(schema_only_descriptors, true);
+        // add_schema_func(schema_only_descriptors, true);
         add_schema_func(receiving_descriptors, false);
 
         spdlog::info("Added message descriptions to MCAP"); 

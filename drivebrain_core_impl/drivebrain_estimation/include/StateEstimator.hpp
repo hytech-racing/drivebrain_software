@@ -39,8 +39,6 @@
 // TODO:
 // - [ ] write tests for the timestamp checking / verification of the state data
 
-
-
 // user story:
 // i want the ability to add in new estimation components by composition or construction
     // how will we know what the estimator is changing / adding as far as state variables? -> this will get annoying 
@@ -61,8 +59,9 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger, estimation::Tire_Model_Codegen_MatlabModel& matlab_estimator) 
-        : _logger(shared_logger), _message_logger(message_logger), _matlab_estimator(matlab_estimator)
+        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger)
+        : _logger(shared_logger), _message_logger(message_logger)
+        //  _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
             _raw_input_data = {};
@@ -70,7 +69,7 @@ namespace core
             _vehicle_state.prev_MCU_recv_millis = -1; // init the last mcu recv millis to < 0
             // initialize the 3 state variables to have a zero timestamp
             std::chrono::microseconds zero_start_time{0};
-            _timestamp_array = {zero_start_time};
+            _timestamp_array = {zero_start_time, zero_start_time, zero_start_time, zero_start_time};
         }
         ~StateEstimator() = default;
 
@@ -79,6 +78,18 @@ namespace core
         void set_previous_control_output(SpeedControlOut prev_control_output);
 
     private:
+        void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
+        void _recv_inverter_states(std::shared_ptr<google::protobuf::Message> msg);
+
+        template <size_t ind, typename inverter_dynamics_msg>
+        void _handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg);
+
+        Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);
+
+        std::shared_ptr<hytech_msgs::VehicleData> _set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
+        std::shared_ptr<hytech_msgs::VehicleData> _set_tv_status(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
+        std::shared_ptr<hytech_msgs::VehicleData> _set_ins_state_data(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out);
+
         template <size_t arr_len>
         bool _validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr);
 
@@ -89,9 +100,9 @@ namespace core
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;
         core::RawInputData _raw_input_data;
-        std::array<std::chrono::microseconds, 1> _timestamp_array;
+        std::array<std::chrono::microseconds, 4> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
-        estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
+        // estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 
     };
 }

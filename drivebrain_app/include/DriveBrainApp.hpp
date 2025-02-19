@@ -33,6 +33,7 @@ struct DriveBrainSettings {
     bool run_db_service{true};
     bool run_io_context{true};
     bool run_process_loop{true};
+    bool use_vectornav{true};
 };
 
 class DriveBrainApp {
@@ -46,7 +47,7 @@ public:
 private:
     // Private member functions
     void _process_loop();
-
+    void _signal_handler(int signal);
 private:
     // Private member variables
     static std::atomic<bool> _stop_signal;
@@ -57,14 +58,14 @@ private:
     boost::asio::io_context _io_context;
     
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 
     std::vector<core::common::Configurable*> _configurable_components;
     std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
     std::unique_ptr<control::SimpleController> _controller;
-    std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
+    // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
     std::unique_ptr<core::StateEstimator> _state_estimator;
