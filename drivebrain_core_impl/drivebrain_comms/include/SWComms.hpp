@@ -35,6 +35,7 @@ public:
 
     void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);
 
+private:
     core::Logger &_logger;
     core::StateEstimator &_state_estimator;
     boost::array<std::uint8_t, 512> _output_buff;
@@ -44,7 +45,6 @@ public:
     config _config;
 
     void _start_receive();
-
 };
 
-} 
+}

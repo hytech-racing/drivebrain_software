@@ -1,4 +1,4 @@
-#include "../include/SWComms.hpp"
+#include "SWComms.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -116,13 +116,11 @@ namespace comms {
                     }
                 }
 
-                std::shared_ptr<hytech_msgs::SWData> msg_out = std::make_shared<hytech_msgs::SWData>();
+                std::shared_ptr<hytech_msgs::WeighScaleData> msg_out = std::make_shared<hytech_msgs::WeighScaleData>();
                 msg_out->set_weight_lf(weight_lf);
                 msg_out->set_weight_lr(weight_lr);
                 msg_out->set_weight_rf(weight_rf);
                 msg_out->set_weight_rr(weight_rr);
-
-                log_proto_message(msg_out);
 
                 log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
 
