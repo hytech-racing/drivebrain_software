@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['main_0',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
+  ['main_0',['main',['../debug__main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;debug_main.cpp'],['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp']]],
   ['main_2ecpp_1',['main.cpp',['../main_8cpp.html',1,'']]],
   ['max_5freg_5ftorque_2',['max_reg_torque',['../structcontrol_1_1SimpleController_1_1config.html#a3d11c2e89175b9aefb342ef670d89a17',1,'control::SimpleController::config']]],
   ['max_5ftorque_3',['max_torque',['../structcontrol_1_1SimpleController_1_1config.html#afd17ead82481809412991c8748bce7b0',1,'control::SimpleController::config']]],

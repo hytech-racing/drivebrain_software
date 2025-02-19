@@ -117,70 +117,81 @@ $(function() {
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">// TODO:</span></div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">// - [ ] write tests for the timestamp checking / verification of the state data</span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">// user story:</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">// i want the ability to add in new estimation components by composition or construction</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">// how will we know what the estimator is changing / adding as far as state variables? -&gt; this will get annoying </span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment">// i dont want to have to change code in here every time we add a new state variable / data derived </span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment">// from the raw sensor data input</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">// new ideas: </span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment">// for a more generic state estimator we can template the class based on the raw input data struct </span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">// and the vehicle state struct. </span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment">// for now i will just move the state estimator into the estimation impl and call it a day </span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecore.html">core</a></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>{</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html">   57</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1StateEstimator.html">StateEstimator</a></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// user story:</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">// i want the ability to add in new estimation components by composition or construction</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">// how will we know what the estimator is changing / adding as far as state variables? -&gt; this will get annoying </span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">// i dont want to have to change code in here every time we add a new state variable / data derived </span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment">// from the raw sensor data input</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment">// new ideas: </span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment">// for a more generic state estimator we can template the class based on the raw input data struct </span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">// and the vehicle state struct. </span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">// for now i will just move the state estimator into the estimation impl and call it a day </span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecore.html">core</a></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>{</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html">   55</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1StateEstimator.html">StateEstimator</a></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    {</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">using </span>loggertype = core::MsgLogger&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keyword">using </span>loggertype = core::MsgLogger&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">   63</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">tsq</a> = core::common::ThreadSafeDeque&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#a4697bc21e323b5ad437772589166c6ee">   64</a></span>        <a class="code hl_function" href="classcore_1_1StateEstimator.html#a4697bc21e323b5ad437772589166c6ee">StateEstimator</a>(core::Logger &amp;shared_logger, std::shared_ptr&lt;loggertype&gt; message_logger, estimation::Tire_Model_Codegen_MatlabModel&amp; matlab_estimator) </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        : _logger(shared_logger), _message_logger(message_logger), _matlab_estimator(matlab_estimator)</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        {</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            _vehicle_state = {}; <span class="comment">// initialize to all zeros</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>            _raw_input_data = {};</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>            _vehicle_state.state_is_valid = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            _vehicle_state.prev_MCU_recv_millis = -1; <span class="comment">// init the last mcu recv millis to &lt; 0</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            <span class="comment">// initialize the 3 state variables to have a zero timestamp</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>            std::chrono::microseconds zero_start_time{0};</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            _timestamp_array = {zero_start_time};</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        }</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">   75</a></span>        <a class="code hl_function" href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">~StateEstimator</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">handle_recv_process</a>(std::shared_ptr&lt;google::protobuf::Message&gt; message);</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        std::pair&lt;core::VehicleState, bool&gt; <a class="code hl_function" href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">get_latest_state_and_validity</a>();</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">set_previous_control_output</a>(SpeedControlOut prev_control_output);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> arr_len&gt;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        <span class="keywordtype">bool</span> _validate_stamps(<span class="keyword">const</span> std::array&lt;std::chrono::microseconds, arr_len&gt; &amp;timestamp_arr);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        core::Logger &amp;_logger;</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordtype">bool</span> _run_recv_threads = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        std::mutex _state_mutex;</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        core::VehicleState _vehicle_state;</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        core::RawInputData _raw_input_data;</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        std::array&lt;std::chrono::microseconds, 1&gt; _timestamp_array;</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        std::shared_ptr&lt;loggertype&gt; _message_logger;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        estimation::Tire_Model_Codegen_MatlabModel&amp; _matlab_estimator;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">   61</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">tsq</a> = core::common::ThreadSafeDeque&lt;std::shared_ptr&lt;google::protobuf::Message&gt;&gt;;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#a042685d9f956e24c8b0db42a253668ae">   62</a></span>        <a class="code hl_function" href="classcore_1_1StateEstimator.html#a042685d9f956e24c8b0db42a253668ae">StateEstimator</a>(core::Logger &amp;shared_logger, std::shared_ptr&lt;loggertype&gt; message_logger)</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        : _logger(shared_logger), _message_logger(message_logger)</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <span class="comment">//  _matlab_estimator(matlab_estimator)</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>            _vehicle_state = {}; <span class="comment">// initialize to all zeros</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            _raw_input_data = {};</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>            _vehicle_state.state_is_valid = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>            _vehicle_state.prev_MCU_recv_millis = -1; <span class="comment">// init the last mcu recv millis to &lt; 0</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            <span class="comment">// initialize the 3 state variables to have a zero timestamp</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            std::chrono::microseconds zero_start_time{0};</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>            _timestamp_array = {zero_start_time, zero_start_time, zero_start_time, zero_start_time};</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        }</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">   74</a></span>        <a class="code hl_function" href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">~StateEstimator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">handle_recv_process</a>(std::shared_ptr&lt;google::protobuf::Message&gt; message);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        std::pair&lt;core::VehicleState, bool&gt; <a class="code hl_function" href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">get_latest_state_and_validity</a>();</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">set_previous_control_output</a>(SpeedControlOut prev_control_output);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordtype">void</span> _recv_low_level_state(std::shared_ptr&lt;google::protobuf::Message&gt; message);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keywordtype">void</span> _recv_inverter_states(std::shared_ptr&lt;google::protobuf::Message&gt; msg);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> ind, <span class="keyword">typename</span> inverter_dynamics_msg&gt;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <span class="keywordtype">void</span> _handle_set_inverter_dynamics(std::shared_ptr&lt;google::protobuf::Message&gt; msg);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_tire_dynamics(std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_tv_status(std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_ins_state_data(core::VehicleState current_state, std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> arr_len&gt;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <span class="keywordtype">bool</span> _validate_stamps(<span class="keyword">const</span> std::array&lt;std::chrono::microseconds, arr_len&gt; &amp;timestamp_arr);</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    };</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>}</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif </span><span class="comment">// __STATEESTIMATOR_H__</span></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html"><div class="ttname"><a href="classcore_1_1StateEstimator.html">core::StateEstimator</a></div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:58</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a2f9d0baf36be2ef74f578c8872680716"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">core::StateEstimator::set_previous_control_output</a></div><div class="ttdeci">void set_previous_control_output(SpeedControlOut prev_control_output)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:91</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a440b0802741aa04ab28432b12a2afd1c"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">core::StateEstimator::handle_recv_process</a></div><div class="ttdeci">void handle_recv_process(std::shared_ptr&lt; google::protobuf::Message &gt; message)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:8</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a4697bc21e323b5ad437772589166c6ee"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a4697bc21e323b5ad437772589166c6ee">core::StateEstimator::StateEstimator</a></div><div class="ttdeci">StateEstimator(core::Logger &amp;shared_logger, std::shared_ptr&lt; loggertype &gt; message_logger, estimation::Tire_Model_Codegen_MatlabModel &amp;matlab_estimator)</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:64</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a51d666139617d3e96b541382f381ba06"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">core::StateEstimator::get_latest_state_and_validity</a></div><div class="ttdeci">std::pair&lt; core::VehicleState, bool &gt; get_latest_state_and_validity()</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:97</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_aa21c0dc03919b18d25252a5dde4b88d8"><div class="ttname"><a href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">core::StateEstimator::tsq</a></div><div class="ttdeci">core::common::ThreadSafeDeque&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; tsq</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:63</div></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        core::Logger &amp;_logger;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordtype">bool</span> _run_recv_threads = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        std::mutex _state_mutex;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        core::VehicleState _vehicle_state;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        core::RawInputData _raw_input_data;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        std::array&lt;std::chrono::microseconds, 4&gt; _timestamp_array;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        std::shared_ptr&lt;loggertype&gt; _message_logger;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        <span class="comment">// estimation::Tire_Model_Codegen_MatlabModel&amp; _matlab_estimator;</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    };</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>}</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">#endif </span><span class="comment">// __STATEESTIMATOR_H__</span></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html"><div class="ttname"><a href="classcore_1_1StateEstimator.html">core::StateEstimator</a></div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:56</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a042685d9f956e24c8b0db42a253668ae"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a042685d9f956e24c8b0db42a253668ae">core::StateEstimator::StateEstimator</a></div><div class="ttdeci">StateEstimator(core::Logger &amp;shared_logger, std::shared_ptr&lt; loggertype &gt; message_logger)</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:62</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a2f9d0baf36be2ef74f578c8872680716"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">core::StateEstimator::set_previous_control_output</a></div><div class="ttdeci">void set_previous_control_output(SpeedControlOut prev_control_output)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:162</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a440b0802741aa04ab28432b12a2afd1c"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">core::StateEstimator::handle_recv_process</a></div><div class="ttdeci">void handle_recv_process(std::shared_ptr&lt; google::protobuf::Message &gt; message)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:15</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a51d666139617d3e96b541382f381ba06"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">core::StateEstimator::get_latest_state_and_validity</a></div><div class="ttdeci">std::pair&lt; core::VehicleState, bool &gt; get_latest_state_and_validity()</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:319</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_aa21c0dc03919b18d25252a5dde4b88d8"><div class="ttname"><a href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">core::StateEstimator::tsq</a></div><div class="ttdeci">core::common::ThreadSafeDeque&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; tsq</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:61</div></div>
 <div class="ttc" id="aclasscore_1_1StateEstimator_html_afd5ce02c72067f4a3b35a8a1ad0e991a"><div class="ttname"><a href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">core::StateEstimator::~StateEstimator</a></div><div class="ttdeci">~StateEstimator()=default</div></div>
 <div class="ttc" id="anamespacecore_html"><div class="ttname"><a href="namespacecore.html">core</a></div><div class="ttdef"><b>Definition:</b> foxglove_server.hpp:24</div></div>
 </div><!-- fragment --></div><!-- contents -->
