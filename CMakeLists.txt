@@ -75,6 +75,7 @@ add_library(drivebrain_comms SHARED
     drivebrain_core_impl/drivebrain_comms/src/CANComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/VNComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/MCUETHComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/AeroComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
 )
 
