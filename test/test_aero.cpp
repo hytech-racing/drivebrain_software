@@ -20,14 +20,37 @@ public:
 
 int main() {
     boost::asio::io_context io;
-    comms::AeroDriver driver;
+    core::JsonFileHandler json_handler("/path/to/config.json");
+    core::Logger logger(core::LogLevel::INFO);
+    auto message_logger = std::make_shared<loggertype>(
+        "aero_test_log",
+        true,
+        [](std::shared_ptr<google::protobuf::Message> msg) {
+            std::cout << "Logging test message." << std::endl;
+        },
+        []() {
+            std::cout << "Flushing test logs." << std::endl;
+        },
+        [](const std::string &error) {
+            std::cerr << "Logger test error: " << error << std::endl;
+        },
+        [](std::shared_ptr<google::protobuf::Message> status) {
+            std::cout << "Test status update received." << std::endl;
+        }
+    );
+    bool construction_failed = false;
+    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator(logger, json_handler, construction_failed);
 
+    if (construction_failed) {
+        std::cerr << "Matlab Model Test Construction Failed." << std::endl;
+        return 1;
+    }
+    core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
+    comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);
     if (!driver.init()) {
         return 1;
     }
-
     driver.start_receive();
     io.run();
-
     return 0;
 }

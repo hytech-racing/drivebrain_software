@@ -125,14 +125,11 @@ namespace comms {
 
 int main() {
     boost::asio::io_context io;
-
     core::JsonFileHandler json_handler("/path/to/config.json");
-
-    core::Logger logger("AeroDriverLogger");
-
+    core::Logger logger(core::LogLevel::INFO);
     auto message_logger = std::make_shared<loggertype>(
-        "aero_log",               
-        true,                       
+        "aero_log",                 
+        true,                      
         [](std::shared_ptr<google::protobuf::Message> msg) { 
             std::cout << "Logging message." << std::endl; 
         },
@@ -146,19 +143,21 @@ int main() {
             std::cout << "Status update received." << std::endl; 
         }
     );
-
-    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator;
+    bool construction_failed = false;
+    estimation::Tire_Model_Codegen_MatlabModel matlab_estimator(logger, json_handler, construction_failed);
+    if (construction_failed) {
+        std::cerr << "Matlab Model Construction Failed." << std::endl;
+        return 1;
+    }
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
     comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);
-
     if (!driver.init()) {
         return 1;
     }
-
     driver.start_receive();
     io.run();
-
     return 0;
 }
+
 
 
