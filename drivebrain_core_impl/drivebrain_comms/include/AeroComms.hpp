@@ -19,7 +19,6 @@
 #include <unordered_map>
 #include <google/protobuf/message.h>
 
-
 using SerialPort = boost::asio::serial_port;
 using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 
@@ -29,10 +28,15 @@ namespace comms {
     public:
         AeroDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io);
         bool init();
+        void start_receive();
     
     private:
         void _start_receive(boost::asio::serial_port& serial_port);
-        void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);
+        void standby_mode();
+        void configure_serial_port(boost::asio::serial_port& serial);
+        void send_command(boost::asio::serial_port& serial, const std::string& command);
+        std::vector<float> extract_sensor_readings(const boost::array<char, 512>& buffer);
+        void log_proto_message(const std::vector<float>& readings);
     
         core::Logger &_logger;
         core::StateEstimator &_state_estimator;
