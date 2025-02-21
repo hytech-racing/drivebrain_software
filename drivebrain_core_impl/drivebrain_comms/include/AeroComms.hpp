@@ -27,8 +27,10 @@ namespace comms {
     class AeroDriver {
     public:
         AeroDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io);
-        bool init();
         void start_receive();
+        bool init();
+
+        
     
     private:
         void _start_receive(boost::asio::serial_port& serial_port);
