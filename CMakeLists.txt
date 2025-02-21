@@ -16,6 +16,7 @@ find_package(spdlog REQUIRED)
 ### generated via nix-proto from hytech's generated CAN protobufs
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
+find_package(simulink_automation_msgs_proto_cpp CONFIG REQUIRED)
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/version_header/versions.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/version_header/versions.h"
@@ -178,6 +179,7 @@ target_link_libraries(drivebrain_estimation PUBLIC
     codegen::matlab_model
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    simulink_automation_msgs_proto_cpp::simulink_automation_msgs_proto_cpp
     protobuf::libprotobuf
 )
 

@@ -521,21 +521,35 @@
         "nebs-packages": "nebs-packages",
         "nix-proto": "nix-proto_2",
         "nixpkgs": "nixpkgs_3",
+        "simulink-automation-msgs": "simulink-automation-msgs",
         "simulink-automation-src": "simulink-automation-src",
         "vn_driver_lib": "vn_driver_lib"
+      }
+    },
+    "simulink-automation-msgs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740112276,
+        "narHash": "sha256-4llO21bSeV/8wX8kRZ+KuwwF/5FpjU8/+XPNNZzDmmw=",
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/proto_outputs.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/proto_outputs.tar.gz"
       }
     },
     "simulink-automation-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1731476452,
-        "narHash": "sha256-8/4zg+iiuBELUoujGuklY3vt9inQdHSgurq8mgZbByo=",
+        "lastModified": 1740112276,
+        "narHash": "sha256-tMmr9WRYxi0fIo5/VhzLEhk/rB0TIlW2AmZuZSfs55g=",
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/matlab_math.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz"
+        "url": "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/matlab_math.tar.gz"
       }
     },
     "systems": {

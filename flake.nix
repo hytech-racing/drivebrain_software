@@ -42,12 +42,17 @@
     };
 
     simulink-automation-src = {
-        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
+        url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/matlab_math.tar.gz";
         flake = false;
     };
 
+    simulink-automation-msgs = {
+      url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2025.02.21_04-31/proto_outputs.tar.gz";
+      flake = false;
+    };
+
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, simulink-automation-msgs, db-core-src, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
@@ -73,6 +78,15 @@
               namespace = "db_service";
             };
           };
+
+      };
+
+      simulink_automation_msgs_overlay = nix-proto.generateOverlays' {
+        simulink_automation_msgs = nix-proto.mkProtoDerivation {
+          name = "simulink_automation_msgs";
+          version = "1.0.0";
+          src = simulink-automation-msgs;
+        };
       };
 
       db_core_overlay = final: prev: {
@@ -89,7 +103,7 @@
         })
         simulink_automation_overlay
         db_core_overlay
-      ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+      ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays) ++ (nix-proto.lib.overlayToList simulink_automation_msgs_overlay);
 
     in
     flake-parts.lib.mkFlake { inherit inputs; }

@@ -4,6 +4,7 @@
 #include "hytech_msgs.pb.h"
 #include <Tire_Model_Codegen_MatlabModel.hpp>
 using namespace core;
+using namespace estimation;
 
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message)
 {
@@ -146,7 +147,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     };
 
     
-    auto res = _matlab_estimator.evaluate_estimator(model_inputs);
+    Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res = _matlab_estimator.evaluate_estimator(model_inputs);
     auto matlab_math_end = std::chrono::high_resolution_clock::now();
     auto state_mutex_2_start = std::chrono::high_resolution_clock::now();
     {
@@ -154,6 +155,9 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         _vehicle_state.matlab_math_temp_out = {res.torq_req_FL,res.torq_req_FR,res.torq_req_RL,res.torq_req_RR};
     }
     auto state_mutex_2_end = std::chrono::high_resolution_clock::now();
+
+    std::shared_ptr<simulink_estimation_msgs::Outports> packed_res = std::make_shared<simulink_estimation_msgs::Outports>();
+    _matlab_estimator.update_proto_info(res, packed_res);
 
     hytech_msgs::TireDynamics *current_tire_dynamics = msg_out->mutable_tire_dynamics();
     auto current_tire_forces = current_tire_dynamics->mutable_tire_forces_n();

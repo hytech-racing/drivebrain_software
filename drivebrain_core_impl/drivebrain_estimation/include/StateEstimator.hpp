@@ -20,6 +20,7 @@
 
 #include "hytech_msgs.pb.h"
 #include "base_msgs.pb.h"
+#include <Tire_Model_Codegen_estimation_msgs.pb.h>
 
 // protobuf
 #include <google/protobuf/any.pb.h>
