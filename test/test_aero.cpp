@@ -43,7 +43,6 @@ int main() {
 
     if (construction_failed) {
         std::cerr << "Matlab Model Test Construction Failed." << std::endl;
-        return 1;
     }
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
     comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);

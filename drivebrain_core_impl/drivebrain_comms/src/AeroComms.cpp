@@ -76,11 +76,26 @@ namespace comms {
 
     void AeroDriver::standby_mode() {
         _logger.log_string("No input detected. Entering standby mode.", core::LogLevel::INFO);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        _logger.log_string("Monitoring for new input...", core::LogLevel::INFO);
-        _start_receive(_serial1);
-        _start_receive(_serial2);
+    
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+    
+            boost::system::error_code ec;
+            _serial1.open("/dev/ttyACM0", ec);
+            _serial2.open("/dev/ttyACM1", ec);
+    
+            if (!ec) {
+                _logger.log_string("Device reconnected. Restarting data stream.", core::LogLevel::INFO);
+                configure_serial_port(_serial1);
+                configure_serial_port(_serial2);
+                send_command(_serial1, "@D");
+                send_command(_serial2, "@D");
+                start_receive();
+                return;
+            }
+        }
     }
+    
 
     std::vector<float> AeroDriver::extract_sensor_readings(const boost::array<char, 512>& buffer) {
         std::vector<float> readings;
@@ -147,7 +162,6 @@ int main() {
     estimation::Tire_Model_Codegen_MatlabModel matlab_estimator(logger, json_handler, construction_failed);
     if (construction_failed) {
         std::cerr << "Matlab Model Construction Failed." << std::endl;
-        return 1;
     }
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
     comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);
