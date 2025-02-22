@@ -108,7 +108,7 @@ $(function() {
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#include &lt;VehicleDataTypes.hpp&gt;</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#include &lt;Logger.hpp&gt;</span></div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#include &lt;MsgLogger.hpp&gt;</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#include &lt;Tire_Model_Codegen_MatlabModel.hpp&gt;</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">#include &lt;Configurable.hpp&gt;</span></div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment">// while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads</span></div>
@@ -162,35 +162,30 @@ $(function() {
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> ind, <span class="keyword">typename</span> inverter_dynamics_msg&gt;</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <span class="keywordtype">void</span> _handle_set_inverter_dynamics(std::shared_ptr&lt;google::protobuf::Message&gt; msg);</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_ins_state_data(core::VehicleState current_state, std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_tire_dynamics(std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_tv_status(std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        std::shared_ptr&lt;hytech_msgs::VehicleData&gt; _set_ins_state_data(core::VehicleState current_state, std::shared_ptr&lt;hytech_msgs::VehicleData&gt; msg_out);</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> arr_len&gt;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <span class="keywordtype">bool</span> _validate_stamps(<span class="keyword">const</span> std::array&lt;std::chrono::microseconds, arr_len&gt; &amp;timestamp_arr);</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        core::Logger &amp;_logger;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordtype">bool</span> _run_recv_threads = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        std::mutex _state_mutex;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        core::VehicleState _vehicle_state;</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        core::RawInputData _raw_input_data;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        std::array&lt;std::chrono::microseconds, 4&gt; _timestamp_array;</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        std::shared_ptr&lt;loggertype&gt; _message_logger;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        <span class="comment">// estimation::Tire_Model_Codegen_MatlabModel&amp; _matlab_estimator;</span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    };</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>}</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">#endif </span><span class="comment">// __STATEESTIMATOR_H__</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> arr_len&gt;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        <span class="keywordtype">bool</span> _validate_stamps(<span class="keyword">const</span> std::array&lt;std::chrono::microseconds, arr_len&gt; &amp;timestamp_arr);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        core::Logger &amp;_logger;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <span class="keywordtype">bool</span> _run_recv_threads = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        std::mutex _state_mutex;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        core::VehicleState _vehicle_state;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        core::RawInputData _raw_input_data;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        std::array&lt;std::chrono::microseconds, 4&gt; _timestamp_array;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        std::shared_ptr&lt;loggertype&gt; _message_logger;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    };</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>}</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">#endif </span><span class="comment">// __STATEESTIMATOR_H__</span></div>
 <div class="ttc" id="aclasscore_1_1StateEstimator_html"><div class="ttname"><a href="classcore_1_1StateEstimator.html">core::StateEstimator</a></div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:56</div></div>
 <div class="ttc" id="aclasscore_1_1StateEstimator_html_a042685d9f956e24c8b0db42a253668ae"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a042685d9f956e24c8b0db42a253668ae">core::StateEstimator::StateEstimator</a></div><div class="ttdeci">StateEstimator(core::Logger &amp;shared_logger, std::shared_ptr&lt; loggertype &gt; message_logger)</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:62</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a2f9d0baf36be2ef74f578c8872680716"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">core::StateEstimator::set_previous_control_output</a></div><div class="ttdeci">void set_previous_control_output(SpeedControlOut prev_control_output)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:162</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a440b0802741aa04ab28432b12a2afd1c"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">core::StateEstimator::handle_recv_process</a></div><div class="ttdeci">void handle_recv_process(std::shared_ptr&lt; google::protobuf::Message &gt; message)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:15</div></div>
-<div class="ttc" id="aclasscore_1_1StateEstimator_html_a51d666139617d3e96b541382f381ba06"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">core::StateEstimator::get_latest_state_and_validity</a></div><div class="ttdeci">std::pair&lt; core::VehicleState, bool &gt; get_latest_state_and_validity()</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:319</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a2f9d0baf36be2ef74f578c8872680716"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">core::StateEstimator::set_previous_control_output</a></div><div class="ttdeci">void set_previous_control_output(SpeedControlOut prev_control_output)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:165</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a440b0802741aa04ab28432b12a2afd1c"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">core::StateEstimator::handle_recv_process</a></div><div class="ttdeci">void handle_recv_process(std::shared_ptr&lt; google::protobuf::Message &gt; message)</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:18</div></div>
+<div class="ttc" id="aclasscore_1_1StateEstimator_html_a51d666139617d3e96b541382f381ba06"><div class="ttname"><a href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">core::StateEstimator::get_latest_state_and_validity</a></div><div class="ttdeci">std::pair&lt; core::VehicleState, bool &gt; get_latest_state_and_validity()</div><div class="ttdef"><b>Definition:</b> StateEstimator.cpp:195</div></div>
 <div class="ttc" id="aclasscore_1_1StateEstimator_html_aa21c0dc03919b18d25252a5dde4b88d8"><div class="ttname"><a href="classcore_1_1StateEstimator.html#aa21c0dc03919b18d25252a5dde4b88d8">core::StateEstimator::tsq</a></div><div class="ttdeci">core::common::ThreadSafeDeque&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; tsq</div><div class="ttdef"><b>Definition:</b> StateEstimator.hpp:61</div></div>
 <div class="ttc" id="aclasscore_1_1StateEstimator_html_afd5ce02c72067f4a3b35a8a1ad0e991a"><div class="ttname"><a href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">core::StateEstimator::~StateEstimator</a></div><div class="ttdeci">~StateEstimator()=default</div></div>
 <div class="ttc" id="anamespacecore_html"><div class="ttname"><a href="namespacecore.html">core</a></div><div class="ttdef"><b>Definition:</b> foxglove_server.hpp:24</div></div>
