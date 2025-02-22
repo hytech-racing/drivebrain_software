@@ -41,17 +41,12 @@
       flake = false;
     };
 
-    simulink-automation-src = {
-      url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
-      flake = false;
-    };
-
     nanopb-proto-api = {
       url = "github:nanopb/nanopb";
       flake = false;
     };
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, nanopb-proto-api, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, nanopb-proto-api, ... }@inputs:
     let
       nanopb-api = nix-proto.mkProtoDerivation {
         name = "nanopb-api";
@@ -98,10 +93,6 @@
         drivebrain_core = final.callPackage ./db-core.nix { inherit db-core-src; };
       };
 
-      simulink_automation_overlay = final: prev: {
-        simulink_automation = final.callPackage ./simulink_automation.nix { inherit simulink-automation-src; };
-      };
-
       my_overlays = [
         (final: prev: {
           # ideTools = import ./force-compile-commands.nix { lib = inputs.nixpkgs.lib; };
@@ -122,7 +113,6 @@
           };
         }
         )
-        simulink_automation_overlay
         db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
@@ -161,7 +151,6 @@
             packages.default = pkgs.drivebrain_software;
             packages.drivebrain_software = pkgs.drivebrain_software;
             packages.drivebrain_core = pkgs.drivebrain_core;
-            packages.simulink_automation = pkgs.simulink_automation;
 
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
@@ -175,26 +164,11 @@
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
-              nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli ] ++ pkgs.drivebrain_software.propagatedBuildInputs;
-              # inputsFrom = [
-              #   pkgs.drivebrain_software
-              # ];
-
-            };
-
-            devShells.sim_automath = pkgs.mkShell rec {
-              name = "nix-devshell";
-              shellHook =
-                let icon = "f121";
-                in ''
-                  
-                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-                  
-                '';
+              packages = [ pkgs.mcap-cli ];
               inputsFrom = [
-                pkgs.simulink_automation
+                pkgs.drivebrain_software
               ];
+
             };
 
             devShells.tests = pkgs.mkShell rec {

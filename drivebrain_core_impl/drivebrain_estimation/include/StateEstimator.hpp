@@ -30,7 +30,7 @@
 #include <VehicleDataTypes.hpp>
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
-#include <Tire_Model_Codegen_MatlabModel.hpp>
+
 #include <Configurable.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
@@ -84,10 +84,6 @@ namespace core
         template <size_t ind, typename inverter_dynamics_msg>
         void _handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg);
 
-        Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T _eval_estimator(core::VehicleState vehicle_state, core::RawInputData raw_input_data);
-
-        std::shared_ptr<hytech_msgs::VehicleData> _set_tire_dynamics(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
-        std::shared_ptr<hytech_msgs::VehicleData> _set_tv_status(std::shared_ptr<hytech_msgs::VehicleData> msg_out, Tire_Model_Codegen::ExtY_Tire_Model_Codegen_T res);
         std::shared_ptr<hytech_msgs::VehicleData> _set_ins_state_data(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out);
 
         template <size_t arr_len>
@@ -102,7 +98,6 @@ namespace core
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 4> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
-        // estimation::Tire_Model_Codegen_MatlabModel& _matlab_estimator;
 
     };
 }
