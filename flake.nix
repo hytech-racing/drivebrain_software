@@ -95,8 +95,6 @@
 
       my_overlays = [
         (final: prev: {
-          # ideTools = import ./force-compile-commands.nix { lib = inputs.nixpkgs.lib; };
-          # drivebrain_software = final.callPackage ./default.nix { inherit ideTools; };
           drivebrain_software = final.callPackage ./default.nix { };
         })
         (self: super: {
