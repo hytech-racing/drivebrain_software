@@ -50,8 +50,9 @@ bool control::SimpleController::init()
     std::optional rear_torque_scale = get_live_parameter<float>("rear_torque_scale");
     std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
     std::optional positive_speed_set = get_live_parameter<speed_m_s>("positive_speed_set");
+    std::optional max_power_kw = get_live_parameter<float>("max_power_kw");
 
-    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set))
+    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set && max_power_kw))
     {
         return false;
     }
@@ -114,61 +115,66 @@ core::SpeedControlOut control::SimpleController::step_controller(const core::Veh
         cmd_out.torque_lim_nm.RR = (torqueRequest * cur_config.rear_torque_scale);
     }
 
+    cmd_out = _apply_power_limit(cmd_out, in.current_rpms);
+
+    return cmd_out;
+}
+
+core::SpeedControlOut control::SimpleController::_apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms)
+{
+    auto cmd_out = current_control;
     // Apply power limit (basically a re-implementation of MCU)
     float net_torque_mag = 0;
     float net_power = 0;
 
-    net_torque_mag += abs(cmd_out.torque_lim_nm.FL);
-    net_torque_mag += abs(cmd_out.torque_lim_nm.FR);
-    net_torque_mag += abs(cmd_out.torque_lim_nm.RL);
-    net_torque_mag += abs(cmd_out.torque_lim_nm.RR);
+    net_torque_mag += ::abs(cmd_out.torque_lim_nm.FL);
+    net_torque_mag += ::abs(cmd_out.torque_lim_nm.FR);
+    net_torque_mag += ::abs(cmd_out.torque_lim_nm.RL);
+    net_torque_mag += ::abs(cmd_out.torque_lim_nm.RR);
 
-    net_power += abs(cmd_out.torque_lim_nm.FL) * (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND);
-    net_power += abs(cmd_out.torque_lim_nm.FR) * (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND);
-    net_power += abs(cmd_out.torque_lim_nm.RL) * (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND);
-    net_power += abs(cmd_out.torque_lim_nm.RR) * (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += ::abs(cmd_out.torque_lim_nm.FL) * (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += ::abs(cmd_out.torque_lim_nm.FR) * (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += ::abs(cmd_out.torque_lim_nm.RL) * (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND);
+    net_power += ::abs(cmd_out.torque_lim_nm.RR) * (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND);
 
-    if (net_power > constants::POWER_LIMIT) {
+    auto max_power_watt = _config.max_power_kw * 1000.0f;
+    if (net_power > max_power_watt) {
 
         /* FL */
         // 1. Calculate the torque percent (individual torque/total torque)
         // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
-        float torque_percent_FL = abs(cmd_out.torque_lim_nm.FL / net_torque_mag);
-        float power_per_corner_FL = (torque_percent_FL * constants::POWER_LIMIT);
+        float torque_percent_FL = ::abs(cmd_out.torque_lim_nm.FL / net_torque_mag);
+        float power_per_corner_FL = (torque_percent_FL * max_power_watt);
 
         // 3. Divide power by rads per seconds to get torque per corner
-        cmd_out.torque_lim_nm.FL = abs(power_per_corner_FL / (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND));
+        cmd_out.torque_lim_nm.FL = ::abs(power_per_corner_FL / (current_rpms.FL * constants::RPM_TO_RAD_PER_SECOND));
 
         /* FR */
         // 1. Calculate the torque percent (individual torque/total torque)
         // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
-        float torque_percent_FR = abs(cmd_out.torque_lim_nm.FR / net_torque_mag);
-        float power_per_corner_FR = (torque_percent_FR * constants::POWER_LIMIT);
+        float torque_percent_FR = ::abs(cmd_out.torque_lim_nm.FR / net_torque_mag);
+        float power_per_corner_FR = (torque_percent_FR * max_power_watt);
 
         // 3. Divide power by rads per seconds to get torque per corner
-        cmd_out.torque_lim_nm.FR = abs(power_per_corner_FR / (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND));
+        cmd_out.torque_lim_nm.FR = ::abs(power_per_corner_FR / (current_rpms.FR * constants::RPM_TO_RAD_PER_SECOND));
 
         /* RL */
         // 1. Calculate the torque percent (individual torque/total torque)
         // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
-        float torque_percent_RL = abs(cmd_out.torque_lim_nm.RL / net_torque_mag);
-        float power_per_corner_RL = (torque_percent_RL * constants::POWER_LIMIT);
+        float torque_percent_RL = ::abs(cmd_out.torque_lim_nm.RL / net_torque_mag);
+        float power_per_corner_RL = (torque_percent_RL * max_power_watt);
 
         // 3. Divide power by rads per seconds to get torque per corner
-        cmd_out.torque_lim_nm.RL = abs(power_per_corner_RL / (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND));
+        cmd_out.torque_lim_nm.RL = ::abs(power_per_corner_RL / (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND));
 
         /* RR */
         // 1. Calculate the torque percent (individual torque/total torque)
         // 2. Multiply the torque percent by the power limit to ensure that all four powers add up to power limit
-        float torque_percent_RR = abs(cmd_out.torque_lim_nm.RR / net_torque_mag);
-        float power_per_corner_RR = (torque_percent_RR * constants::POWER_LIMIT);
+        float torque_percent_RR = ::abs(cmd_out.torque_lim_nm.RR / net_torque_mag);
+        float power_per_corner_RR = (torque_percent_RR * max_power_watt);
 
         // 3. Divide power by rads per seconds to get torque per corner
-        cmd_out.torque_lim_nm.RR = abs(power_per_corner_RR / (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND));
+        cmd_out.torque_lim_nm.RR = ::abs(power_per_corner_RR / (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND));
 
     }
-
-
-
-    return cmd_out;
 }

@@ -32,6 +32,7 @@ namespace control
         float rear_torque_scale;  
         float regen_torque_scale; 
         speed_m_s positive_speed_set;
+        float max_power_kw;
     };
         SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
         float get_dt_sec() override { 
@@ -42,6 +43,7 @@ namespace control
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
+        core::SpeedControlOut _apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms);
     private:
         std::mutex _config_mutex;
         config _config;

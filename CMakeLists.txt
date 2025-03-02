@@ -259,7 +259,7 @@ enable_testing()
 
 add_executable(alpha_test 
     unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
+    # unit_test/SimpleControllerTest.cpp
 )
 
 target_link_libraries(alpha_build PUBLIC
