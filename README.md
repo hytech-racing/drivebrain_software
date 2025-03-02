@@ -18,7 +18,7 @@ This repo contains the main executable that runs on the Drivebrain embedded comp
 
 as can be seen in the `flake.nix` file, there are upstream repos that this software depends upon, most of them are not written by us directly and some of them are auto-generated (such as the controller/estimator library and CAN library)
 
-chief among the upstream repo libraries is the `drivebrain_core` repo which contains code that is common to both `drivebrain_software` and other upstream libraries that `drivebrain_software` depends upon, such as controller, estimator and driver lib implementations. 
+chief among the upstream repo libraries is the [`drivebrain_core`](https://github.com/hytech-racing/drivebrain_core) repo which contains code that is common to both `drivebrain_software` and other upstream libraries that `drivebrain_software` depends upon, such as controller, estimator and driver lib implementations. 
 
 ```mermaid
 flowchart TD
