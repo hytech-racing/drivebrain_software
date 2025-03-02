@@ -37,7 +37,7 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:JohnNesbit/drivebrain_core/17d90e3eacf9d4a23ba43dc8dfabf1412b0b588a";
+      url = "github:hytech-racing/drivebrain_core/feature/ControllerMUX";
       flake = false;
     };
 

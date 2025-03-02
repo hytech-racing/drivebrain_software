@@ -121,30 +121,17 @@ void DriveBrainApp::_process_loop() {
 
         //logic for retrieving whichever type is currently in the variant, i dont think we need to check if it has monostate
         core::SpeedControlOut speed_cmd_out;
-        core::TorqueControlOut torque_cmd_out;
         if(std::holds_alternative<core::SpeedControlOut>(out_struct.out))
         {
             speed_cmd_out = std::get<core::SpeedControlOut>(out_struct.out);
         }
         else if(std::holds_alternative<core::TorqueControlOut>(out_struct.out))
         {
-            torque_cmd_out = std::get<core::TorqueControlOut>(out_struct.out);
+            speed_cmd_out = {0, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm};
         }
         //for when we have both controllers the vision is if(speed_cmd_out) -> else 
         auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
-
-
-        //_state_estimator->set_previous_control_output(out_struct);
-        // TCMUX code works with ControllerOutput, but the state estimator only works with speed controls it looks like
-        // so we grab the speed if that is what the variant contains
-        // this means that we actuall can only use one Controller, the speed one, so we gotta re-write state estimator :/
-        if (auto speedOut = std::get_if<core::SpeedControlOut>(&out_struct.out)) {
-            _state_estimator->set_previous_control_output(*speedOut);
-        } else {
-            // if the std::variant does not contain SpeedControlOut(we're so cooked)
-            std::cerr << "Error: ControllerOutput is monostate or TorqueControlOut" << std::endl;
-        }
-
+        _state_estimator->set_previous_control_output(speed_cmd_out);
 
         if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
             desired_rpm_msg->set_drivebrain_set_rpm_fl(0);

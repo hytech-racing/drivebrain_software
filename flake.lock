@@ -52,17 +52,17 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1740936071,
+        "lastModified": 1740951635,
         "narHash": "sha256-Js+xaJFIjGIGWwmlOp4sl4FgNGxP7qbEXg6kkzGVfbs=",
-        "owner": "JohnNesbit",
+        "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "17d90e3eacf9d4a23ba43dc8dfabf1412b0b588a",
+        "rev": "2303c612b5b4fb9e4975811e77079f2b25193399",
         "type": "github"
       },
       "original": {
-        "owner": "JohnNesbit",
+        "owner": "hytech-racing",
+        "ref": "feature/ControllerMUX",
         "repo": "drivebrain_core",
-        "rev": "17d90e3eacf9d4a23ba43dc8dfabf1412b0b588a",
         "type": "github"
       }
     },
