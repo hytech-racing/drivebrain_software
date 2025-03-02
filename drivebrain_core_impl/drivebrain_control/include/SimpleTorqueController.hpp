@@ -3,20 +3,14 @@
 #include <Configurable.hpp>
 #include <Logger.hpp>
 #include <hytech_msgs.pb.h>
-#include <Literals.hpp>
-#include <hytech.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
 #include <mutex>
 
-// ABOUT: this controller is an implementation of mode 0
-
-// this controller will be reactionary for now
+// ABOUT: this controller is an implementation of mode 0 but with torque type shit 
 namespace control
 {
-
-    // TODO make the output CAN message for the drivetrain, rpms telem is just a standin for now
-    class SimpleController : Controller<core::SpeedControlOut, core::VehicleState>, public core::common::Configurable
+    class SimpleTorqueController : public Controller<core::ControllerOutput, core::VehicleState>, public core::common::Configurable
     {
     public:
         // rear_torque_scale:
@@ -27,18 +21,18 @@ namespace control
         // torque on the front, 1 = 50/50, 2 = all regen torque on the rear
         
         struct config {
-        torque_nm max_torque;
-        torque_nm max_reg_torque;
-        float rear_torque_scale;  
-        float regen_torque_scale; 
-        speed_m_s positive_speed_set;
-    };
-        SimpleController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleController") {}
+            torque_nm max_torque;
+            torque_nm max_reg_torque;
+            float rear_torque_scale;  
+            float regen_torque_scale;
+        };
+        SimpleTorqueController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleTorqueController") {}
+        SimpleTorqueController(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::string config) : Configurable(logger, json_file_handler, config) {}
         float get_dt_sec() override { 
             return (0.001); 
         }
         bool init() override;
-        core::SpeedControlOut step_controller(const core::VehicleState &in) override;
+        core::ControllerOutput step_controller(const core::VehicleState &in) override;
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);

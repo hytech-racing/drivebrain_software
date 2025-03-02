@@ -1,6 +1,7 @@
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
+#include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
