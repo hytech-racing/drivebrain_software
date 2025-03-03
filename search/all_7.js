@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['init_0',['init',['../classcomms_1_1CANDriver.html#a56b1e7e4480c2c300ad587f2deb5d505',1,'comms::CANDriver::init()'],['../classcomms_1_1VNDriver.html#afd0663417b9b10141990cec3774a037c',1,'comms::VNDriver::init()'],['../classcontrol_1_1SimpleController.html#a2477197b5f34011095fab23865e55bc8',1,'control::SimpleController::init()']]]
+  ['handle_5frecv_5fprocess_0',['handle_recv_process',['../classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c',1,'core::StateEstimator']]]
 ];
