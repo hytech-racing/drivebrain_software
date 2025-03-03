@@ -3,7 +3,8 @@
 
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
+#include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
@@ -64,7 +65,13 @@ private:
 
     std::vector<core::common::Configurable*> _configurable_components;
     std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
-    std::unique_ptr<control::SimpleController> _controller;
+
+    // TCMUX
+    control::SimpleSpeedController controller1;
+    control::SimpleTorqueController controller2;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 > _controllerManager;
+    std::function<bool(size_t)> switch_modes;
+
     // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;

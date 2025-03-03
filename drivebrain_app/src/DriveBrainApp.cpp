@@ -13,15 +13,26 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-
+    , controller1(control::SimpleSpeedController(_logger, _config))
+    , controller2(control::SimpleTorqueController(_logger, _config))
+    , _controllerManager(_logger, _config, {&controller1, &controller2})  // Initialize correctly
 {
 
     spdlog::set_level(spdlog::level::warn);
 
     _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
-    
-    _controller = std::make_unique<control::SimpleController>(_logger, _config);
-    _configurable_components.push_back(_controller.get());
+
+
+    //control::SimpleSpeedController controller1(_logger, _config);
+    //control::SimpleTorqueController controller2(_logger, _config);
+    _configurable_components.push_back(&controller1);
+    _configurable_components.push_back(&controller2);
+    //_controllerManager = control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 >(_logger, _config, {&controller1 , &controller2});
+    _configurable_components.push_back(&_controllerManager);
+
+    bool successful_controller1_init = controller1.init();
+    bool successful_controller2_init = controller2.init();
+    bool successful_manager_init = _controllerManager.init();
     
     // bool matlab_construction_failed = false;
     // _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
@@ -59,9 +70,16 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
     }
     
-    if (!_controller->init()) {
-        throw std::runtime_error("Failed to initialize controller");
+    if (!successful_controller1_init || !successful_controller2_init) {
+        throw std::runtime_error("Failed to initialize a controller");
     }
+    if (!successful_manager_init) {
+        throw std::runtime_error("Failed to initialize controller manager");
+    }
+    switch_modes = 
+    [this](size_t mode) -> bool {
+        return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
+    };
 }
 
 DriveBrainApp::~DriveBrainApp() {
@@ -90,7 +108,7 @@ void DriveBrainApp::_process_loop() {
     // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
-    auto loop_time = _controller->get_dt_sec();
+    auto loop_time = _controllerManager.get_active_controller_timestep();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -99,32 +117,44 @@ void DriveBrainApp::_process_loop() {
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
         // TODO handle invalid state. need tc mux
-        auto out_struct = _controller->step_controller(state_and_validity.first);
+        auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
+
+        //logic for retrieving whichever type is currently in the variant, i dont think we need to check if it has monostate
+        core::SpeedControlOut speed_cmd_out;
+        if(std::holds_alternative<core::SpeedControlOut>(out_struct.out))
+        {
+            speed_cmd_out = std::get<core::SpeedControlOut>(out_struct.out);
+        }
+        else if(std::holds_alternative<core::TorqueControlOut>(out_struct.out))
+        {
+            speed_cmd_out = {0, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm};
+        }
+        //for when we have both controllers the vision is if(speed_cmd_out) -> else 
         auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
-        _state_estimator->set_previous_control_output(out_struct);
+        _state_estimator->set_previous_control_output(speed_cmd_out);
 
         if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
             desired_rpm_msg->set_drivebrain_set_rpm_fl(0);
         } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(out_struct.desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(speed_cmd_out.desired_rpms.FL);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.FR < 0) {
             desired_rpm_msg->set_drivebrain_set_rpm_fr(0);
         } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(out_struct.desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(speed_cmd_out.desired_rpms.FR);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.RL < 0) {
             desired_rpm_msg->set_drivebrain_set_rpm_rl(0);
         } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(out_struct.desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(speed_cmd_out.desired_rpms.RL);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.RR < 0) {
             desired_rpm_msg->set_drivebrain_set_rpm_rr(0);
         } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(out_struct.desired_rpms.RR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(speed_cmd_out.desired_rpms.RR);
         }
 
         torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
@@ -162,7 +192,7 @@ void DriveBrainApp::run() {
         
         if (!_settings.run_db_service) return;
         
-        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {

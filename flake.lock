@@ -52,16 +52,16 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1739899350,
-        "narHash": "sha256-9BYbFPgHMOP756AhWICIzg6qxTdBcT831bO0QhI3WPM=",
+        "lastModified": 1740951635,
+        "narHash": "sha256-Js+xaJFIjGIGWwmlOp4sl4FgNGxP7qbEXg6kkzGVfbs=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "a90ba76b5ff105814c1fd64e8112b5eae5f5bae4",
+        "rev": "2303c612b5b4fb9e4975811e77079f2b25193399",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "feature/low_level_inputs",
+        "ref": "feature/ControllerMUX",
         "repo": "drivebrain_core",
         "type": "github"
       }
@@ -151,11 +151,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1730504689,
-        "narHash": "sha256-hgmguH29K2fvs9szpq2r3pz2/8cJd2LPS+b4tfNFCwE=",
+        "lastModified": 1740872218,
+        "narHash": "sha256-ZaMw0pdoUKigLpv9HiNDH2Pjnosg7NBYMJlHTIsHEUo=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "506278e768c2a08bec68eb62932193e341f55c90",
+        "rev": "3876f6b87db82f33775b1ef5ea343986105db764",
         "type": "github"
       },
       "original": {
@@ -235,11 +235,11 @@
     "foxglove-schemas-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1721832154,
-        "narHash": "sha256-Jp47MYWu3Sh60prjNALs1OaFnPZb7tXRNzFbSRZBXU0=",
+        "lastModified": 1740803626,
+        "narHash": "sha256-3gNItgIP1CWjxCwjD5NoK2oCe0tRqQ+0rvInSfh2VXg=",
         "owner": "foxglove",
         "repo": "schemas",
-        "rev": "f028ba1154faa1226a9993cc2223855123dbf817",
+        "rev": "399da6847abc0d0bcde103acf59e238af1652c70",
         "type": "github"
       },
       "original": {
@@ -261,6 +261,54 @@
       "original": {
         "owner": "RCMast3r",
         "repo": "ws-protocol",
+        "type": "github"
+      }
+    },
+    "glim-ros2-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739507942,
+        "narHash": "sha256-VI8oaJNS265CVD5xqxVAL0ofbM96rkylIMyqZxSp2FY=",
+        "owner": "koide3",
+        "repo": "glim_ros2",
+        "rev": "3d74aaff264c4482f0ee9e152ebcf25299e14d75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "koide3",
+        "repo": "glim_ros2",
+        "type": "github"
+      }
+    },
+    "glim-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740059717,
+        "narHash": "sha256-N/Q1nIwv6y6W0tGjVE9hXmVT1mcm+WRpOH559VGa8Hc=",
+        "owner": "RCMast3r",
+        "repo": "glim",
+        "rev": "37f0e6cf54d880b08f0643cc66e23ab1da76328b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "RCMast3r",
+        "repo": "glim",
+        "type": "github"
+      }
+    },
+    "gtsam-points-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739867676,
+        "narHash": "sha256-f97r/rtwi7l+pf273rjRcfA/GaHs3+Sqbci8Z7+PJ1s=",
+        "owner": "RCMast3r",
+        "repo": "gtsam_points",
+        "rev": "127c2959592e697a38a29139443db14fbf02cdfe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "RCMast3r",
+        "repo": "gtsam_points",
         "type": "github"
       }
     },
@@ -325,11 +373,11 @@
     "nanopb-proto-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1736537572,
-        "narHash": "sha256-+vIvF7t58oB+QrxUBlHoQxLpbkOKv1Oy07ggyXnn4go=",
+        "lastModified": 1740503649,
+        "narHash": "sha256-5TOMOQ+8+7UYkhlx856+XYUWRWX63gLIoO9FCyXpshc=",
         "owner": "nanopb",
         "repo": "nanopb",
-        "rev": "fc7d53c3fea3ce04af5b98234feaa1c7400f73d6",
+        "rev": "8e9d5a10125b596188e95e925937d380a3c79e8e",
         "type": "github"
       },
       "original": {
@@ -348,6 +396,9 @@
         "flow-ipc-src": "flow-ipc-src",
         "foxglove-mcap-src": "foxglove-mcap-src",
         "foxglove-ws-protocol-src": "foxglove-ws-protocol-src",
+        "glim-ros2-src": "glim-ros2-src",
+        "glim-src": "glim-src",
+        "gtsam-points-src": "gtsam-points-src",
         "gtsam-src": "gtsam-src",
         "libsocketcanpp-src": "libsocketcanpp-src",
         "nix-proto": "nix-proto",
@@ -357,11 +408,11 @@
         "soem-src": "soem-src"
       },
       "locked": {
-        "lastModified": 1739446508,
-        "narHash": "sha256-ARAcuJ1twR7tUQGzqn+UGyFzuoX+wVpyrOvZ4yrgqYo=",
+        "lastModified": 1740060207,
+        "narHash": "sha256-VXZhU9CnTCnQh1SmbituUSIuoT8nnCRxDa2Lps4ii7E=",
         "owner": "RCMast3r",
         "repo": "nebs_packages",
-        "rev": "803448c63e96783ef4b280318a276cc63ba00f09",
+        "rev": "5e6051e167325ee43080051f44880924f55dbb1f",
         "type": "github"
       },
       "original": {
