@@ -124,10 +124,10 @@ target_link_libraries(drivebrain_control PUBLIC
 
 make_cmake_package(drivebrain_control drivebrain)
 
-add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp)
+add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_logging/src/MCAPProtobufLogger.cpp)
 target_include_directories(drivebrain_mcap_logger PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_mcap_logger/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_mcap_logger/include>    
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_logging/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_logging/include>    
 )
 
 target_link_libraries(drivebrain_mcap_logger PUBLIC
@@ -221,6 +221,12 @@ add_executable(test_db_grpc test/test_db_interace_grpc_service.cpp)
 target_link_libraries(test_db_grpc PUBLIC
     db_service_grpc_cpp::db_service_grpc_cpp
     gRPC::grpc++_reflection
+)
+
+add_executable(test_config_schema test/test_configurable.cpp)
+
+target_link_libraries(test_config_schema PRIVATE
+    drivebrain_core::drivebrain_core
 )
 
 

@@ -3,7 +3,7 @@
 
 #include <DriverBus.hpp>
 
-#include <nhlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 
 #include <google/protobuf/message.h>
 
@@ -18,7 +18,7 @@
 #include <mutex>
 #include <thread>
 
-
+#include <functional>
 // - [ ] add functionality for logging parameters json 
 
 
@@ -43,13 +43,13 @@ namespace common
             uint64_t log_time;
         };
 
-        MCAPProtobufLogger(const std::string &base_dir);
+        MCAPProtobufLogger(const std::string &base_dir, std::function<nlohmann::json::object()> get_component_param_schemas);
         ~MCAPProtobufLogger();
 
         /// @brief 
         /// @param out_msg 
         void log_msg(std::shared_ptr<google::protobuf::Message> out_msg);
-        void log_json_struct(const std::string & topic, const nhlohmann::json::object & out_json );
+        void log_json_struct(const std::string & topic, const nlohmann::json::object & out_json );
         
         void open_new_mcap(const std::string &name);
         void close_current_mcap();
@@ -57,13 +57,15 @@ namespace common
     private:
         void _handle_log_to_file();
     private:
-        core::common::ThreadSafeDeque<MsgType> _input_deque;
+        core::common::ThreadSafeDeque<RawMessage> _input_deque;
         std::thread _log_thread;
         bool _running = false;
         mcap::McapWriterOptions _options;
         mcap::McapWriter _writer;
         std::mutex _logger_mtx;
         std::unordered_map<std::string, uint32_t> _msg_name_id_map;
+
+        std::function<nlohmann::json::object()> _get_params_schema;
 
     };
 }

@@ -65,7 +65,7 @@ bool comms::CANDriver::init() {
     _logger.log_string("inited, started read", core::LogLevel::INFO);
 
     _do_read();
-    _configured = true;
+    // _configured = true;
     return true;
 }
 

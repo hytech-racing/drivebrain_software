@@ -75,7 +75,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _io_context, "192.168.1.30", 2001, 2000);
     
     _vn_driver = std::make_unique<comms::VNDriver>(
-        _config, _logger, _message_logger, *_state_estimator, _io_context);
+        _config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
+
+    if (construction_failed) {
+        throw std::runtime_error("Failed to construct VN driver");
+    }
     
     _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
     

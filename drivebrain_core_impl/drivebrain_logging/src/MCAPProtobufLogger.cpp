@@ -12,8 +12,8 @@
 
 namespace common
 {
-    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir, std::function<std::string()> get_json_schema)
-        : _options(mcap::McapWriterOptions(""))
+    MCAPProtobufLogger::MCAPProtobufLogger(const std::string &base_dir, std::function<nlohmann::json::object()> get_component_param_schemas)
+        : _options(mcap::McapWriterOptions(""), _get_params_schema(get_component_param_schemas))
     {
         auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
         if (optional_map)
@@ -78,8 +78,9 @@ namespace common
         add_schema_func(schema_only_descriptors, true);
         add_schema_func(receiving_descriptors, false);
 
+        auto params_schema_json = _get_params_schema();
         
-
+        
         spdlog::info("Added message descriptions to MCAP"); 
     }
 
@@ -91,7 +92,7 @@ namespace common
 
     void MCAPProtobufLogger::_handle_log_to_file()
     {
-        core::common::ThreadSafeDeque<ProtobufRawMessage> q;
+        core::common::ThreadSafeDeque<RawMessage> q;
 
         // this will occasionally take a while (~200ms) to complete a loop iteration so this is in its own thread
         while (true)
@@ -146,5 +147,5 @@ namespace common
         
     }
 
-    void MCAPProtobufLogger::log_parameters()
+    // void MCAPProtobufLogger::log_parameters()
 }

@@ -1,20 +1,31 @@
 {
     "type": "object",
     "properties": {
-        "member_1": { 
-            "type": "object" ,
+        "member_1": {
+            "type": "object",
             "properties": {
-                "y": { "type": "number" },
-                "z": { "type": "number" }
+                "y": {
+                    "type": "number"
+                },
+                "z": {
+                    "type": "number"
+                }
             }
         },
-       "member_2": { 
-            "type": "object" ,
+        "member_2": {
+            "type": "object",
             "properties": {
-                "y": { "type": "number" },
-                "z": { "type": "number" }
+                "y": {
+                    "type": "number"
+                },
+                "z": {
+                    "type": "number"
+                }
             }
         }
     },
-    "required": ["member_1", "member_2"]
+    "required": [
+        "member_1",
+        "member_2"
+    ]
 }

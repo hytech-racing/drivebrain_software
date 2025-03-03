@@ -52,7 +52,7 @@ namespace comms
 
         _configure_binary_outputs();
 
-        _configured = true;
+        // _configured = true;
         return true;
     }
 

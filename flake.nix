@@ -37,7 +37,7 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:hytech-racing/drivebrain_core";
+      url = "github:hytech-racing/drivebrain_core/feature/param_rec_support";
       flake = false;
     };
 

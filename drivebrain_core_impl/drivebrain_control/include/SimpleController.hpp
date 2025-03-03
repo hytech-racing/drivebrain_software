@@ -22,7 +22,7 @@ namespace control
         // rear_torque_scale:
         // 0 to 2 scale on forward torque to rear wheels. 0 = FWD, 1 = Balanced, 2 = RWD
 
-        // regen_torque_scale:
+        // regen_torque_scale:`
         // same as rear_torque_scale but applies to regen torque split. 0 = All regen
         // torque on the front, 1 = 50/50, 2 = all regen torque on the rear
         
