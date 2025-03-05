@@ -53,6 +53,7 @@ namespace comms
         _configure_binary_outputs();
 
         // _configured = true;
+        set_configured();
         return true;
     }
 

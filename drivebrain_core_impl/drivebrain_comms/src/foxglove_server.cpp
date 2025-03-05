@@ -1,4 +1,5 @@
 #include <foxglove_server.hpp>
+#include <memory>
 #include <variant>
 #include <hytech_msgs.pb.h>
 #include <ProtobufUtils.hpp>
@@ -22,7 +23,7 @@ static uint64_t nanosecondsSinceEpoch()
                         .count());
 }
 
-core::FoxgloveWSServer::FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components) : _components(configurable_components)
+core::FoxgloveWSServer::FoxgloveWSServer(std::vector<std::shared_ptr<core::common::Configurable>> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
     {

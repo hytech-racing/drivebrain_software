@@ -6,5 +6,9 @@
         "test_double": 2.0,
         "test_string": "asdf",
         "test_int": 2
+    },
+    "asdf2":
+    {
+        "test_val": 3.0 
     }
 }

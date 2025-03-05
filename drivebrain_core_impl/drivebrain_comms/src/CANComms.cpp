@@ -124,7 +124,11 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
     auto msg = pb_msg_recv(frame);
     if (msg) {
         _state_estimator.handle_recv_process(msg);
-        _message_logger->log_msg(msg);
+        if(_message_logger) // this may not exist yet as this gets constr
+        {
+            _message_logger->log_msg(msg);
+        }
+        
     }
 }
 
@@ -403,7 +407,10 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
             if (can_msg)
             {
                 _send_message(*can_msg);
-                _message_logger->log_msg(msg);
+                if(_message_logger)
+                {
+                    _message_logger->log_msg(msg);
+                }
             }
         }
         q.deque.clear();

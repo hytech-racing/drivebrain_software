@@ -5,6 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_HEADERS_IN_COMPILE_COMMANDS ON)
 
+# THIS FUCKING FINALLY FIXED IT HOLY SHIT FUCK YESSSSSSS
+# fixes the bug in compile commands generation where system libs are not seen libs that need include dirs included
+# https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_IMPLICIT_INCLUDE_DIRECTORIES.html#variable:CMAKE_%3CLANG%3E_IMPLICIT_INCLUDE_DIRECTORIES
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
@@ -42,7 +47,10 @@ find_package(cmake_macros REQUIRED)
 find_package(GTest REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(db_service_grpc_cpp REQUIRED)
-find_package(codegen REQUIRED)
+
+find_package(ZLIB REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(zstd REQUIRED)
 
 find_package(drivebrain_core REQUIRED)
 
@@ -124,7 +132,7 @@ target_link_libraries(drivebrain_control PUBLIC
 
 make_cmake_package(drivebrain_control drivebrain)
 
-add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_logging/src/MCAPProtobufLogger.cpp)
+add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_logging/src/DrivebrainMCAPLogger.cpp)
 target_include_directories(drivebrain_mcap_logger PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_logging/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_logging/include>    
@@ -174,8 +182,6 @@ target_link_libraries(drivebrain_app PUBLIC
 target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core::drivebrain_core 
     drivebrain_common_utils
-    codegen::Tire_Model_Codegen
-    codegen::matlab_model
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
@@ -191,23 +197,31 @@ make_cmake_package(drivebrain_app drivebrain)
 ### testing executables ###
 ###                     ###
 
-# add_executable(test_CAN_driver drivebrain_core_impl/drivebrain_comms/car_CAN_driver/test/test_can_driver.cpp)
-# target_link_libraries(test_CAN_driver PUBLIC
-#     CAN_driver
-#     GTest::gtest_main
-# )
-
 # add_executable(test_boost_asio_CAN drivebrain_app/example_boost_asio_can.cpp)
 
 # target_link_libraries(test_boost_asio_CAN PUBLIC
 #     Boost::boost
 # )
 
-# add_executable(test_foxglove_server test/test_foxglove_server.cpp)
+add_executable(test_param_server test/test_param_server.cpp)
 
-# target_link_libraries(test_foxglove_server PUBLIC 
-#     foxglove-schemas_proto_cpp::foxglove-schemas_proto_cpp 
-#     foxglove_websocket::foxglove_websocket)
+target_link_libraries(test_param_server PUBLIC 
+    foxglove_websocket::foxglove_websocket
+    PkgConfig::lz4
+    zstd::libzstd_shared
+)
+
+# add_executable(test_dbcan test/test_dbcan.cpp)
+
+# target_link_libraries(test_dbcan PUBLIC
+#     drivebrain_comms
+# )
+
+target_link_libraries(test_param_server PUBLIC 
+    foxglove_websocket::foxglove_websocket
+    PkgConfig::lz4
+    zstd::libzstd_shared
+)
 
 add_executable(mcu_standin test/test_mcu.cpp)
 
@@ -227,16 +241,18 @@ add_executable(test_config_schema test/test_configurable.cpp)
 
 target_link_libraries(test_config_schema PRIVATE
     drivebrain_core::drivebrain_core
+    drivebrain_mcap_logger
+    drivebrain_comms
 )
 
 
-# add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
+add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
-# target_link_libraries(test_mcap PUBLIC
-#     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-#     protobuf::libprotobuf
-#     mcap::mcap
-# )
+target_link_libraries(test_mcap PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    # protobuf::libprotobuf
+    mcap::mcap
+)
 
 set(CMAKE_CXX_STANDARD 17) 
 add_executable(test_vn test/test_vn.cpp)
@@ -260,14 +276,6 @@ add_executable(alpha_build
 target_include_directories(alpha_build PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
-
-enable_testing()
-
-add_executable(alpha_test 
-    unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
-)
-
 target_link_libraries(alpha_build PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
@@ -277,6 +285,24 @@ target_link_libraries(alpha_build PUBLIC
     Boost::program_options
 )
 
+add_executable(test_build 
+    drivebrain_app/debug_main.cpp
+)
+target_link_libraries(test_build PUBLIC
+    drivebrain_app
+    drivebrain_core::drivebrain_core
+    drivebrain_control
+    drivebrain_comms
+    drivebrain_mcap_logger
+    Boost::program_options
+)
+
+enable_testing()
+
+add_executable(alpha_test 
+    unit_test/main.cpp
+    unit_test/SimpleControllerTest.cpp
+)
 
 target_link_libraries(alpha_test PUBLIC 
     drivebrain_core::drivebrain_core
@@ -297,5 +323,7 @@ target_link_libraries(mcu_standin PUBLIC
 include(GNUInstallDirs)
 install(TARGETS 
         alpha_build
+        test_param_server
+        test_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})

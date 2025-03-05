@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2024-11-08T01_13_42";
+        ref = "2025-02-17T06_32_03";
         flake = false;
       };
 
@@ -30,10 +30,10 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/enums";
+    ht_can.url = "github:hytech-racing/ht_can/141";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
-  
+
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
@@ -42,15 +42,37 @@
     };
 
     simulink-automation-src = {
-      url = "https://github.com/hytech-racing/simulink_automation/releases/download/CodeGen_2024.11.13_05-40/matlab_math.tar.gz";
+      url = "github:hytech-racing/drivebrain_core/feature/low_level_inputs";
       flake = false;
     };
 
+    nanopb-proto-api = {
+      url = "github:nanopb/nanopb";
+      flake = false;
+    };
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, simulink-automation-src, db-core-src, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, nanopb-proto-api, ... }@inputs:
     let
+      nanopb-api = nix-proto.mkProtoDerivation {
+        name = "nanopb-api";
+        version = "0.0.0";
+        # need to remove the makefile from the proto boi because nix will attempt to build that shit
+        src = builtins.filterSource (path: _: baseNameOf path != "Makefile") "${nanopb-proto-api}/generator/proto";
+      };
+
+      drivebrain_core_msgs = { nanopb-api }: nix-proto.mkProtoDerivation {
+        name = "drivebrain_core_msgs";
+        version = (HT_proto.rev or "asdf");
+        
+        src = "${HT_proto}/proto";
+        # protoDeps = [ nanopb-api ];
+      };
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
+
+        inherit nanopb-api;
+        inherit drivebrain_core_msgs;
+
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
           version = "1.0.1";
@@ -59,11 +81,8 @@
             namespace = "foxglove";
           };
         };
-        drivebrain_core_msgs = nix-proto.mkProtoDerivation {
-          name = "drivebrain_core_msgs";
-          version = HT_proto.rev;
-          src = "${HT_proto}/proto";
-        };
+
+
         db_service = nix-proto.mkProtoDerivation
           {
             name = "db_service";
@@ -79,15 +98,24 @@
         drivebrain_core = final.callPackage ./db-core.nix { inherit db-core-src; };
       };
 
-      simulink_automation_overlay = final: prev: {
-        simulink_automation = final.callPackage ./simulink_automation.nix { inherit simulink-automation-src; };
-      };
-
       my_overlays = [
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
-        simulink_automation_overlay
+        (self: super: {
+          python311 = super.python311.override {
+            packageOverrides = pyself: pysuper: {
+              crccheck = pysuper.crccheck.overrideAttrs (oldAttrs: {
+                meta.platforms = nixpkgs.lib.platforms.all;
+              });
+              cantools = pysuper.cantools.overrideAttrs (oldAttrs: {
+                doCheck = false;
+                disabledTests = [ "test_plot_style test_plot_tz" ];
+              });
+            };
+          };
+        }
+        )
         db_core_overlay
       ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
 
@@ -98,6 +126,7 @@
         systems = [
           "x86_64-linux"
           "aarch64-linux"
+          "aarch64-darwin"
         ];
         imports = [
           # inputs.flake-parts.flakeModules.easyOverlay
@@ -125,7 +154,6 @@
             packages.default = pkgs.drivebrain_software;
             packages.drivebrain_software = pkgs.drivebrain_software;
             packages.drivebrain_core = pkgs.drivebrain_core;
-            packages.simulink_automation = pkgs.simulink_automation;
 
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
@@ -144,25 +172,12 @@
               inputsFrom = [
                 pkgs.drivebrain_software
               ];
-            };
 
-            devShells.sim_automath = pkgs.mkShell rec {
-              name = "nix-devshell";
-              shellHook =
-                let icon = "f121";
-                in ''
-                  
-                  export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-                  
-                '';
-              inputsFrom = [
-                pkgs.simulink_automation
-              ];
             };
 
             devShells.tests = pkgs.mkShell rec {
               name = "test-devshell";
-        
+
               shellHook =
                 let icon = "f121";
                 in ''
@@ -177,7 +192,7 @@
               inputsFrom = [
                 pkgs.drivebrain_software
               ];
-            
+
             };
 
             legacyPackages =

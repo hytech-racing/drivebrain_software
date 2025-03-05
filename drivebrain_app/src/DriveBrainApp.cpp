@@ -1,6 +1,10 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "hytech.pb.h"
+#include <mutex>
+#include <thread>
+
 std::atomic<bool> DriveBrainApp::_stop_signal{false};
 
 DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& dbc_path, const DriveBrainSettings& settings)
@@ -9,84 +13,89 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-    , _db_service_thread([this]() {
-        if (!_settings.run_db_service) return;
-        spdlog::info("started db service thread");
-        try {
-            while (!_stop_signal.load()) {
-                _db_service->run_server();
-            }
-        } catch (const std::exception& e) {
-            spdlog::error("Error in drivebrain service thread: {}", e.what());
-        }
-    })
-    , _io_context_thread([this]() {
-        if (!_settings.run_io_context) return;
-        spdlog::info("Started io context thread");
-        try {
-            _io_context.run();
-        } catch (const std::exception& e) {
-            spdlog::error("Error in io_context: {}", e.what());
-        }
-    })
-    , _process_thread([this]() {
-        if (!_settings.run_process_loop) return;
-        _process_loop();
-    })
+
 {
+    // spdlog::info("top o");
+    std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
+    spdlog::set_level(spdlog::level::info);
 
-    spdlog::set_level(spdlog::level::warn);
+    // TODO make this function that can get the config schemas from the configureable components. it also needs to join all of the schemas together 
+    
+    auto get_schema = []() -> nlohmann::json
+    {
+        return nlohmann::json();
+    };
 
-    _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
     
-    _controller = std::make_unique<control::SimpleController>(_logger, _config);
-    _configurable_components.push_back(_controller.get());
+    _controller = std::make_shared<control::SimpleController>(_logger, _config);
+    if (!_controller->init()) {
+        throw std::runtime_error("Failed to initialize controller");
+    }
+    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
+    spdlog::info("made controller");
+
     
-    bool matlab_construction_failed = false;
-    _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
-        _logger, _config, matlab_construction_failed);
     
-    _configurable_components.push_back(_matlab_math.get());
     
-    _foxglove_server = std::make_unique<core::FoxgloveWSServer>(_configurable_components);
-    
-    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
-        ".mcap", true,
-        std::bind(&common::MCAPProtobufLogger::log_msg, std::ref(*_mcap_logger), std::placeholders::_1),
-        std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(*_mcap_logger)),
-        std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(*_mcap_logger), std::placeholders::_1),
-        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(*_foxglove_server), std::placeholders::_1));
-    
-    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger, *_matlab_math);
-    
+    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
+    spdlog::info("made state estimator");
     bool construction_failed = false;
-    _driver = std::make_unique<comms::CANDriver>(
-        _config, _logger, _message_logger, _tx_queue, _io_context, 
+    // this also calls init() in the constructor
+    _driver = std::make_shared<comms::CANDriver>(
+        _config, _logger, _message_logger,_can_tx_queue, _io_context, 
         _dbc_path, construction_failed, *_state_estimator);
     
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    
-    _configurable_components.push_back(_driver.get());
-    
+    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_driver));
+    spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
     
-    _vn_driver = std::make_unique<comms::VNDriver>(
-        _config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
-
-    if (construction_failed) {
-        throw std::runtime_error("Failed to construct VN driver");
-    }
-    
+    spdlog::info("eth driver");
     _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
-    
-    if (!_controller->init()) {
-        throw std::runtime_error("Failed to initialize controller");
+    spdlog::info("made db service");
+    if(_settings.use_vectornav)
+    {
+        // on creation calls init()
+        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
+        if (construction_failed) {
+           throw std::runtime_error("Failed to construct VN driver");
+        }
+        configurable_components.push_back(_vn_driver);
     }
 
+    
+    
+    
+    // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 
+    // the mcap logger is needed by the message logger but I wont know the schemas until the components have been created and the each
+    // component is given the message logger on construction. 
+    //   if I just have an initialize method that calls the schema get function and sets a member var to store that schema
+    //   that could work. 
+    
+    // - [x] TODO add in function for getting the current config values periodically of all of the configureable components,
+    //       or, just give the vector of configureable components that gets given to the foxglove webserver instance
+    //       and make the logger also handle the getting of all of the configs of the components (imma do dis way)
+    _mcap_logger = std::make_shared<common::DrivebrainMCAPLogger>("temp", configurable_components);
+    _foxglove_server = std::make_shared<core::FoxgloveWSServer>(configurable_components);
+    
+    spdlog::info("made mcap logger and foxglove server");
+
+    // all things must be initialized before this gets constructed due to logging on init needing the schemas determined by the init 
+    // functions of the configurable components
+    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
+        ".mcap", true,
+        std::bind(&common::DrivebrainMCAPLogger::log_msg, _mcap_logger, std::placeholders::_1),
+        std::bind(&common::DrivebrainMCAPLogger::close_current_mcap, _mcap_logger),
+        std::bind(&common::DrivebrainMCAPLogger::open_new_mcap, _mcap_logger, std::placeholders::_1),
+        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, _foxglove_server, std::placeholders::_1),
+        std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
+        std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
+
+    spdlog::info("constructed app");
     // TODO add here the creation of the config logger
 }
 
@@ -113,7 +122,9 @@ DriveBrainApp::~DriveBrainApp() {
 }
 
 void DriveBrainApp::_process_loop() {
-    auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
+    // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
+    auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
+    auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
     auto loop_time = _controller->get_dt_sec();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
@@ -122,45 +133,44 @@ void DriveBrainApp::_process_loop() {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
+        // TODO handle invalid state. need tc mux
         auto out_struct = _controller->step_controller(state_and_validity.first);
         auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
         _state_estimator->set_previous_control_output(out_struct);
 
-        out_msg->set_prev_mcu_recv_millis(out_struct.mcu_recv_millis);
-
         if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
-            out_msg->mutable_desired_rpms()->set_fl(0);
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(0);
         } else {
-            out_msg->mutable_desired_rpms()->set_fl(out_struct.desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(out_struct.desired_rpms.FL);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.FR < 0) {
-            out_msg->mutable_desired_rpms()->set_fr(0);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(0);
         } else {
-            out_msg->mutable_desired_rpms()->set_fr(out_struct.desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(out_struct.desired_rpms.FR);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.RL < 0) {
-            out_msg->mutable_desired_rpms()->set_rl(0);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(0);
         } else {
-            out_msg->mutable_desired_rpms()->set_rl(out_struct.desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(out_struct.desired_rpms.RL);
         }
 
         if(temp_desired_torques.res_torque_lim_nm.RR < 0) {
-            out_msg->mutable_desired_rpms()->set_rr(0);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(0);
         } else {
-            out_msg->mutable_desired_rpms()->set_rr(out_struct.desired_rpms.RR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(out_struct.desired_rpms.RR);
         }
 
-        out_msg->mutable_torque_limit_nm()->set_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-        out_msg->mutable_torque_limit_nm()->set_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-        out_msg->mutable_torque_limit_nm()->set_rl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-        out_msg->mutable_torque_limit_nm()->set_rr(::abs(temp_desired_torques.res_torque_lim_nm.RR));
+        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
+        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FR));
+        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
+        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RR));
 
         {
-            std::unique_lock lk(_eth_tx_queue.mtx);
-            _eth_tx_queue.deque.push_back(out_msg);
-            _eth_tx_queue.cv.notify_all();
+            std::unique_lock lk(_can_tx_queue.mtx);
+            _can_tx_queue.deque.push_back(desired_rpm_msg);
+            _can_tx_queue.deque.push_back(torque_limit_msg);
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -172,8 +182,49 @@ void DriveBrainApp::_process_loop() {
     }
 }
 
+
+std::atomic<bool> stop_signal{false};
+void signal_handler(int signal)
+{
+    spdlog::info("Interrupt signal ({}) received. Cleaning up...", signal);
+    stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
+}
+
 void DriveBrainApp::run() {
-    while (!_stop_signal.load()) {
+
+    std::signal(SIGINT, signal_handler);
+    _db_service_thread = std::thread([this]() {
+        
+        if (!_settings.run_db_service) return;
+        
+        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+        spdlog::info("started db service thread");
+        try {
+            while (!stop_signal.load()) {
+                _db_service->run_server();
+            }
+        } catch (const std::exception& e) {
+            spdlog::error("Error in drivebrain service thread: {}", e.what());
+        }
+    });
+
+    _io_context_thread = std::thread([this]() {
+        if (!_settings.run_io_context) return;
+        spdlog::info("Started io context thread");
+        try {
+            _io_context.run();
+        } catch (const std::exception& e) {
+            spdlog::error("Error in io_context: {}", e.what());
+        }
+    });
+
+    _process_thread = std::thread([this]() {
+        if (!_settings.run_process_loop) return;
+        _process_loop();
+    });
+
+    
+    while (!stop_signal.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
