@@ -2,6 +2,7 @@
 #include "DriveBrainApp.hpp"
 
 #include "hytech.pb.h"
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -20,8 +21,13 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
 
     _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
     
-    _controller = std::make_unique<control::SimpleController>(_logger, _config);
-    _configurable_components.push_back(_controller.get());
+    control::SimpleTorqueController _controller = std::make_unique<control::SimpleController>(_logger, _config);
+    std::array<std::unique_ptr<control::SimpleTorqueController>, 1> _controllers = {
+        _controller
+    };
+    _controller_manager = std::make_unique<control::ControllerManager>(_logger, _config, _controllers)>
+
+    _configurable_components.push_back(_controller_manager.get_active_controller.get());
     
     // bool matlab_construction_failed = false;
     // _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
@@ -59,7 +65,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
     }
     
-    if (!_controller->init()) {
+    if (!_controller_manager->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
 }
@@ -86,11 +92,12 @@ DriveBrainApp::~DriveBrainApp() {
     spdlog::info("joined io context");
 }
 
+
 void DriveBrainApp::_process_loop() {
     // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
-    auto loop_time = _controller->get_dt_sec();
+    auto loop_time = _controller_manager.get_active_controller_timestep();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -99,7 +106,11 @@ void DriveBrainApp::_process_loop() {
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
         // TODO handle invalid state. need tc mux
-        auto out_struct = _controller->step_controller(state_and_validity.first);
+
+        if (!state_and_validity.second) {
+             
+        }
+        auto out_struct = _controller_manager->step_active_controller(state_and_validity.first);
         auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
         _state_estimator->set_previous_control_output(out_struct);
 

@@ -19,6 +19,7 @@ find_package(spdlog REQUIRED)
 
 
 ### generated via nix-proto from hytech's generated CAN protobufs
+find_package(protobuf REQUIRED)
 find_package(hytech_np_proto_cpp CONFIG REQUIRED)
 find_package(drivebrain_core_msgs_proto_cpp CONFIG REQUIRED)
 configure_file(
@@ -35,7 +36,6 @@ find_package(libvncxx REQUIRED)
 ### off-the-shelf libraries
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
-find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
 find_package(mcap REQUIRED)

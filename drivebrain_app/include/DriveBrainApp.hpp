@@ -29,6 +29,8 @@
 #include <spdlog/spdlog.h>
 #include <atomic>
 
+#include <drivebrain_core/ControllerManager.hpp>
+
 struct DriveBrainSettings {
     bool run_db_service{true};
     bool run_io_context{true};
@@ -64,7 +66,9 @@ private:
 
     std::vector<core::common::Configurable*> _configurable_components;
     std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
-    std::unique_ptr<control::SimpleController> _controller;
+     // std::unique_ptr<control::SimpleController> _controller;
+    std::unique_ptr<control::ControllerManager> _controller_manager;
+    
     // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
