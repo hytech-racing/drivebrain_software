@@ -158,9 +158,9 @@ void DriveBrainApp::_process_loop() {
         }
 
         torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RR));
+        torque_limit_msg->set_drivebrain_torque_fr(::abs(temp_desired_torques.res_torque_lim_nm.FR));
+        torque_limit_msg->set_drivebrain_torque_rl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
+        torque_limit_msg->set_drivebrain_torque_rr(::abs(temp_desired_torques.res_torque_lim_nm.RR));
 
         {
             std::unique_lock lk(_can_tx_queue.mtx);
