@@ -126,30 +126,30 @@ void DriveBrainApp::_process_loop() {
         // push current command for next state estimator call
         _state_estimator->set_previous_control_output(out_struct);
 
-        if (std::holds_alternative<core::SpeedControlOut>(cmd_out)) { // speed controller, set RPM
+        if (const core::SpeedControlOut* speedControl = std::get_if<core::SpeedControlOut>(&cmd_out)) { // speed controller, set RPM
 
             // set RPMs in message to the RPMS given from the controller
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(cmd_out.desired_rpms.FL);
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(cmd_out.desired_rpms.FR);
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(cmd_out.desired_rpms.RL);
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(cmd_out.desired_rpms.RR);
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(speedControl->desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(speedControl->desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(speedControl->desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(speedControl->desired_rpms.RR);
 
             // same with torque limits
-            torque_limit_msg->set_drivebrain_torque_fl(::abs(cmd_out.torque_lim_nm.FL));
-            torque_limit_msg->set_drivebrain_torque_fr(::abs(cmd_out.torque_lim_nm.FR));
-            torque_limit_msg->set_drivebrain_torque_rl(::abs(cmd_out.torque_lim_nm.RL));
-            torque_limit_msg->set_drivebrain_torque_rr(::abs(cmd_out.torque_lim_nm.RR));
+            torque_limit_msg->set_drivebrain_torque_fl(::abs(speedControl->torque_lim_nm.FL));
+            torque_limit_msg->set_drivebrain_torque_fr(::abs(speedControl->torque_lim_nm.FR));
+            torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
+            torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
             {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_rpm_msg);
                 _can_tx_queue.deque.push_back(torque_limit_msg);
             }
-        } else if (std::holds_alternative<core::TorqueControlOut>(cmd_out)){ // if it is a torque controller:
+        } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
             // set desired torque
-            desired_torque_msg->set_drivebrain_torque_fl(::abs(cmd_out.desired_torques_nm.FL));
-            desired_torque_msg->set_drivebrain_torque_fr(::abs(cmd_out.desired_torques_nm.FR));
-            desired_torque_msg->set_drivebrain_torque_rl(::abs(cmd_out.desired_torques_nm.RL));
-            desired_torque_msg->set_drivebrain_torque_rr(::abs(cmd_out.desired_torques_nm.RR));
+            desired_torque_msg->set_drivebrain_torque_fl(::abs(torqueControl->desired_torques_nm.FL));
+            desired_torque_msg->set_drivebrain_torque_fr(::abs(torqueControl->desired_torques_nm.FR));
+            desired_torque_msg->set_drivebrain_torque_rl(::abs(torqueControl->desired_torques_nm.RL));
+            desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
             {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
