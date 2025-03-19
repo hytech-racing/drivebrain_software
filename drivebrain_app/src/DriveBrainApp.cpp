@@ -121,10 +121,10 @@ void DriveBrainApp::_process_loop() {
         auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
 
         // get current command
-        core::ControllerOutput cmd_out = out_struct.out;
+        std::variant<SpeedControlOut, TorqueControlOut, std::monostate> cmd_out = out_struct.out;
 
         // push current command for next state estimator call
-        _state_estimator->set_previous_control_output(cmd_out);
+        _state_estimator->set_previous_control_output(out_struct);
 
         if (std::holds_alternative<core::SpeedControlOut>(current_state.prev_controller_output)) { // speed controller, set RPM
 
