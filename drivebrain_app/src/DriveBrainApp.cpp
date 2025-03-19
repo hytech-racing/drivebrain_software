@@ -108,6 +108,7 @@ void DriveBrainApp::_process_loop() {
     // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
+    auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
     auto loop_time = _controllerManager.get_active_controller_timestep();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
@@ -116,56 +117,43 @@ void DriveBrainApp::_process_loop() {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
-        // TODO handle invalid state. need tc mux
+
         auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
 
-        //logic for retrieving whichever type is currently in the variant, i dont think we need to check if it has monostate
-        core::SpeedControlOut speed_cmd_out;
-        if(std::holds_alternative<core::SpeedControlOut>(out_struct.out))
-        {
-            speed_cmd_out = std::get<core::SpeedControlOut>(out_struct.out);
-        }
-        else if(std::holds_alternative<core::TorqueControlOut>(out_struct.out))
-        {
-            speed_cmd_out = {0, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm, std::get<core::TorqueControlOut>(out_struct.out).desired_torques_nm};
-        }
-        //for when we have both controllers the vision is if(speed_cmd_out) -> else 
-        auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
-        _state_estimator->set_previous_control_output(speed_cmd_out);
+        // get current command
+        core::ControllerOutput cmd_out = out_struct.out;
 
-        if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(speed_cmd_out.desired_rpms.FL);
-        }
+        // push current command for next state estimator call
+        _state_estimator->set_previous_control_output(cmd_out);
 
-        if(temp_desired_torques.res_torque_lim_nm.FR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(speed_cmd_out.desired_rpms.FR);
-        }
+        if (std::holds_alternative<core::SpeedControlOut>(current_state.prev_controller_output)) { // speed controller, set RPM
 
-        if(temp_desired_torques.res_torque_lim_nm.RL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(speed_cmd_out.desired_rpms.RL);
-        }
+            // set RPMs in message to the RPMS given from the controller
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(cmd_out.desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(cmd_out.desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(cmd_out.desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(cmd_out.desired_rpms.RR);
 
-        if(temp_desired_torques.res_torque_lim_nm.RR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(speed_cmd_out.desired_rpms.RR);
-        }
-
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RR));
-
-        {
-            std::unique_lock lk(_can_tx_queue.mtx);
-            _can_tx_queue.deque.push_back(desired_rpm_msg);
-            _can_tx_queue.deque.push_back(torque_limit_msg);
+            // same with torque limits
+            torque_limit_msg->set_drivebrain_torque_fl(::abs(cmd_out.torque_lim_nm.FL));
+            torque_limit_msg->set_drivebrain_torque_fr(::abs(cmd_out.torque_lim_nm.FR));
+            torque_limit_msg->set_drivebrain_torque_rl(::abs(cmd_out.torque_lim_nm.RL));
+            torque_limit_msg->set_drivebrain_torque_rr(::abs(cmd_out.torque_lim_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_rpm_msg);
+                _can_tx_queue.deque.push_back(torque_limit_msg);
+            }
+        } else if (std::holds_alternative<core::TorqueControlOut>(current_state.prev_controller_output)){ // if it is a torque controller:
+            // set desired torque
+            desired_torque_msg->set_drivebrain_torque_fl(::abs(cmd_out.desired_torques_nm.FL));
+            desired_torque_msg->set_drivebrain_torque_fr(::abs(cmd_out.desired_torques_nm.FR));
+            desired_torque_msg->set_drivebrain_torque_rl(::abs(cmd_out.desired_torques_nm.RL));
+            desired_torque_msg->set_drivebrain_torque_rr(::abs(cmd_out.desired_torques_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
+            }
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();

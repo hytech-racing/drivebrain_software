@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2025-02-17T06_32_03";
+        ref = "TCMUX";
         flake = false;
       };
 
@@ -30,7 +30,7 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/141";
+    ht_can.url = "github:hytech-racing/ht_can/TCMUX";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
 

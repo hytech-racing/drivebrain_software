@@ -75,7 +75,7 @@ namespace core
 
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
-        void set_previous_control_output(SpeedControlOut prev_control_output);
+        void set_previous_control_output(ControllerOutput prev_control_output);
 
     private:
         void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
