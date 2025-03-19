@@ -121,12 +121,12 @@ void DriveBrainApp::_process_loop() {
         auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
 
         // get current command
-        std::variant<SpeedControlOut, TorqueControlOut, std::monostate> cmd_out = out_struct.out;
+        std::variant<core::SpeedControlOut, core::TorqueControlOut, std::monostate> cmd_out = out_struct.out;
 
         // push current command for next state estimator call
         _state_estimator->set_previous_control_output(out_struct);
 
-        if (std::holds_alternative<core::SpeedControlOut>(current_state.prev_controller_output)) { // speed controller, set RPM
+        if (std::holds_alternative<core::SpeedControlOut>(cmd_out)) { // speed controller, set RPM
 
             // set RPMs in message to the RPMS given from the controller
             desired_rpm_msg->set_drivebrain_set_rpm_fl(cmd_out.desired_rpms.FL);
@@ -144,7 +144,7 @@ void DriveBrainApp::_process_loop() {
                 _can_tx_queue.deque.push_back(desired_rpm_msg);
                 _can_tx_queue.deque.push_back(torque_limit_msg);
             }
-        } else if (std::holds_alternative<core::TorqueControlOut>(current_state.prev_controller_output)){ // if it is a torque controller:
+        } else if (std::holds_alternative<core::TorqueControlOut>(cmd_out)){ // if it is a torque controller:
             // set desired torque
             desired_torque_msg->set_drivebrain_torque_fl(::abs(cmd_out.desired_torques_nm.FL));
             desired_torque_msg->set_drivebrain_torque_fr(::abs(cmd_out.desired_torques_nm.FR));
