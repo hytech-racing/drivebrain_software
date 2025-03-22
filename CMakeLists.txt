@@ -302,12 +302,15 @@ enable_testing()
 add_executable(alpha_test 
     unit_test/main.cpp
     unit_test/SimpleControllerTest.cpp
+    unit_test/DrivebrainAppTest.cpp
 )
 
 target_link_libraries(alpha_test PUBLIC 
     drivebrain_core::drivebrain_core
+    drivebrain_app 
     drivebrain_control
     drivebrain_comms
+    drivebrain_mcap_logger
     Boost::program_options
     gtest
 )
