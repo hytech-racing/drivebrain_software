@@ -236,13 +236,17 @@ namespace common
     {
         nlohmann::json top_level_schema;
         top_level_schema["type"] = "object";
+        std::cout << "getting schema" <<std::endl;
+        
         for(const auto component : _configurable_components )
         {
             // TODO handle multiple instances of the same component
             if(!component->is_configured())
             {
+                std::cout << "erm, not configured" <<std::endl;
                 return std::nullopt;
             }
+            std::cout << "name: " << component->get_name() <<std::endl;
             top_level_schema["properties"][component->get_name()] = component->get_schema();
         }
         return top_level_schema;

@@ -60,6 +60,7 @@ bool control::SimpleController::init()
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this, std::placeholders::_1));
     // _configured = true;
+    set_configured();
     return true;
 }
 

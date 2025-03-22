@@ -10,7 +10,6 @@
 #include <unordered_set>
 
 #include <foxglove/websocket/server_factory.hpp>
-// #include <foxglove/websocket/websocket_notls.hpp>
 #include <foxglove/websocket/websocket_server.hpp>
 
 std::atomic<bool> running = true;

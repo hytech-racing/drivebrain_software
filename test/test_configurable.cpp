@@ -70,8 +70,6 @@ int main()
     auto test = std::make_shared<ConfigureableTest>(logger, config);
     auto test_inst = std::make_shared<ConfigureableTest2>(logger, config);
     
-    
-
     std::vector<std::shared_ptr<core::common::Configurable>> configureable_components;
     auto test_inst_cast = std::reinterpret_pointer_cast<core::common::Configurable>(test);
     configureable_components.push_back(test_inst_cast);

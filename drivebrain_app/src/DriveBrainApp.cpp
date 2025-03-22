@@ -2,6 +2,7 @@
 #include "DriveBrainApp.hpp"
 
 #include "hytech.pb.h"
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -31,12 +32,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!_controller->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
+    configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_controller));
     spdlog::info("made controller");
 
-    
-    
-    
     _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
     spdlog::info("made state estimator");
     bool construction_failed = false;
@@ -48,7 +46,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_driver));
+    configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_driver));
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
