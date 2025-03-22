@@ -16,3 +16,39 @@ the mcap logger's parameter logging function gets called at a fixed rate in the 
 
 the parameters being logged are a subset of the schema that gets written to the mcap file. the schemas is generated from the json file that gets loaded at runtime.
 
+example of the parameter schema that gets recorded into the mcap file:
+```json
+{
+    "type": "object",
+    "properties": {
+        "member_1": {
+            "type": "object",
+            "properties": {
+                "y": {
+                    "type": "number"
+                },
+                "z": {
+                    "type": "number"
+                }
+            }
+        },
+        "member_2": {
+            "type": "object",
+            "properties": {
+                "y": {
+                    "type": "number"
+                },
+                "z": {
+                    "type": "number"
+                }
+            }
+        }
+    },
+    "required": [
+        "member_1",
+        "member_2"
+    ]
+}
+```
+
+this uses the [json schema reference](https://json-schema.org/understanding-json-schema/reference)
