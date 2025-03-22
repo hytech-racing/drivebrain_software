@@ -66,7 +66,7 @@ namespace comms
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, core::StateEstimator &state_estimator) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
             Configurable(logger, json_file_handler, "CANDriver"),
             _logger(logger),
             _message_logger(message_logger),
@@ -125,6 +125,6 @@ namespace comms
         std::unordered_map<std::string, uint64_t> _messages_names_and_ids;
         int _CAN_socket; // can socket bound to
         bool _running = false;
-        core::StateEstimator & _state_estimator;
+        std::shared_ptr<core::StateEstimator> _state_estimator = nullptr;
     };
 }

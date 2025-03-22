@@ -68,7 +68,7 @@ private:
     // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
-    std::unique_ptr<core::StateEstimator> _state_estimator;
+    std::shared_ptr<core::StateEstimator> _state_estimator;
     std::shared_ptr<comms::CANDriver> _driver;
     std::unique_ptr<comms::MCUETHComms> _eth_driver;
     std::shared_ptr<comms::VNDriver> _vn_driver;

@@ -123,7 +123,10 @@ void comms::CANDriver::_send_message(const struct can_frame &frame) {
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
     auto msg = pb_msg_recv(frame);
     if (msg) {
-        _state_estimator.handle_recv_process(msg);
+        if(_state_estimator)
+        {
+            _state_estimator->handle_recv_process(msg);
+        }
         if(_message_logger) // this may not exist yet as this gets constr
         {
             _message_logger->log_msg(msg);

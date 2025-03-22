@@ -12,6 +12,7 @@
 #include "libvncxx/vntime.h"
 #include "libvncxx/packetfinder.h"
 #include "libvncxx/packet.h"
+#include <memory>
 #include <spdlog/spdlog.h>
 
 namespace comms
@@ -57,7 +58,7 @@ namespace comms
         return true;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io, bool &init_successful)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context& io, bool &init_successful)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
           _logger(logger),
           _state_estimator(state_estimator),
@@ -78,7 +79,10 @@ namespace comms
 
     void VNDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)
     {
-        _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+        if(_state_estimator)
+        {
+            _state_estimator->handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+        }
         _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
     }
 

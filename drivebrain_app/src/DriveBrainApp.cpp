@@ -35,13 +35,13 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_controller));
     spdlog::info("made controller");
 
-    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
+    _state_estimator = std::make_shared<core::StateEstimator>(_logger, _message_logger);
     spdlog::info("made state estimator");
     bool construction_failed = false;
     // this also calls init() in the constructor
     _driver = std::make_shared<comms::CANDriver>(
         _config, _logger, _message_logger,_can_tx_queue, _io_context, 
-        _dbc_path, construction_failed, *_state_estimator);
+        _dbc_path, construction_failed, _state_estimator);
     
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
@@ -49,7 +49,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_driver));
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
-        _logger, _eth_tx_queue, _message_logger, *_state_estimator,
+        _logger, _eth_tx_queue, _message_logger, _state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
     
     spdlog::info("eth driver");
@@ -58,7 +58,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if(_settings.use_vectornav)
     {
         // on creation calls init()
-        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
+        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, _state_estimator, _io_context, construction_failed);
         if (construction_failed) {
            throw std::runtime_error("Failed to construct VN driver");
         }
