@@ -18,7 +18,7 @@ jobs:
 
       - name: Build and test
         run: |
-          nix develop --command bash -c './vcan_bringup.sh && mkdir -p build && cd build && cmake .. && make -j && ctest --output-on-failure'
+          nix develop --command bash -c 'mkdir -p build && cd build && cmake .. && make -j && ctest --output-on-failure'
 
         
       

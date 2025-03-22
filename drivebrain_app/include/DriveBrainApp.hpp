@@ -34,6 +34,7 @@ struct DriveBrainSettings {
     bool run_io_context{true};
     bool run_process_loop{true};
     bool use_vectornav{true};
+    bool use_can{true};
 };
 
 class DriveBrainApp {

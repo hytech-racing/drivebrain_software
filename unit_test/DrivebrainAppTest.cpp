@@ -16,7 +16,8 @@ class DrivebrainAppTest : public testing::Test {
               {.run_db_service = true,
                .run_io_context = true,
                .run_process_loop = true,
-               .use_vectornav = false}) {
+               .use_vectornav = false,
+               .use_can = false}) {
 
         std::cout << "constructed" << std::endl;
     }

@@ -39,14 +39,18 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     spdlog::info("made state estimator");
     bool construction_failed = false;
     // this also calls init() in the constructor
-    _driver = std::make_shared<comms::CANDriver>(
-        _config, _logger, _message_logger,_can_tx_queue, _io_context, 
-        _dbc_path, construction_failed, _state_estimator);
-    
-    if (construction_failed) {
-        throw std::runtime_error("Failed to construct CAN driver");
+    if(_settings.use_can)
+    {
+        _driver = std::make_shared<comms::CANDriver>(
+            _config, _logger, _message_logger,_can_tx_queue, _io_context, 
+            _dbc_path, construction_failed, _state_estimator);
+        
+        if (construction_failed) {
+            throw std::runtime_error("Failed to construct CAN driver");
+        }
+        configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_driver));
     }
-    configurable_components.push_back(std::dynamic_pointer_cast<core::common::Configurable>(_driver));
+    
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, _state_estimator,

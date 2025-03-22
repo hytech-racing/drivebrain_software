@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
             .run_db_service = true,
             .run_io_context = true,
             .run_process_loop = true,
-            .use_vectornav = false
+            .use_vectornav = false,
+            .use_can = true
         };
         
         std::cout <<"creating app" <<std::endl;
