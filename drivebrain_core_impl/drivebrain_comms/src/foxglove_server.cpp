@@ -126,22 +126,18 @@ foxglove::Parameter core::FoxgloveWSServer::_get_foxglove_param(const std::strin
     }
     else if (std::holds_alternative<int>(param))
     {
-        // std::cout << set_name << " Variant holds a int: " << std::get<int>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<int>(param));
     }
     else if (std::holds_alternative<float>(param))
     {
-        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, ((double)std::get<float>(param)));
     }
     else if (std::holds_alternative<double>(param))
     {
-        // std::cout << set_name << " Variant holds a float: " << std::get<float>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<double>(param));
     }
     else if (std::holds_alternative<std::string>(param))
     {
-        // std::cout << set_name << " Variant holds a string: " << std::get<std::string>(param) << std::endl;
         return foxglove::Parameter(set_name, std::get<std::string>(param));
     }
     else

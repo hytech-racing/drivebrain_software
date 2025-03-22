@@ -9,7 +9,6 @@
 class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {
     grpc::Status RequestStopLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response)
     override {
-        std::cout << "requested stopping of logging" <<std::endl;
         response->set_currently_logging(false);
         response->set_active_or_previous_log_file_name("dummyname");
         return grpc::Status::OK;

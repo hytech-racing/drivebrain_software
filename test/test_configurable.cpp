@@ -89,7 +89,6 @@ int main()
         std::bind(&common::DrivebrainMCAPLogger::log_params, mcap_logger));
     std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::seconds(2)));
     
-    // std::cout << test.get_schema().dump() << std::endl;
     std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::seconds(10)));
     return 0;
 }

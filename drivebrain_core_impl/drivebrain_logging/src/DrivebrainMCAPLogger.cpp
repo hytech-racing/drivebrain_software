@@ -218,7 +218,6 @@ namespace common
         {
             std::unordered_map params_map = cc->get_all_params_map();
             std::string param_parent = cc->get_name();
-            std::cout << param_parent << std::endl;
             std::vector<std::string> param_names = cc->get_param_names();
             for (auto i = params_map.begin(); i != params_map.end(); i++)
             {
@@ -228,7 +227,6 @@ namespace common
                 _get_params_as_json<bool, int, float, double, std::string>(param_parent, name, var_val, params_all);
             }
         }
-        std::cout << params_all.dump() <<std::endl;
         return params_all;
     }
 
@@ -236,17 +234,15 @@ namespace common
     {
         nlohmann::json top_level_schema;
         top_level_schema["type"] = "object";
-        std::cout << "getting schema" <<std::endl;
         
-        for(const auto component : _configurable_components )
+        for(const auto component : _configurable_components)
         {
             // TODO handle multiple instances of the same component
             if(!component->is_configured())
             {
-                std::cout << "erm, not configured" <<std::endl;
+                spdlog::error("component {} is not configured yet", component->get_name());
                 return std::nullopt;
             }
-            std::cout << "name: " << component->get_name() <<std::endl;
             top_level_schema["properties"][component->get_name()] = component->get_schema();
         }
         return top_level_schema;
