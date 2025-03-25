@@ -45,6 +45,7 @@ namespace comms {
         std::shared_ptr<loggertype> _message_logger;
         boost::asio::serial_port _serial1;
         boost::array<char, 512> _input_buff;
+        bool _active_connection = false;
     };
 }
 
