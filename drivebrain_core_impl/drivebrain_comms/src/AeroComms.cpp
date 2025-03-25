@@ -1,21 +1,20 @@
 #include "AeroComms.hpp"
-#include <boost/asio.hpp>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <iomanip>
-#include <vector>
-#include <array>
-#include <cstring>
-#include <cstdint>
-#include <mutex>
+#include <thread>
 #include <chrono>
-#include "hytech_msgs.pb.h"
+#include <cstring>
 
 namespace comms {
 
-    AeroDriver::AeroDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
-        : _logger(logger), _state_estimator(state_estimator), _message_logger(message_logger), _serial1(io) {}
+    AeroDriver::AeroDriver(core::JsonFileHandler &json_file_handler,
+                           core::Logger &logger,
+                           std::shared_ptr<loggertype> message_logger,
+                           core::StateEstimator &state_estimator,
+                           boost::asio::io_context& io)
+        : _logger(logger), _state_estimator(state_estimator),
+          _message_logger(message_logger), _serial1(io), _active_connection(false) {}
 
     bool AeroDriver::init() {
         _logger.log_string("Opening Aero driver.", core::LogLevel::INFO);
@@ -31,7 +30,6 @@ namespace comms {
         send_command(_serial1, "@D");
 
         _logger.log_string("Aero driver initialized and in standby mode.", core::LogLevel::INFO);
-
         return true;
     }
 
@@ -42,41 +40,58 @@ namespace comms {
     void AeroDriver::_start_receive(boost::asio::serial_port& serial_port) {
         serial_port.async_read_some(
             boost::asio::buffer(_input_buff),
-            [&](const boost::system::error_code &ec, std::size_t bytesCount) {
+            [this, &serial_port](const boost::system::error_code &ec, std::size_t bytesCount) {
                 if (ec) {
                     if (ec != boost::asio::error::operation_aborted) {
                         std::cerr << "ERROR: " << ec.message() << std::endl;
                     }
+                    _active_connection = false;
                     standby_mode();
                     return;
                 }
 
                 if (bytesCount == 0) {
+                    _active_connection = false;
                     standby_mode();
                     return;
                 }
 
-                _logger.log_string("Data received, processing...", core::LogLevel::INFO);
-                auto sensor_readings = extract_sensor_readings(_input_buff);
-                log_proto_message(sensor_readings);
+                if (!_active_connection) {
+                    _logger.log_string("Device connected. Receiving data stream...", core::LogLevel::INFO);
+                    _active_connection = true;
+                }
 
+                std::vector<float> sensor_readings = extract_sensor_readings(_input_buff);
+
+                std::ostringstream oss;
+                oss << "Received sensor readings: ";
+                for (float val : sensor_readings) {
+                    oss << std::fixed << std::setprecision(2) << val << " ";
+                }
+                _logger.log_string(oss.str(), core::LogLevel::DEBUG);
+
+                log_proto_message(sensor_readings);
                 _start_receive(serial_port);
             });
     }
 
     void AeroDriver::standby_mode() {
-        _logger.log_string("No input detected. Entering standby mode.", core::LogLevel::INFO);
+        _logger.log_string("No input detected. Entering standby mode...", core::LogLevel::INFO);
 
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
 
             boost::system::error_code ec;
-            _serial1.open("/dev/ttyACM0", ec);
+            if (_serial1.is_open()) {
+                _serial1.close(ec);
+            }
 
+            _serial1.open("/dev/ttyACM0", ec);
             if (!ec) {
                 _logger.log_string("Device reconnected. Restarting data stream.", core::LogLevel::INFO);
                 configure_serial_port(_serial1);
                 send_command(_serial1, "@D");
+                _active_connection = false;
                 start_receive();
                 return;
             }
@@ -129,19 +144,19 @@ int main() {
     core::JsonFileHandler json_handler("/path/to/config.json");
     core::Logger logger(core::LogLevel::INFO);
     auto message_logger = std::make_shared<loggertype>(
-        "aero_log",                 
-        true,                      
-        [](std::shared_ptr<google::protobuf::Message> msg) { 
-            std::cout << "Logging message." << std::endl; 
+        "aero_log",
+        true,
+        [](std::shared_ptr<google::protobuf::Message> msg) {
+            std::cout << "Logging message." << std::endl;
         },
-        []() { 
-            std::cout << "Flushing logs." << std::endl; 
+        []() {
+            std::cout << "Flushing logs." << std::endl;
         },
-        [](const std::string &error) { 
-            std::cerr << "Logger error: " << error << std::endl; 
+        [](const std::string &error) {
+            std::cerr << "Logger error: " << error << std::endl;
         },
-        [](std::shared_ptr<google::protobuf::Message> status) { 
-            std::cout << "Status update received." << std::endl; 
+        [](std::shared_ptr<google::protobuf::Message> status) {
+            std::cout << "Status update received." << std::endl;
         }
     );
 
@@ -149,6 +164,7 @@ int main() {
     estimation::Tire_Model_Codegen_MatlabModel matlab_estimator(logger, json_handler, construction_failed);
     if (construction_failed) {
         std::cerr << "Matlab Model Construction Failed." << std::endl;
+        return 1;
     }
 
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
