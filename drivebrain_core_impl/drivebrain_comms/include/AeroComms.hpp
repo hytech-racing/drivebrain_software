@@ -44,7 +44,6 @@ namespace comms {
         core::StateEstimator &_state_estimator;
         std::shared_ptr<loggertype> _message_logger;
         boost::asio::serial_port _serial1;
-        boost::asio::serial_port _serial2;
         boost::array<char, 512> _input_buff;
     };
 }
