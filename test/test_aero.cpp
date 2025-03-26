@@ -46,10 +46,8 @@ int main() {
     }
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
     comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);
-    if (!driver.init()) {
-        return 1;
-    }
-    driver.start_receive();
+    driver.standby_mode();
+
     io.run();
     return 0;
 }

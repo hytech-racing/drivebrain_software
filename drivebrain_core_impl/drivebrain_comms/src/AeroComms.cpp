@@ -68,7 +68,7 @@ namespace comms {
                 for (float val : sensor_readings) {
                     oss << std::fixed << std::setprecision(2) << val << " ";
                 }
-                _logger.log_string(oss.str(), core::LogLevel::DEBUG);
+                _logger.log_string(oss.str(), core::LogLevel::INFO);
 
                 log_proto_message(sensor_readings);
                 _start_receive(serial_port);
@@ -170,11 +170,8 @@ int main() {
     core::StateEstimator state_estimator(logger, message_logger, matlab_estimator);
     comms::AeroDriver driver(json_handler, logger, message_logger, state_estimator, io);
 
-    if (!driver.init()) {
-        return 1;
-    }
+    driver.standby_mode();
 
-    driver.start_receive();
     io.run();
     return 0;
 }
