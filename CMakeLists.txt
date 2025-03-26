@@ -327,3 +327,15 @@ install(TARGETS
         test_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+add_executable(TCMUX_integration_test test/test_controller_manager.cpp)
+
+target_link_libraries(
+    TCMUX_integration_test PUBLIC
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    drivebrain_core::drivebrain_core
+    drivebrain_control
+    Boost::boost
+    drivebrain_app
+)
