@@ -168,7 +168,9 @@
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli pkgs.ethercat ];
+              packages = [ pkgs.mcap-cli 
+             # pkgs.ethercat
+               ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];
