@@ -1,3 +1,6 @@
+#ifndef DBSERVICE_IMPL_HPP
+#define DBSERVICE_IMPL_HPP
+
 #include <db_service/v1/service/db_interface.grpc.pb.h>
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <iostream>
@@ -26,3 +29,5 @@ class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Servi
         std::unique_ptr<grpc::Server> _server;  // Store server instance here
 
 };
+
+#endif

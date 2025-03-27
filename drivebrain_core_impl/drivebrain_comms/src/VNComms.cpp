@@ -55,6 +55,42 @@ namespace comms
         return 0;
     }
 
+    void VNDriver::standby_mode() {
+        _logger.log_string("No input detected. Entering VN standby mode...", core::LogLevel::INFO);
+    
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+    
+            boost::system::error_code ec;
+            if (_serial.is_open()) {
+                _serial.close(ec); // clean close if already open
+            }
+    
+            auto device_name = get_parameter_value<std::string>("device_name");
+            _serial.open(device_name.value(), ec);
+    
+            if (!ec) {
+                _logger.log_string("VN device reconnected. Configuring serial port...", core::LogLevel::INFO);
+    
+                _serial.set_option(SerialPort::baud_rate(get_parameter_value<int>("baud_rate").value()));
+                _serial.set_option(SerialPort::character_size(8));
+                _serial.set_option(SerialPort::parity(SerialPort::parity::none));
+                _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
+                _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
+    
+                _configure_binary_outputs(); // VN-specific config
+                _active_connection = false;
+    
+                _start_recieve(); // start streaming data
+                return;
+            } else {
+                std::ostringstream oss;
+                oss << "Waiting for VN device... (" << ec.message() << ")";
+                _logger.log_string(oss.str(), core::LogLevel::INFO);
+            }
+        }
+    }
+
     VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
           _logger(logger),
@@ -62,7 +98,7 @@ namespace comms
           _message_logger(message_logger),
           _serial(io)
     {
-        init();
+        standby_mode();
 
         // Starts read
         _logger.log_string("Starting vn driver recieve.", core::LogLevel::INFO);
@@ -185,24 +221,28 @@ namespace comms
         }
     }
 
-    void VNDriver::_start_recieve()
-    {
+    void VNDriver::_start_recieve() {
         _serial.async_read_some(
             boost::asio::buffer(_input_buff),
-            [&](const boost::system::error_code &ec, std::size_t bytesCount)
-            {
-                if (ec)
-                {
-                    if (ec != boost::asio::error::operation_aborted)
-                    {
-                        spdlog::error("ERROR: {}", ec.message());
+            [this](const boost::system::error_code &ec, std::size_t bytesCount) {
+                if (ec || bytesCount == 0) {
+                    if (ec != boost::asio::error::operation_aborted) {
+                        spdlog::error("VNDriver error: {}", ec.message());
                     }
+                    _active_connection = false;
+                    standby_mode();
                     return;
                 }
-                // _logger.log_string("logging", core::LogLevel::INFO);
+    
+                if (!_active_connection) {
+                    _logger.log_string("VN data stream started.", core::LogLevel::INFO);
+                    _active_connection = true;
+                }
+    
                 _processor.processReceivedData((char *)(_input_buff.data()), bytesCount);
-                // Initiate another asynchronous read
-                _start_recieve();
-            });
+                _start_recieve(); // loop
+            }
+        );
     }
+    
 }

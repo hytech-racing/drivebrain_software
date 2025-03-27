@@ -9,3 +9,4 @@ core.*
 result-man/
 result-man
 .cache/
+*.dbc

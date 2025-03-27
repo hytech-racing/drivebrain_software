@@ -5,7 +5,7 @@
 #include <Logger.hpp>
 #include <MsgLogger.hpp>
 #include <StateEstimator.hpp>
-#include <hytech.pb.h>
+#include <hytech.pb.h> // generated from CAN description
 
 // system includes
 #include <linux/can.h>

@@ -1,3 +1,4 @@
+
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 #include <SimpleController.hpp>
@@ -80,7 +81,6 @@ std::pair<std::string, std::string> parse_arguments(int argc, char* argv[]) {
 
 int main(int argc, char *argv[])
 {
-    std::signal(SIGINT, signal_handler);
     
     try {
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
             .run_db_service = true,
             .run_io_context = true,
             .run_process_loop = true,
-            .use_vectornav = true
+            .use_vectornav = false
         };
         
         std::cout <<"creating app" <<std::endl;

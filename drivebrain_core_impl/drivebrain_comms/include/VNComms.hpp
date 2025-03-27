@@ -42,12 +42,11 @@ namespace comms {
     {
         public:
             VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, ::core::StateEstimator &state_estimator, boost::asio::io_context &io_context);
-            bool init();
             struct config {
                 int baud_rate;
                 int freq_divisor;
             };
-
+            bool init();
         private: 
             // Private variables
             core::Logger& _logger;
@@ -63,6 +62,7 @@ namespace comms {
 
         public: 
             // Public methods
+            void standby_mode();
             void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);  
         
         private:
@@ -70,6 +70,7 @@ namespace comms {
             static void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);
             void _configure_binary_outputs();
             void _start_recieve();
+            bool _active_connection = false;
 
     };
 }

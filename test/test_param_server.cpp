@@ -10,7 +10,7 @@
 #include <unordered_set>
 
 #include <foxglove/websocket/server_factory.hpp>
-#include <foxglove/websocket/websocket_notls.hpp>
+// #include <foxglove/websocket/websocket_notls.hpp>
 #include <foxglove/websocket/websocket_server.hpp>
 
 std::atomic<bool> running = true;
@@ -30,6 +30,9 @@ int main()
         "C++ Protobuf example server", logHandler, serverOptions);
 
     foxglove::Parameter test_param("test_param", "yo");
+    
+    foxglove::Parameter double_param("float_param", foxglove::ParameterValue((double) 3.0));
+    foxglove::Parameter bool_param("bool_param", foxglove::ParameterValue((bool) false));
 
     foxglove::ServerHandlers<foxglove::ConnHandle> hdlrs;
 
@@ -40,7 +43,7 @@ int main()
         {
             std::cout << name <<std::endl;
         }
-        server->publishParameterValues(clientHandle, {test_param}, request_id);
+        server->publishParameterValues(clientHandle, {test_param, double_param, bool_param}, request_id);
     };
 
     hdlrs.parameterSubscriptionHandler = [&](const std::vector<std::string> &params_to_subscribe,
@@ -52,8 +55,21 @@ int main()
 
     hdlrs.parameterChangeHandler = [&](const std::vector<foxglove::Parameter> &params, const std::optional<std::string> &request_id, foxglove::ConnHandle clientHandle)
     {
-        test_param = params.at(0);
-        server->publishParameterValues(clientHandle, {test_param}, request_id);
+        for(auto param : params)
+        {
+            if(param.getName() == test_param.getName())
+            {
+                test_param = param;
+            } else if (param.getName() == double_param.getName()) 
+            {
+                double_param = param;
+            } else if(param.getName() == bool_param.getName())
+            {
+                bool_param = param;
+            }
+        }
+
+        server->publishParameterValues(clientHandle, {test_param, double_param, bool_param}, request_id);
     };
 
     server->setHandlers(std::move(hdlrs));
