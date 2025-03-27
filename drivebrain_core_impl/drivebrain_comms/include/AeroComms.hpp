@@ -29,12 +29,12 @@ namespace comms {
         AeroDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io);
         void start_receive();
         bool init();
+        void standby_mode();
 
         
     
     private:
         void _start_receive(boost::asio::serial_port& serial_port);
-        void standby_mode();
         void configure_serial_port(boost::asio::serial_port& serial);
         void send_command(boost::asio::serial_port& serial, const std::string& command);
         std::vector<float> extract_sensor_readings(const boost::array<char, 512>& buffer);

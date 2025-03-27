@@ -94,7 +94,7 @@ namespace comms {
                 _active_connection = false;
                 start_receive();
                 return;
-            }
+            } 
         }
     }
 
