@@ -13,29 +13,41 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-
+    , controller1(control::SimpleSpeedController(_logger, _config))
+    , controller2(control::SimpleTorqueController(_logger, _config))
+    , _controllerManager(_logger, _config, {&controller1, &controller2})  // Initialize correctly
 {
-    // spdlog::info("top o");
-    std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
-    spdlog::set_level(spdlog::level::info);
 
-    // TODO make this function that can get the config schemas from the configureable components. it also needs to join all of the schemas together 
-    
-    auto get_schema = []() -> nlohmann::json
-    {
-        return nlohmann::json();
-    };
+    spdlog::set_level(spdlog::level::warn);
 
-    
-    _controller = std::make_shared<control::SimpleController>(_logger, _config);
-    if (!_controller->init()) {
-        throw std::runtime_error("Failed to initialize controller");
-    }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
-    spdlog::info("made controller");
+    _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
 
+
+    //control::SimpleSpeedController controller1(_logger, _config);
+    //control::SimpleTorqueController controller2(_logger, _config);
+    _configurable_components.push_back(&controller1);
+    _configurable_components.push_back(&controller2);
+    //_controllerManager = control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 >(_logger, _config, {&controller1 , &controller2});
+    _configurable_components.push_back(&_controllerManager);
+
+    bool successful_controller1_init = controller1.init();
+    bool successful_controller2_init = controller2.init();
+    bool successful_manager_init = _controllerManager.init();
     
+    // bool matlab_construction_failed = false;
+    // _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
+    //     _logger, _config, matlab_construction_failed);
     
+    // _configurable_components.push_back(_matlab_math.get());
+    
+    _foxglove_server = std::make_unique<core::FoxgloveWSServer>(_configurable_components);
+    
+    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
+        ".mcap", true,
+        std::bind(&common::MCAPProtobufLogger::log_msg, std::ref(*_mcap_logger), std::placeholders::_1),
+        std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(*_mcap_logger)),
+        std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(*_mcap_logger), std::placeholders::_1),
+        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(*_foxglove_server), std::placeholders::_1));
     
     _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
     spdlog::info("made state estimator");
@@ -59,44 +71,19 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     spdlog::info("made db service");
     if(_settings.use_vectornav)
     {
-        // on creation calls init()
-        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
-        if (construction_failed) {
-           throw std::runtime_error("Failed to construct VN driver");
-        }
-        configurable_components.push_back(_vn_driver);
+        _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
     }
-
     
-    
-    
-    // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 
-    // the mcap logger is needed by the message logger but I wont know the schemas until the components have been created and the each
-    // component is given the message logger on construction. 
-    //   if I just have an initialize method that calls the schema get function and sets a member var to store that schema
-    //   that could work. 
-    
-    // - [x] TODO add in function for getting the current config values periodically of all of the configureable components,
-    //       or, just give the vector of configureable components that gets given to the foxglove webserver instance
-    //       and make the logger also handle the getting of all of the configs of the components (imma do dis way)
-    _mcap_logger = std::make_shared<common::DrivebrainMCAPLogger>("temp", configurable_components);
-    _foxglove_server = std::make_shared<core::FoxgloveWSServer>(configurable_components);
-    
-    spdlog::info("made mcap logger and foxglove server");
-
-    // all things must be initialized before this gets constructed due to logging on init needing the schemas determined by the init 
-    // functions of the configurable components
-    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
-        ".mcap", true,
-        std::bind(&common::DrivebrainMCAPLogger::log_msg, _mcap_logger, std::placeholders::_1),
-        std::bind(&common::DrivebrainMCAPLogger::close_current_mcap, _mcap_logger),
-        std::bind(&common::DrivebrainMCAPLogger::open_new_mcap, _mcap_logger, std::placeholders::_1),
-        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, _foxglove_server, std::placeholders::_1),
-        std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
-        std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
-
-    spdlog::info("constructed app");
-    // TODO add here the creation of the config logger
+    if (!successful_controller1_init || !successful_controller2_init) {
+        throw std::runtime_error("Failed to initialize a controller");
+    }
+    if (!successful_manager_init) {
+        throw std::runtime_error("Failed to initialize controller manager");
+    }
+    switch_modes = 
+    [this](size_t mode) -> bool {
+        return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
+    };
 }
 
 DriveBrainApp::~DriveBrainApp() {
@@ -125,7 +112,8 @@ void DriveBrainApp::_process_loop() {
     // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
-    auto loop_time = _controller->get_dt_sec();
+    auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
+    auto loop_time = _controllerManager.get_active_controller_timestep();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -133,44 +121,43 @@ void DriveBrainApp::_process_loop() {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
-        // TODO handle invalid state. need tc mux
-        auto out_struct = _controller->step_controller(state_and_validity.first);
-        auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
+
+        auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
+
+        // get current command
+        std::variant<core::SpeedControlOut, core::TorqueControlOut, std::monostate> cmd_out = out_struct.out;
+
+        // push current command for next state estimator call
         _state_estimator->set_previous_control_output(out_struct);
 
-        if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(out_struct.desired_rpms.FL);
-        }
+        if (const core::SpeedControlOut* speedControl = std::get_if<core::SpeedControlOut>(&cmd_out)) { // speed controller, set RPM
 
-        if(temp_desired_torques.res_torque_lim_nm.FR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(out_struct.desired_rpms.FR);
-        }
+            // set RPMs in message to the RPMS given from the controller
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(speedControl->desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(speedControl->desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(speedControl->desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(speedControl->desired_rpms.RR);
 
-        if(temp_desired_torques.res_torque_lim_nm.RL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(out_struct.desired_rpms.RL);
-        }
-
-        if(temp_desired_torques.res_torque_lim_nm.RR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(out_struct.desired_rpms.RR);
-        }
-
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RR));
-
-        {
-            std::unique_lock lk(_can_tx_queue.mtx);
-            _can_tx_queue.deque.push_back(desired_rpm_msg);
-            _can_tx_queue.deque.push_back(torque_limit_msg);
+            // same with torque limits
+            torque_limit_msg->set_drivebrain_torque_fl(::abs(speedControl->torque_lim_nm.FL));
+            torque_limit_msg->set_drivebrain_torque_fr(::abs(speedControl->torque_lim_nm.FR));
+            torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
+            torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_rpm_msg);
+                _can_tx_queue.deque.push_back(torque_limit_msg);
+            }
+        } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
+            // set desired torque
+            desired_torque_msg->set_drivebrain_torque_fl(::abs(torqueControl->desired_torques_nm.FL));
+            desired_torque_msg->set_drivebrain_torque_fr(::abs(torqueControl->desired_torques_nm.FR));
+            desired_torque_msg->set_drivebrain_torque_rl(::abs(torqueControl->desired_torques_nm.RL));
+            desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
+            }
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -197,7 +184,7 @@ void DriveBrainApp::run() {
         
         if (!_settings.run_db_service) return;
         
-        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {

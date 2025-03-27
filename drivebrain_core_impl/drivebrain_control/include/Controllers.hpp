@@ -1,2 +1,3 @@
 #pragma once
-#include <SimpleController.hpp>
+#include <SimpleSpeedController.hpp>
+#include <SimpleTorqueController.hpp>

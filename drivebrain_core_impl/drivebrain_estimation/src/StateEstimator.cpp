@@ -162,7 +162,7 @@ bool StateEstimator::_validate_stamps(const std::array<std::chrono::microseconds
     return within_threshold && all_members_received && last_update_recent_enough;
 }
 
-void StateEstimator::set_previous_control_output(SpeedControlOut prev_control_output)
+void StateEstimator::set_previous_control_output(core::ControllerOutput prev_control_output)
 {
     std::unique_lock lk(_state_mutex);
     _vehicle_state.prev_controller_output = prev_control_output;
@@ -224,13 +224,25 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     curr_rpms->set_rr(current_state.current_rpms.RR);
 
     msg_out->set_state_is_valid(state_is_valid);
-    msg_out->set_steering_angle_deg(current_state.steering_angle_deg);
+    msg_out->set_steering_angle_deg(current_state.steering_angle_deg); 
+    auto prev_driver_torque_req = msg_out->mutable_driver_torque();   
 
-    auto prev_driver_torque_req = msg_out->mutable_driver_torque();
-    prev_driver_torque_req->set_fl(current_state.prev_controller_output.torque_lim_nm.FL);
-    prev_driver_torque_req->set_fr(current_state.prev_controller_output.torque_lim_nm.FR);
-    prev_driver_torque_req->set_rl(current_state.prev_controller_output.torque_lim_nm.RL);
-    prev_driver_torque_req->set_rr(current_state.prev_controller_output.torque_lim_nm.RR);
+    if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&current_state.prev_controller_output.out)) {
+        // TODO: REPLACE THIS CODE BLOCK TO PUSH A TORQUE CONTROLLER STRUCT IN THE PROTOBUF MESSAGE, NOT A SPEED CONTROLLER STRUCT
+        // RIGHT NOW IT TREATS DESIRED TORQUE AS A TORQUE LIMIT
+        msg_out->set_is_using_torque_controller(true); // add to message that we are using desired torque commands, not torque limits
+        prev_driver_torque_req->set_fl(torqueControl->desired_torques_nm.FL);
+        prev_driver_torque_req->set_fr(torqueControl->desired_torques_nm.FR);
+        prev_driver_torque_req->set_rl(torqueControl->desired_torques_nm.RL);
+        prev_driver_torque_req->set_rr(torqueControl->desired_torques_nm.RR);
+
+    } else if (const core::SpeedControlOut* speedControl = std::get_if<core::SpeedControlOut>(&current_state.prev_controller_output.out)) { // assuming no monostate possible here
+        msg_out->set_is_using_torque_controller(false);
+        prev_driver_torque_req->set_fl(speedControl->torque_lim_nm.FL);
+        prev_driver_torque_req->set_fr(speedControl->torque_lim_nm.FR);
+        prev_driver_torque_req->set_rl(speedControl->torque_lim_nm.RL);
+        prev_driver_torque_req->set_rr(speedControl->torque_lim_nm.RR);    
+    }
 
     auto log_start = std::chrono::high_resolution_clock::now();
     _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
