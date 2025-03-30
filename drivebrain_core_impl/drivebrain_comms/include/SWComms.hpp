@@ -26,16 +26,22 @@ namespace comms {
 class SWDriver : public core::common::Configurable
 {
 public:
-    SWDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context &io_context);
+    SWDriver(core::JsonFileHandler &json_file_handler,
+             core::Logger &logger,
+             std::shared_ptr<loggertype> message_logger,
+             core::StateEstimator &state_estimator,
+             boost::asio::io_context &io_context);
     bool init();
+    void standby_mode(); 
+    void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);
 
     struct config {
         int baud_rate;
     };
 
-    void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);
-
 private:
+    void _start_receive();
+
     core::Logger &_logger;
     core::StateEstimator &_state_estimator;
     boost::array<std::uint8_t, 512> _output_buff;
@@ -44,7 +50,7 @@ private:
     std::shared_ptr<loggertype> _message_logger;
     config _config;
 
-    void _start_receive();
+    bool _active_connection = false;
 };
 
 }
