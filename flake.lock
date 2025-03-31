@@ -151,11 +151,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1741352980,
-        "narHash": "sha256-+u2UunDA4Cl5Fci3m7S643HzKmIDAe+fiXrLqYsR2fs=",
+        "lastModified": 1738453229,
+        "narHash": "sha256-7H9XgNiGLKN1G1CgRh0vUL4AheZSYzPm+zmZ7vxbJdo=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "f4330d22f1c5d2ba72d3d22df5597d123fdb60a9",
+        "rev": "32ea77a06711b758da0ad9bd6a844c5740a87abd",
         "type": "github"
       },
       "original": {
@@ -235,11 +235,11 @@
     "foxglove-schemas-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1742332163,
-        "narHash": "sha256-GdHx4NtpCdipBbuToHtE+joryJt/YG4vOqGGH8Raqbw=",
+        "lastModified": 1738884246,
+        "narHash": "sha256-2o0oVc3GUUFrwktcVzYoshVcLjLam/6unaY6MgrmVAM=",
         "owner": "foxglove",
         "repo": "schemas",
-        "rev": "1ded9d0b71f0fdaf3a7064506be055aa009c1fc9",
+        "rev": "ce1ffa651a01277fdb43b86ac3f42e5b755c6869",
         "type": "github"
       },
       "original": {
@@ -641,7 +641,25 @@
         "nebs-packages": "nebs-packages",
         "nix-proto": "nix-proto_2",
         "nixpkgs": "nixpkgs_3",
+        "simulink-automation-src": "simulink-automation-src",
         "vn_driver_lib": "vn_driver_lib"
+      }
+    },
+    "simulink-automation-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739899350,
+        "narHash": "sha256-9BYbFPgHMOP756AhWICIzg6qxTdBcT831bO0QhI3WPM=",
+        "owner": "hytech-racing",
+        "repo": "drivebrain_core",
+        "rev": "a90ba76b5ff105814c1fd64e8112b5eae5f5bae4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hytech-racing",
+        "ref": "feature/low_level_inputs",
+        "repo": "drivebrain_core",
+        "type": "github"
       }
     },
     "soem-src": {

@@ -48,26 +48,8 @@
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, nanopb-proto-api, ... }@inputs:
     let
-      nanopb-api = nix-proto.mkProtoDerivation {
-        name = "nanopb-api";
-        version = "0.0.0";
-        # need to remove the makefile from the proto boi because nix will attempt to build that shit
-        src = builtins.filterSource (path: _: baseNameOf path != "Makefile") "${nanopb-proto-api}/generator/proto";
-      };
-
-      drivebrain_core_msgs = { nanopb-api }: nix-proto.mkProtoDerivation {
-        name = "drivebrain_core_msgs";
-        version = (HT_proto.rev or "asdf");
-        
-        src = "${HT_proto}/proto";
-        # protoDeps = [ nanopb-api ];
-      };
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
-
-        inherit nanopb-api;
-        inherit drivebrain_core_msgs;
-
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
           version = "1.0.1";
@@ -76,17 +58,21 @@
             namespace = "foxglove";
           };
         };
-
-
-        db_service = nix-proto.mkProtoDerivation
-          {
-            name = "db_service";
-            version = "0.0.1";
-            src = nix-proto.lib.srcFromNamespace {
-              root = ./proto;
-              namespace = "db_service";
-            };
+        drivebrain_core_msgs = nix-proto.mkProtoDerivation {
+          name = "drivebrain_core_msgs";
+          version = HT_proto.rev;
+          src = "${HT_proto}/proto";
           };
+        db_service = nix-proto.mkProtoDerivation
+            {
+              name = "db_service";
+              version = "0.0.1";
+              src = nix-proto.lib.srcFromNamespace {
+                root = ./proto;
+                namespace = "db_service";
+              };
+            };
+        
       };
 
       db_core_overlay = final: prev: {
@@ -162,7 +148,8 @@
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
-              packages = [ pkgs.mcap-cli ];
+              nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
+              packages = [ pkgs.mcap-cli pkgs.valgrind ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

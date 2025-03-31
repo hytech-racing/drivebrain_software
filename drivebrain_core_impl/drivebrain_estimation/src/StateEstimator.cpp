@@ -62,8 +62,8 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
             _timestamp_array[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
             _raw_input_data.raw_load_cell_values.RL = in_msg->rl_load_cell();
             _raw_input_data.raw_load_cell_values.RR = in_msg->rr_load_cell();
-            _raw_input_data.raw_shock_pot_values.RL = in_msg->rl_shock_pot();
-            _raw_input_data.raw_shock_pot_values.RR = in_msg->rr_shock_pot();
+            // _raw_input_data.raw_shock_pot_values.RL = in_msg->rl_shock_pot();
+            // _raw_input_data.raw_shock_pot_values.RR = in_msg->rr_shock_pot();
         }
     } else if(message->GetTypeName() == "hytech.front_suspension")
     {
@@ -73,8 +73,8 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
             _timestamp_array[1] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
             _raw_input_data.raw_load_cell_values.FL = in_msg->fl_load_cell();
             _raw_input_data.raw_load_cell_values.FR = in_msg->fr_load_cell();
-            _raw_input_data.raw_shock_pot_values.FL = in_msg->fl_shock_pot();
-            _raw_input_data.raw_shock_pot_values.FR = in_msg->fr_shock_pot();
+            // _raw_input_data.raw_shock_pot_values.FL = in_msg->fl_shock_pot();
+            // _raw_input_data.raw_shock_pot_values.FR = in_msg->fr_shock_pot();
         }
     } else if(message->GetTypeName() == "hytech.pedals_system_data")
     {
@@ -91,8 +91,8 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
         {
             std::unique_lock lk(_state_mutex);
             _timestamp_array[3] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-            _raw_input_data.raw_steering_analog = in_msg->steering_analog_raw();
-            _raw_input_data.raw_steering_digital = in_msg->steering_digital_raw();
+            // _raw_input_data.raw_steering_analog = in_msg->steering_analog_raw();
+            // _raw_input_data.raw_steering_digital = in_msg->steering_digital_raw();
         }
     } else {
         _recv_inverter_states(message);
@@ -129,9 +129,9 @@ void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::proto
     auto in_msg = std::static_pointer_cast<inverter_dynamics_msg>(msg);
     {
         std::unique_lock lk(_state_mutex);
-        _raw_input_data.raw_inverter_torques.set_from_index<ind>(in_msg->actual_torque_nm());
-        _raw_input_data.raw_inverter_power.set_from_index<ind>(in_msg->actual_power_w());
-        _vehicle_state.current_rpms.set_from_index<ind>(in_msg->actual_speed_rpm());
+        // _raw_input_data.raw_inverter_torques.set_from_index<ind>(in_msg->actual_torque_nm());
+        // _raw_input_data.raw_inverter_power.set_from_index<ind>(in_msg->actual_power_w());
+        // _vehicle_state.current_rpms.set_from_index<ind>(in_msg->actual_speed_rpm());
     }
 }
 

@@ -20,7 +20,7 @@ namespace control
         // rear_torque_scale:
         // 0 to 2 scale on forward torque to rear wheels. 0 = FWD, 1 = Balanced, 2 = RWD
 
-        // regen_torque_scale:
+        // regen_torque_scale:`
         // same as rear_torque_scale but applies to regen torque split. 0 = All regen
         // torque on the front, 1 = 50/50, 2 = all regen torque on the rear
         
@@ -30,9 +30,9 @@ namespace control
         float rear_torque_scale;  
         float regen_torque_scale; 
         speed_m_s positive_speed_set;
+        float max_power_kw;
     };
-        SimpleSpeedController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleSpeedController") {}
-        SimpleSpeedController(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::string config) : Configurable(logger, json_file_handler, config) {}
+        SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
         float get_dt_sec() override { 
             return (0.001); 
         }
@@ -41,6 +41,7 @@ namespace control
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
+        core::SpeedControlOut _apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms);
     private:
         std::mutex _config_mutex;
         config _config;

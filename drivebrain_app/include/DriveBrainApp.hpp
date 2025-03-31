@@ -10,7 +10,7 @@
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
 #include <MsgLogger.hpp>
-#include <MCAPProtobufLogger.hpp>
+#include <DrivebrainMCAPLogger.hpp>
 #include <mcap/writer.hpp>
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
@@ -64,22 +64,18 @@ private:
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 
-    std::vector<core::common::Configurable*> _configurable_components;
-    std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
-
-    // TCMUX
+    std::vector<std::shared_ptr<core::common::Configurable>> _configurable_components;
+    std::shared_ptr<common::DrivebrainMCAPLogger> _mcap_logger;
     std::shared_ptr<control::SimpleSpeedController> controller1;
     std::shared_ptr<control::SimpleTorqueController> controller2;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 > _controllerManager;
-    std::function<bool(size_t)> switch_modes;
-
-    // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
-    std::unique_ptr<core::FoxgloveWSServer> _foxglove_server;
+        // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
+    std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger;
     std::unique_ptr<core::StateEstimator> _state_estimator;
-    std::unique_ptr<comms::CANDriver> _driver;
+    std::shared_ptr<comms::CANDriver> _driver;
     std::unique_ptr<comms::MCUETHComms> _eth_driver;
-    std::unique_ptr<comms::VNDriver> _vn_driver;
+    std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
     std::thread _process_thread;

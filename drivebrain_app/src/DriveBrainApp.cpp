@@ -18,68 +18,88 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , controller2(std::make_shared<control::SimpleTorqueController>(_logger, _config))
     , _controllerManager(_logger, _config, {controller1, controller2})  // Initialize correctly
 {
+    // spdlog::info("top o");
+    std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
+    spdlog::set_level(spdlog::level::info);
 
-    spdlog::set_level(spdlog::level::warn);
+    // TODO make this function that can get the config schemas from the configureable components. it also needs to join all of the schemas together 
+    
+    auto get_schema = []() -> nlohmann::json
+    {
+        return nlohmann::json();
+    };
 
-    _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
+    
+    _controller = std::make_shared<control::SimpleController>(_config);
+    if (!_controller->init()) {
+        throw std::runtime_error("Failed to initialize controller");
+    }
+    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
+    spdlog::info("made controller");
 
-    //control::SimpleSpeedController controller1(_logger, _config);
-    //control::SimpleTorqueController controller2(_logger, _config);
-    _configurable_components.push_back(controller1.get());
-    _configurable_components.push_back(controller2.get());
-    //_controllerManager = control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 >(_logger, _config, {&controller1 , &controller2});
-    _configurable_components.push_back(&_controllerManager);
-
-    bool successful_controller1_init = controller1->init();
-    bool successful_controller2_init = controller2->init();
-    bool successful_manager_init = _controllerManager.init();
     
-    // bool matlab_construction_failed = false;
-    // _matlab_math = std::make_unique<estimation::Tire_Model_Codegen_MatlabModel>(
-    //     _logger, _config, matlab_construction_failed);
     
-    // _configurable_components.push_back(_matlab_math.get());
-    
-    _foxglove_server = std::make_unique<core::FoxgloveWSServer>(_configurable_components);
-    
-    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
-        ".mcap", true,
-        std::bind(&common::MCAPProtobufLogger::log_msg, std::ref(*_mcap_logger), std::placeholders::_1),
-        std::bind(&common::MCAPProtobufLogger::close_current_mcap, std::ref(*_mcap_logger)),
-        std::bind(&common::MCAPProtobufLogger::open_new_mcap, std::ref(*_mcap_logger), std::placeholders::_1),
-        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, std::ref(*_foxglove_server), std::placeholders::_1));
     
     _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
-    
+    spdlog::info("made state estimator");
     bool construction_failed = false;
-    _driver = std::make_unique<comms::CANDriver>(
+    // this also calls init() in the constructor
+    _driver = std::make_shared<comms::CANDriver>(
         _config, _logger, _message_logger,_can_tx_queue, _io_context, 
         _dbc_path, construction_failed, *_state_estimator);
     
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    
-    _configurable_components.push_back(_driver.get());
-    
+    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_driver));
+    spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
+    
+    spdlog::info("eth driver");
+    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+    spdlog::info("made db service");
     if(_settings.use_vectornav)
     {
-        _vn_driver = std::make_unique<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context);
+        // on creation calls init()
+        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
+        if (construction_failed) {
+           throw std::runtime_error("Failed to construct VN driver");
+        }
+        configurable_components.push_back(_vn_driver);
     }
+
     
-    if (!successful_controller1_init || !successful_controller2_init) {
-        throw std::runtime_error("Failed to initialize a controller");
-    }
-    if (!successful_manager_init) {
-        throw std::runtime_error("Failed to initialize controller manager");
-    }
-    switch_modes = 
-    [this](size_t mode) -> bool {
-        return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
-    };
+    
+    
+    // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 
+    // the mcap logger is needed by the message logger but I wont know the schemas until the components have been created and the each
+    // component is given the message logger on construction. 
+    //   if I just have an initialize method that calls the schema get function and sets a member var to store that schema
+    //   that could work. 
+    
+    // - [x] TODO add in function for getting the current config values periodically of all of the configureable components,
+    //       or, just give the vector of configureable components that gets given to the foxglove webserver instance
+    //       and make the logger also handle the getting of all of the configs of the components (imma do dis way)
+    _mcap_logger = std::make_shared<common::DrivebrainMCAPLogger>("temp", configurable_components);
+    _foxglove_server = std::make_shared<core::FoxgloveWSServer>(configurable_components);
+    
+    spdlog::info("made mcap logger and foxglove server");
+
+    // all things must be initialized before this gets constructed due to logging on init needing the schemas determined by the init 
+    // functions of the configurable components
+    _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
+        ".mcap", true,
+        std::bind(&common::DrivebrainMCAPLogger::log_msg, _mcap_logger, std::placeholders::_1),
+        std::bind(&common::DrivebrainMCAPLogger::close_current_mcap, _mcap_logger),
+        std::bind(&common::DrivebrainMCAPLogger::open_new_mcap, _mcap_logger, std::placeholders::_1),
+        std::bind(&core::FoxgloveWSServer::send_live_telem_msg, _foxglove_server, std::placeholders::_1),
+        std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
+        std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
+
+    spdlog::info("constructed app");
+    // TODO add here the creation of the config logger
 }
 
 DriveBrainApp::~DriveBrainApp() {

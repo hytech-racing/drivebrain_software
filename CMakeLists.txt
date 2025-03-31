@@ -133,10 +133,10 @@ target_link_libraries(drivebrain_control PUBLIC
 
 make_cmake_package(drivebrain_control drivebrain)
 
-add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_mcap_logger/src/MCAPProtobufLogger.cpp)
+add_library(drivebrain_mcap_logger SHARED drivebrain_core_impl/drivebrain_logging/src/DrivebrainMCAPLogger.cpp)
 target_include_directories(drivebrain_mcap_logger PUBLIC
-    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_mcap_logger/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_mcap_logger/include>    
+    $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_logging/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_logging/include>    
 )
 
 target_link_libraries(drivebrain_mcap_logger PUBLIC
@@ -238,6 +238,14 @@ target_link_libraries(test_db_grpc PUBLIC
     gRPC::grpc++_reflection
 )
 
+add_executable(test_config_schema test/test_configurable.cpp)
+
+target_link_libraries(test_config_schema PRIVATE
+    drivebrain_core::drivebrain_core
+    drivebrain_mcap_logger
+    drivebrain_comms
+)
+
 
 add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)
 
@@ -269,6 +277,14 @@ add_executable(alpha_build
 target_include_directories(alpha_build PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
+
+enable_testing()
+
+# add_executable(alpha_test 
+#     unit_test/main.cpp
+#     # unit_test/SimpleControllerTest.cpp
+# )
+
 target_link_libraries(alpha_build PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
@@ -300,9 +316,6 @@ add_executable(alpha_test
 
 )
 
-
-
-
 target_link_libraries(alpha_test PUBLIC 
     drivebrain_core::drivebrain_core
     drivebrain_control
@@ -311,7 +324,7 @@ target_link_libraries(alpha_test PUBLIC
     gtest
 )
 
-add_test(NAME MyTest COMMAND alpha_test)
+add_test(NAME Drivebrain_Tests COMMAND alpha_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
