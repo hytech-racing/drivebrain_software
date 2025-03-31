@@ -15,8 +15,6 @@ core::JsonFileHandler _config("../config/test_tcmux_integration.json");
 std::shared_ptr<control::SimpleTorqueController> controller1(std::make_shared<control::SimpleTorqueController>(_config));
 std::shared_ptr<control::SimpleSpeedController> controller2(std::make_shared<control::SimpleSpeedController>(_config));
 
-  // std::cout << _controllerManager.ma
-
          // for 1000 rpm
         // _max_switch_rpm = ((*max_switch_speed) * constants::METERS_PER_SECOND_TO_RPM);
         // METERS_PER_SECOND_TO_RPM    = 1.0 / RPM_TO_METERS_PER_SECOND;
