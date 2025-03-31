@@ -5,7 +5,7 @@
 #include <MCUETHComms.hpp>
 #include <VNComms.hpp>
 #include <MsgLogger.hpp>
-#include <MCAPProtobufLogger.hpp>
+#include <DrivebrainMCAPLogger.hpp>
 #include <mcap/writer.hpp>
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>

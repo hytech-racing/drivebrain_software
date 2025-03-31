@@ -37,6 +37,11 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
+      url = "github:hytech-racing/drivebrain_core/feature/param_rec_support";
+      flake = false;
+    };
+
+    simulink-automation-src = {
       url = "github:hytech-racing/drivebrain_core/feature/low_level_inputs";
       flake = false;
     };
@@ -162,7 +167,8 @@
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                   alias run="./build/alpha_build config/drivebrain_config.json $DBC_PATH/hytech.dbc"
                 '';
-              packages = [ pkgs.mcap-cli ];
+              nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
+              packages = [ pkgs.mcap-cli pkgs.ethercat ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

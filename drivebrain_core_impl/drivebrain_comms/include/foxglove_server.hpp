@@ -27,7 +27,7 @@ namespace core
     public:
         FoxgloveWSServer() = delete;
 
-        FoxgloveWSServer(std::vector<core::common::Configurable *> configurable_components);
+        FoxgloveWSServer(std::vector<std::shared_ptr<core::common::Configurable>> configurable_components);
         void send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg);
         ~FoxgloveWSServer()
         {
@@ -61,7 +61,7 @@ namespace core
         std::optional<foxglove::Parameter> _convert_foxglove_param(core::common::Configurable::ParamTypes curr_param_val, foxglove::Parameter incoming_param);
         void _handle_foxglove_send();
     private:
-        std::vector<core::common::Configurable *> _components;
+        std::vector<std::shared_ptr<core::common::Configurable>> _components;
         std::unique_ptr<foxglove::ServerInterface<websocketpp::connection_hdl>> _server;
         std::function<void(foxglove::WebSocketLogLevel, char const *)> _log_handler;
         foxglove::ServerOptions _server_options;
