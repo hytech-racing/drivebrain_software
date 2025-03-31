@@ -164,6 +164,7 @@ TEST_F(ControllerManagerTest, SwapControllerFailure_HighRPM_onewheel) {
 
 //test foot on accelerator over/under threshold
 TEST_F(ControllerManagerTest, SwapAccelerator) {
+    vehicle_state.current_rpms = {0, 0, 0, 0};
     vehicle_state.input.requested_accel = .3;
     ASSERT_FALSE(controller_manager_2speed.swap_active_controller(1, vehicle_state));
     EXPECT_EQ(controller_manager_2speed.get_current_ctr_manager_state().current_status, core::control::ControllerManagerStatus::ERROR_DRIVER_ON_PEDAL);
