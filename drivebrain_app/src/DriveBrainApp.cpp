@@ -1,6 +1,7 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
 #include <mutex>
 #include <thread>
@@ -13,25 +14,24 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-    , controller1(control::SimpleSpeedController(_logger, _config))
-    , controller2(control::SimpleTorqueController(_logger, _config))
-    , _controllerManager(_logger, _config, {&controller1, &controller2})  // Initialize correctly
+    , controller1(std::make_shared<control::SimpleSpeedController>(_logger, _config))
+    , controller2(std::make_shared<control::SimpleTorqueController>(_logger, _config))
+    , _controllerManager(_logger, _config, {controller1, controller2})  // Initialize correctly
 {
 
     spdlog::set_level(spdlog::level::warn);
 
     _mcap_logger = std::make_unique<common::MCAPProtobufLogger>("temp");
 
-
     //control::SimpleSpeedController controller1(_logger, _config);
     //control::SimpleTorqueController controller2(_logger, _config);
-    _configurable_components.push_back(&controller1);
-    _configurable_components.push_back(&controller2);
+    _configurable_components.push_back(controller1.get());
+    _configurable_components.push_back(controller2.get());
     //_controllerManager = control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 >(_logger, _config, {&controller1 , &controller2});
     _configurable_components.push_back(&_controllerManager);
 
-    bool successful_controller1_init = controller1.init();
-    bool successful_controller2_init = controller2.init();
+    bool successful_controller1_init = controller1->init();
+    bool successful_controller2_init = controller2->init();
     bool successful_manager_init = _controllerManager.init();
     
     // bool matlab_construction_failed = false;

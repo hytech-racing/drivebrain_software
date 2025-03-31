@@ -1,6 +1,7 @@
 // DriveBrainApp.hpp
 #pragma once
 
+#include "SimpleTorqueController.hpp"
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 #include <SimpleSpeedController.hpp>
@@ -67,8 +68,8 @@ private:
     std::unique_ptr<common::MCAPProtobufLogger> _mcap_logger;
 
     // TCMUX
-    control::SimpleSpeedController controller1;
-    control::SimpleTorqueController controller2;
+    std::shared_ptr<control::SimpleSpeedController> controller1;
+    std::shared_ptr<control::SimpleTorqueController> controller2;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 > _controllerManager;
     std::function<bool(size_t)> switch_modes;
 

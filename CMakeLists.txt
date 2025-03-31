@@ -112,7 +112,6 @@ target_link_libraries(drivebrain_comms PUBLIC
     libvncxx::libvncxx
     drivebrain_estimation
     spdlog::spdlog
-    drivebrain_control
 )
 
 make_cmake_package(drivebrain_comms drivebrain)

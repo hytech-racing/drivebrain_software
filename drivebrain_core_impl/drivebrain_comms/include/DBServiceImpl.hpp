@@ -10,7 +10,6 @@
 #include <grpcpp/grpcpp.h>
 
 #include <MsgLogger.hpp>
-#include <Controllers.hpp>
 #include <ControllerManager.hpp>
 
 class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {

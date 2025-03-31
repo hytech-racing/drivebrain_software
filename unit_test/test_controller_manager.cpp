@@ -6,13 +6,14 @@
 #include "SimpleTorqueController.hpp"
 
 #include <VehicleDataTypes.hpp>
+#include <memory>
 
 class ControllerManagerTest : public ::testing::Test {
 protected:
-    control::SimpleSpeedController simpleSpeedController1;
-    control::SimpleTorqueController simpleTorqueController1;
-    control::SimpleSpeedController simpleSpeedController2;
-    control::SimpleTorqueController simpleTorqueController2;
+    std::shared_ptr<control::SimpleSpeedController> simpleSpeedController1;
+    std::shared_ptr<control::SimpleTorqueController> simpleTorqueController1;
+    std::shared_ptr<control::SimpleSpeedController> simpleSpeedController2;
+    std::shared_ptr<control::SimpleTorqueController> simpleTorqueController2;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_2speed;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_2torque;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_diff;
@@ -26,13 +27,13 @@ protected:
     ControllerManagerTest()
         : logger(core::LogLevel::NONE),
           json_file_handler("../config/drivebrain_config.json"),
-          simpleSpeedController1(logger, json_file_handler),
-          simpleSpeedController2(logger, json_file_handler),
-          simpleTorqueController1(logger, json_file_handler),
-          simpleTorqueController2(logger, json_file_handler),
-          controller_manager_2speed(logger, json_file_handler, {&simpleSpeedController1, &simpleSpeedController2}),
-          controller_manager_2torque(logger, json_file_handler, {&simpleTorqueController1, &simpleTorqueController2}),
-          controller_manager_diff(logger, json_file_handler, {&simpleSpeedController1, &simpleTorqueController1})
+          simpleSpeedController1(std::make_shared<control::SimpleSpeedController>(logger, json_file_handler)),
+          simpleSpeedController2(std::make_shared<control::SimpleSpeedController>(logger, json_file_handler)),
+          simpleTorqueController1(std::make_shared<control::SimpleTorqueController>(logger, json_file_handler)),
+          simpleTorqueController2(std::make_shared<control::SimpleTorqueController>(logger, json_file_handler)),
+          controller_manager_2speed(logger, json_file_handler, {simpleSpeedController1, simpleSpeedController2}),
+          controller_manager_2torque(logger, json_file_handler, {simpleTorqueController1, simpleTorqueController2}),
+          controller_manager_diff(logger, json_file_handler, {simpleSpeedController1, simpleTorqueController1})
     {
     }
 
@@ -45,10 +46,10 @@ protected:
         controller_manager_2speed.init();
         controller_manager_2torque.init();
         controller_manager_diff.init();
-        simpleSpeedController1.init();
-        simpleSpeedController2.init();
-        simpleTorqueController1.init();
-        simpleTorqueController2.init();
+        simpleSpeedController1->init();
+        simpleSpeedController2->init();
+        simpleTorqueController1->init();
+        simpleTorqueController2->init();
         
         // std::cout << "set up" << std::endl;
     }
