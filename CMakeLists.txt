@@ -276,6 +276,14 @@ add_executable(alpha_build
 target_include_directories(alpha_build PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
+
+enable_testing()
+
+# add_executable(alpha_test 
+#     unit_test/main.cpp
+#     # unit_test/SimpleControllerTest.cpp
+# )
+
 target_link_libraries(alpha_build PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
@@ -312,7 +320,7 @@ target_link_libraries(alpha_test PUBLIC
     gtest
 )
 
-add_test(NAME MyTest COMMAND alpha_test)
+add_test(NAME Drivebrain_Tests COMMAND alpha_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp

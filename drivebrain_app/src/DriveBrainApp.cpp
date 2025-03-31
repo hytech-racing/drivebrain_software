@@ -27,7 +27,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     };
 
     
-    _controller = std::make_shared<control::SimpleController>(_logger, _config);
+    _controller = std::make_shared<control::SimpleController>(_config);
     if (!_controller->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }

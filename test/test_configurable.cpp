@@ -28,7 +28,7 @@
 class ConfigureableTest : public core::common::Configurable
 {
 public:
-    ConfigureableTest(core::Logger &logger, core::JsonFileHandler &json_file_handler) : _logger(logger), Configurable(_logger, json_file_handler, "ConfigureableTest") {}
+    ConfigureableTest(core::Logger &logger, core::JsonFileHandler &json_file_handler) : _logger(logger), Configurable(json_file_handler, "ConfigureableTest") {}
     bool init() override {
         std::optional test_float = get_parameter_value<float>("test_float");
         std::optional test_bool = get_parameter_value<bool>("test_bool");
@@ -46,7 +46,7 @@ private:
 class ConfigureableTest2 : public core::common::Configurable
 {
 public:
-    ConfigureableTest2(core::Logger &logger, core::JsonFileHandler &json_file_handler) : _logger(logger), Configurable(_logger, json_file_handler, "asdf2") {}
+    ConfigureableTest2(core::Logger &logger, core::JsonFileHandler &json_file_handler) : _logger(logger), Configurable(json_file_handler, "asdf2") {}
     bool init() override {
         std::optional test_float = get_parameter_value<float>("test_val");
         // _configured = true;

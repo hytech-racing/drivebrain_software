@@ -58,7 +58,7 @@ namespace comms
     }
 
     VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io, bool &init_successful)
-        : core::common::Configurable(logger, json_file_handler, "VNDriver"),
+        : core::common::Configurable(json_file_handler, "VNDriver"),
           _logger(logger),
           _state_estimator(state_estimator),
           _message_logger(message_logger),

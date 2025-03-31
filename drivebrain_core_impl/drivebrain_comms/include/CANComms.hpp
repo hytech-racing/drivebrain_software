@@ -67,7 +67,7 @@ namespace comms
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
         CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, core::StateEstimator &state_estimator) : 
-            Configurable(logger, json_file_handler, "CANDriver"),
+            Configurable(json_file_handler, "CANDriver"),
             _logger(logger),
             _message_logger(message_logger),
             _input_deque_ref(in_deq),
