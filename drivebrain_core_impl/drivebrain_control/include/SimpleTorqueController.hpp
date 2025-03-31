@@ -34,6 +34,11 @@ namespace control
         bool init() override;
         core::ControllerOutput step_controller(const core::VehicleState &in) override;
 
+        void get_config() {
+            std::cout << "SimpleTorqueController config: " << std::endl;
+            std::cout << "max_torque: " << _config.max_torque << std::endl;
+            std::cout << "max_reg_torque: " << _config.max_reg_torque << std::endl;
+        }
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
     private:

@@ -41,6 +41,7 @@ bool control::SimpleTorqueController::init()
     auto regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
     if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale))
     {
+        std::cout << "ERROR: couldn't get params" << std::endl;
         return false;
     }
 
