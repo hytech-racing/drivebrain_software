@@ -146,5 +146,5 @@ TEST_F(SimpleControllerTest, TestPowerLimit)
     net_power += ::abs(res.torque_lim_nm.RL) * (current_rpms.RL * constants::RPM_TO_RAD_PER_SECOND);
     net_power += ::abs(res.torque_lim_nm.RR) * (current_rpms.RR * constants::RPM_TO_RAD_PER_SECOND);
 
-    ASSERT_NEAR(net_power, 63000.0, 0.001);  // Expect power limiting applied
+    ASSERT_NEAR(net_power, 63000.0, 0.001);  // Expect power limiting applied and ensure near 63kw (hard-coded limit)
 }
