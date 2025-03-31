@@ -313,7 +313,6 @@ add_executable(alpha_test
     unit_test/SimpleSpeedControllerTest.cpp
     unit_test/SimpleTorqueControllerTest.cpp
     unit_test/test_controller_manager.cpp
-
 )
 
 target_link_libraries(alpha_test PUBLIC 

@@ -16,5 +16,11 @@
         "baud_rate": 921600, 
         "port": 1,
         "freq_divisor": 1
+    },
+    "SimpleTorqueController": {
+        "max_torque": 21.0,
+        "max_regen_torque": 10.0,
+        "rear_torque_scale": 1.0,
+        "regen_torque_scale": 0.6
     }
 }

@@ -37,7 +37,7 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:hytech-racing/drivebrain_core/fix/removing_logger_references_and_controller_pointers";
+      url = "github:hytech-racing/drivebrain_core/main";
       flake = false;
     };
 
