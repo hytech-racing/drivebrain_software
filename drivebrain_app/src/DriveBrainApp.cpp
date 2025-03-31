@@ -1,6 +1,7 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "SimpleSpeedController.hpp"
 #include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
 #include <mutex>
@@ -14,9 +15,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-    , controller1(std::make_shared<control::SimpleSpeedController>(_logger, _config))
-    , controller2(std::make_shared<control::SimpleTorqueController>(_logger, _config))
-    , _controllerManager(_logger, _config, {controller1, controller2})  // Initialize correctly
+    , controller1(std::make_shared<control::SimpleSpeedController>(_config))
+    , controller2(std::make_shared<control::SimpleTorqueController>(_config))
+    , _controllerManager(_config, {controller1, controller2})  // Initialize correctly
 {
     // spdlog::info("top o");
     std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
@@ -30,11 +31,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     };
 
     
-    _controller = std::make_shared<control::SimpleController>(_config);
-    if (!_controller->init()) {
+    controller1 = std::make_shared<control::SimpleSpeedController>(_config);
+    if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
+    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(controller1));
     spdlog::info("made controller");
 
     
@@ -200,7 +201,7 @@ void DriveBrainApp::run() {
         
         if (!_settings.run_db_service) return;
         
-        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
+        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {

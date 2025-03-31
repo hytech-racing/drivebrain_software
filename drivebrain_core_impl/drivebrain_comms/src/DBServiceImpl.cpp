@@ -1,78 +1,33 @@
-#include <DBServiceImpl.hpp>
-#include "spdlog/spdlog.h"
+#ifndef DBSERVICE_IMPL_HPP
+#define DBSERVICE_IMPL_HPP
 
-grpc::Status DBInterfaceImpl::RequestStopLogging(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
-{
-    {
-        spdlog::warn("requested stopping of logging");
-        _logger_inst->stop_logging_to_file();
-        auto status = _logger_inst->get_logger_status();
+#include <db_service/v1/service/db_interface.grpc.pb.h>
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include <iostream>
+#include <memory>
+#include <string>
 
-        response->set_active_or_previous_log_file_name(std::get<0>(status));
-        response->set_currently_logging(std::get<1>(status));
-        return grpc::Status::OK;
-    }
-}
-grpc::Status DBInterfaceImpl::RequestStartLogging(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
-{
-    {
-        spdlog::warn("requested start of logging");
-        _logger_inst->start_logging_to_new_file();
-        auto status = _logger_inst->get_logger_status();
-        response->set_active_or_previous_log_file_name(std::get<0>(status));
-        response->set_currently_logging(std::get<1>(status));
-        return grpc::Status::OK;
-    }
-}
-grpc::Status DBInterfaceImpl::RequestCurrentLoggerStatus(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
-{
-    {
-        spdlog::warn("requested status of logger");
-        auto status = _logger_inst->get_logger_status();
-        response->set_active_or_previous_log_file_name(std::get<0>(status));
-        response->set_currently_logging(std::get<1>(status));
-        return grpc::Status::OK;
-    }
-}
+#include <grpcpp/grpcpp.h>
 
-grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response)
-{
-    if(_mode_switch(static_cast<size_t>(rq->requested_controller_index()))){
-        response->set_status("switch");
-    }
-    else{
-        response->set_status("no switch");
-    }
+#include <MsgLogger.hpp>
 
-    return grpc::Status::OK;
-}
+class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch)
-        : _logger_inst(logger_inst), _mode_switch(mode_switch){
-}
-void DBInterfaceImpl::stop_server() {
-    if (_server) {
-        spdlog::warn("Shutting down the server...");
+    struct InitStruct {
+        std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst;
+    };
+    grpc::Status RequestStopLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override; 
+    grpc::Status RequestStartLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override;
+    grpc::Status RequestCurrentLoggerStatus(grpc::ServerContext* context, const google::protobuf::Empty* request, db_service::v1::service::LoggerStatus* response) override; 
+    
+    public: 
+        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst);
+        void run_server(); 
+        void stop_server();
+    private:
+        std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _logger_inst;
+        std::unique_ptr<grpc::Server> _server;  // Store server instance here
 
-        _server->Shutdown();
-    }
-}
-void DBInterfaceImpl::run_server()
-{
-    std::string server_address = "0.0.0.0:6969";
+};
 
-    grpc::reflection::InitProtoReflectionServerBuilderPlugin();
-    grpc::ServerBuilder builder;
-    // Listen on the given address without any authentication mechanism.
-    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-    // Register "service" as the instance through which we'll communicate with
-    // clients. In this case it corresponds to an *synchronous* service.
-    builder.RegisterService(this);
-    // Finally assemble the server.
-    _server = builder.BuildAndStart();
-    spdlog::warn("Server listening on ");
-
-    // Wait for the server to shutdown. Note that some other thread must be
-    // responsible for shutting down the server for this call to ever return.
-    _server->Wait();
-}
+#endif

@@ -4,11 +4,7 @@
 #include <Controller.hpp>
 #include <ControllerManager.hpp>
 #include <JsonFileHandler.hpp>
-#include <Logger.hpp>
-#include <JsonFileHandler.hpp>
-#include <MsgLogger.hpp>
 #include <VehicleDataTypes.hpp>
-#include <cstddef>
 #include <hytech.pb.h>
 
 #include <cstdio>
@@ -16,9 +12,8 @@
 #include <memory>
 #include <chrono>
 core::JsonFileHandler _config("../config/test_tcmux_integration.json");
-core::Logger _logger(core::LogLevel::INFO);
-std::shared_ptr<control::SimpleTorqueController> controller1(std::make_shared<control::SimpleTorqueController>(_logger, _config));
-std::shared_ptr<control::SimpleSpeedController> controller2(std::make_shared<control::SimpleSpeedController>(_logger, _config));
+std::shared_ptr<control::SimpleTorqueController> controller1(std::make_shared<control::SimpleTorqueController>(_config));
+std::shared_ptr<control::SimpleSpeedController> controller2(std::make_shared<control::SimpleSpeedController>(_config));
 
   // std::cout << _controllerManager.ma
 
@@ -35,7 +30,7 @@ int main(int argc, char **argv) {
     controller2->init();
     // important to init controllers. maybe put this in constructor?
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 > _controllerManager(
-        _logger, _config, {controller1, controller2}
+        _config, {controller1, controller2}
     );
     _controllerManager.init();
 

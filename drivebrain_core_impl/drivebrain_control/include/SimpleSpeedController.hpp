@@ -1,7 +1,6 @@
 #pragma once
 #include <Controller.hpp>
 #include <Configurable.hpp>
-#include <Logger.hpp>
 #include <hytech_msgs.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
@@ -32,7 +31,7 @@ namespace control
         speed_m_s positive_speed_set;
         float max_power_kw;
     };
-        SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
+        SimpleSpeedController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleSpeedController") {}
         float get_dt_sec() override { 
             return (0.001); 
         }

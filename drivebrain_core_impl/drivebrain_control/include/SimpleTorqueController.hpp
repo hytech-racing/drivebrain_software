@@ -1,7 +1,6 @@
 #pragma once
 #include <Controller.hpp>
 #include <Configurable.hpp>
-#include <Logger.hpp>
 #include <hytech_msgs.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
@@ -26,8 +25,7 @@ namespace control
             float rear_torque_scale;  
             float regen_torque_scale;
         };
-        SimpleTorqueController(core::Logger &logger, core::JsonFileHandler &json_file_handler) : Configurable(logger, json_file_handler, "SimpleTorqueController") {}
-        SimpleTorqueController(core::Logger &logger, core::JsonFileHandler &json_file_handler, std::string config) : Configurable(logger, json_file_handler, config) {}
+        SimpleTorqueController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleTorqueController") {}
         float get_dt_sec() override { 
             return (0.001); 
         }

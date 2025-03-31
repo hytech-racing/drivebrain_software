@@ -10,6 +10,7 @@ class SimpleSpeedControllerTest : public testing::Test {
 protected:
     core::Logger logger;
     core::JsonFileHandler config;
+    core::JsonFileHandler fail_config;
     control::SimpleSpeedController simple_controller;
     control::SimpleSpeedController fail_controller;
     core::VehicleState in;
@@ -17,8 +18,9 @@ protected:
     SimpleSpeedControllerTest()
         : logger(core::LogLevel::INFO), 
         config("../config/drivebrain_config.json"),
-        simple_controller(logger, config),
-        fail_controller(logger, config, "no_config_here"),
+        fail_config("../config/fail_config.json"),
+        simple_controller(config),
+        fail_controller(fail_config),
         in()
     {
         in.is_ready_to_drive = true;

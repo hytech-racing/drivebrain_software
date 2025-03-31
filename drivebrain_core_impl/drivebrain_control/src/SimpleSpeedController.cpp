@@ -59,7 +59,7 @@ bool control::SimpleSpeedController::init()
 
     _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set, *max_power_kw};
 
-    param_update_handler_sig.connect(boost::bind(&control::SimpleController::_handle_param_updates, this, std::placeholders::_1));
+    param_update_handler_sig.connect(boost::bind(&control::SimpleSpeedController::_handle_param_updates, this, std::placeholders::_1));
     // _configured = true;
     return true;
 }
@@ -119,12 +119,12 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
     }
 
     
-    cmd_out = _apply_power_limit(cmd_out, in.current_rpms);
+    cmd_out.out = _apply_power_limit(type_set, in.current_rpms);
 
     return cmd_out;
 }
 
-core::SpeedControlOut control::SimpleController::_apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms)
+core::SpeedControlOut control::SimpleSpeedController::_apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms)
 {
     auto cmd_out = current_control;
     std::cout <<"cmd_out.torque_lim_nm.FL " << cmd_out.torque_lim_nm.FL <<std::endl;

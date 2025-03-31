@@ -52,16 +52,16 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1743446752,
-        "narHash": "sha256-5XPD41jIX7rApUfNRnujFt+FXLQr8M+VrReYOWHTKIY=",
+        "lastModified": 1743454261,
+        "narHash": "sha256-cftrGlquFrDt9K63b/CPamaD0yVJkVoYV3zBcOWCJEM=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "c91f915c0d33ed04ef11e9613e57c739538ad10d",
+        "rev": "9b481592d60f7d4b00bf9e28dd33c9391fe5357e",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "fix/resolve_merge_conflicts",
+        "ref": "fix/removing_logger_references_and_controller_pointers",
         "repo": "drivebrain_core",
         "type": "github"
       }
@@ -641,25 +641,7 @@
         "nebs-packages": "nebs-packages",
         "nix-proto": "nix-proto_2",
         "nixpkgs": "nixpkgs_3",
-        "simulink-automation-src": "simulink-automation-src",
         "vn_driver_lib": "vn_driver_lib"
-      }
-    },
-    "simulink-automation-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1739899350,
-        "narHash": "sha256-9BYbFPgHMOP756AhWICIzg6qxTdBcT831bO0QhI3WPM=",
-        "owner": "hytech-racing",
-        "repo": "drivebrain_core",
-        "rev": "a90ba76b5ff105814c1fd64e8112b5eae5f5bae4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hytech-racing",
-        "ref": "feature/low_level_inputs",
-        "repo": "drivebrain_core",
-        "type": "github"
       }
     },
     "soem-src": {

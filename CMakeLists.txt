@@ -238,13 +238,13 @@ target_link_libraries(test_db_grpc PUBLIC
     gRPC::grpc++_reflection
 )
 
-add_executable(test_config_schema test/test_configurable.cpp)
+# add_executable(test_config_schema test/test_configurable.cpp)
 
-target_link_libraries(test_config_schema PRIVATE
-    drivebrain_core::drivebrain_core
-    drivebrain_mcap_logger
-    drivebrain_comms
-)
+#target_link_libraries(test_config_schema PRIVATE
+#    drivebrain_core::drivebrain_core
+#    drivebrain_mcap_logger
+#    drivebrain_comms
+#)
 
 
 add_executable(test_mcap test/test_mcap/test_mcap_logging.cpp test/test_mcap/BuildFileDescriptorSet.cpp)

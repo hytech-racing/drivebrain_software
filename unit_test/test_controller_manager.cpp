@@ -18,22 +18,21 @@ protected:
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_2torque;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> controller_manager_diff;
     core::JsonFileHandler json_file_handler; 
-    core::Logger logger; 
 
     core::VehicleState vehicle_state;
     core::ControllerOutput torque_controller_output;
     core::ControllerOutput speed_controller_output;
 
     ControllerManagerTest()
-        : logger(core::LogLevel::NONE),
+        : 
           json_file_handler("../config/drivebrain_config.json"),
-          simpleSpeedController1(std::make_shared<control::SimpleSpeedController>(logger, json_file_handler)),
-          simpleSpeedController2(std::make_shared<control::SimpleSpeedController>(logger, json_file_handler)),
-          simpleTorqueController1(std::make_shared<control::SimpleTorqueController>(logger, json_file_handler)),
-          simpleTorqueController2(std::make_shared<control::SimpleTorqueController>(logger, json_file_handler)),
-          controller_manager_2speed(logger, json_file_handler, {simpleSpeedController1, simpleSpeedController2}),
-          controller_manager_2torque(logger, json_file_handler, {simpleTorqueController1, simpleTorqueController2}),
-          controller_manager_diff(logger, json_file_handler, {simpleSpeedController1, simpleTorqueController1})
+          simpleSpeedController1(std::make_shared<control::SimpleSpeedController>(json_file_handler)),
+          simpleSpeedController2(std::make_shared<control::SimpleSpeedController>(json_file_handler)),
+          simpleTorqueController1(std::make_shared<control::SimpleTorqueController>(json_file_handler)),
+          simpleTorqueController2(std::make_shared<control::SimpleTorqueController>(json_file_handler)),
+          controller_manager_2speed(json_file_handler, {simpleSpeedController1, simpleSpeedController2}),
+          controller_manager_2torque(json_file_handler, {simpleTorqueController1, simpleTorqueController2}),
+          controller_manager_diff(json_file_handler, {simpleSpeedController1, simpleTorqueController1})
     {
     }
 
