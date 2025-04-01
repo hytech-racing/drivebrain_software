@@ -10,3 +10,5 @@ result-man/
 result-man
 .cache/
 *.dbc
+
+compile_commands.json

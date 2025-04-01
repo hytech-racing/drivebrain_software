@@ -1,10 +1,7 @@
 #pragma once
 #include <Controller.hpp>
 #include <Configurable.hpp>
-#include <Logger.hpp>
 #include <hytech_msgs.pb.h>
-#include <Literals.hpp>
-#include <hytech.pb.h>
 #include <VehicleDataTypes.hpp>
 #include <utility>
 #include <mutex>
@@ -16,7 +13,7 @@ namespace control
 {
 
     // TODO make the output CAN message for the drivetrain, rpms telem is just a standin for now
-    class SimpleController : Controller<core::SpeedControlOut, core::VehicleState>, public core::common::Configurable
+    class SimpleSpeedController : public Controller<core::ControllerOutput, core::VehicleState>, public core::common::Configurable
     {
     public:
         // rear_torque_scale:
@@ -34,12 +31,12 @@ namespace control
         speed_m_s positive_speed_set;
         float max_power_kw;
     };
-        SimpleController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleController") {}
+        SimpleSpeedController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleSpeedController") {}
         float get_dt_sec() override { 
             return (0.001); 
         }
         bool init() override;
-        core::SpeedControlOut step_controller(const core::VehicleState &in) override;
+        core::ControllerOutput step_controller(const core::VehicleState &in) override;
 
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);

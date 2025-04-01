@@ -1,7 +1,10 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "SimpleSpeedController.hpp"
+#include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -13,7 +16,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _logger(core::LogLevel::INFO)
     , _config(_param_path)
     , _settings(settings)
-
+    , controller1(std::make_shared<control::SimpleSpeedController>(_config))
+    , controller2(std::make_shared<control::SimpleTorqueController>(_config))
+    , _controllerManager(_config, {controller1, controller2})  // Initialize correctly
 {
     // spdlog::info("top o");
     std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
@@ -27,11 +32,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     };
 
     
-    _controller = std::make_shared<control::SimpleController>(_config);
-    if (!_controller->init()) {
+    controller1 = std::make_shared<control::SimpleSpeedController>(_config);
+    if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_controller));
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(controller1));
     spdlog::info("made controller");
 
     
@@ -48,14 +53,19 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_driver));
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver));
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
     
     spdlog::info("eth driver");
-    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+
+    auto switch_modes = 
+    [this](size_t mode) -> bool {
+        return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
+    };
+    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
     spdlog::info("made db service");
     if(_settings.use_vectornav)
     {
@@ -125,7 +135,8 @@ void DriveBrainApp::_process_loop() {
     // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
-    auto loop_time = _controller->get_dt_sec();
+    auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
+    auto loop_time = _controllerManager.get_active_controller_timestep();
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -133,44 +144,43 @@ void DriveBrainApp::_process_loop() {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
-        // TODO handle invalid state. need tc mux
-        auto out_struct = _controller->step_controller(state_and_validity.first);
-        auto temp_desired_torques = state_and_validity.first.matlab_math_temp_out;
+
+        auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
+
+        // get current command
+        std::variant<core::SpeedControlOut, core::TorqueControlOut, std::monostate> cmd_out = out_struct.out;
+
+        // push current command for next state estimator call
         _state_estimator->set_previous_control_output(out_struct);
 
-        if(temp_desired_torques.res_torque_lim_nm.FL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fl(out_struct.desired_rpms.FL);
-        }
+        if (const core::SpeedControlOut* speedControl = std::get_if<core::SpeedControlOut>(&cmd_out)) { // speed controller, set RPM
 
-        if(temp_desired_torques.res_torque_lim_nm.FR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_fr(out_struct.desired_rpms.FR);
-        }
+            // set RPMs in message to the RPMS given from the controller
+            desired_rpm_msg->set_drivebrain_set_rpm_fl(speedControl->desired_rpms.FL);
+            desired_rpm_msg->set_drivebrain_set_rpm_fr(speedControl->desired_rpms.FR);
+            desired_rpm_msg->set_drivebrain_set_rpm_rl(speedControl->desired_rpms.RL);
+            desired_rpm_msg->set_drivebrain_set_rpm_rr(speedControl->desired_rpms.RR);
 
-        if(temp_desired_torques.res_torque_lim_nm.RL < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rl(out_struct.desired_rpms.RL);
-        }
-
-        if(temp_desired_torques.res_torque_lim_nm.RR < 0) {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(0);
-        } else {
-            desired_rpm_msg->set_drivebrain_set_rpm_rr(out_struct.desired_rpms.RR);
-        }
-
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.FR));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RL));
-        torque_limit_msg->set_drivebrain_torque_fl(::abs(temp_desired_torques.res_torque_lim_nm.RR));
-
-        {
-            std::unique_lock lk(_can_tx_queue.mtx);
-            _can_tx_queue.deque.push_back(desired_rpm_msg);
-            _can_tx_queue.deque.push_back(torque_limit_msg);
+            // same with torque limits
+            torque_limit_msg->set_drivebrain_torque_fl(::abs(speedControl->torque_lim_nm.FL));
+            torque_limit_msg->set_drivebrain_torque_fr(::abs(speedControl->torque_lim_nm.FR));
+            torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
+            torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_rpm_msg);
+                _can_tx_queue.deque.push_back(torque_limit_msg);
+            }
+        } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
+            // set desired torque
+            desired_torque_msg->set_drivebrain_torque_fl(::abs(torqueControl->desired_torques_nm.FL));
+            desired_torque_msg->set_drivebrain_torque_fr(::abs(torqueControl->desired_torques_nm.FR));
+            desired_torque_msg->set_drivebrain_torque_rl(::abs(torqueControl->desired_torques_nm.RL));
+            desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
+            {
+                std::unique_lock lk(_can_tx_queue.mtx);
+                _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
+            }
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -197,7 +207,6 @@ void DriveBrainApp::run() {
         
         if (!_settings.run_db_service) return;
         
-        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {

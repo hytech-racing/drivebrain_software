@@ -1,10 +1,10 @@
 {
     "CANDriver": {
         "canbus_device": "vcan0",
-        "path_to_dbc": "/home/ben/drivebrain_software/config/hytech.dbc"
+        "path_to_dbc": "./config/hytech.dbc"
     },
-    "SimpleController": {
-        "max_torque": 21,
+    "SimpleSpeedController": {
+        "max_torque": 21.0,
         "max_regen_torque": 10.0,
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
@@ -16,5 +16,17 @@
         "baud_rate": 921600, 
         "port": 1,
         "freq_divisor": 1
+    },
+    "SimpleTorqueController": {
+        "max_torque": 21.0,
+        "max_regen_torque": 10.0,
+        "rear_torque_scale": 1.0,
+        "regen_torque_scale": 0.6
+    },
+    "ControllerManager": {
+        "max_controller_switch_speed_ms": 5.0, 
+        "max_switch_requested_rpm": 20000.0,
+        "max_torque_switch_nm": 10.0,
+        "max_accel_switch_float": 0.1
     }
 }

@@ -21,7 +21,7 @@
         type = "github";
         owner = "hytech-racing";
         repo = "HT_proto";
-        ref = "2025-02-17T06_32_03";
+        ref = "TCMUX";
         flake = false;
       };
 
@@ -30,19 +30,14 @@
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/141";
+    ht_can.url = "github:hytech-racing/ht_can/TCMUX";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
 
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:hytech-racing/drivebrain_core/feature/param_rec_support";
-      flake = false;
-    };
-
-    simulink-automation-src = {
-      url = "github:hytech-racing/drivebrain_core/feature/low_level_inputs";
+      url = "github:hytech-racing/drivebrain_core/main";
       flake = false;
     };
 

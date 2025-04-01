@@ -102,6 +102,7 @@ target_include_directories(drivebrain_comms PUBLIC
 target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core::drivebrain_core
     drivebrain_common_utils
+    drivebrain_control
     gRPC::grpc++_reflection
     foxglove_websocket::foxglove_websocket
     protobuf::libprotobuf
@@ -117,7 +118,8 @@ target_link_libraries(drivebrain_comms PUBLIC
 make_cmake_package(drivebrain_comms drivebrain)
 
 
-add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleController.cpp)
+add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleTorqueController.cpp drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp)
+
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
 target_include_directories(drivebrain_control PUBLIC
     $<INSTALL_INTERFACE:drivebrain_core_impl/drivebrain_control/include>
@@ -309,7 +311,9 @@ enable_testing()
 
 add_executable(alpha_test 
     unit_test/main.cpp
-    unit_test/SimpleControllerTest.cpp
+    unit_test/SimpleSpeedControllerTest.cpp
+    unit_test/SimpleTorqueControllerTest.cpp
+    unit_test/test_controller_manager.cpp
 )
 
 target_link_libraries(alpha_test PUBLIC 
@@ -335,3 +339,16 @@ install(TARGETS
         test_build
     RUNTIME 
         DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
+add_executable(TCMUX_integration_test test/controller_manager_integration.cpp)
+
+target_link_libraries(
+    TCMUX_integration_test PUBLIC
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    drivebrain_core::drivebrain_core
+    drivebrain_control
+    Boost::boost
+    drivebrain_app
+)

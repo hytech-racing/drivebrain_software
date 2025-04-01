@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <gtest/gtest.h>
-#include <SimpleController.hpp>
 #include <VehicleDataTypes.hpp>
 #include <JsonFileHandler.hpp>
 #include <Logger.hpp>
