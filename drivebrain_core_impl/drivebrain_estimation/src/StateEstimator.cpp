@@ -245,7 +245,11 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     }
 
     auto log_start = std::chrono::high_resolution_clock::now();
-    _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+    if(_message_logger)
+    {
+        _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+    }
+    
     auto log_end = std::chrono::high_resolution_clock::now();
     
     auto state_estim_end = std::chrono::high_resolution_clock::now();

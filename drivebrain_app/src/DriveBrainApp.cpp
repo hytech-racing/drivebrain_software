@@ -4,6 +4,7 @@
 #include "SimpleSpeedController.hpp"
 #include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -35,7 +36,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(controller1));
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(controller1));
     spdlog::info("made controller");
 
     
@@ -52,14 +53,19 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    configurable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(_driver));
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver));
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
         _logger, _eth_tx_queue, _message_logger, *_state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
     
     spdlog::info("eth driver");
-    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
+
+    auto switch_modes = 
+    [this](size_t mode) -> bool {
+        return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
+    };
+    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
     spdlog::info("made db service");
     if(_settings.use_vectornav)
     {
@@ -201,7 +207,6 @@ void DriveBrainApp::run() {
         
         if (!_settings.run_db_service) return;
         
-        _db_service = std::make_unique<DBInterfaceImpl>(_message_logger);
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {

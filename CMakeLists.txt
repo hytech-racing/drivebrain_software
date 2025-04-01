@@ -102,6 +102,7 @@ target_include_directories(drivebrain_comms PUBLIC
 target_link_libraries(drivebrain_comms PUBLIC 
     drivebrain_core::drivebrain_core
     drivebrain_common_utils
+    drivebrain_control
     gRPC::grpc++_reflection
     foxglove_websocket::foxglove_websocket
     protobuf::libprotobuf

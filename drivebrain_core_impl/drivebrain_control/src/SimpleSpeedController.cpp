@@ -68,6 +68,7 @@ bool control::SimpleSpeedController::init()
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleSpeedController::_handle_param_updates, this, std::placeholders::_1));
     // _configured = true;
+    set_configured();
     return true;
 }
 

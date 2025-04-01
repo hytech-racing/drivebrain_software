@@ -66,6 +66,7 @@ bool comms::CANDriver::init() {
 
     _do_read();
     // _configured = true;
+    set_configured();
     return true;
 }
 

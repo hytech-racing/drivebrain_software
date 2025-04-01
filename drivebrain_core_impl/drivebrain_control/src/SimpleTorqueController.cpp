@@ -48,7 +48,7 @@ bool control::SimpleTorqueController::init()
     _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale};
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleTorqueController::_handle_param_updates, this, std::placeholders::_1));
-
+    set_configured();
     return true;
 }
 
