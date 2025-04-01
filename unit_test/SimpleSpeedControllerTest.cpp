@@ -51,6 +51,7 @@ TEST_F(SimpleSpeedControllerTest, InitDoesNotHaveConfig)
 
 TEST_F(SimpleSpeedControllerTest, NoPedalInput)
 {
+    
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
