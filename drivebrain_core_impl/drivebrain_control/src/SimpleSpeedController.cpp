@@ -5,7 +5,7 @@
 
 void control::SimpleSpeedController::_handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map)
 {
-    // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache
+        // TODO make this easier to work with, rn variants can shift between any of the param types at runtime in the cache
     if (auto pval = std::get_if<float>(&new_param_map.at("max_torque")))
     {   
         
@@ -41,6 +41,13 @@ void control::SimpleSpeedController::_handle_param_updates(const std::unordered_
         _config.positive_speed_set = *pval;
         spdlog::info("Setting new positive speed set: {}", _config.positive_speed_set);
     }
+    if (auto pval = std::get_if<float>(&new_param_map.at("max_power_kw")))
+    {
+        std::unique_lock lk(_config_mutex);
+        _config.max_power_kw = *pval;
+        spdlog::info("Setting new max power limit kw: {}", _config.max_power_kw);
+    }
+
 }
 
 bool control::SimpleSpeedController::init()
@@ -78,10 +85,10 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
 
     veh_vec<float> current_rpms = in.current_rpms;
 
-    torque_nm torqueRequest;
+    torque_nm torqueRequest = {};
 
-    core::SpeedControlOut type_set;
-    core::ControllerOutput cmd_out;
+    core::SpeedControlOut type_set = {};
+    core::ControllerOutput cmd_out = {};
     cmd_out.out = type_set;
     auto& speed_out = std::get<core::SpeedControlOut>(cmd_out.out);
 
@@ -119,7 +126,7 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
     }
 
     
-    cmd_out.out = _apply_power_limit(type_set, in.current_rpms);
+    cmd_out.out = _apply_power_limit(speed_out, in.current_rpms);
 
     return cmd_out;
 }

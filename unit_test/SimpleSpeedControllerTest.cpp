@@ -1,3 +1,4 @@
+#include <Literals.hpp>
 #include <gtest/gtest.h>
 #include <SimpleSpeedController.hpp>
 #include <VehicleDataTypes.hpp>
@@ -51,14 +52,16 @@ TEST_F(SimpleSpeedControllerTest, InitDoesNotHaveConfig)
 
 TEST_F(SimpleSpeedControllerTest, NoPedalInput)
 {
-    
+
+    in.input.requested_accel = 0.0;
+    in.input.requested_brake = 0.0;   
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FL,std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR,std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL,std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR,std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
 
     ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
@@ -72,10 +75,10 @@ TEST_F(SimpleSpeedControllerTest, SmallPositiveAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
 
     ASSERT_NEAR(res->torque_lim_nm.FR, 4.48, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 4.48, 1.0);
@@ -89,10 +92,10 @@ TEST_F(SimpleSpeedControllerTest, FullPositiveAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
 
     ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 2.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 2.0);
@@ -142,11 +145,10 @@ TEST_F(SimpleSpeedControllerTest, FullBrakeAndAccelRequest)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
-
+    ASSERT_NEAR(res->desired_rpms.FL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.RR, 0.0, 1.0);
@@ -254,10 +256,10 @@ TEST_F(SimpleSpeedControllerTest, VariableRequests)
     auto cmd = simple_controller.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
 
     ASSERT_NEAR(res->torque_lim_nm.FR, 0.0, 1.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 0.0, 1.0);
@@ -281,10 +283,10 @@ TEST_F(SimpleSpeedControllerTest, VariableRequests)
     in.input.requested_brake = 0;
     cmd = simple_controller.step_controller(in);
 
-    ASSERT_NEAR(res->desired_rpms.FL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.FR, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RL, 1672.12, 1.0);
-    ASSERT_NEAR(res->desired_rpms.RR, 1672.12, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.FR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RL, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
+    ASSERT_NEAR(res->desired_rpms.RR, std::get<float>(simple_controller.get_cached_param("positive_speed_set")) * constants::METERS_PER_SECOND_TO_RPM, 1.0);
 
     ASSERT_NEAR(res->torque_lim_nm.FR, 22.4, 2.0);
     ASSERT_NEAR(res->torque_lim_nm.FL, 22.4, 2.0);
