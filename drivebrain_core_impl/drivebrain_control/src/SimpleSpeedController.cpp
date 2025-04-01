@@ -135,7 +135,6 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
 core::SpeedControlOut control::SimpleSpeedController::_apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms)
 {
     auto cmd_out = current_control;
-    std::cout <<"cmd_out.torque_lim_nm.FL " << cmd_out.torque_lim_nm.FL <<std::endl;
     // Apply power limit (basically a re-implementation of MCU)
     float net_torque_mag = 0;
     float net_power = 0;
