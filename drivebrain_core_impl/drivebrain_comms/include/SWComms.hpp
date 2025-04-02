@@ -31,6 +31,7 @@ public:
              std::shared_ptr<loggertype> message_logger,
              core::StateEstimator &state_estimator,
              boost::asio::io_context &io_context);
+
     bool init();
     void standby_mode(); 
     void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);
@@ -41,12 +42,14 @@ public:
 
 private:
     void _start_receive();
+    void attempt_connection(); 
 
     core::Logger &_logger;
     core::StateEstimator &_state_estimator;
     boost::array<std::uint8_t, 512> _output_buff;
     boost::array<std::uint8_t, 512> _input_buff;
     SerialPort _serial;
+    boost::asio::steady_timer _retry_timer; 
     std::shared_ptr<loggertype> _message_logger;
     config _config;
 

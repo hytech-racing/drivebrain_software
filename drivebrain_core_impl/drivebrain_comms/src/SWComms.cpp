@@ -22,6 +22,7 @@ namespace comms {
           _state_estimator(state_estimator),
           _message_logger(message_logger),
           _serial(io),
+          _retry_timer(io),
           _active_connection(false)
     {
         standby_mode();
@@ -29,38 +30,43 @@ namespace comms {
 
     void SWDriver::standby_mode() {
         _logger.log_string("Entering SW standby mode. Waiting for device...", core::LogLevel::INFO);
+        attempt_connection();
+    }
 
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+    void SWDriver::attempt_connection() {
+        boost::system::error_code ec;
 
-            boost::system::error_code ec;
+        if (_serial.is_open()) {
+            _serial.close(ec);
+        }
 
-            if (_serial.is_open()) {
-                _serial.close(ec);
-            }
+        auto device_name = get_parameter_value<std::string>("device_name");
+        _serial.open(device_name.value(), ec);
 
-            auto device_name = get_parameter_value<std::string>("device_name");
-            _serial.open(device_name.value(), ec);
+        if (!ec) {
+            _logger.log_string("SW device connected. Configuring serial port...", core::LogLevel::INFO);
 
-            if (!ec) {
-                _logger.log_string("SW device connected. Configuring serial port...", core::LogLevel::INFO);
+            _config.baud_rate = get_parameter_value<int>("baud_rate").value();
 
-                _config.baud_rate = get_parameter_value<int>("baud_rate").value();
+            _serial.set_option(SerialPort::baud_rate(_config.baud_rate));
+            _serial.set_option(SerialPort::character_size(8));
+            _serial.set_option(SerialPort::parity(SerialPort::parity::none));
+            _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
+            _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
 
-                _serial.set_option(SerialPort::baud_rate(_config.baud_rate));
-                _serial.set_option(SerialPort::character_size(8));
-                _serial.set_option(SerialPort::parity(SerialPort::parity::none));
-                _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
-                _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
+            _active_connection = false;
+            _start_receive();
+        } else {
+            std::ostringstream oss;
+            oss << "Waiting for SW device... (" << ec.message() << ")";
+            _logger.log_string(oss.str(), core::LogLevel::INFO);
 
-                _active_connection = false;
-                _start_receive();
-                return;
-            } else {
-                std::ostringstream oss;
-                oss << "Waiting for SW device... (" << ec.message() << ")";
-                _logger.log_string(oss.str(), core::LogLevel::INFO);
-            }
+            _retry_timer.expires_after(std::chrono::seconds(2));
+            _retry_timer.async_wait([this](const boost::system::error_code& timer_ec) {
+                if (!timer_ec) {
+                    attempt_connection();
+                }
+            });
         }
     }
 
@@ -80,15 +86,6 @@ namespace comms {
                 if (!_active_connection) {
                     _logger.log_string("SW data stream started.", core::LogLevel::INFO);
                     _active_connection = true;
-                }
-
-                static auto last_time = std::chrono::steady_clock::now();
-                auto current_time = std::chrono::steady_clock::now();
-                double time_diff = std::chrono::duration<double>(current_time - last_time).count();
-                last_time = current_time;
-
-                if (time_diff > 0) {
-                    std::cout << "Message Rate: " << 1.0 / time_diff << " Hz\n";
                 }
 
                 std::string input_data;
@@ -129,7 +126,7 @@ namespace comms {
 
                 log_proto_message(msg_out);
 
-                _start_receive();
+                _start_receive();  
             });
     }
 
@@ -139,6 +136,7 @@ namespace comms {
     }
 
     bool SWDriver::init() {
-        return true; 
+        return true;
     }
+
 }
