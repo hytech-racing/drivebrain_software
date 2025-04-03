@@ -57,54 +57,59 @@ namespace comms
 
     void VNDriver::standby_mode() {
         _logger.log_string("No input detected. Entering VN standby mode...", core::LogLevel::INFO);
-    
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-    
-            boost::system::error_code ec;
-            if (_serial.is_open()) {
-                _serial.close(ec); // clean close if already open
-            }
-    
-            auto device_name = get_parameter_value<std::string>("device_name");
-            _serial.open(device_name.value(), ec);
-    
-            if (!ec) {
-                _logger.log_string("VN device reconnected. Configuring serial port...", core::LogLevel::INFO);
-    
-                _serial.set_option(SerialPort::baud_rate(get_parameter_value<int>("baud_rate").value()));
-                _serial.set_option(SerialPort::character_size(8));
-                _serial.set_option(SerialPort::parity(SerialPort::parity::none));
-                _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
-                _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
-    
-                _configure_binary_outputs(); // VN-specific config
-                _active_connection = false;
-    
-                _start_recieve(); // start streaming data
-                return;
-            } else {
-                std::ostringstream oss;
-                oss << "Waiting for VN device... (" << ec.message() << ")";
-                _logger.log_string(oss.str(), core::LogLevel::INFO);
-            }
-        }
+        attempt_connection();
     }
+    
+    void VNDriver::attempt_connection() {
+        boost::system::error_code ec;
+    
+        if (_serial.is_open()) {
+            _serial.close(ec);
+        }
+    
+        auto device_name = get_parameter_value<std::string>("device_name");
+        _serial.open(device_name.value(), ec);
+    
+        if (!ec) {
+            _logger.log_string("VN device reconnected. Configuring serial port...", core::LogLevel::INFO);
+    
+            _serial.set_option(SerialPort::baud_rate(get_parameter_value<int>("baud_rate").value()));
+            _serial.set_option(SerialPort::character_size(8));
+            _serial.set_option(SerialPort::parity(SerialPort::parity::none));
+            _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
+            _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
+    
+            _configure_binary_outputs();
+            _active_connection = false;
+            _start_recieve();
+        } else {
+            std::ostringstream oss;
+            oss << "Waiting for VN device... (" << ec.message() << ")";
+            _logger.log_string(oss.str(), core::LogLevel::INFO);
+    
+            _retry_timer.expires_after(std::chrono::seconds(2));
+            _retry_timer.async_wait([this](const boost::system::error_code& timer_ec) {
+                if (!timer_ec) {
+                    attempt_connection();
+                }
+            });
+        }
+    }    
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger,
+                        std::shared_ptr<loggertype> message_logger,
+                        core::StateEstimator &state_estimator,
+                        boost::asio::io_context& io)
         : core::common::Configurable(logger, json_file_handler, "VNDriver"),
-          _logger(logger),
-          _state_estimator(state_estimator),
-          _message_logger(message_logger),
-          _serial(io)
+        _logger(logger),
+        _state_estimator(state_estimator),
+        _message_logger(message_logger),
+        _serial(io),
+        _retry_timer(io)
     {
         standby_mode();
+    }          
 
-        // Starts read
-        _logger.log_string("Starting vn driver recieve.", core::LogLevel::INFO);
-
-        _start_recieve();
-    }
 
     void VNDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)
     {

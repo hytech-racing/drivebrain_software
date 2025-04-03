@@ -58,7 +58,8 @@ namespace comms {
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
             std::shared_ptr<loggertype> _message_logger; 
-            config _config;    
+            config _config;
+            boost::asio::steady_timer _retry_timer;    
 
         public: 
             // Public methods
@@ -71,6 +72,6 @@ namespace comms {
             void _configure_binary_outputs();
             void _start_recieve();
             bool _active_connection = false;
-
+            void attempt_connection();
     };
 }
