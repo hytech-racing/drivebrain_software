@@ -132,7 +132,6 @@ DriveBrainApp::~DriveBrainApp() {
 }
 
 void DriveBrainApp::_process_loop() {
-    // auto out_msg = std::make_shared<hytech_msgs::MCUCommandData>();
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
     auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();

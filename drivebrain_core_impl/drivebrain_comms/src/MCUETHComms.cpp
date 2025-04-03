@@ -55,7 +55,11 @@ namespace comms
                 for (const auto &msg : _input_deque_ref.deque)
                 {
                     _send_message(msg);
-                    _message_logger->log_msg(msg);
+                    if(_message_logger)
+                    {
+                        _message_logger->log_msg(msg);
+                    }
+                    
                 }
                 _input_deque_ref.deque.clear();
             }
@@ -81,7 +85,11 @@ namespace comms
             _mcu_msg->ParseFromArray(_recv_buffer.data(), size);
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
             _state_estimator.handle_recv_process(out_msg);
-            _message_logger->log_msg(out_msg);
+            if(_message_logger)
+            {
+                _message_logger->log_msg(out_msg);
+            }
+            
             _start_receive();
         }
     }
