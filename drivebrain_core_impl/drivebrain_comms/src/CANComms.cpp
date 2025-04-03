@@ -112,6 +112,7 @@ void comms::CANDriver::_do_read() {
 }
 
 void comms::CANDriver::_send_message(const struct can_frame &frame) {
+    std:: cout << "Sending CAN message with ID: {} and length: {}" << frame.can_id << frame.len;
     boost::asio::async_write(
         _socket, boost::asio::buffer(&frame, sizeof(frame)),
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
@@ -390,16 +391,19 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
     while (_running) {
         {
+            
             std::unique_lock lk(_input_deque_ref.mtx);
             // TODO unfuck this, queue management shouldnt live within the queue
             // itself
+            std::cout << "Waiting for input deque to be filled";
             _input_deque_ref.cv.wait(
-                lk, [this]() { return !_input_deque_ref.deque.empty() || !_running; });
+                lk, [this]() { return !this->_input_deque_ref.deque.empty() || !this->_running; });
 
             if (_input_deque_ref.deque.empty()) {
+                std::cout << "Deque is empty, returning";
                 return;
             }
-
+            std::cout << "Let;s go";
             q.deque = _input_deque_ref.deque;
             _input_deque_ref.deque.clear();
         }
@@ -407,6 +411,10 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
         for (const auto &msg : q.deque)
         {
             auto can_msg = _get_CAN_msg(msg);
+            if (!can_msg) {
+                spdlog::error("Failed to generate CAN message from protobuf");
+                continue;
+            }
             if (can_msg)
             {
                 _send_message(*can_msg);
