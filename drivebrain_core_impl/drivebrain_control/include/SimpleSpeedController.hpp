@@ -42,7 +42,6 @@ namespace control
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
         core::SpeedControlOut _apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms);
-        int dt_rate_hz;
     private:
         std::mutex _config_mutex;
         config _config;
