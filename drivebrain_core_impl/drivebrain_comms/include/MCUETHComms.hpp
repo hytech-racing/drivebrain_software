@@ -48,7 +48,9 @@ namespace comms
         void _handle_send(std::array<uint8_t, 2048> /*message*/,
                           const boost::system::error_code & /*error*/,
                           std::size_t /*bytes_transferred*/);
-
+        void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
+            _message_logger = message_logger;
+        }
     private:
         core::Logger &_logger;
         std::shared_ptr<loggertype> _message_logger;

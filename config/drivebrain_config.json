@@ -9,7 +9,8 @@
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
         "positive_speed_set" : 45,
-        "max_power_kw": 63.0
+        "max_power_kw": 63.0,
+        "dt_rate_hz": 1000
     }, 
     "VNDriver": {
         "device_name": "/dev/ttyUSB0",

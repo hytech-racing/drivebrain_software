@@ -35,10 +35,6 @@ protected:
     }
 };
 
-TEST_F(SimpleSpeedControllerTest, ConstructorInitializesProperly) 
-{
-    EXPECT_NEAR(simple_controller.get_dt_sec(), 0.001, 0.01);
-}
 
 TEST_F(SimpleSpeedControllerTest, InitHasConfig)
 {

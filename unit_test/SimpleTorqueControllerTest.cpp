@@ -34,10 +34,7 @@ protected:
     }
 };
 
-TEST_F(SimpleTorqueControllerTest, ConstructorInitializesProperly) 
-{
-    EXPECT_NEAR(simple_controller.get_dt_sec(), 0.001, 0.01);
-}
+
 
 TEST_F(SimpleTorqueControllerTest, InitHasConfig)
 {

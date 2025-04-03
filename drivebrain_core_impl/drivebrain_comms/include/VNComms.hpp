@@ -64,7 +64,9 @@ namespace comms {
         public: 
             // Public methods
             void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);  
-        
+            void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
+                _message_logger = message_logger;
+            }
         private:
             // Private methods
             static void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);

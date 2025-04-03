@@ -1,7 +1,9 @@
 #ifndef DBSERVICE_IMPL_HPP
 #define DBSERVICE_IMPL_HPP
 
+#include "VNComms.hpp"
 #include <db_service/v1/service/db_interface.grpc.pb.h>
+#include <google/protobuf/message.h>
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <iostream>
 #include <memory>
@@ -26,6 +28,9 @@ class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Servi
     public: 
         DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch);        void run_server(); 
         void stop_server();
+        void update_msg_logger(std::shared_ptr<core::MsgLogger<google::protobuf::Message>> _logger_inst) {
+            _logger_inst = _logger_inst;
+        }
     private:
         std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _logger_inst;
         std::function<bool(size_t)> _mode_switch;
