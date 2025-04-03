@@ -6,6 +6,7 @@
 #include "hytech.pb.h"
 #include <memory>
 #include <mutex>
+#include <spdlog/spdlog.h>
 #include <thread>
 
 std::atomic<bool> DriveBrainApp::_stop_signal{false};
@@ -191,7 +192,9 @@ void DriveBrainApp::_process_loop() {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_rpm_msg);
                 _can_tx_queue.deque.push_back(torque_limit_msg);
+                spdlog::info("sent can");
             }
+            
         } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
             // set desired torque
             desired_torque_msg->set_drivebrain_torque_fl(::abs(torqueControl->desired_torques_nm.FL));
