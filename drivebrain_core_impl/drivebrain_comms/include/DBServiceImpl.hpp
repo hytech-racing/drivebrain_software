@@ -28,7 +28,7 @@ class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Servi
     public: 
         DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch);        void run_server(); 
         void stop_server();
-        void update_msg_logger(std::shared_ptr<core::MsgLogger<google::protobuf::Message>> _logger_inst) {
+        void update_msg_logger(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _logger_inst) {
             _logger_inst = _logger_inst;
         }
     private:

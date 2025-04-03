@@ -129,7 +129,7 @@ namespace common
 
                     spdlog::info("Logging message: {}", msg.message_name);
                     spdlog::info("message size: {}", msg_to_log.dataSize);
-                    spdlog::info(msg.serialized_data);
+                    // spdlog::info(msg.serialized_data);
                 }
             }
 

@@ -109,6 +109,23 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         _driver->update_msg_logger(_message_logger);
     }
+    if(_vn_driver)
+    {
+        _vn_driver->update_msg_logger(_message_logger);
+    }
+    if(_state_estimator)
+    {
+        _state_estimator->update_msg_logger(_message_logger);
+    }
+
+    if(_db_service)
+    {
+        _db_service->update_msg_logger(_message_logger);
+    }
+    if(_eth_driver)
+    {
+        _eth_driver->update_msg_logger(_message_logger);
+    }
 
     spdlog::info("constructed app");
     // TODO add here the creation of the config logger

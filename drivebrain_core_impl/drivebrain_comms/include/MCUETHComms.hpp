@@ -39,7 +39,10 @@ namespace comms
                     const std::string &send_ip,
                     uint16_t recv_port,
                     uint16_t send_port);
-
+        void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
+            _message_logger = message_logger;
+        }
+        
     private:
         void _handle_send_msg_from_queue();
         void _send_message(std::shared_ptr<google::protobuf::Message> msg_out);
@@ -48,9 +51,6 @@ namespace comms
         void _handle_send(std::array<uint8_t, 2048> /*message*/,
                           const boost::system::error_code & /*error*/,
                           std::size_t /*bytes_transferred*/);
-        void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
-            _message_logger = message_logger;
-        }
     private:
         core::Logger &_logger;
         std::shared_ptr<loggertype> _message_logger;

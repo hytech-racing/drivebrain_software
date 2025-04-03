@@ -13,7 +13,7 @@
         "dt_rate_hz": 1000
     }, 
     "VNDriver": {
-        "device_name": "/dev/ttyUSB0",
+        "device_name": "/dev/ttyUSB1",
         "baud_rate": 921600, 
         "port": 1,
         "freq_divisor": 1
