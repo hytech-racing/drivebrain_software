@@ -112,6 +112,7 @@ void comms::CANDriver::_do_read() {
 }
 
 void comms::CANDriver::_send_message(const struct can_frame &frame) {
+    std:: cout << "Sending CAN message with ID: {} and length: {}" << frame.can_id << frame.len;
     boost::asio::async_write(
         _socket, boost::asio::buffer(&frame, sizeof(frame)),
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
@@ -391,10 +392,16 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
 
     while (_running) {
         {
+            
             std::unique_lock lk(_input_deque_ref.mtx);
 
-            while (_input_deque_ref.deque.empty()) { }
+            _input_deque_ref.cv.wait(
+                lk, [this]() { return !this->_input_deque_ref.deque.empty() || !this->_running; });
 
+            if (_input_deque_ref.deque.empty()) {
+                spdlog::info("Returning, deque empty or not running.")
+                return;
+            }
             q.deque = _input_deque_ref.deque;
             _input_deque_ref.deque.clear();
         }
@@ -402,6 +409,10 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
         for (const auto &msg : q.deque)
         {
             auto can_msg = _get_CAN_msg(msg);
+            if (!can_msg) {
+                spdlog::error("Failed to generate CAN message from protobuf");
+                continue;
+            }
             if (can_msg)
             {
                 _send_message(*can_msg);

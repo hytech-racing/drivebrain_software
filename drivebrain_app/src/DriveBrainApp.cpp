@@ -192,6 +192,7 @@ void DriveBrainApp::_process_loop() {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_rpm_msg);
                 _can_tx_queue.deque.push_back(torque_limit_msg);
+                _can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
                 spdlog::info("sent can");
             }
             
@@ -204,6 +205,7 @@ void DriveBrainApp::_process_loop() {
             {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
+                _can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
             }
         }
 
