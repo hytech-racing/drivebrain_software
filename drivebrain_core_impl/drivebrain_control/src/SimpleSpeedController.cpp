@@ -48,6 +48,13 @@ void control::SimpleSpeedController::_handle_param_updates(const std::unordered_
         spdlog::info("Setting new max power limit kw: {}", _config.max_power_kw);
     }
 
+    if (auto pval = std::get_if<int>(&new_param_map.at("dt_rate_hz")))
+    {
+        std::unique_lock lk(_config_mutex);
+        _config.dt_rate_hz = *pval;
+        spdlog::info("Setting new dt_rate (in hertz) hz: {}", _config.dt_rate_hz);
+    }
+
 }
 
 bool control::SimpleSpeedController::init()

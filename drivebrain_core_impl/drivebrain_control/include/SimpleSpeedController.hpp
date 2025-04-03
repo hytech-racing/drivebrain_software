@@ -30,10 +30,11 @@ namespace control
         float regen_torque_scale; 
         speed_m_s positive_speed_set;
         float max_power_kw;
+        int dt_rate_hz;
     };
         SimpleSpeedController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleSpeedController") {}
         float get_dt_sec() override { 
-            return (0.001); 
+            return (double) 1.0 / _config.dt_rate_hz;
         }
         bool init() override;
         core::ControllerOutput step_controller(const core::VehicleState &in) override;
@@ -41,6 +42,7 @@ namespace control
     private:
         void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
         core::SpeedControlOut _apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms);
+        int dt_rate_hz;
     private:
         std::mutex _config_mutex;
         config _config;
