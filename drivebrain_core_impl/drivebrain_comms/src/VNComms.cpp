@@ -82,6 +82,8 @@ namespace comms
         if(_message_logger)
         {
             _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+        } else {
+            spdlog::warn("message logger not real");
         }
         
     }

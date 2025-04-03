@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include <base_msgs.pb.h> // from HT_proto
+#include <spdlog/spdlog.h>
 #include "hytech_msgs.pb.h" // from HT_proto
 #include "hytech.pb.h" // from HT_CAN
 
@@ -248,6 +249,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     if(_message_logger)
     {
         _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
+    } else {
+        spdlog::warn("message logger not real");
     }
     
     auto log_end = std::chrono::high_resolution_clock::now();

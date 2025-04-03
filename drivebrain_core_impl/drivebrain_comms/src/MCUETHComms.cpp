@@ -58,6 +58,8 @@ namespace comms
                     if(_message_logger)
                     {
                         _message_logger->log_msg(msg);
+                    }   else {
+                        spdlog::warn("message logger not real");
                     }
                     
                 }
@@ -88,6 +90,8 @@ namespace comms
             if(_message_logger)
             {
                 _message_logger->log_msg(out_msg);
+            }else {
+                spdlog::warn("message logger not real");
             }
             
             _start_receive();
