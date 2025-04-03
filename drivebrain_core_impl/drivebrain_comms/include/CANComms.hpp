@@ -81,6 +81,13 @@ namespace comms
         }
         ~CANDriver();
         bool init();
+
+
+        void update_msg_logger(std::shared_ptr<loggertype> message_logger)
+        {
+            _message_logger = message_logger;
+        }
+        
         void _handle_send_msg_from_queue();
         std::shared_ptr<google::protobuf::Message> pb_msg_recv(const can_frame &in_frame);
         void set_field_values_of_pb_msg(const std::unordered_map<std::string, FieldVariant> &field_values, std::shared_ptr<google::protobuf::Message> message);

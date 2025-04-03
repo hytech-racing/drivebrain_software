@@ -128,6 +128,8 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
         if(_message_logger) // this may not exist yet as this gets constr
         {
             _message_logger->log_msg(msg);
+        }else {
+            spdlog::warn("can comms message logger not real");
         }
         
     }
@@ -411,6 +413,8 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
                 if(_message_logger)
                 {
                     _message_logger->log_msg(msg);
+                } else {
+                    spdlog::warn("message logger not real");
                 }
             }
         }

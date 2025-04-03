@@ -82,7 +82,6 @@ std::pair<std::string, std::string> parse_arguments(int argc, char* argv[]) {
 
 int main(int argc, char *argv[])
 {
-    
     try {
 
         auto [param_path, dbc_path] = parse_arguments(argc, argv);

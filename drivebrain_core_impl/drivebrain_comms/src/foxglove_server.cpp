@@ -105,7 +105,7 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<std::shared_ptr<core::commo
 
 void core::FoxgloveWSServer::send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg)
 {
-
+    spdlog::info("sending live telem msg");
     if (_id_name_map.find(msg->GetDescriptor()->name()) != _id_name_map.end())
     {
         auto msg_chan_id = _id_name_map[msg->GetDescriptor()->name()];

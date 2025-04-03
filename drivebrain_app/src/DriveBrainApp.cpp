@@ -105,6 +105,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
         std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
 
+    if(_driver)
+    {
+        _driver->update_msg_logger(_message_logger);
+    }
+
     spdlog::info("constructed app");
     // TODO add here the creation of the config logger
 }
