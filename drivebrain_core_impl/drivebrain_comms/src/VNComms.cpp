@@ -64,6 +64,7 @@ namespace comms
         boost::system::error_code ec;
     
         if (_serial.is_open()) {
+            _serial.cancel();
             _serial.close(ec);
         }
     
