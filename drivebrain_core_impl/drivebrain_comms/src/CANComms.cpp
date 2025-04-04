@@ -323,7 +323,7 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
     can_frame frame{};
     std::string type_url = pb_msg->GetTypeName();
     std::string messageTypeName = type_url.substr(type_url.find_last_of('.') + 1);
-
+    
     if (_messages_names_and_ids.find(messageTypeName) != _messages_names_and_ids.end())
     {
         auto id = _messages_names_and_ids[messageTypeName];
@@ -389,21 +389,19 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
 void comms::CANDriver::_handle_send_msg_from_queue() {
     // we will assume that this queue only has messages that we want to send
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
+
     while (_running) {
         {
             
             std::unique_lock lk(_input_deque_ref.mtx);
-            // TODO unfuck this, queue management shouldnt live within the queue
-            // itself
-            std::cout << "Waiting for input deque to be filled";
+
             _input_deque_ref.cv.wait(
                 lk, [this]() { return !this->_input_deque_ref.deque.empty() || !this->_running; });
 
             if (_input_deque_ref.deque.empty()) {
-                std::cout << "Deque is empty, returning";
+                spdlog::info("Returning, deque empty or not running.");
                 return;
             }
-            std::cout << "Let;s go";
             q.deque = _input_deque_ref.deque;
             _input_deque_ref.deque.clear();
         }

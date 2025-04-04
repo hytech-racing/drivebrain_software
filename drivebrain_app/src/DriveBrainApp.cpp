@@ -263,3 +263,5 @@ void DriveBrainApp::run() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
+
+// ./test_build -p ../config/drivebrain_config.json -d ../config/hytech.dbc

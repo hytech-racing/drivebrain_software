@@ -124,11 +124,11 @@ namespace common
                 {
                     std::unique_lock lk(_logger_mtx);
                     msg_to_log.channelId = _msg_name_id_map[msg.message_name];
-                    spdlog::info("logging at channel: {}", msg_to_log.channelId);
+                    // spdlog::info("logging at channel: {}", msg_to_log.channelId);
                     auto write_res = _writer.write(msg_to_log);
 
-                    spdlog::info("Logging message: {}", msg.message_name);
-                    spdlog::info("message size: {}", msg_to_log.dataSize);
+                    // spdlog::info("Logging message: {}", msg.message_name);
+                    // spdlog::info("message size: {}", msg_to_log.dataSize);
                 }
             }
 
