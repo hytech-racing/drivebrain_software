@@ -68,24 +68,14 @@ namespace comms
         }
     
         auto device_name = get_parameter_value<std::string>("device_name");
+    
+        _logger.log_string("Opening vn driver.", core::LogLevel::INFO);
+    
         _serial.open(device_name.value(), ec);
     
-        if (!ec) {
-            _logger.log_string("VN device reconnected. Configuring serial port...", core::LogLevel::INFO);
-    
-            _serial.set_option(SerialPort::baud_rate(get_parameter_value<int>("baud_rate").value()));
-            _serial.set_option(SerialPort::character_size(8));
-            _serial.set_option(SerialPort::parity(SerialPort::parity::none));
-            _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
-            _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
-    
-            _configure_binary_outputs();
-            _active_connection = false;
-            _start_recieve();
-        } else {
-            std::ostringstream oss;
-            oss << "Waiting for VN device... (" << ec.message() << ")";
-            _logger.log_string(oss.str(), core::LogLevel::INFO);
+        if (ec) {
+            spdlog::warn("Error: {}", ec.message());
+            _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
     
             _retry_timer.expires_after(std::chrono::seconds(2));
             _retry_timer.async_wait([this](const boost::system::error_code& timer_ec) {
@@ -93,8 +83,29 @@ namespace comms
                     attempt_connection();
                 }
             });
+    
+            return;
         }
-    }    
+    
+        _config.baud_rate = get_parameter_value<int>("baud_rate").value();
+        _config.freq_divisor = get_parameter_value<int>("freq_divisor").value();
+        auto port = get_parameter_value<int>("port");
+    
+        _serial.set_option(SerialPort::baud_rate(_config.baud_rate));
+        _serial.set_option(SerialPort::character_size(8));
+        _serial.set_option(SerialPort::parity(SerialPort::parity::none));
+        _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
+        _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
+    
+        _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
+    
+        _logger.log_string("Configuring binary outputs.", core::LogLevel::INFO);
+        _configure_binary_outputs();
+    
+        _active_connection = false;
+        _start_recieve();
+    }
+    
 
     VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger,
                         std::shared_ptr<loggertype> message_logger,
