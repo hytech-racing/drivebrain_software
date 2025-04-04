@@ -65,13 +65,14 @@ bool control::SimpleSpeedController::init()
     std::optional regen_torque_scale = get_live_parameter<float>("regen_torque_scale");
     std::optional positive_speed_set = get_live_parameter<speed_m_s>("positive_speed_set");
     std::optional max_power_kw = get_live_parameter<float>("max_power_kw");
+    std::optional dt_rate_hz = get_live_parameter<int>("dt_rate_hz");
 
-    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set && max_power_kw))
+    if (!(max_torque && max_regen_torque && rear_torque_scale && regen_torque_scale && positive_speed_set && max_power_kw && dt_rate_hz))
     {
         return false;
     }
 
-    _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set, *max_power_kw};
+    _config = {*max_torque, *max_regen_torque, *rear_torque_scale, *regen_torque_scale, *positive_speed_set, *max_power_kw, *dt_rate_hz};
 
     param_update_handler_sig.connect(boost::bind(&control::SimpleSpeedController::_handle_param_updates, this, std::placeholders::_1));
     // _configured = true;

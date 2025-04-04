@@ -158,7 +158,8 @@ void DriveBrainApp::_process_loop() {
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
     auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
-    auto loop_time = _controllerManager.get_active_controller_timestep();
+    // auto loop_time = _controllerManager.get_active_controller_timestep();
+    auto loop_time = 0.005;
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -182,18 +183,19 @@ void DriveBrainApp::_process_loop() {
             desired_rpm_msg->set_drivebrain_set_rpm_fr(speedControl->desired_rpms.FR);
             desired_rpm_msg->set_drivebrain_set_rpm_rl(speedControl->desired_rpms.RL);
             desired_rpm_msg->set_drivebrain_set_rpm_rr(speedControl->desired_rpms.RR);
-
+            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_rpm_msg));
             // same with torque limits
             torque_limit_msg->set_drivebrain_torque_fl(::abs(speedControl->torque_lim_nm.FL));
             torque_limit_msg->set_drivebrain_torque_fr(::abs(speedControl->torque_lim_nm.FR));
             torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
             torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
+            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(torque_limit_msg));
             {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_rpm_msg);
                 _can_tx_queue.deque.push_back(torque_limit_msg);
                 _can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
-                spdlog::info("sent can");
+                // spdlog::info("sent can");
             }
             
         } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
@@ -202,6 +204,7 @@ void DriveBrainApp::_process_loop() {
             desired_torque_msg->set_drivebrain_torque_fr(::abs(torqueControl->desired_torques_nm.FR));
             desired_torque_msg->set_drivebrain_torque_rl(::abs(torqueControl->desired_torques_nm.RL));
             desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
+            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_torque_msg));
             {
                 std::unique_lock lk(_can_tx_queue.mtx);
                 _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
@@ -265,3 +268,4 @@ void DriveBrainApp::run() {
 }
 
 // ./test_build -p ../config/drivebrain_config.json -d ../config/hytech.dbc
+// ./alpha_build -p ../config/drivebrain_config.json -d ../config/hytech.dbc
