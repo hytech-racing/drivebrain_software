@@ -73,5 +73,6 @@ namespace comms {
             void _start_recieve();
             bool _active_connection = false;
             void attempt_connection();
+            bool _initialized = false;
     };
 }

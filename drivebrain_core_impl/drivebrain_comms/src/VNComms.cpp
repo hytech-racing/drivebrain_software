@@ -88,9 +88,11 @@ namespace comms
             return;
         }
     
-        _config.baud_rate = get_parameter_value<int>("baud_rate").value();
-        _config.freq_divisor = get_parameter_value<int>("freq_divisor").value();
-        auto port = get_parameter_value<int>("port");
+        if (!_initialized) {
+            _config.baud_rate = get_parameter_value<int>("baud_rate").value();
+            _config.freq_divisor = get_parameter_value<int>("freq_divisor").value();
+            auto port = get_parameter_value<int>("port");
+        }
     
         _serial.set_option(SerialPort::baud_rate(_config.baud_rate));
         _serial.set_option(SerialPort::character_size(8));
@@ -98,7 +100,10 @@ namespace comms
         _serial.set_option(SerialPort::stop_bits(SerialPort::stop_bits::one));
         _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
     
-        _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
+        if (!_initialized) {
+            _processor.registerPossiblePacketFoundHandler(this, &VNDriver::_handle_recieve);
+            _initialized = true;
+        }
     
         _logger.log_string("Configuring binary outputs.", core::LogLevel::INFO);
         _configure_binary_outputs();
