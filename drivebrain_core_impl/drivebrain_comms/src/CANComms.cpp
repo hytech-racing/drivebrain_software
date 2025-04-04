@@ -399,7 +399,7 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
                 lk, [this]() { return !this->_input_deque_ref.deque.empty() || !this->_running; });
 
             if (_input_deque_ref.deque.empty()) {
-                spdlog::info("Returning, deque empty or not running.")
+                spdlog::info("Returning, deque empty or not running.");
                 return;
             }
             q.deque = _input_deque_ref.deque;
