@@ -36,6 +36,7 @@ struct DriveBrainSettings {
     bool run_io_context{true};
     bool run_process_loop{true};
     bool use_vectornav{true};
+    bool use_secondary_can{true};
 };
 
 class DriveBrainApp {
@@ -58,9 +59,11 @@ private:
     core::JsonFileHandler _config;
     std::optional<std::string> _dbc_path;
     boost::asio::io_context _io_context;
+    boost::asio::io_context _io_context_secondary_can;
     
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _can_tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _secondary_can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 
@@ -72,14 +75,16 @@ private:
         // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger = nullptr;
-    std::unique_ptr<core::StateEstimator> _state_estimator;
-    std::shared_ptr<comms::CANDriver> _driver;
+    std::shared_ptr<core::StateEstimator> _state_estimator;
+    std::shared_ptr<comms::CANDriver> _driver_primary_can;
+    std::shared_ptr<comms::CANDriver> _driver_secondary_can;
     std::unique_ptr<comms::MCUETHComms> _eth_driver;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
     std::thread _process_thread;
     std::thread _io_context_thread;
+    std::thread _io_context_secondary_thread;
     std::thread _db_service_thread;
 
     const DriveBrainSettings _settings;

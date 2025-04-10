@@ -39,7 +39,7 @@
 #include <sstream>
 
 #include <spdlog/spdlog.h>
-
+#include "arg_parse.hpp"
 // TODO first application will have
 
 // - [x] message queue that can send messages between the CAN driver and the controller
@@ -47,51 +47,19 @@
 // - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
 // - [x] simple controller
 
-std::atomic<bool> stop_signal{false};
-// Signal handler function
-void signal_handler(int signal)
-{
-    spdlog::info("Interrupt signal ({}) received. Cleaning up...", signal);
-    stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
-}
-
-
-std::pair<std::string, std::string> parse_arguments(int argc, char* argv[]) {
-    namespace po = boost::program_options;
-    po::options_description desc("Allowed options");
-    std::string param_path = "config/drivebrain_config.json";
-    std::string dbc_path;
-
-    desc.add_options()
-        ("help,h", "produce help message")
-        ("param-path,p", po::value<std::string>(&param_path), "Path to the parameter JSON file")
-        ("dbc-path,d", po::value<std::string>(&dbc_path), "Path to the DBC file (optional)");
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-
-    if (vm.count("help")) {
-        std::cout << desc << std::endl;
-        std::exit(0);
-    }
-
-    return {param_path, dbc_path};
-}
-
 int main(int argc, char *argv[])
 {
-    std::signal(SIGINT, signal_handler);
     
     try {
 
-        auto [param_path, dbc_path] = parse_arguments(argc, argv);
+        auto [param_path, dbc_path, use_secondary_can] = parse_arguments(argc, argv);
 
         DriveBrainSettings settings{
             .run_db_service = true,
             .run_io_context = true,
             .run_process_loop = true,
-            .use_vectornav = true
+            .use_vectornav = true,
+            .use_secondary_can = use_secondary_can
         };
         
         std::cout <<"creating app" <<std::endl;

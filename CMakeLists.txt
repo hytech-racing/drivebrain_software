@@ -166,6 +166,7 @@ make_cmake_package(drivebrain_estimation drivebrain)
 
 add_library(drivebrain_app SHARED
     drivebrain_app/src/DriveBrainApp.cpp
+    drivebrain_app/src/arg_parse.cpp
 )
 
 target_include_directories(drivebrain_app PUBLIC

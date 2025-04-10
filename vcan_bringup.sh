@@ -7,3 +7,6 @@ modprobe vcan
 ip link add dev vcan0 type vcan
 # Bring the virtual CAN interface online.
 ip link set up vcan0
+ip link add dev vcan1 type vcan
+# Bring the virtual CAN interface online.
+ip link set up vcan1

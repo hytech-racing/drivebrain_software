@@ -20,8 +20,7 @@ namespace comms
     bool VNDriver::init()
     {
         // Try to establish a connection to the driver
-        _logger.log_string("Opening vn driver.", core::LogLevel::INFO);
-
+        spdlog::info("Opening vn driver.");
         auto device_name = get_parameter_value<std::string>("device_name");
         _config.baud_rate = get_parameter_value<int>("baud_rate").value();
         _config.freq_divisor = get_parameter_value<int>("freq_divisor").value();
@@ -31,12 +30,12 @@ namespace comms
         
         boost::system::error_code ec;
 
-        _serial.open(device_name.value(), ec);
+        auto ec_ret = _serial.open(device_name.value(), ec);
 
         if (ec)
         {
             spdlog::warn("Error: {}", ec.message());
-            _logger.log_string("Failed to open vn driver device.", core::LogLevel::INFO);
+            spdlog::info("failed to open vectornav serial port");
             return false;
         }
 
@@ -48,18 +47,15 @@ namespace comms
         _serial.set_option(SerialPort::flow_control(SerialPort::flow_control::none));
 
         // Configures the binary outputs for the device
-        _logger.log_string("Configuring binary outputs.", core::LogLevel::INFO);
-
+        spdlog::info("Configuring binary outputs.");
         _configure_binary_outputs();
 
-        // _configured = true;
         set_configured();
         return true;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, core::StateEstimator &state_estimator, boost::asio::io_context& io, bool &init_not_successful)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context& io, bool &init_not_successful)
         : core::common::Configurable(json_file_handler, "VNDriver"),
-          _logger(logger),
           _state_estimator(state_estimator),
           _message_logger(message_logger),
           _serial(io)
@@ -69,8 +65,7 @@ namespace comms
         // Starts read
         if(!init_not_successful)
         {
-            _logger.log_string("Starting vn driver recieve.", core::LogLevel::INFO);
-
+            spdlog::info("Starting vn driver recieve.");
             _start_recieve();
         }
         
@@ -78,7 +73,7 @@ namespace comms
 
     void VNDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)
     {
-        _state_estimator.handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
+        _state_estimator->handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
         if(_message_logger)
         {
             _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));

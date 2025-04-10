@@ -1,4 +1,5 @@
 #include <MCUETHComms.hpp>
+#include "StateEstimator.hpp"
 #include "hytech_msgs.pb.h"
 #include <spdlog/spdlog.h>
 
@@ -9,7 +10,7 @@ namespace comms
     MCUETHComms::MCUETHComms(core::Logger &logger,
                              deqtype &in_deq,
                              std::shared_ptr<loggertype> message_logger,
-                             core::StateEstimator &state_estimator,
+                             std::shared_ptr<core::StateEstimator> state_estimator,
                              boost::asio::io_context &io_context,
                              const std::string &send_ip,
                              uint16_t recv_port,
@@ -86,7 +87,7 @@ namespace comms
         {
             _mcu_msg->ParseFromArray(_recv_buffer.data(), size);
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_mcu_msg);
-            _state_estimator.handle_recv_process(out_msg);
+            _state_estimator->handle_recv_process(out_msg);
             if(_message_logger)
             {
                 _message_logger->log_msg(out_msg);

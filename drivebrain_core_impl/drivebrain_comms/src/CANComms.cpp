@@ -112,7 +112,6 @@ void comms::CANDriver::_do_read() {
 }
 
 void comms::CANDriver::_send_message(const struct can_frame &frame) {
-    std:: cout << "Sending CAN message with ID: {} and length: {}" << frame.can_id << frame.len;
     boost::asio::async_write(
         _socket, boost::asio::buffer(&frame, sizeof(frame)),
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
@@ -125,7 +124,7 @@ void comms::CANDriver::_send_message(const struct can_frame &frame) {
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
     auto msg = pb_msg_recv(frame);
     if (msg) {
-        _state_estimator.handle_recv_process(msg);
+        _state_estimator->handle_recv_process(msg);
         if(_message_logger) // this may not exist yet as this gets constr
         {
             _message_logger->log_msg(msg);

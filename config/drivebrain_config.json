@@ -1,6 +1,10 @@
 {
-    "CANDriver": {
+    "CANDriverPrimary": {
         "canbus_device": "vcan0",
+        "path_to_dbc": "./config/hytech.dbc"
+    },
+    "CANDriverSecondary": {
+        "canbus_device": "vcan1",
         "path_to_dbc": "./config/hytech.dbc"
     },
     "SimpleSpeedController": {

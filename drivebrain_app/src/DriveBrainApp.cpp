@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 #include <thread>
 
-std::atomic<bool> DriveBrainApp::_stop_signal{false};
+std::atomic<bool> stop_signal{false};
 
 DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& dbc_path, const DriveBrainSettings& settings)
     : _param_path(param_path)
@@ -47,17 +47,27 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     spdlog::info("made state estimator");
     bool construction_failed = false;
     // this also calls init() in the constructor
-    _driver = std::make_shared<comms::CANDriver>(
-        _config, _logger, _message_logger,_can_tx_queue, _io_context, 
-        _dbc_path, construction_failed, *_state_estimator);
+    
+    _driver_primary_can = std::make_shared<comms::CANDriver>(
+        _config, _logger, _message_logger, _primary_can_tx_queue, _io_context, 
+        _dbc_path, construction_failed, _state_estimator, "CANDriverPrimary");
     
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver));
+    
+    _driver_secondary_can = std::make_shared<comms::CANDriver>(
+        _config, _logger, _message_logger, _secondary_can_tx_queue, _io_context_secondary_can, 
+        _dbc_path, construction_failed, _state_estimator, "CANDriverSecondary");
+    
+    if (construction_failed) {
+        throw std::runtime_error("Failed to construct CAN driver");
+    }
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_primary_can));
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_secondary_can));
     spdlog::info("made CAN driver");
     _eth_driver = std::make_unique<comms::MCUETHComms>(
-        _logger, _eth_tx_queue, _message_logger, *_state_estimator,
+        _logger, _eth_tx_queue, _message_logger, _state_estimator,
         _io_context, "192.168.1.30", 2001, 2000);
     
     spdlog::info("eth driver");
@@ -71,7 +81,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if(_settings.use_vectornav)
     {
         // on creation calls init()
-        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, *_state_estimator, _io_context, construction_failed);
+        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, _state_estimator, _io_context, construction_failed);
         if (construction_failed) {
            throw std::runtime_error("Failed to construct VN driver");
         }
@@ -106,10 +116,15 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
         std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
 
-    if(_driver)
+    if(_driver_primary_can)
     {
-        _driver->update_msg_logger(_message_logger);
+        _driver_primary_can->update_msg_logger(_message_logger);
     }
+    if(_driver_secondary_can)
+    {
+        _driver_secondary_can->update_msg_logger(_message_logger);
+    }
+    
     if(_vn_driver)
     {
         _vn_driver->update_msg_logger(_message_logger);
@@ -133,16 +148,22 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
 }
 
 DriveBrainApp::~DriveBrainApp() {
-    _stop_signal.store(true);
+    stop_signal.store(true);
     
     if (_process_thread.joinable()) {
         _process_thread.join();
     }
     spdlog::info("joined main process");
 
+    _message_logger->halt();
     _io_context.stop();
     if (_io_context_thread.joinable()) {
         _io_context_thread.join();
+    }
+
+    _io_context_secondary_can.stop();
+    if (_io_context_secondary_thread.joinable()) {
+        _io_context_secondary_thread.join();
     }
     
     if (_db_service) {
@@ -158,12 +179,11 @@ void DriveBrainApp::_process_loop() {
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
     auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
-    // auto loop_time = _controllerManager.get_active_controller_timestep();
     auto loop_time = 0.005;
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
-    while (!_stop_signal.load()) {
+    while (!stop_signal.load()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
@@ -191,10 +211,10 @@ void DriveBrainApp::_process_loop() {
             torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
             _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(torque_limit_msg));
             {
-                std::unique_lock lk(_can_tx_queue.mtx);
-                _can_tx_queue.deque.push_back(desired_rpm_msg);
-                _can_tx_queue.deque.push_back(torque_limit_msg);
-                _can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
+                std::unique_lock lk(_primary_can_tx_queue.mtx);
+                _primary_can_tx_queue.deque.push_back(desired_rpm_msg);
+                _primary_can_tx_queue.deque.push_back(torque_limit_msg);
+                _primary_can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
                 // spdlog::info("sent can");
             }
             
@@ -206,9 +226,9 @@ void DriveBrainApp::_process_loop() {
             desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
             _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_torque_msg));
             {
-                std::unique_lock lk(_can_tx_queue.mtx);
-                _can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
-                _can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
+                std::unique_lock lk(_primary_can_tx_queue.mtx);
+                _primary_can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
+                _primary_can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
             }
         }
 
@@ -222,10 +242,10 @@ void DriveBrainApp::_process_loop() {
 }
 
 
-std::atomic<bool> stop_signal{false};
+
 void signal_handler(int signal)
 {
-    spdlog::info("Interrupt signal ({}) received. Cleaning up...", signal);
+    spdlog::info("Interrupt signal db app({}) received. Cleaning up...", signal);
     stop_signal.store(true); // Set running to false to exit the main loop or gracefully terminate
 }
 
@@ -253,6 +273,16 @@ void DriveBrainApp::run() {
             _io_context.run();
         } catch (const std::exception& e) {
             spdlog::error("Error in io_context: {}", e.what());
+        }
+    });
+
+    _io_context_secondary_thread = std::thread([this]() {
+        if (!_settings.run_io_context) return;
+        spdlog::info("Started io context 2 thread");
+        try {
+            _io_context_secondary_can.run();
+        } catch (const std::exception& e) {
+            spdlog::error("Error in io_context 2: {}", e.what());
         }
     });
 

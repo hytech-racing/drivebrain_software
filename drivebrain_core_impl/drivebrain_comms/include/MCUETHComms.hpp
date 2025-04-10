@@ -34,7 +34,7 @@ namespace comms
         MCUETHComms(core::Logger &logger,
                     deqtype &in_deq,
                     std::shared_ptr<loggertype> message_logger,
-                    core::StateEstimator &state_estimator,
+                    std::shared_ptr<core::StateEstimator> state_estimator,
                     boost::asio::io_context &io_context,
                     const std::string &send_ip,
                     uint16_t recv_port,
@@ -54,7 +54,7 @@ namespace comms
     private:
         core::Logger &_logger;
         std::shared_ptr<loggertype> _message_logger;
-        core::StateEstimator &_state_estimator;
+        std::shared_ptr<core::StateEstimator> _state_estimator;
         std::array<uint8_t, 2048> _recv_buffer;
         std::array<uint8_t, 2048> _send_buffer;
 

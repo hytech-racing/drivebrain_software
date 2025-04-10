@@ -124,11 +124,8 @@ namespace common
                 {
                     std::unique_lock lk(_logger_mtx);
                     msg_to_log.channelId = _msg_name_id_map[msg.message_name];
-                    // spdlog::info("logging at channel: {}", msg_to_log.channelId);
                     auto write_res = _writer.write(msg_to_log);
 
-                    // spdlog::info("Logging message: {}", msg.message_name);
-                    // spdlog::info("message size: {}", msg_to_log.dataSize);
                 }
             }
 
@@ -217,7 +214,7 @@ namespace common
         {
             std::unordered_map params_map = cc->get_all_params_map();
             std::string param_parent = cc->get_name();
-            std::cout << param_parent << std::endl;
+            // std::cout << param_parent << std::endl;
             std::vector<std::string> param_names = cc->get_param_names();
             for (auto i = params_map.begin(); i != params_map.end(); i++)
             {
@@ -227,7 +224,7 @@ namespace common
                 _get_params_as_json<bool, int, float, double, std::string>(param_parent, name, var_val, params_all);
             }
         }
-        std::cout << params_all.dump() <<std::endl;
+        // std::cout << params_all.dump() <<std::endl;
         return params_all;
     }
 
