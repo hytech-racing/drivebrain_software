@@ -204,8 +204,6 @@ namespace common
                 _input_deque.cv.notify_all();
             }
         }
-        
-        
     }
     nlohmann::json DrivebrainMCAPLogger::_get_param_vals() {
     
@@ -224,7 +222,6 @@ namespace common
                 _get_params_as_json<bool, int, float, double, std::string>(param_parent, name, var_val, params_all);
             }
         }
-        // std::cout << params_all.dump() <<std::endl;
         return params_all;
     }
 
@@ -246,8 +243,6 @@ namespace common
         }
         return top_level_schema;
     }
-
-
 }
 
 

@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
             .run_db_service = true,
             .run_io_context = true,
             .run_process_loop = true,
-            .use_vectornav = true,
+            .use_vectornav = false,
             .use_secondary_can = use_secondary_can
         };
         
