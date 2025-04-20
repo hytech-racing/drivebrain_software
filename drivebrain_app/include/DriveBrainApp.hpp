@@ -15,6 +15,7 @@
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
 #include <DBServiceImpl.hpp>
+#include <ACUETHComms.hpp>
 
 #include <thread>
 #include <chrono>
@@ -79,6 +80,7 @@ private:
     std::shared_ptr<comms::CANDriver> _driver_primary_can;
     std::shared_ptr<comms::CANDriver> _driver_secondary_can;
     std::unique_ptr<comms::MCUETHComms> _eth_driver;
+    std::unique_ptr<comms::ACUETHComms> _acu_eth_driver;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
