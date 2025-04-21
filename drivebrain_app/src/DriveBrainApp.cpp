@@ -79,8 +79,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     };
     _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
     spdlog::info("made db service");
-    if(_settings.use_vectornav)
+
+    nlohmann::json &config_json = _config.get_config();
+    if(config_json.contains("use_vectornav") && config_json["use_vectornav"])
     {
+        spdlog::info("using vectornav");
         // on creation calls init()
         _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, _state_estimator, _io_context, construction_failed);
         if (construction_failed) {

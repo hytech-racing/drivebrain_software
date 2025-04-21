@@ -33,5 +33,6 @@
         "max_switch_requested_rpm": 20000.0,
         "max_torque_switch_nm": 10.0,
         "max_accel_switch_float": 0.1
-    }
+    },
+    "use_vectornav": false
 }

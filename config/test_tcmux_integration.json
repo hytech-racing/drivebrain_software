@@ -1,4 +1,4 @@
-{
+g{
     "ControllerManager": {
         "max_controller_switch_speed_ms": 1.793, 
         "max_switch_requested_rpm": 20000.0,
