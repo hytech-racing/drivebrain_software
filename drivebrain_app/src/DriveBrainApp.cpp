@@ -18,7 +18,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _config(_param_path)
     , _settings(settings)
     , controller1(std::make_shared<control::SimpleSpeedController>(_config))
-    , controller2(std::make_shared<control::SimpleTorqueController>(_config))
+    , controller2(std::make_shared<control::DynoController>(_config))
     , _controllerManager(_config, {controller1, controller2})  // Initialize correctly
 {
     // spdlog::info("top o");
@@ -91,8 +91,6 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         }
         configurable_components.push_back(_vn_driver);
     }
-
-    
     
     
     // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 

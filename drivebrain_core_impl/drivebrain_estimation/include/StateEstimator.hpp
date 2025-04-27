@@ -71,7 +71,7 @@ namespace core
             std::chrono::microseconds zero_start_time{0};
             _timestamp_array = {zero_start_time, zero_start_time, zero_start_time, zero_start_time};
         }
-        ~StateEstimator() = default;
+        ~StateEstimator();
 
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();

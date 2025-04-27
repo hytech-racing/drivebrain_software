@@ -1,10 +1,14 @@
 // DriveBrainApp.hpp
 #pragma once
 
+#include "DynoController.hpp"
 #include "SimpleTorqueController.hpp"
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
+
 #include <SimpleSpeedController.hpp>
+#include <DynoController.hpp>
+
 #include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <MCUETHComms.hpp>
@@ -71,7 +75,7 @@ private:
     std::vector<std::shared_ptr<core::common::Configurable>> _configurable_components;
     std::shared_ptr<common::DrivebrainMCAPLogger> _mcap_logger;
     std::shared_ptr<control::SimpleSpeedController> controller1;
-    std::shared_ptr<control::SimpleTorqueController> controller2;
+    std::shared_ptr<control::DynoController> controller2;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 > _controllerManager;
         // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;

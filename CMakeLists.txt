@@ -119,7 +119,11 @@ target_link_libraries(drivebrain_comms PUBLIC
 make_cmake_package(drivebrain_comms drivebrain)
 
 
-add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleTorqueController.cpp drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp)
+add_library(drivebrain_control SHARED 
+    drivebrain_core_impl/drivebrain_control/src/SimpleTorqueController.cpp 
+    drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp
+    drivebrain_core_impl/drivebrain_control/src/DynoController.cpp
+)
 
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
 target_include_directories(drivebrain_control PUBLIC
@@ -230,6 +234,13 @@ target_link_libraries(test_param_server PUBLIC
 add_executable(mcu_standin test/test_mcu.cpp)
 
 target_link_libraries(mcu_standin PUBLIC
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
+
+add_executable(acu_standing test/test_aucu_send.cpp)
+
+target_link_libraries(acu_standing PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
 )

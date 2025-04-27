@@ -29,6 +29,7 @@ comms::CANDriver::~CANDriver() {
     _running = false;
     _input_deque_ref.cv.notify_all();
     _output_thread.join();
+    spdlog::info("destructed CAN driver");
 }
 bool comms::CANDriver::init() {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");

@@ -32,6 +32,7 @@ namespace core
         ~FoxgloveWSServer()
         {
             _server->stop();
+            spdlog::info("destructed foxglove websocket server");
         }
 
     private:

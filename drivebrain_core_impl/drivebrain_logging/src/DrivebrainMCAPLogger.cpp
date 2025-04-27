@@ -37,10 +37,12 @@ namespace common
 
     DrivebrainMCAPLogger::~DrivebrainMCAPLogger()
     {
+        spdlog::info("destructing mcap logger"); 
         {
             std::unique_lock lk(_input_deque.mtx);
             _running = false;
         }
+        
         spdlog::info("attempting close log thread in mcap logger");
         _input_deque.cv.notify_all();
         spdlog::info("notif sent");
