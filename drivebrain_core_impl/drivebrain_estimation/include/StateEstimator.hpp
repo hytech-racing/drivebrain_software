@@ -52,15 +52,36 @@
 // for now i will just move the state estimator into the estimation impl and call it a day 
 namespace core
 {
-    class StateEstimator
+    class StateEstimator : public core::common::Configurable
     {
+        struct config
+        {
+            float fl_sus_pot_min;
+            float fl_sus_pot_min_mm;
+            float fl_sus_pot_max;
+            float fl_sus_pot_max_mm;
+            float fr_sus_pot_min;
+            float fr_sus_pot_min_mm;
+            float fr_sus_pot_max;
+            float fr_sus_pot_max_mm;
+            float rl_sus_pot_min;
+            float rl_sus_pot_min_mm;
+            float rl_sus_pot_max;
+            float rl_sus_pot_max_mm;
+            float rr_sus_pot_min;
+            float rr_sus_pot_min_mm;
+            float rr_sus_pot_max;
+            float rr_sus_pot_max_mm;
+        } _config;
 
     using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::Logger &shared_logger, std::shared_ptr<loggertype> message_logger)
-        : _logger(shared_logger), _message_logger(message_logger)
+        StateEstimator(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger) : 
+        
+        Configurable(json_file_handler, "StateEstimator")
+        , _message_logger(message_logger)
         //  _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
@@ -76,10 +97,13 @@ namespace core
         void handle_recv_process(std::shared_ptr<google::protobuf::Message> message);
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
         void set_previous_control_output(ControllerOutput prev_control_output);
+        core::VehicleState append_state_variables_from_raw_inputs(core::VehicleState vs, core::RawInputData raw_inputs);
         void update_msg_logger(std::shared_ptr<loggertype> message_logger)
         {
             _message_logger = message_logger;
         }
+        bool init();
+
 
     private:
         void _recv_low_level_state(std::shared_ptr<google::protobuf::Message> message);
@@ -92,10 +116,11 @@ namespace core
 
         template <size_t arr_len>
         bool _validate_stamps(const std::array<std::chrono::microseconds, arr_len> &timestamp_arr);
+        std::shared_ptr<hytech_msgs::VehicleData> _set_computed_states(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out);
 
+        void _set_float_veh_vec_message_member(veh_vec<float> from, hytech_msgs::veh_vec_float * to_set);
     private:
-        
-        core::Logger &_logger;
+
         bool _run_recv_threads = false;
         std::mutex _state_mutex;
         core::VehicleState _vehicle_state;

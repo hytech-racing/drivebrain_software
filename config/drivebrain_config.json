@@ -34,5 +34,24 @@
         "max_torque_switch_nm": 10.0,
         "max_accel_switch_float": 0.1
     },
+    "StateEstimator": {
+        "fl_sus_pot_min": 1.0,
+        "fl_sus_pot_min_mm": 0.0,
+        "fl_sus_pot_max": 2000.0,
+        "fl_sus_pot_max_mm": 1.0,
+        "fr_sus_pot_min": 1.0,
+        "fr_sus_pot_min_mm": 0.0,
+        "fr_sus_pot_max": 2000.0,
+        "fr_sus_pot_max_mm": 1.0,
+        "rl_sus_pot_min": 1.0,
+        "rl_sus_pot_min_mm": 0.0,
+        "rl_sus_pot_max": 2000.0,
+        "rl_sus_pot_max_mm": 1.0,
+        "rr_sus_pot_min": 1.0,
+        "rr_sus_pot_min_mm": 0.0,
+        "rr_sus_pot_max": 2000.0,
+        "rr_sus_pot_max_mm": 1.0
+    },
     "use_vectornav": false
+
 }

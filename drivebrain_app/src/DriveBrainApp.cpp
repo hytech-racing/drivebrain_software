@@ -25,13 +25,6 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
     spdlog::set_level(spdlog::level::info);
 
-    // TODO make this function that can get the config schemas from the configureable components. it also needs to join all of the schemas together 
-    
-    auto get_schema = []() -> nlohmann::json
-    {
-        return nlohmann::json();
-    };
-
     
     controller1 = std::make_shared<control::SimpleSpeedController>(_config);
     if (!controller1->init()) {
@@ -43,8 +36,14 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     
     
     
-    _state_estimator = std::make_unique<core::StateEstimator>(_logger, _message_logger);
+    _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger);
+    if(!_state_estimator->init())
+    {
+        throw std::runtime_error("Failed to initialize state estimator");
+    }
+    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_state_estimator));
     spdlog::info("made state estimator");
+    
     bool construction_failed = false;
     // this also calls init() in the constructor
     

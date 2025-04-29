@@ -3,16 +3,16 @@
     "HT_proto": {
       "flake": false,
       "locked": {
-        "lastModified": 1744328254,
-        "narHash": "sha256-N4JJyjXAkPn8B2V7opNnhuvJZ8CD/V/g0FD/sCZcl/c=",
+        "lastModified": 1745886368,
+        "narHash": "sha256-d1KpRJ9Ov3mE8zGBLZNkHrFvuoKCsb+Pn3DRovF2VvA=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "22d4c819aedd716d924275ff89be61b3644face7",
+        "rev": "b63b352f4a4d3d0e9b0cdb90f876ae12e812b4a7",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "22d4c819aedd716d924275ff89be61b3644face7",
+        "ref": "b63b352f4a4d3d0e9b0cdb90f876ae12e812b4a7",
         "repo": "HT_proto",
         "type": "github"
       }
@@ -52,11 +52,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1744269183,
-        "narHash": "sha256-WR4r7QAh07J2QmN4Kl4x6YG/IZCBATOGLhhmW+FRJ8o=",
+        "lastModified": 1745886021,
+        "narHash": "sha256-BKPcAybnaEat8tGx93dXpqEnjTlGy+RM+liL70FSJeY=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "706d6bcc9c0a22a3e1c2c86d1789514bfb4b07cd",
+        "rev": "bf99f0daf0acdc658ea83a74ae58977fe0096ab6",
         "type": "github"
       },
       "original": {

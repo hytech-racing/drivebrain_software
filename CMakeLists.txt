@@ -163,6 +163,8 @@ target_include_directories(drivebrain_estimation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_estimation/include>    
 )
 
+target_link_libraries(drivebrain_estimation PUBLIC drivebrain_core::drivebrain_core)
+
 make_cmake_package(drivebrain_estimation drivebrain)
 
 add_library(drivebrain_app SHARED
