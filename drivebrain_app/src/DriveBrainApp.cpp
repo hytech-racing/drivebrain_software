@@ -155,7 +155,6 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     }
 
     spdlog::info("constructed app");
-    // TODO add here the creation of the config logger
 }
 
 DriveBrainApp::~DriveBrainApp() {
