@@ -4,7 +4,6 @@
 #include <SimpleSpeedController.hpp>
 #include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
-#include <MCUETHComms.hpp>
 #include <VNComms.hpp>
 #include <MsgLogger.hpp>
 #include <DrivebrainMCAPLogger.hpp>

@@ -1,7 +1,6 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
-#include "ACUETHComms.hpp"
 #include "SimpleSpeedController.hpp"
 #include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
@@ -67,12 +66,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(_driver_primary_can);
     configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
-    comms::ETHCommPorts ports = {7766, 5555, 4444};
-    _acu_eth_driver = std::make_unique<comms::ACUETHComms>(
-        _logger, _message_logger, 
-        _io_context, ports);
+    _acu_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_message_logger,_io_context, 7766);
+    _vcr_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_message_logger,_io_context, 9999);
+    _vcf_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_message_logger,_io_context, 4444);
     
-    spdlog::info("eth driver");
+    spdlog::info("eth drivers");
 
     auto switch_modes = 
     [this](size_t mode) -> bool {
@@ -146,6 +144,14 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if(_acu_eth_driver)
     {
         _acu_eth_driver->update_msg_logger(_message_logger);
+    }
+    if(_vcr_eth_driver)
+    {
+        _vcr_eth_driver->update_msg_logger(_message_logger);
+    }
+    if(_vcf_eth_driver)
+    {
+        _vcf_eth_driver->update_msg_logger(_message_logger);
     }
 
     spdlog::info("constructed app");

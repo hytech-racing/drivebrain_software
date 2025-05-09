@@ -1,5 +1,6 @@
-#ifndef __ACUCOMMS_H__
-#define __ACUCOMMS_H__
+#ifndef __ETHRECVCOMMS_H__
+#define __ETHRECVCOMMS_H__
+
 
 #include <Logger.hpp>
 #include <StateEstimator.hpp>
@@ -24,23 +25,16 @@
 
 namespace comms
 {
-    struct ETHCommPorts
-    {
-        uint16_t acu_port;
-        uint16_t vcr_port;
-        uint16_t vcf_port;
-    };
-    class ACUETHComms
+    
+    template<typename ETHMsgType>
+    class ETHRecvComms
     {
     public:
         
         using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
-        ACUETHComms() = delete;
-        ~ACUETHComms();
-        ACUETHComms(core::Logger &logger,
-                    std::shared_ptr<loggertype> message_logger,
-                    boost::asio::io_context &io_context,
-                    ETHCommPorts ports);
+        ETHRecvComms() = delete;
+        ~ETHRecvComms();
+        ETHRecvComms(std::shared_ptr<loggertype> message_logger, boost::asio::io_context &io_context, uint16_t recv_port);
         void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
             _message_logger = message_logger;
         }
@@ -48,20 +42,19 @@ namespace comms
     private:
         void _handle_receive(const boost::system::error_code &error, std::size_t size);
         void _start_receive();
-        void _handle_send(std::array<uint8_t, 2048> /*message*/,
-                          const boost::system::error_code & /*error*/,
-                          std::size_t /*bytes_transferred*/);
+        
     private:
-        core::Logger &_logger;
         std::shared_ptr<loggertype> _message_logger;
-        std::array<uint8_t, 2048> _recv_buffer;
+        std::array<uint8_t, 4096> _recv_buffer;
         boost::asio::ip::udp::socket _socket;
         boost::asio::ip::udp::endpoint _remote_endpoint;
-        std::shared_ptr<hytech_msgs::ACUAllData> _acu_msg;
+        std::shared_ptr<ETHMsgType> _eth_msg;
         bool _running = false;
         std::thread _output_thread;
     };
 
 }
 
-#endif // __ACUCOMMS_H__
+#include "ETHRecvComms.tpp"
+
+#endif // __ETHRECVCOMMS_H__

@@ -7,7 +7,6 @@
 #include <SimpleSpeedController.hpp>
 #include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
-#include <MCUETHComms.hpp>
 #include <VNComms.hpp>
 #include <MsgLogger.hpp>
 #include <DrivebrainMCAPLogger.hpp>
@@ -15,7 +14,7 @@
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
 #include <DBServiceImpl.hpp>
-#include <ACUETHComms.hpp>
+#include <ETHRecvComms.hpp>
 
 #include <thread>
 #include <chrono>
@@ -79,8 +78,9 @@ private:
     std::shared_ptr<core::StateEstimator> _state_estimator;
     std::shared_ptr<comms::CANDriver> _driver_primary_can;
     std::shared_ptr<comms::CANDriver> _driver_secondary_can;
-    // std::unique_ptr<comms::MCUETHComms> _eth_driver;
-    std::unique_ptr<comms::ACUETHComms> _acu_eth_driver;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
