@@ -14,7 +14,7 @@
 
 namespace common
 {
-    DrivebrainMCAPLogger::DrivebrainMCAPLogger(const std::string &base_dir, std::vector<std::shared_ptr<core::common::Configurable>> configurable_components)
+    DrivebrainMCAPLogger::DrivebrainMCAPLogger(const std::string &base_dir, std::vector<std::weak_ptr<core::common::Configurable>> configurable_components)
         : _options(mcap::McapWriterOptions("")), _configurable_components(configurable_components)
     {
         auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
@@ -210,19 +210,23 @@ namespace common
     nlohmann::json DrivebrainMCAPLogger::_get_param_vals() {
     
         nlohmann::json params_all;
-        for(const auto cc: _configurable_components)
+        for(const auto cc_locked: _configurable_components)
         {
-            std::unordered_map params_map = cc->get_all_params_map();
-            std::string param_parent = cc->get_name();
-            // std::cout << param_parent << std::endl;
-            std::vector<std::string> param_names = cc->get_param_names();
-            for (auto i = params_map.begin(); i != params_map.end(); i++)
+            if(auto cc = cc_locked.lock())
             {
-                auto name = i->first;
-                auto var_val = i->second;
-                
-                _get_params_as_json<bool, int, float, double, std::string>(param_parent, name, var_val, params_all);
+                std::unordered_map params_map = cc->get_all_params_map();
+                std::string param_parent = cc->get_name();
+                // std::cout << param_parent << std::endl;
+                std::vector<std::string> param_names = cc->get_param_names();
+                for (auto i = params_map.begin(); i != params_map.end(); i++)
+                {
+                    auto name = i->first;
+                    auto var_val = i->second;
+                    
+                    _get_params_as_json<bool, int, float, double, std::string>(param_parent, name, var_val, params_all);
+                }
             }
+            
         }
         return params_all;
     }
@@ -235,13 +239,16 @@ namespace common
         for(const auto component : _configurable_components )
         {
             // TODO handle multiple instances of the same component
-            std::cout << "getting component index: "<<component_index <<std::endl;
-            if(!component->is_configured())
+            if(auto comp_locked = component.lock())
             {
-                return std::nullopt;
+                std::cout << "getting component index: "<<component_index <<std::endl;
+                if(!comp_locked->is_configured())
+                {
+                    return std::nullopt;
+                }
+                component_index++;
+                top_level_schema["properties"][comp_locked->get_name()] = comp_locked->get_schema();
             }
-            component_index++;
-            top_level_schema["properties"][component->get_name()] = component->get_schema();
         }
         return top_level_schema;
     }

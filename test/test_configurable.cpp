@@ -72,10 +72,9 @@ int main()
     
     
 
-    std::vector<std::shared_ptr<core::common::Configurable>> configureable_components;
-    auto test_inst_cast = std::reinterpret_pointer_cast<core::common::Configurable>(test);
-    configureable_components.push_back(test_inst_cast);
-    configureable_components.push_back(std::reinterpret_pointer_cast<core::common::Configurable>(test_inst));
+    std::vector<std::weak_ptr<core::common::Configurable>> configureable_components;
+    configureable_components.push_back(test);
+    configureable_components.push_back(test_inst);
 
     auto standin_foxglove_ws_send = [](std::shared_ptr<google::protobuf::Message> msg){};
     auto mcap_logger = std::make_shared<common::DrivebrainMCAPLogger>("temp", configureable_components);

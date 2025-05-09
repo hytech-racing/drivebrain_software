@@ -23,7 +23,7 @@ static uint64_t nanosecondsSinceEpoch()
                         .count());
 }
 
-core::FoxgloveWSServer::FoxgloveWSServer(std::vector<std::shared_ptr<core::common::Configurable>> configurable_components) : _components(configurable_components)
+core::FoxgloveWSServer::FoxgloveWSServer(std::vector<std::weak_ptr<core::common::Configurable>> configurable_components) : _components(configurable_components)
 {
     _log_handler = [](foxglove::WebSocketLogLevel, char const *msg)
     {
@@ -210,20 +210,24 @@ void core::FoxgloveWSServer::_set_db_param(foxglove::Parameter param_update)
     std::string param_name = param_update.getName().substr(split_pos + 1);
     std::string component_name = param_update.getName().substr(0, split_pos);
 
-    for (const auto component : _components)
+    for (const auto component_locked : _components)
     {
-        if (component->get_name() == component_name)
+        if(auto component = component_locked.lock())
         {
-
-            core::common::Configurable::ParamTypes curr_param_val = component->get_cached_param(param_name);
-            std::optional<foxglove::Parameter> converted_type = _convert_foxglove_param(curr_param_val, param_update);
-            if(converted_type)
+            if (component->get_name() == component_name)
             {
-                core::common::Configurable::ParamTypes val = _get_db_param(*converted_type);
-                component->handle_live_param_update(param_name, val);
+
+                core::common::Configurable::ParamTypes curr_param_val = component->get_cached_param(param_name);
+                std::optional<foxglove::Parameter> converted_type = _convert_foxglove_param(curr_param_val, param_update);
+                if(converted_type)
+                {
+                    core::common::Configurable::ParamTypes val = _get_db_param(*converted_type);
+                    component->handle_live_param_update(param_name, val);
+                }
+                return;
             }
-            return;
         }
+        
     }
     spdlog::warn("WARNING: could not find component {}", component_name);
 
@@ -232,17 +236,21 @@ void core::FoxgloveWSServer::_set_db_param(foxglove::Parameter param_update)
 std::vector<foxglove::Parameter> core::FoxgloveWSServer::_get_current_params()
 {
     std::vector<foxglove::Parameter> params;
-    for (const auto component : _components)
+    for (const auto component_locked : _components)
     {
-        std::unordered_map params_map = component->get_params_map();
-        std::string param_parent = component->get_name();
-        std::vector<std::string> param_names = component->get_param_names();
-        for (const auto &component_param_name : param_names)
+        if(auto component = component_locked.lock())
         {
-            std::string foxglove_param_id = param_parent + "/" + component_param_name;
-            foxglove::Parameter fxglove_param = _get_foxglove_param(foxglove_param_id, params_map[component_param_name]);
-            params.push_back(fxglove_param);
+            std::unordered_map params_map = component->get_params_map();
+            std::string param_parent = component->get_name();
+            std::vector<std::string> param_names = component->get_param_names();
+            for (const auto &component_param_name : param_names)
+            {
+                std::string foxglove_param_id = param_parent + "/" + component_param_name;
+                foxglove::Parameter fxglove_param = _get_foxglove_param(foxglove_param_id, params_map[component_param_name]);
+                params.push_back(fxglove_param);
+            }
         }
+        
     }
     return params;
 }

@@ -46,7 +46,7 @@ namespace common
             uint64_t log_time;
         };
 
-        DrivebrainMCAPLogger(const std::string &base_dir, std::vector<std::shared_ptr<core::common::Configurable>> configurable_components);
+        DrivebrainMCAPLogger(const std::string &base_dir, std::vector<std::weak_ptr<core::common::Configurable>> configurable_components);
         ~DrivebrainMCAPLogger();
 
         /// @brief 
@@ -91,9 +91,7 @@ namespace common
         std::mutex _logger_mtx;
         std::unordered_map<std::string, uint32_t> _msg_name_id_map;
         
-        // std::function<std::optional<nlohmann::json>()> _get_params_schema;
-        // std::function<nlohmann::json()> _get_param_vals;
-        std::vector<std::shared_ptr<core::common::Configurable>> _configurable_components;
+        std::vector<std::weak_ptr<core::common::Configurable>> _configurable_components;
     };
 }
 

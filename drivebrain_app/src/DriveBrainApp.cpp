@@ -24,7 +24,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _controllerManager(_config, {controller1, controller2})  // Initialize correctly
 {
     // spdlog::info("top o");
-    std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
+    std::vector<std::weak_ptr<core::common::Configurable>> configurable_components;
     spdlog::set_level(spdlog::level::debug);
 
     
@@ -32,7 +32,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
-    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(controller1));
+    configurable_components.push_back(controller1);
     spdlog::info("made controller");
 
     
@@ -43,7 +43,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         throw std::runtime_error("Failed to initialize state estimator");
     }
-    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_state_estimator));
+    configurable_components.push_back(_state_estimator);
     spdlog::info("made state estimator");
     
     bool construction_failed = false;
@@ -64,8 +64,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
-    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_primary_can));
-    configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_secondary_can));
+    configurable_components.push_back(_driver_primary_can);
+    configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
     comms::ETHCommPorts ports = {7766, 5555, 4444};
     _acu_eth_driver = std::make_unique<comms::ACUETHComms>(
