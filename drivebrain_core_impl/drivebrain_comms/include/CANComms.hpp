@@ -114,6 +114,7 @@ namespace comms
         /// @return variant of types
         FieldVariant get_field_value(std::shared_ptr<google::protobuf::Message> message, const std::string &field_name);
 
+        
         // for exposing to the test framework directly
     protected:
         // socket operations

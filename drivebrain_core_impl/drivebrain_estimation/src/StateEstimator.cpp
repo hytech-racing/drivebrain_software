@@ -19,6 +19,10 @@
 
 using namespace core;
 
+StateEstimator::~StateEstimator()
+{
+    spdlog::info("destructed StateEstimator");
+}
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message) {
     if (message->GetTypeName() == "hytech_msgs.VNData") {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);

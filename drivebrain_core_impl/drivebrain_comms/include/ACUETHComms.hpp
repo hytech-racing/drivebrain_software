@@ -10,6 +10,7 @@
 #include <boost/array.hpp>
 #include <boost/bind/bind.hpp>
 
+#include <cstdint>
 #include <google/protobuf/message.h>
 #include "hytech_msgs.pb.h"
 #include <memory>
@@ -24,16 +25,23 @@
 
 namespace comms
 {
+    struct ETHCommPorts
+    {
+        uint16_t acu_port;
+        uint16_t vcr_port;
+        uint16_t vcf_port;
+    };
     class ACUETHComms
     {
     public:
+        
         using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         ACUETHComms() = delete;
         ~ACUETHComms();
         ACUETHComms(core::Logger &logger,
                     std::shared_ptr<loggertype> message_logger,
                     boost::asio::io_context &io_context,
-                    uint16_t recv_port);
+                    ETHCommPorts ports);
         void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
             _message_logger = message_logger;
         }

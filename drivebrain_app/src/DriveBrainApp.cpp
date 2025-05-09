@@ -1,11 +1,13 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "ACUETHComms.hpp"
 #include "SimpleSpeedController.hpp"
 #include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
 #include <memory>
 #include <mutex>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <thread>
 
@@ -23,7 +25,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
 {
     // spdlog::info("top o");
     std::vector<std::shared_ptr<core::common::Configurable>> configurable_components;
-    spdlog::set_level(spdlog::level::info);
+    spdlog::set_level(spdlog::level::debug);
 
     
     controller1 = std::make_shared<control::SimpleSpeedController>(_config);
@@ -65,10 +67,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_primary_can));
     configurable_components.push_back(std::static_pointer_cast<core::common::Configurable>(_driver_secondary_can));
     spdlog::info("made CAN driver");
+    comms::ETHCommPorts ports = {7766, 5555, 4444};
     _acu_eth_driver = std::make_unique<comms::ACUETHComms>(
         _logger, _message_logger, 
-        _io_context, 7766
-    );
+        _io_context, ports);
     
     spdlog::info("eth driver");
 
@@ -109,7 +111,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     spdlog::info("made mcap logger and foxglove server");
 
     // all things must be initialized before this gets constructed due to logging on init needing the schemas determined by the init 
-    // functions of the configurable components
+    // // functions of the configurable components
     _message_logger = std::make_shared<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>>(
         ".mcap", true,
         std::bind(&common::DrivebrainMCAPLogger::log_msg, _mcap_logger, std::placeholders::_1),
@@ -153,29 +155,41 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
 DriveBrainApp::~DriveBrainApp() {
     stop_signal.store(true);
     
+    if(_message_logger)
+    {
+        _message_logger->halt();
+    }
+    
+
     if (_process_thread.joinable()) {
         _process_thread.join();
+        spdlog::info("joined main process");
     }
-    spdlog::info("joined main process");
-
-    _message_logger->halt();
+    
+    
+    spdlog::info("halted message logger");
     _io_context.stop();
     if (_io_context_thread.joinable()) {
         _io_context_thread.join();
+        spdlog::info("joined io context 1");
     }
-
+    
     _io_context_secondary_can.stop();
     if (_io_context_secondary_thread.joinable()) {
         _io_context_secondary_thread.join();
+        spdlog::info("joined io context 2");
     }
+
+    
     
     if (_db_service) {
         _db_service->stop_server();
     }
     if ( _db_service_thread.joinable()) {
         _db_service_thread.join();
+        spdlog::info("joined db service");
     }
-    spdlog::info("joined io context");
+    spdlog::info("destructed db app");
 }
 
 void DriveBrainApp::_process_loop() {
@@ -187,6 +201,7 @@ void DriveBrainApp::_process_loop() {
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
     while (!stop_signal.load()) {
+        spdlog::debug("looping _process_loop");
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
@@ -206,13 +221,21 @@ void DriveBrainApp::_process_loop() {
             desired_rpm_msg->set_drivebrain_set_rpm_fr(speedControl->desired_rpms.FR);
             desired_rpm_msg->set_drivebrain_set_rpm_rl(speedControl->desired_rpms.RL);
             desired_rpm_msg->set_drivebrain_set_rpm_rr(speedControl->desired_rpms.RR);
-            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_rpm_msg));
+            if(_message_logger)
+            {
+                _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_rpm_msg));
+            }
+                
             // same with torque limits
             torque_limit_msg->set_drivebrain_torque_fl(::abs(speedControl->torque_lim_nm.FL));
             torque_limit_msg->set_drivebrain_torque_fr(::abs(speedControl->torque_lim_nm.FR));
             torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
             torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
-            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(torque_limit_msg));
+            if(_message_logger)
+            {
+                _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(torque_limit_msg));
+            }
+            
             {
                 std::unique_lock lk(_primary_can_tx_queue.mtx);
                 _primary_can_tx_queue.deque.push_back(desired_rpm_msg);
@@ -227,7 +250,11 @@ void DriveBrainApp::_process_loop() {
             desired_torque_msg->set_drivebrain_torque_fr(::abs(torqueControl->desired_torques_nm.FR));
             desired_torque_msg->set_drivebrain_torque_rl(::abs(torqueControl->desired_torques_nm.RL));
             desired_torque_msg->set_drivebrain_torque_rr(::abs(torqueControl->desired_torques_nm.RR));
-            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_torque_msg));
+            if(_message_logger)
+            {
+                _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_torque_msg));
+            }
+            
             {
                 std::unique_lock lk(_primary_can_tx_queue.mtx);
                 _primary_can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
@@ -262,6 +289,7 @@ void DriveBrainApp::run() {
         spdlog::info("started db service thread");
         try {
             while (!stop_signal.load()) {
+                spdlog::debug("looping db service thread");
                 _db_service->run_server();
             }
         } catch (const std::exception& e) {
@@ -296,6 +324,7 @@ void DriveBrainApp::run() {
 
     
     while (!stop_signal.load()) {
+        spdlog::debug("looping DBAPP run");
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }

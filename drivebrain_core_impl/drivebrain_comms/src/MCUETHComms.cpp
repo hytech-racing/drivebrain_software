@@ -43,6 +43,7 @@ namespace comms
         // we will assume that this queue only has messages that we want to send
         while (_running)
         {
+            spdlog::debug("looping _handle_send_msg_from_queue mcu eth");
             {
                 std::unique_lock lk(_input_deque_ref.mtx);
                 // TODO unfuck this, queue management shouldnt live within the queue itself

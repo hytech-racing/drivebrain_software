@@ -37,6 +37,7 @@ namespace common
 
     DrivebrainMCAPLogger::~DrivebrainMCAPLogger()
     {
+        spdlog::info("started destruction of mcap logger");
         {
             std::unique_lock lk(_input_deque.mtx);
             _running = false;
@@ -101,6 +102,7 @@ namespace common
         while (true)
         {
             {
+                spdlog::debug("looping _handle_log_to_file");
                 std::unique_lock lk(_input_deque.mtx);
                 _input_deque.cv.wait(lk, [this]()
                                     { return !_input_deque.deque.empty() || !_running; });

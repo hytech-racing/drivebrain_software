@@ -16,21 +16,14 @@
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    HT_proto =
-      {
-        type = "github";
-        owner = "hytech-racing";
-        repo = "HT_proto";
-        ref = "b63b352f4a4d3d0e9b0cdb90f876ae12e812b4a7";
-        flake = false;
-      };
+    HT_proto.url = "github:hytech-racing/HT_proto";
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
       flake = false;
     };
 
-    ht_can.url = "github:hytech-racing/ht_can/156";
+    ht_can.url = "github:hytech-racing/ht_can";
     ht_can.inputs.nixpkgs.follows = "nixpkgs";
     ht_can.inputs.nix-proto.follows = "nix-proto";
 
@@ -41,12 +34,8 @@
       flake = false;
     };
 
-    nanopb-proto-api = {
-      url = "github:nanopb/nanopb";
-      flake = false;
-    };
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, nanopb-proto-api, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, ... }@inputs:
     let
 
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {

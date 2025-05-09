@@ -118,6 +118,7 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
         speed_out.torque_lim_nm.FR = (torqueRequest * (2.0 - cur_config.rear_torque_scale));
         speed_out.torque_lim_nm.RL = (torqueRequest * cur_config.rear_torque_scale);
         speed_out.torque_lim_nm.RR = (torqueRequest * cur_config.rear_torque_scale);
+        cmd_out.out = _apply_power_limit(speed_out, in.current_rpms);
     }
     else
     {
@@ -132,10 +133,8 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
         speed_out.torque_lim_nm.FR = (torqueRequest * (2.0 - cur_config.rear_torque_scale));
         speed_out.torque_lim_nm.RL = (torqueRequest * cur_config.rear_torque_scale);
         speed_out.torque_lim_nm.RR = (torqueRequest * cur_config.rear_torque_scale);
+        cmd_out.out = speed_out; // no need to apply power limit for regen request
     }
-
-    
-    cmd_out.out = _apply_power_limit(speed_out, in.current_rpms);
 
     return cmd_out;
 }

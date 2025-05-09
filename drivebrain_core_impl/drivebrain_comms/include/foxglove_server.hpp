@@ -31,7 +31,9 @@ namespace core
         void send_live_telem_msg(std::shared_ptr<google::protobuf::Message> msg);
         ~FoxgloveWSServer()
         {
+            spdlog::info("stopping foxglove server");
             _server->stop();
+            spdlog::info("stopped foxglove server and destructed foxglove server");
         }
 
     private:

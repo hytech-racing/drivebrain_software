@@ -6,12 +6,13 @@
 using boost::asio::ip::udp;
 namespace comms
 {
+    
     ACUETHComms::ACUETHComms(core::Logger &logger,
                              std::shared_ptr<loggertype> message_logger,
                              boost::asio::io_context &io_context,
-                             uint16_t recv_port) : _logger(logger),
+                             ETHCommPorts ports) : _logger(logger),
                                                    _message_logger(message_logger),
-                                                   _socket(io_context, udp::endpoint(udp::v4(), recv_port))
+                                                   _socket(io_context, udp::endpoint(udp::v4(), ports.acu_port))
     {
         _acu_msg = std::make_shared<hytech_msgs::ACUAllData>();
         _start_receive();
@@ -22,7 +23,7 @@ namespace comms
         _running = false;
         spdlog::warn("Destructed ACU ETH COMMS");
     }
-
+    
     void ACUETHComms::_handle_receive(const boost::system::error_code &error, std::size_t size)
     {
 

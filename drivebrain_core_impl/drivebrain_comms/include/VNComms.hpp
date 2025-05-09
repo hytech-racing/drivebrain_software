@@ -42,6 +42,9 @@ namespace comms {
     {
         public:
             VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context &io_context, bool &init_successful); 
+            ~VNDriver(){
+                spdlog::info("destructed %s", this->get_name());
+            }
             bool init();
             struct config {
                 int baud_rate;

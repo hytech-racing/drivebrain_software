@@ -26,9 +26,11 @@ std::string comms::CANDriver::_to_lowercase(std::string s) {
     return s;
 }
 comms::CANDriver::~CANDriver() {
+    spdlog::info("destructing CANDriver %s", this->get_name());
     _running = false;
     _input_deque_ref.cv.notify_all();
     _output_thread.join();
+    spdlog::info("destructed CANDriver %s", this->get_name());
 }
 bool comms::CANDriver::init() {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
@@ -391,7 +393,7 @@ void comms::CANDriver::_handle_send_msg_from_queue() {
 
     while (_running) {
         {
-            
+            spdlog::debug("looping _handle_send_msg_from_queue");
             std::unique_lock lk(_input_deque_ref.mtx);
 
             _input_deque_ref.cv.wait(
