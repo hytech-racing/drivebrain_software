@@ -4,7 +4,7 @@
 grpc::Status DBInterfaceImpl::RequestStopLogging(grpc::ServerContext *context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus *response)
 {
     {
-        spdlog::warn("requested stopping of logging");
+        spdlog::info("requested stopping of logging");
         _logger_inst->stop_logging_to_file();
         auto status = _logger_inst->get_logger_status();
 

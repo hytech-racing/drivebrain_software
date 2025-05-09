@@ -24,7 +24,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
 {
     // spdlog::info("top o");
     std::vector<std::weak_ptr<core::common::Configurable>> configurable_components;
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::info);
 
     
     controller1 = std::make_shared<control::SimpleSpeedController>(_config);
@@ -153,6 +153,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         _vcf_eth_driver->update_msg_logger(_message_logger);
     }
+
+    // _message_logger->start_logging_params();
 
     spdlog::info("constructed app");
 }
