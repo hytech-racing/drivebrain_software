@@ -39,13 +39,10 @@ bool comms::CANDriver::init() {
 
 
     if (!(canbus_device && dbc_file_path)) {
-        _logger.log_string("couldnt get params", core::LogLevel::ERROR);
+        spdlog::error("couldnt get params");
         return false;
     } else if (!std::filesystem::exists(*dbc_file_path)) {
-        std::string msg("params file does not exist! ");
-        msg += " ";
-        msg += (*dbc_file_path);
-        _logger.log_string(msg, core::LogLevel::ERROR);
+        spdlog::error("dbc file {} does not exist!", (*dbc_file_path));
         return false;
     }
     std::shared_ptr<dbcppp::INetwork> net;
@@ -60,14 +57,13 @@ bool comms::CANDriver::init() {
     }
 
     if (!_open_socket(*canbus_device)) {
-        _logger.log_string("couldnt open socket", core::LogLevel::ERROR);
+        spdlog::error("couldnt open socket");
         return false;
     }
 
-    _logger.log_string("inited, started read", core::LogLevel::INFO);
 
+    spdlog::info("inited, started read");
     _do_read();
-    // _configured = true;
     set_configured();
     return true;
 }
@@ -75,9 +71,7 @@ bool comms::CANDriver::init() {
 bool comms::CANDriver::_open_socket(const std::string &interface_name) {
     int raw_socket = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (raw_socket < 0) {
-        auto err_str = std::string("Error creating CAN socket: ") + std::string(strerror(errno));
-        _logger.log_string(err_str.c_str(), core::LogLevel::ERROR);
-
+        spdlog::error("Error creating CAN socket: {}", std::string(strerror(errno)));
         return false;
     }
 
@@ -90,9 +84,7 @@ bool comms::CANDriver::_open_socket(const std::string &interface_name) {
     addr.can_ifindex = ifr.ifr_ifindex;
 
     if (::bind(raw_socket, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0) {
-        auto err_str = std::string("Error binding CAN socket: ") + std::string(strerror(errno));
-        _logger.log_string(err_str.c_str(), core::LogLevel::ERROR);
-
+        spdlog::error("Error binding CAN socket: {}", std::string(strerror(errno)));
         ::close(raw_socket);
         return false;
     }
@@ -126,7 +118,10 @@ void comms::CANDriver::_send_message(const struct can_frame &frame) {
 void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
     auto msg = pb_msg_recv(frame);
     if (msg) {
-        _state_estimator->handle_recv_process(msg);
+        if(_state_estimator)
+        {
+            _state_estimator->handle_recv_process(msg);
+        }
         if(_message_logger) // this may not exist yet as this gets constr
         {
             _message_logger->log_msg(msg);
@@ -380,7 +375,7 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
                        field_value);
         }
     } else {
-        spdlog::warn("WARNING: not creating a frame to send due to not finding frame name");
+        spdlog::warn("not creating a frame to send due to not finding frame name");
         return std::nullopt;
     }
 

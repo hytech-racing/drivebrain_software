@@ -209,6 +209,7 @@ target_link_libraries(drivebrain_utils PUBLIC
     mcap::mcap
     Boost::program_options
     spdlog::spdlog
+    drivebrain_comms # CANDriver
 )
 
 

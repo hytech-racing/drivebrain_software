@@ -1,11 +1,27 @@
 #include "MCAPReplay.hpp"
 
+#include <JsonFileHandler.hpp>
 #include <cmath>
 #include <spdlog/spdlog.h>
+
+#include <chrono>
 
 namespace gp = google::protobuf;
 
 namespace util {
+MCAPReplay::MCAPReplay(std::string param_file_path, std::string dbc_file_path)
+    : _config(param_file_path) {
+    std::cout << param_file_path << std::endl;
+    bool cf = false;
+    _driver_primary_can =
+        std::make_shared<comms::CANDriver>(_config, nullptr, _primary_can_tx_queue, _io_context,
+                                           dbc_file_path, cf, nullptr, "CANDriverPrimary");
+    if(cf)
+    {
+        throw std::runtime_error("Failed to initialize can driver");
+    }
+}
+
 bool MCAPReplay::_load_schema(const mcap::SchemaPtr schema,
                               google::protobuf::SimpleDescriptorDatabase *protoDb) {
     gp::FileDescriptorSet fdSet;
@@ -19,13 +35,40 @@ bool MCAPReplay::_load_schema(const mcap::SchemaPtr schema,
         if (!protoDb->FindFileByName(file.name(), &unused)) {
             if (!protoDb->Add(file)) {
                 spdlog::error("failed to add def {} to protoDB", file.name());
-                // std::cerr << "failed to add definition " << file.name() << "to protoDB" <<
-                // std::endl;
                 return false;
             }
         }
     }
     return true;
+}
+
+std::shared_ptr<gp::Message> MCAPReplay::_get_pb_msg(gp::DescriptorPool &protoPool,
+                                                     gp::DynamicMessageFactory &protoFactory,
+                                                     const mcap::SchemaPtr schema,
+                                                     google::protobuf::SimpleDescriptorDatabase *protoDbPtr, mcap::Message mcap_msg) {
+    const gp::Descriptor *descriptor = protoPool.FindMessageTypeByName(schema->name);
+
+
+    if (descriptor == nullptr) {
+        if (!_load_schema(schema, protoDbPtr)) {
+            std::cerr << "failed to load schema" << std::endl;
+            return nullptr;
+        }
+        descriptor = protoPool.FindMessageTypeByName(schema->name);
+        if (descriptor == nullptr) {
+            std::cerr << "failed to find descriptor after loading pool" << std::endl;
+            return nullptr;
+        }
+    }
+    auto msg = std::shared_ptr<gp::Message>(protoFactory.GetPrototype(descriptor)->New());
+
+
+    if (!msg->ParseFromArray(mcap_msg.data, static_cast<int>(mcap_msg.dataSize))) {
+      std::cerr << "failed to parse message" << std::endl;
+      return nullptr;
+    }
+
+    return msg;
 }
 
 void MCAPReplay::start(std::string filename) {
@@ -36,34 +79,63 @@ void MCAPReplay::start(std::string filename) {
         return;
     }
 
-    auto msg_view = _mcap_reader.readMessages();
+    _io_context_thread = std::thread([this]() {
+        try {
+            _io_context.run();
+        } catch (const std::exception &e) {
+            spdlog::error("Error in io_context: {}", e.what());
+        }
+    });
 
+    auto prev_ns = std::chrono::nanoseconds(-1);
+    auto msg_view = _mcap_reader.readMessages();
+    auto prev_start = std::chrono::high_resolution_clock::now();
     gp::SimpleDescriptorDatabase protoDb;
     gp::DescriptorPool protoPool(&protoDb);
     gp::DynamicMessageFactory protoFactory(&protoPool);
 
     for (auto it = msg_view.begin(); it != msg_view.end(); it++) {
         // skip any non-protobuf-encoded messages.
+
+        auto loop_start = std::chrono::high_resolution_clock::now();
         if (it->schema->encoding != "protobuf") {
             continue;
         }
 
-        spdlog::info("name: {}", it->schema->name);
-        const gp::Descriptor *descriptor = protoPool.FindMessageTypeByName(it->schema->name);
+        auto next_ns = std::chrono::nanoseconds(it->message.logTime);
 
-        if (descriptor == nullptr) {
-            if (!_load_schema(it->schema, &protoDb)) {
-                spdlog::error("failed to load schema, exiting");
-                _mcap_reader.close();
-                return;
-            }
-            descriptor = protoPool.FindMessageTypeByName(it->schema->name);
-            if (descriptor == nullptr) {
-                spdlog::error("failed to find desc after loading pool, exiting");
-                _mcap_reader.close();
-                return;
+        // spdlog::info("time diff in ns: {}", std::chrono::duration_cast<std::chrono::nanoseconds>(
+        // next_ns-prev_ns).count());
+        // TODO add configurable divider for the sleep time
+
+        if (prev_ns.count() > 0) {
+            auto intended_duration = next_ns - prev_ns;
+            auto actual_elapsed = (loop_start - prev_start);
+            if (actual_elapsed < intended_duration) {
+                std::this_thread::sleep_for(intended_duration - actual_elapsed);
             }
         }
+
+        prev_ns = next_ns;
+
+        auto msg = _get_pb_msg(protoPool, protoFactory, it->schema, &protoDb, it->message);
+        if (!it->schema->name.rfind("hytech.", 0)) // denotes CAN message
+        {
+            {
+                std::unique_lock lk(_primary_can_tx_queue.mtx);
+                _primary_can_tx_queue.deque.push_back(msg);
+                _primary_can_tx_queue.cv.notify_all();
+            }
+        }
+
+        prev_start = loop_start;
+    }
+
+    spdlog::info("halted message logger");
+    _io_context.stop();
+    if (_io_context_thread.joinable()) {
+        _io_context_thread.join();
+        spdlog::info("joined io context");
     }
 
     _mcap_reader.close();

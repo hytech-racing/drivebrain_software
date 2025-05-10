@@ -49,7 +49,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     // this also calls init() in the constructor
     
     _driver_primary_can = std::make_shared<comms::CANDriver>(
-        _config, _logger, _message_logger, _primary_can_tx_queue, _io_context, 
+        _config, _message_logger, _primary_can_tx_queue, _io_context, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverPrimary");
     
     if (construction_failed) {
@@ -57,7 +57,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     }
     
     _driver_secondary_can = std::make_shared<comms::CANDriver>(
-        _config, _logger, _message_logger, _secondary_can_tx_queue, _io_context_secondary_can, 
+        _config,  _message_logger, _secondary_can_tx_queue, _io_context_secondary_can, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverSecondary");
     
     if (construction_failed) {
@@ -154,7 +154,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vcf_eth_driver->update_msg_logger(_message_logger);
     }
 
-    // _message_logger->start_logging_params();
+    _message_logger->start_logging_params();
 
     spdlog::info("constructed app");
 }

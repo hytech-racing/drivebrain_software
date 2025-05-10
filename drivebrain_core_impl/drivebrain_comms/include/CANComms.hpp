@@ -2,7 +2,6 @@
 // drivebrain includes
 #include <Configurable.hpp>
 #include <DriverBus.hpp>
-#include <Logger.hpp>
 #include <MsgLogger.hpp>
 #include <StateEstimator.hpp>
 #include <hytech.pb.h> // generated from CAN description
@@ -66,9 +65,8 @@ namespace comms
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
             Configurable(json_file_handler, "CANDriver"),
-            _logger(logger),
             _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _socket(io_context),
@@ -80,9 +78,8 @@ namespace comms
             construction_failed = !init();
         }
 
-        CANDriver(core::JsonFileHandler &json_file_handler, core::Logger& logger, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
             Configurable(json_file_handler, driver_name),
-            _logger(logger),
             _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _socket(io_context),
@@ -131,7 +128,6 @@ namespace comms
         static std::string _to_lowercase(std::string s);
 
     private:
-        core::Logger& _logger;
         std::shared_ptr<loggertype> _message_logger;
         deqtype &_input_deque_ref;
 
