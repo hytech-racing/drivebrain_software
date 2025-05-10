@@ -56,9 +56,9 @@ find_package(drivebrain_core REQUIRED)
 
 include(create_package)
 
-#####################
-# created libraries #
-#####################
+###################################
+# created drivebrain sw libraries #
+###################################
 
 # utils
 add_library(drivebrain_common_utils SHARED 
@@ -161,7 +161,13 @@ target_include_directories(drivebrain_estimation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_core_impl/drivebrain_estimation/include>    
 )
 
-target_link_libraries(drivebrain_estimation PUBLIC drivebrain_core::drivebrain_core)
+target_link_libraries(drivebrain_estimation PUBLIC
+    drivebrain_core::drivebrain_core 
+    drivebrain_common_utils
+    hytech_np_proto_cpp::hytech_np_proto_cpp
+    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
+    protobuf::libprotobuf
+)
 
 make_cmake_package(drivebrain_estimation drivebrain)
 
@@ -183,15 +189,30 @@ target_link_libraries(drivebrain_app PUBLIC
     Boost::program_options
 )
 
-target_link_libraries(drivebrain_estimation PUBLIC
-    drivebrain_core::drivebrain_core 
-    drivebrain_common_utils
-    hytech_np_proto_cpp::hytech_np_proto_cpp
-    drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
-    protobuf::libprotobuf
+make_cmake_package(drivebrain_app drivebrain)
+
+#####################################
+# drivebrain util / debug libraries #
+#####################################
+
+add_library(drivebrain_utils SHARED
+    drivebrain_utils/src/MCAPReplay.cpp
 )
 
-make_cmake_package(drivebrain_app drivebrain)
+target_include_directories(drivebrain_utils PUBLIC
+    $<INSTALL_INTERFACE:drivebrain_utils/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_utils/include>
+)
+
+target_link_libraries(drivebrain_utils PUBLIC
+    protobuf::libprotobuf
+    mcap::mcap
+    Boost::program_options
+    spdlog::spdlog
+)
+
+
+make_cmake_package(drivebrain_utils drivebrain)
 
 ###############
 # executables #
@@ -206,6 +227,11 @@ make_cmake_package(drivebrain_app drivebrain)
 # target_link_libraries(test_boost_asio_CAN PUBLIC
 #     Boost::boost
 # )
+
+
+add_executable(replay_app drivebrain_utils/src/replay_app.cpp)
+
+target_link_libraries(replay_app PUBLIC drivebrain_utils)
 
 add_executable(test_param_server test/test_param_server.cpp)
 
