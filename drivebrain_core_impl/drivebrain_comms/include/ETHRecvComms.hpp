@@ -34,7 +34,7 @@ namespace comms
         using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         ETHRecvComms() = delete;
         ~ETHRecvComms();
-        ETHRecvComms(std::shared_ptr<loggertype> message_logger, boost::asio::io_context &io_context, uint16_t recv_port);
+        ETHRecvComms(boost::asio::io_context &io_context, uint16_t recv_port, std::shared_ptr<core::StateEstimator> state_estim=nullptr);
         void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
             _message_logger = message_logger;
         }
@@ -45,6 +45,7 @@ namespace comms
         
     private:
         std::shared_ptr<loggertype> _message_logger;
+        std::shared_ptr<core::StateEstimator> _state_estimator = nullptr;
         std::array<uint8_t, 4096> _recv_buffer;
         boost::asio::ip::udp::socket _socket;
         boost::asio::ip::udp::endpoint _remote_endpoint;

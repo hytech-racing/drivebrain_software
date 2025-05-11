@@ -20,6 +20,13 @@ MCAPReplay::MCAPReplay(std::string param_file_path, std::string dbc_file_path)
     {
         throw std::runtime_error("Failed to initialize can driver");
     }
+
+    _acu_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 7766, "127.0.0.1", false);
+    // _acu_core_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 7777, "127.0.0.1");
+    // _vcr_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 9999, "127.0.0.1");
+    _vn_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 13111, "127.0.0.1", false); // fake VN 
+    
+
 }
 
 bool MCAPReplay::_load_schema(const mcap::SchemaPtr schema,
@@ -126,6 +133,14 @@ void MCAPReplay::start(std::string filename) {
                 _primary_can_tx_queue.deque.push_back(msg);
                 _primary_can_tx_queue.cv.notify_all();
             }
+        } 
+        else if(it->schema->name == "hytech_msgs.ACUAllData")
+        {
+            spdlog::info("sending ACUALLData");
+            _acu_sender->enqueue_msg_to_send(msg);
+        } else if(it->schema->name == "hytech_msgs.VNData")
+        {
+            _vn_sender->enqueue_msg_to_send(msg);
         }
 
         prev_start = loop_start;

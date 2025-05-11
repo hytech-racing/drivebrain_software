@@ -10,6 +10,7 @@
 #include <VNComms.hpp>
 #include <MsgLogger.hpp>
 #include <DrivebrainMCAPLogger.hpp>
+#include <hytech_msgs.pb.h>
 #include <mcap/writer.hpp>
 #include <DrivebrainBase.hpp>
 #include <foxglove_server.hpp>
@@ -81,6 +82,7 @@ private:
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
