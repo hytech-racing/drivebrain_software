@@ -300,23 +300,18 @@ target_compile_features(test_vn PUBLIC cxx_std_11)
 ### system executable ###
 ###                   ###
 
-add_executable(alpha_build 
+add_executable(drivebrain_exe
     drivebrain_app/main.cpp
 )
 
 # Add include directory for DriveBrainApp header
-target_include_directories(alpha_build PRIVATE
+target_include_directories(drivebrain_exe PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/drivebrain_app
 )
 
 enable_testing()
 
-# add_executable(alpha_test 
-#     unit_test/main.cpp
-#     # unit_test/SimpleControllerTest.cpp
-# )
-
-target_link_libraries(alpha_build PUBLIC
+target_link_libraries(drivebrain_exe PUBLIC
     drivebrain_app
     drivebrain_core::drivebrain_core
     drivebrain_control
@@ -339,14 +334,14 @@ target_link_libraries(test_build PUBLIC
 
 enable_testing()
 
-add_executable(alpha_test 
+add_executable(drivebrain_test 
     unit_test/main.cpp
     unit_test/SimpleSpeedControllerTest.cpp
     unit_test/SimpleTorqueControllerTest.cpp
     unit_test/test_controller_manager.cpp
 )
 
-target_link_libraries(alpha_test PUBLIC 
+target_link_libraries(drivebrain_test PUBLIC 
     drivebrain_core::drivebrain_core
     drivebrain_control
     drivebrain_comms
@@ -354,7 +349,7 @@ target_link_libraries(alpha_test PUBLIC
     gtest
 )
 
-add_test(NAME Drivebrain_Tests COMMAND alpha_test)
+add_test(NAME Drivebrain_Tests COMMAND drivebrain_test)
 
 target_link_libraries(mcu_standin PUBLIC
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
@@ -364,7 +359,7 @@ target_link_libraries(mcu_standin PUBLIC
 
 include(GNUInstallDirs)
 install(TARGETS 
-        alpha_build
+        drivebrain_exe
         test_param_server
         test_build
     RUNTIME 

@@ -1,7 +1,7 @@
 # execution
 
 ```bash
-./build/alpha_build -h
+./build/drivebrain_exe -h
 Allowed options:
   -h [ --help ]           produce help message
   -p [ --param-path ] arg Path to the parameter JSON file
@@ -19,7 +19,7 @@ Allowed options:
 ```
 - drivebrain:
 ```
-./build/alpha_build -p ./config/drivebrain_config.json -d ./config/hytech.dbc -c false
+./build/drivebrain_exe -p ./config/drivebrain_config.json -d ./config/hytech.dbc -c false
 ```
 
 - replay app:
@@ -156,7 +156,7 @@ example `c_cpp_properties.json` file to be placed in your `.vscode/`:
       "name": "Debug",
       "type": "cppdbg", // use "cppdbg" with gdb on Linux
       "request": "launch",
-      "program": "${workspaceFolder}/build/alpha_build",
+      "program": "${workspaceFolder}/build/drivebrain_exe",
       "args": ["-p", "./config/drivebrain_config.json", "-d", "./config/hytech.dbc", "-c", "false"],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
