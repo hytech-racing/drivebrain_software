@@ -182,6 +182,7 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
         _config.rr_sus_pot_min_mm, _config.rr_sus_pot_max_mm);
     return vehicle_state;
 }
+
 void StateEstimator::set_previous_control_output(core::ControllerOutput prev_control_output) {
     std::unique_lock lk(_state_mutex);
     _vehicle_state.prev_controller_output = prev_control_output;
