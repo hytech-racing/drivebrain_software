@@ -79,7 +79,7 @@ bool comms::CANDriver::_open_socket(const std::string &interface_name) {
     std::strcpy(ifr.ifr_name, interface_name.c_str());
     ioctl(raw_socket, SIOCGIFINDEX, &ifr);
 
-    struct sockaddr_can addr;
+    struct sockaddr_can addr{};
     addr.can_family = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 

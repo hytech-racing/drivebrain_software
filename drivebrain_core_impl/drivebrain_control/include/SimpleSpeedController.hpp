@@ -24,14 +24,14 @@ namespace control
         // torque on the front, 1 = 50/50, 2 = all regen torque on the rear
         
         struct config {
-        torque_nm max_torque;
-        torque_nm max_reg_torque;
-        float rear_torque_scale;  
-        float regen_torque_scale; 
-        speed_m_s positive_speed_set;
-        float max_power_kw;
-        int dt_rate_hz;
-    };
+            torque_nm max_torque;
+            torque_nm max_reg_torque;
+            float rear_torque_scale;  
+            float regen_torque_scale; 
+            speed_m_s positive_speed_set;
+            float max_power_kw;
+            int dt_rate_hz;
+        };
         SimpleSpeedController(core::JsonFileHandler &json_file_handler) : Configurable(json_file_handler, "SimpleSpeedController") {}
         float get_dt_sec() override { 
             return (double) 1.0 / _config.dt_rate_hz;
@@ -44,6 +44,6 @@ namespace control
         core::SpeedControlOut _apply_power_limit(core::SpeedControlOut current_control, veh_vec<float> current_rpms);
     private:
         std::mutex _config_mutex;
-        config _config;
+        config _config{};
     };
 }
