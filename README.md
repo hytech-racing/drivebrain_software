@@ -121,3 +121,23 @@ example `c_cpp_properties.json` file to be placed in your `.vscode/`:
     "version": 4
 }
 ```
+
+## debugging example `launch.json`
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "cppdbg", // use "cppdbg" with gdb on Linux
+      "request": "launch",
+      "program": "${workspaceFolder}/build/alpha_build",
+      "args": ["-p", "./config/drivebrain_config.json", "-d", "./config/hytech.dbc", "-c", "false"],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}
+```

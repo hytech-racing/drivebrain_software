@@ -126,7 +126,14 @@ void MCAPReplay::start(std::string filename) {
         prev_ns = next_ns;
 
         auto msg = _get_pb_msg(protoPool, protoFactory, it->schema, &protoDb, it->message);
-        if (!it->schema->name.rfind("hytech.", 0)) // denotes CAN message
+
+        auto msg_name = it->schema->name;
+        // TODO make filter configure-able
+        if ((!msg_name.rfind("hytech.", 0)) && 
+            !(msg_name == "hytech.drivebrain_torque_lim_input") && 
+            !(msg_name == "hytech.drivebrain_speed_set_input") &&
+            !(msg_name == "hytech.drivebrain_desired_torque_input")
+        ) // denotes CAN message that is not a drivebrain output
         {
             {
                 std::unique_lock lk(_primary_can_tx_queue.mtx);

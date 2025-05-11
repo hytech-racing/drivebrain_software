@@ -17,7 +17,7 @@ protected:
 
     SimpleTorqueControllerTest()
         : logger(core::LogLevel::INFO), 
-        config("../config/drivebrain_config.json"),
+        config("../config/simple_torque_controller_test.json"),
         fail_config("../config/fail_config.json"),
         simple_controller(config),
         fail_controller(fail_config),

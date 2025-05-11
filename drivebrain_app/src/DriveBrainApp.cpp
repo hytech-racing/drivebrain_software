@@ -2,7 +2,6 @@
 #include "DriveBrainApp.hpp"
 
 #include "SimpleSpeedController.hpp"
-#include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
 #include <hytech_msgs.pb.h>
 #include <memory>
@@ -20,8 +19,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _config(_param_path)
     , _settings(settings)
     , controller1(std::make_shared<control::SimpleSpeedController>(_config))
-    , controller2(std::make_shared<control::SimpleTorqueController>(_config))
-    , _controllerManager(_config, {controller1, controller2})  // Initialize correctly
+    , _controllerManager(_config, {controller1})  // Initialize correctly
 {
     // spdlog::info("top o");
     std::vector<std::weak_ptr<core::common::Configurable>> configurable_components;
@@ -32,6 +30,12 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
+    // TODO make this required for the controller manager and remove use of raii for this shared ptrs to the controllers for construction of cm
+    _controllerManager.update_controllers({controller1});
+    if(!_controllerManager.init()){
+        throw std::runtime_error("Failed to initialize controller manager");
+    }
+
     configurable_components.push_back(controller1);
     spdlog::info("made controller");
 

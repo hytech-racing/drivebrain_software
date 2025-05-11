@@ -27,8 +27,10 @@
     // starting with the timestamp of the first message, ensure that we wait until the next message was sent
     // before we "send" the next message on read of the message.
 // [x] use a CANDriver and send all CAN traffic from MCAP file to vcan
-// [ ] use instances of (TODO) ETHSendComms to send the VCF/VCR/ACU data
-    // [ ] create ETHSendComms
+// [x] use instances of (TODO) ETHSendComms to send the VCF/VCR/ACU data
+    // [x] create ETHSendComms
+// [x] add in fake VN output eth sender 
+    // [x] add fake VN listener into drivebrain software
 
 namespace util
 {
