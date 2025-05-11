@@ -1,7 +1,31 @@
 # execution
+
+```bash
+./build/alpha_build -h
+Allowed options:
+  -h [ --help ]           produce help message
+  -p [ --param-path ] arg Path to the parameter JSON file
+  -d [ --dbc-path ] arg   Path to the DBC file (optional)
+  -c [ --2-can ] arg      use secondary CAN
+```
+
+```bash
+ ./build/replay_app -h
+Allowed options:
+  -h [ --help ]         produce help message
+  -m [ --mcap ] arg     Path to mcap file
+  -c [ --config ] arg   Path to config file
+  -d [ --dbc ] arg      Path to dbc file
+```
 - drivebrain:
 ```
-./build
+./build/alpha_build -p ./config/drivebrain_config.json -d ./config/hytech.dbc -c false
+```
+
+- replay app:
+
+```bash
+./build/replay_app -m <path_to_car_recorded_mcap_file> -c ./config/drivebrain_config.json -d ./config/hytech.dbc
 ```
 # About
 
