@@ -4,6 +4,7 @@
 #include "SimpleSpeedController.hpp"
 #include "SimpleTorqueController.hpp"
 #include "hytech.pb.h"
+#include <hytech_msgs.pb.h>
 #include <memory>
 #include <mutex>
 #include <spdlog/common.h>
@@ -66,9 +67,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(_driver_primary_can);
     configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
-    _acu_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_message_logger,_io_context, 7766);
-    _vcr_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_message_logger,_io_context, 9999);
-    _vcf_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_message_logger,_io_context, 4444);
+    _acu_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_io_context, 7766);
+    _vcr_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_io_context, 9999);
+    _vcf_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_io_context, 4444);
     
     spdlog::info("eth drivers");
 
@@ -89,6 +90,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
            throw std::runtime_error("Failed to construct VN driver");
         }
         configurable_components.push_back(_vn_driver);
+    } else if(config_json.contains("use_fake_vn") && config_json["use_fake_vn"])
+    {
+        _fake_vn = std::make_unique<comms::ETHRecvComms<hytech_msgs::VNData>>( _io_context, 13111, _state_estimator);
     }
 
     
@@ -131,6 +135,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if(_vn_driver)
     {
         _vn_driver->update_msg_logger(_message_logger);
+    }
+    if(_fake_vn)
+    {
+        _fake_vn->update_msg_logger(_message_logger);
     }
     if(_state_estimator)
     {

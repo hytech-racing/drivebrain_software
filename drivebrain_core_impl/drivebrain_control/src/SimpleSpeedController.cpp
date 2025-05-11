@@ -100,7 +100,7 @@ core::ControllerOutput control::SimpleSpeedController::step_controller(const cor
     core::ControllerOutput cmd_out = {};
     cmd_out.out = type_set;
     auto& speed_out = std::get<core::SpeedControlOut>(cmd_out.out);
-
+    speed_out = {};
     speed_out.mcu_recv_millis = in.prev_MCU_recv_millis; // heartbeat
 
     if (accelRequest >= 0.0)

@@ -16,7 +16,7 @@
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    HT_proto.url = "github:hytech-racing/HT_proto";
+    HT_proto.url = "github:hytech-racing/HT_proto/2afaef827a82f4dfc172d5ed6ed90000ba500513";
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";

@@ -12,3 +12,4 @@ result-man
 *.dbc
 
 compile_commands.json
+*.log

@@ -1,3 +1,8 @@
+# execution
+- drivebrain:
+```
+./build
+```
 # About
 
 This repo contains the main executable that runs on the Drivebrain embedded computer on HyTech Racing's cars. This code is deployed as a `systemd` service onto the car within HyTech's [raspberry pi nixos description](https://github.com/hytech-racing/hytech_nixos). This service handles, among other things:

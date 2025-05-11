@@ -7,10 +7,12 @@ using boost::asio::ip::udp;
 namespace comms
 {
     template <typename ETHMsgType> 
-    ETHRecvComms<ETHMsgType>::ETHRecvComms(std::shared_ptr<loggertype> message_logger,
-                                           boost::asio::io_context &io_context,
-                                           uint16_t port) : _message_logger(message_logger),
-                                                            _socket(io_context, udp::endpoint(udp::v4(), port))
+    ETHRecvComms<ETHMsgType>::ETHRecvComms(boost::asio::io_context &io_context,
+                                           uint16_t port,
+                                           std::shared_ptr<core::StateEstimator> state_estim) 
+                                                : _message_logger(nullptr),
+                                                _state_estimator(state_estim),
+                                                _socket(io_context, udp::endpoint(udp::v4(), port))
     {
         _eth_msg = std::make_shared<ETHMsgType>();
         _start_receive();
@@ -35,8 +37,13 @@ namespace comms
             {
                 _message_logger->log_msg(out_msg);
             } else {
-                spdlog::warn("Message logger not real");
+                spdlog::info("Message logger not real");
             }
+            if(_state_estimator)
+            {
+                _state_estimator->handle_recv_process(out_msg);
+            }
+
             
             _start_receive();
         }

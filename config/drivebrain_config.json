@@ -52,6 +52,7 @@
         "rr_sus_pot_max": 2000.0,
         "rr_sus_pot_max_mm": 1.0
     },
-    "use_vectornav": false
+    "use_vectornav": false,
+    "use_fake_vn": true
 
 }
