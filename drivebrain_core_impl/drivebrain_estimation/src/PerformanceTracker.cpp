@@ -59,6 +59,8 @@ using namespace GeographicLib;
 Performance PerformanceTracker::update(const core::Position& current_position)
 {
     // Calculate distance to finish position
+
+    switch(_performance_state.state_machine_state)
     const Geodesic& geod = Geodesic::WGS84();
     double distance_from_finish_m, distance_from_start_m;
     double azi1, azi2;

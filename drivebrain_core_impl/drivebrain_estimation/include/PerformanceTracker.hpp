@@ -5,6 +5,17 @@
 // TODO able to detect when the lap has started when 
 //      leaving a certain radius of the start point and / or when we have started moving
 
+// design:
+
+
+// loop lap timer state:
+// when active, detect when we have left the starting bubble and start the timer. once crossing back into the start bubble
+
+// start / finish timer state:
+// when active, detect when we have left the starting bubble and start the timer, only once we have crossed into the finish bubble do we stop the time. 
+// push back to the lap times the time that was reached. 
+
+
 #include <Configurable.hpp>
 #include <VehicleDataTypes.hpp>
 #include <chrono>
@@ -18,13 +29,20 @@ struct TrackConfig
 
 struct Performance
 {
-    bool active = false;
+    
     bool timer_started = false;
     double current_lap_time_ms = 0;
     bool was_in_bubble_last_update = false;
     std::chrono::time_point<std::chrono::steady_clock> last_update_time{};
     int lap_count=0;
     std::vector<double> lap_times;
+};
+
+enum class PerformanceTrackerState
+{
+    NOT_ACTIVE = 0,
+    LAP_TIMING = 1,
+
 };
 
 class PerformanceTracker : public core::common::Configurable
