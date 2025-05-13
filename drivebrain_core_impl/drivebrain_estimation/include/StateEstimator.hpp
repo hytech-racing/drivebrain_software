@@ -18,6 +18,7 @@
 #include <chrono>
 #include <memory>
 
+#include "PerformanceTracker.hpp"
 #include "hytech_msgs.pb.h"
 #include "base_msgs.pb.h"
 
@@ -78,10 +79,10 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger) : 
+        StateEstimator(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger, std::shared_ptr<PerformanceTracker> performance_tracker) : 
         
         Configurable(json_file_handler, "StateEstimator")
-        , _message_logger(message_logger)
+        , _message_logger(message_logger), _performance_tracker(performance_tracker)
         //  _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
@@ -127,6 +128,7 @@ namespace core
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 4> _timestamp_array;
         std::shared_ptr<loggertype> _message_logger;
+        std::shared_ptr<PerformanceTracker> _performance_tracker = nullptr;
 
     };
 }

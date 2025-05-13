@@ -341,6 +341,7 @@ add_executable(drivebrain_test
     unit_test/SimpleSpeedControllerTest.cpp
     unit_test/SimpleTorqueControllerTest.cpp
     unit_test/test_controller_manager.cpp
+    unit_test/test_performance_tracker.cpp
 )
 
 target_link_libraries(drivebrain_test PUBLIC 

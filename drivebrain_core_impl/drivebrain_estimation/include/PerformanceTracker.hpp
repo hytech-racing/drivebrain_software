@@ -7,28 +7,30 @@
 
 #include <Configurable.hpp>
 #include <VehicleDataTypes.hpp>
+#include <chrono>
 
-struct LLA {
-    double latitude;
-    double longitude;
-    double altitude;
-};
 
 struct TrackConfig
 {
-    LLA start;
-    LLA finish;
+    core::Position start;
+    core::Position finish;
 };
 
 struct Performance
 {
     bool active = false;
-    double current_lap_time = -1;
+    bool timer_started = false;
+    double current_lap_time_ms = 0;
+    bool was_in_bubble_last_update = false;
+    std::chrono::time_point<std::chrono::steady_clock> last_update_time{};
+    int lap_count=0;
+    std::vector<double> lap_times;
 };
 
 class PerformanceTracker : public core::common::Configurable
 {
     private:
+        std::mutex _config_mutex; 
         struct config
         {
             float start_lat;
@@ -46,15 +48,18 @@ class PerformanceTracker : public core::common::Configurable
     
     public: 
         // functions that will get called by the grpc service
-        void reset_timer();
-    
+        void reset_tracker();
+        void activate();
+        void deactivate();
     public: // functions that will be called by the state estimator
 
-        // Update current position and speed, check for lap start/finish detection
-        void update(const lla_t& current_position, double speed);
-
-    private: 
-
+        // Update current position check for lap start/finish detection and return the performance state
+        Performance update(const core::Position& current_position);
+    private:
+        void _handle_param_updates(const std::unordered_map<std::string, core::common::Configurable::ParamTypes> &new_param_map);
+    private:
+        
+        Performance _performance_state{};
 };
 
 #endif // __PERFORMANCETRACKER_H__

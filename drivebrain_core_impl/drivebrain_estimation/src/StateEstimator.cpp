@@ -41,12 +41,15 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
         ypr_vec<float> ypr_rad = {(in_msg->vn_ypr_rad().yaw()), (in_msg->vn_ypr_rad().pitch()),
                                   (in_msg->vn_ypr_rad().roll())};
 
+        core::Position veh_position = {in_msg->vn_gps().lat(), in_msg->vn_gps().lon(), (in_msg->status().ins_mode() == hytech_msgs::INSMode::TRACKING_2)};
+
         {
             std::unique_lock lk(_state_mutex);
             _vehicle_state.current_body_vel_ms = body_vel_ms;
             _vehicle_state.current_body_accel_mss = body_accel_mss;
             _vehicle_state.current_angular_rate_rads = angular_rate_rads;
             _vehicle_state.current_ypr_rad = ypr_rad;
+            _vehicle_state.vehicle_position = veh_position;
         }
     } else {
         _recv_low_level_state(message);
@@ -276,6 +279,11 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         spdlog::warn("message logger not real");
     }
 
+
+    if(_performance_tracker)
+    {
+        _performance_tracker->update(current_state.vehicle_position);
+    }
     auto log_end = std::chrono::high_resolution_clock::now();
 
     auto state_estim_end = std::chrono::high_resolution_clock::now();

@@ -1,6 +1,7 @@
 // DriveBrainApp.hpp
 #pragma once
 
+#include "PerformanceTracker.hpp"
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 #include <SimpleSpeedController.hpp>
@@ -83,6 +84,7 @@ private:
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
+    std::shared_ptr<PerformanceTracker> _performance_tracker=nullptr;
     
     std::thread _process_thread;
     std::thread _io_context_thread;
