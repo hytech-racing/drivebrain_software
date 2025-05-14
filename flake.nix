@@ -16,7 +16,7 @@
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    HT_proto.url = "github:hytech-racing/HT_proto/2afaef827a82f4dfc172d5ed6ed90000ba500513";
+    HT_proto.url = "github:hytech-racing/HT_proto/2025-05-14T04_28_50";
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
@@ -30,7 +30,7 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:hytech-racing/drivebrain_core/main";
+      url = "github:hytech-racing/drivebrain_core/feat/loggable_w_position_type";
       flake = false;
     };
 

@@ -2,6 +2,7 @@
 #include "DriveBrainApp.hpp"
 
 #include "SimpleSpeedController.hpp"
+#include "SurreyAeroComms.hpp"
 #include "hytech.pb.h"
 #include <hytech_msgs.pb.h>
 #include <memory>
@@ -97,6 +98,17 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     } else if(config_json.contains("use_fake_vn") && config_json["use_fake_vn"])
     {
         _fake_vn = std::make_unique<comms::ETHRecvComms<hytech_msgs::VNData>>( _io_context, 13111, _state_estimator);
+    } 
+    
+    if(config_json.contains("use_surrey_aero") && config_json["use_surrey_aero"])
+    {
+        spdlog::info("making surrey aero sensor");
+        _aero_sensor_driver = std::make_shared<comms::SurreyAeroComms>(_config, _aero_usb_io_context);
+        if(!_aero_sensor_driver->init()){
+            throw std::runtime_error("failed to init aero sensor driver");
+
+        }
+        spdlog::info("made surrey aero sensor");
     }
 
     
@@ -165,6 +177,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         _vcf_eth_driver->update_msg_logger(_message_logger);
     }
+    if(_aero_sensor_driver)
+    {
+        _aero_sensor_driver->set_msg_logger(_message_logger);
+    }
 
     _message_logger->start_logging_params();
 
@@ -199,6 +215,13 @@ DriveBrainApp::~DriveBrainApp() {
         spdlog::info("joined io context 2");
     }
 
+    if(_aero_sensor_driver) {
+        _aero_usb_io_context.stop();
+        if(_aero_usb_io_context_thread.joinable()) {
+            _aero_usb_io_context_thread.join();
+        }
+    }
+    
     
     
     if (_db_service) {
@@ -344,6 +367,19 @@ void DriveBrainApp::run() {
             spdlog::error("Error in io_context 2: {}", e.what());
         }
     });
+
+    if(_aero_sensor_driver)
+    {
+        _aero_usb_io_context_thread = std::thread([this]() {
+            spdlog::info("Started _aero_usb_io_context_thread");
+            try {
+                _aero_usb_io_context.run();
+            } catch (const std::exception& e) {
+                spdlog::error("Error in _aero_usb_io_context: {}", e.what());
+            }
+        });
+    }
+    
 
     _process_thread = std::thread([this]() {
         if (!_settings.run_process_loop) return;

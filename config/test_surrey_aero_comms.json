@@ -1,0 +1,5 @@
+{
+    "SurreyAeroComms": {
+        "port_name": "/dev/ttyACM0"
+    }
+}

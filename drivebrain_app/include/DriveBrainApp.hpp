@@ -1,6 +1,7 @@
 // DriveBrainApp.hpp
 #pragma once
 
+#include "SurreyAeroComms.hpp"
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 #include <SimpleSpeedController.hpp>
@@ -60,6 +61,7 @@ private:
     std::optional<std::string> _dbc_path;
     boost::asio::io_context _io_context;
     boost::asio::io_context _io_context_secondary_can;
+    boost::asio::io_context _aero_usb_io_context;
     
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
@@ -77,6 +79,7 @@ private:
     std::shared_ptr<core::StateEstimator> _state_estimator;
     std::shared_ptr<comms::CANDriver> _driver_primary_can;
     std::shared_ptr<comms::CANDriver> _driver_secondary_can;
+    std::shared_ptr<comms::SurreyAeroComms> _aero_sensor_driver = nullptr;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
@@ -88,6 +91,6 @@ private:
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;
     std::thread _db_service_thread;
-
+    std::thread _aero_usb_io_context_thread;
     const DriveBrainSettings _settings;
 };
