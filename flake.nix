@@ -16,7 +16,7 @@
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    HT_proto.url = "github:hytech-racing/HT_proto/2afaef827a82f4dfc172d5ed6ed90000ba500513";
+    HT_proto.url = "github:hytech-racing/HT_proto/1042c50cb0643080d3322c45b8f0247d39a03351";
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
@@ -36,8 +36,9 @@
 
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, ... }@inputs:
+    
     let
-
+    
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
@@ -49,7 +50,8 @@
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = HT_proto.rev;
+          
+          version = (if HT_proto ? rev then HT_proto.rev else "unknown");
           src = "${HT_proto}/proto";
           };
         db_service = nix-proto.mkProtoDerivation

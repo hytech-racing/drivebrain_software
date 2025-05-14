@@ -196,7 +196,7 @@ namespace comms
     {
         _serial.async_read_some(
             boost::asio::buffer(_input_buff),
-            [&](const boost::system::error_code &ec, std::size_t bytesCount)
+            [&](const boost::system::error_code &ec, std::size_t bytesCount) -> void
             {
                 if (ec)
                 {

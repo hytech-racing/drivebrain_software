@@ -6,17 +6,17 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1746370014,
-        "narHash": "sha256-tJylKeVpbiAGPpUwZYwCcxNNmpm74mMVvMludIZaMVM=",
+        "lastModified": 1747186853,
+        "narHash": "sha256-6wemPOvZM5k+QPXmd32yUAHBTGqIlQqyCVKJ350w0pE=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "2afaef827a82f4dfc172d5ed6ed90000ba500513",
+        "rev": "1042c50cb0643080d3322c45b8f0247d39a03351",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "2afaef827a82f4dfc172d5ed6ed90000ba500513",
+        "rev": "1042c50cb0643080d3322c45b8f0247d39a03351",
         "type": "github"
       }
     },
