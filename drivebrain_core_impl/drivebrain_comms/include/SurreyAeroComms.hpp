@@ -33,7 +33,7 @@ namespace comms {
         void _start_receive();
         void _configure_serial_port(boost::asio::serial_port& serial);
         bool _send_command(const std::string& command);
-        std::vector<float> _extract_sensor_readings(const boost::array<std::uint8_t, 512>& buffer);
+        std::optional<std::vector<float>> _extract_sensor_readings(const boost::array<std::uint8_t, 512>& buffer);
         void _log_proto_message(const std::vector<float>& readings);
     private:
         boost::asio::serial_port _serial;
