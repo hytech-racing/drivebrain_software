@@ -1,6 +1,7 @@
 #include "ScaleComms.hpp"
 
 #include "JSONUtils.hpp"
+#include <hytech_msgs.pb.h>
 
 namespace comms {
 ScaleComms::ScaleComms(core::JsonFileHandler &json_file_handler, boost::asio::io_context &io)
@@ -40,7 +41,7 @@ ScaleComms::ScaleData ScaleComms::_parse_buffer(const boost::array<std::uint8_t,
 
 void ScaleComms::_log_proto_message(const ScaleData & data)
 {
-    
+    auto msg_out = std::make_shared<hytech_msgs::WeighScaleData>();
 }
 
 void ScaleComms::_start_receive() {
