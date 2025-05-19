@@ -49,8 +49,13 @@
     "SurreyAeroComms": {
         "port_name": "/dev/ttyACM0"
     },
+    "ScaleComms": {
+        "baud_rate": 115200,
+        "port_name": "/dev/ttyUSB0"
+    },
     "use_vectornav": false,
     "use_fake_vn": false,
-    "use_surrey_aero": true
+    "use_surrey_aero": false,
+    "use_scale_comms": true
 
 }

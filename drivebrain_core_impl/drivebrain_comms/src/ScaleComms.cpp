@@ -1,7 +1,10 @@
 #include "ScaleComms.hpp"
 
+
 #include "JSONUtils.hpp"
 #include <hytech_msgs.pb.h>
+
+#include <regex>
 
 namespace comms {
 ScaleComms::ScaleComms(core::JsonFileHandler &json_file_handler, boost::asio::io_context &io)
@@ -34,29 +37,52 @@ void ScaleComms::_configure_serial_port(boost::asio::serial_port& serial) {
     serial.set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
 }
 
-ScaleComms::ScaleData ScaleComms::_parse_buffer(const boost::array<std::uint8_t, 512>& buffer, std::size_t bytes_count) {
-    ScaleData data{};
-    return data;
+std::optional<ScaleComms::ScaleData> ScaleComms::_parse_buffer(const boost::array<std::uint8_t, 512>& buffer, std::size_t bytes_count) {
+    
+    std::string input_data;
+    for (std::size_t i = 0; i < bytes_count; ++i) {
+        
+        if (std::isprint(_input_buff[i])) {
+            input_data += static_cast<char>(_input_buff[i]);
+        }
+    }
+    std::regex pattern(R"(1:\s*([+-]?[0-9]*[.]?[0-9]+)\s*2:\s*([+-]?[0-9]*[.]?[0-9]+)\s*3:\s*([+-]?[0-9]*[.]?[0-9]+)\s*4:\s*([+-]?[0-9]*[.]?[0-9]+))");
+
+    std::smatch match;
+
+    if (std::regex_search(input_data, match, pattern)) {
+        ScaleData data = {};
+        data.corner_weights_lbs.FL = std::stod(match[1]);
+        data.corner_weights_lbs.FR = std::stod(match[2]);
+        data.corner_weights_lbs.RL = std::stod(match[3]);
+        data.corner_weights_lbs.RR = std::stod(match[4]);
+        spdlog::info("scale data fl {} fr {} rl {} rr {}", data.corner_weights_lbs.FL, data.corner_weights_lbs.FR, data.corner_weights_lbs.RL, data.corner_weights_lbs.RR);
+        return data;
+    } else {
+        spdlog::info("erm, no match for:{}", input_data);
+    }
+    return std::nullopt;
 }
 
 void ScaleComms::_log_proto_message(const ScaleData & data)
 {
     auto msg_out = std::make_shared<hytech_msgs::WeighScaleData>();
+    msg_out->set_weight_lf(data.corner_weights_lbs.FL);
+    msg_out->set_weight_lr(data.corner_weights_lbs.FR);
+    msg_out->set_weight_lr(data.corner_weights_lbs.RL);
+    msg_out->set_weight_rr(data.corner_weights_lbs.RR);
+    this->log(msg_out);
 }
 
 void ScaleComms::_start_receive() {
     _serial.async_read_some(
     boost::asio::buffer(_input_buff),
     [&](const boost::system::error_code &ec, std::size_t bytes_count) {
-        // auto scale_data = _parse_buffer(_input_buff, bytes_count);
-        std::string input_data;
-        for (std::size_t i = 0; i < bytes_count; ++i) {
-            if (std::isprint(_input_buff[i])) {
-                input_data += static_cast<char>(_input_buff[i]);
-            }
+        auto scale_data = _parse_buffer(_input_buff, bytes_count);
+        if(scale_data)
+        {
+            _log_proto_message(*scale_data);
         }
-        spdlog::debug("{}", input_data);
-        // _log_proto_message(scale_data);
         _start_receive();
     });
 }

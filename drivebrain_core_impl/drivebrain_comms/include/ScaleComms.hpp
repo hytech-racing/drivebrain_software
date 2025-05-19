@@ -31,7 +31,7 @@ class ScaleComms : public core::common::Loggable<std::shared_ptr<google::protobu
     void _configure_serial_port(boost::asio::serial_port &serial);
     private:
         void _start_receive();
-        ScaleData _parse_buffer(const boost::array<std::uint8_t, 512>& buffer, std::size_t bytes_count);
+        std::optional<ScaleData> _parse_buffer(const boost::array<std::uint8_t, 512>& buffer, std::size_t bytes_count);
         void _log_proto_message(const ScaleData & data);
     private:
         boost::asio::serial_port _serial;
