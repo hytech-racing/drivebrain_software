@@ -5,7 +5,10 @@
 #include "SpeedTechComms.hpp"
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
+
 #include <SimpleSpeedController.hpp>
+#include <LoadCellVectoringTorqueController.hpp>
+
 #include <ControllerManager.hpp>
 #include <StateEstimator.hpp>
 #include <VNComms.hpp>
@@ -73,7 +76,8 @@ private:
     std::vector<std::shared_ptr<core::common::Configurable>> _configurable_components;
     std::shared_ptr<common::DrivebrainMCAPLogger> _mcap_logger;
     std::shared_ptr<control::SimpleSpeedController> controller1;
-    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 1> _controllerManager;
+    std::shared_ptr<control::LoadCellVectoringTorqueController> _mode1;
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> _controllerManager;
         // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger = nullptr;
