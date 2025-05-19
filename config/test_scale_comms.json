@@ -1,0 +1,6 @@
+{
+  "ScaleComms": {
+    "baud_rate": 115200,
+    "port_name": "/dev/ttyUSB0"
+  }
+}

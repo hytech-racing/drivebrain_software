@@ -2,7 +2,9 @@
 #pragma once
 
 #include "SurreyAeroComms.hpp"
-#include "SpeedTechComms.hpp"
+
+#include <SpeedTechComms.hpp>
+#include <ScaleComms.hpp>
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 
@@ -67,6 +69,8 @@ private:
     boost::asio::io_context _io_context_secondary_can;
     boost::asio::io_context _aero_usb_io_context;
     boost::asio::io_context _io_context_speed_tech_serial;
+    boost::asio::io_context _scale_usb_io_context;
+    
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _secondary_can_tx_queue;
@@ -93,13 +97,15 @@ private:
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
-
+    
+    std::shared_ptr<comms::ScaleComms> _scale_comms = nullptr;
     std::thread _process_thread;
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;
     std::thread _db_service_thread;
     std::thread _aero_usb_io_context_thread;
     std::thread _io_context_speed_tech_serial_thread;
-
+    std::thread _scale_usb_io_context_thread;
     const DriveBrainSettings _settings;
+
 };
