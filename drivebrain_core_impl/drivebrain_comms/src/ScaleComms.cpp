@@ -69,7 +69,7 @@ void ScaleComms::_log_proto_message(const ScaleData & data)
     auto msg_out = std::make_shared<hytech_msgs::WeighScaleData>();
     msg_out->set_weight_lf(data.corner_weights_lbs.FL);
     msg_out->set_weight_lr(data.corner_weights_lbs.FR);
-    msg_out->set_weight_lr(data.corner_weights_lbs.RL);
+    msg_out->set_weight_rf(data.corner_weights_lbs.RL);
     msg_out->set_weight_rr(data.corner_weights_lbs.RR);
     this->log(msg_out);
 }
