@@ -32,14 +32,22 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (!controller1->init()) {
         throw std::runtime_error("Failed to initialize controller");
     }
+    configurable_components.push_back(controller1);
+    spdlog::info("made mode 0 controller");
+
+    _mode1 = std::make_shared<control::LoadCellVectoringTorqueController>(_config);
+    if (!_mode1->init()) {
+        throw std::runtime_error("Failed to mode 1 controller");
+    }
+    configurable_components.push_back(_mode1);
+    spdlog::info("made mode 1 controller");
     // TODO make this required for the controller manager and remove use of raii for this shared ptrs to the controllers for construction of cm
-    _controllerManager.update_controllers({controller1});
+    _controllerManager.update_controllers({controller1, _mode1});
     if(!_controllerManager.init()){
         throw std::runtime_error("Failed to initialize controller manager");
     }
 
-    configurable_components.push_back(controller1);
-    spdlog::info("made controller");
+    
 
     
     _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger);

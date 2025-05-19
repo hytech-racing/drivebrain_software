@@ -1,4 +1,5 @@
 #include <Literals.hpp>
+#include <cassert>
 #include <gtest/gtest.h>
 #include <SimpleSpeedController.hpp>
 #include <VehicleDataTypes.hpp>
@@ -31,7 +32,7 @@ protected:
     }
 
     void SetUp() override {
-        simple_controller.init();
+        assert(simple_controller.init());
     }
 };
 
