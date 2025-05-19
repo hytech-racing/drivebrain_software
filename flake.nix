@@ -30,7 +30,7 @@
     vn_driver_lib.url = "github:RCMast3r/vn_driver_lib/fix/boost-compatible";
 
     db-core-src = {
-      url = "github:hytech-racing/drivebrain_core/feat/loggable_w_position_type";
+      url = "github:hytech-racing/drivebrain_core";
       flake = false;
     };
 
