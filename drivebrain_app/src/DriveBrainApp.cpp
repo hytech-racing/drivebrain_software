@@ -3,6 +3,7 @@
 
 #include "SimpleSpeedController.hpp"
 #include "SurreyAeroComms.hpp"
+#include "SpeedTechComms.hpp"
 #include "hytech.pb.h"
 #include <hytech_msgs.pb.h>
 #include <memory>
@@ -41,8 +42,6 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     spdlog::info("made controller");
 
     
-    
-    
     _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger);
     if(!_state_estimator->init())
     {
@@ -69,6 +68,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if (construction_failed) {
         throw std::runtime_error("Failed to construct CAN driver");
     }
+
+    
     configurable_components.push_back(_driver_primary_can);
     configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
@@ -111,7 +112,13 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         spdlog::info("made surrey aero sensor");
     }
 
-    
+    if(config_json.contains("use_laptimer") && config_json["use_laptimer"])
+    {
+        _lap_timer_driver = std::make_shared<comms::SpeedTechComms>(_config, _io_context_speed_tech_serial);
+        _using_lap_timer = true;
+    } else {
+        _using_lap_timer = false;
+    }
     
     
     // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 
@@ -181,8 +188,11 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         _aero_sensor_driver->set_msg_logger(_message_logger);
     }
+    if(_lap_timer_driver)
+    {
+        _lap_timer_driver->update_msg_logger(_message_logger);
+    }
 
-    _message_logger->start_logging_params();
 
     spdlog::info("constructed app");
 }
@@ -230,6 +240,15 @@ DriveBrainApp::~DriveBrainApp() {
     if ( _db_service_thread.joinable()) {
         _db_service_thread.join();
         spdlog::info("joined db service");
+    }
+
+    if(_using_lap_timer)
+    {
+        _io_context_speed_tech_serial.stop();
+        if(_io_context_speed_tech_serial_thread.joinable())
+        {
+            _io_context_speed_tech_serial_thread.join();
+        }
     }
     spdlog::info("destructed db app");
 }
@@ -380,6 +399,17 @@ void DriveBrainApp::run() {
         });
     }
     
+    if(_using_lap_timer)
+    {
+        _io_context_speed_tech_serial_thread = std::thread([this]() -> void {
+            spdlog::info("Started speed tech serial context thread");
+            try {
+                _io_context_speed_tech_serial.run();
+            } catch (const std::exception& e) {
+                spdlog::error("Error in speed tech serial context: {}", e.what());
+            }
+        });
+    }
 
     _process_thread = std::thread([this]() {
         if (!_settings.run_process_loop) return;
