@@ -51,18 +51,22 @@ void SurreyAeroComms::_start_receive() {
     _serial.async_read_some(
     boost::asio::buffer(_input_buff),
     [&](const boost::system::error_code &ec, std::size_t bytesCount) {
-        std::vector<float> sensor_readings = _extract_sensor_readings(_input_buff);
+        auto opt_readings = _extract_sensor_readings(_input_buff);
+        if(opt_readings)
+        {
+            std::vector<float> sensor_readings = (*opt_readings);
+            _log_proto_message(sensor_readings);
+        }
         
-        _log_proto_message(sensor_readings);
         _start_receive();
     });
 }
 
-std::vector<float> SurreyAeroComms::_extract_sensor_readings(const boost::array<std::uint8_t, 512>& buffer) {
+std::optional<std::vector<float>> SurreyAeroComms::_extract_sensor_readings(const boost::array<std::uint8_t, 512>& buffer) {
     std::vector<float> readings;
     if (buffer[0] != '#') {
         spdlog::error("invalid aero sensor frame received");
-        return readings;
+        return std::nullopt;
     }
 
 
@@ -87,7 +91,6 @@ std::vector<float> SurreyAeroComms::_extract_sensor_readings(const boost::array<
         _timestamp_of_last_debug_p = now_time;
     }
     
-    
     return readings;
 }
 
@@ -98,8 +101,6 @@ void SurreyAeroComms::_log_proto_message(const std::vector<float>& readings) {
     }
     log(msg_out);
 }
-
-    
 
 bool SurreyAeroComms::_send_command(const std::string& command) {
     boost::system::error_code ec;

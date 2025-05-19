@@ -54,13 +54,26 @@
         "rr_sus_pot_min": 1.0,
         "rr_sus_pot_min_mm": 0.0,
         "rr_sus_pot_max": 2000.0,
-        "rr_sus_pot_max_mm": 1.0
+        "rr_sus_pot_max_mm": 1.0,
+        "fl_load_cell_offset": 0.0,
+        "fl_load_cell_scale": 1.0,
+        "fr_load_cell_offset": 0.0,
+        "fr_load_cell_scale": 1.0,
+        "rl_load_cell_offset": 0.0,
+        "rl_load_cell_scale": 1.0,
+        "rr_load_cell_offset": 0.0,
+        "rr_load_cell_scale": 1.0
     },
     "SurreyAeroComms": {
         "port_name": "/dev/ttyACM0"
     },
+    "ScaleComms": {
+        "baud_rate": 115200,
+        "port_name": "/dev/ttyUSB0"
+    },
     "use_vectornav": false,
     "use_fake_vn": false,
-    "use_surrey_aero": true
+    "use_surrey_aero": false,
+    "use_scale_comms": false
 
 }

@@ -128,6 +128,19 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _using_lap_timer = false;
     }
     
+    if(config_json.contains("use_scale_comms") && config_json["use_scale_comms"])
+    {
+        spdlog::info("making scale comms driver");
+        _scale_comms = std::make_shared<comms::ScaleComms>(_config, _scale_usb_io_context);
+        if(!_scale_comms->init()){
+            throw std::runtime_error("failed to init scale comms");
+
+        }
+        spdlog::info("made scale comms driver");
+    }
+
+    
+    
     
     // - [x] TODO figure out how im going to get the parameter schemas for each of the configureable components into the mcap logger if 
     // the mcap logger is needed by the message logger but I wont know the schemas until the components have been created and the each
@@ -200,6 +213,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         _lap_timer_driver->update_msg_logger(_message_logger);
     }
+    if(_scale_comms)
+    {
+        _scale_comms->set_msg_logger(_message_logger);
+    }
 
 
     spdlog::info("constructed app");
@@ -239,7 +256,14 @@ DriveBrainApp::~DriveBrainApp() {
             _aero_usb_io_context_thread.join();
         }
     }
-    
+    if(_scale_comms)
+    {
+        _scale_usb_io_context.stop();
+        if(_scale_usb_io_context_thread.joinable())
+        {
+            _scale_usb_io_context_thread.join();
+        }
+    }
     
     
     if (_db_service) {
@@ -397,12 +421,23 @@ void DriveBrainApp::run() {
 
     if(_aero_sensor_driver)
     {
-        _aero_usb_io_context_thread = std::thread([this]() {
+        _aero_usb_io_context_thread = std::thread([this]() -> void {
             spdlog::info("Started _aero_usb_io_context_thread");
             try {
                 _aero_usb_io_context.run();
             } catch (const std::exception& e) {
                 spdlog::error("Error in _aero_usb_io_context: {}", e.what());
+            }
+        });
+    }
+    if(_scale_comms)
+    {
+        _scale_usb_io_context_thread = std::thread([this]() -> void {
+            spdlog::info("Started _scale_usb_io_context_thread");
+            try {
+                _scale_usb_io_context.run();
+            } catch (const std::exception& e) {
+                spdlog::error("Error in _scale_usb_io_context: {}", e.what());
             }
         });
     }
