@@ -36,8 +36,9 @@
 
   };
   outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, ... }@inputs:
+    
     let
-
+    
       nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
@@ -49,7 +50,8 @@
         };
         drivebrain_core_msgs = nix-proto.mkProtoDerivation {
           name = "drivebrain_core_msgs";
-          version = HT_proto.rev;
+          
+          version = (if HT_proto ? rev then HT_proto.rev else "unknown");
           src = "${HT_proto}/proto";
           };
         db_service = nix-proto.mkProtoDerivation

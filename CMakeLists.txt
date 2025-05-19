@@ -85,6 +85,7 @@ add_library(drivebrain_comms SHARED
     drivebrain_core_impl/drivebrain_comms/src/DBServiceImpl.cpp
     drivebrain_core_impl/drivebrain_comms/src/ETHSendComms.cpp
     drivebrain_core_impl/drivebrain_comms/src/SurreyAeroComms.cpp
+    drivebrain_core_impl/drivebrain_comms/src/SpeedTechComms.cpp
 )
 
 target_compile_features(drivebrain_comms PUBLIC cxx_std_17)
@@ -249,6 +250,13 @@ add_executable(test_surrey_aero_comms test/test_surrey_aero_comms.cpp)
 target_link_libraries(test_surrey_aero_comms PUBLIC 
     drivebrain_comms
 )
+add_executable(test_speedtech_comms test/test_speedtech_comms.cpp)
+
+target_link_libraries(test_speedtech_comms PUBLIC 
+    drivebrain_comms
+)
+
+
 # add_executable(test_dbcan test/test_dbcan.cpp)
 
 # target_link_libraries(test_dbcan PUBLIC
