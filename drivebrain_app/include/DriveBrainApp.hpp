@@ -65,6 +65,7 @@ private:
     boost::asio::io_context _aero_usb_io_context;
     boost::asio::io_context _io_context_speed_tech_serial;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
+    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _secondary_can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
@@ -82,10 +83,13 @@ private:
     std::shared_ptr<comms::SurreyAeroComms> _aero_sensor_driver = nullptr;
     std::shared_ptr<comms::SpeedTechComms> _lap_timer_driver;
     bool _using_lap_timer = false;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
+    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
-    
+    std::unique_ptr<DBInterfaceImpl> _db_service;
+
     std::thread _process_thread;
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;
