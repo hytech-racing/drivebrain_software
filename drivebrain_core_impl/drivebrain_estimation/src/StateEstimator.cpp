@@ -180,6 +180,11 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
     vehicle_state.suspension_potentiometers_mm.RR = math::normalize_linear_scale(
         raw_data.raw_shock_pot_values.RR, _config.rr_sus_pot_min, _config.rr_sus_pot_max,
         _config.rr_sus_pot_min_mm, _config.rr_sus_pot_max_mm);
+    
+    vehicle_state.normalized_corner_load.FL = math::linear_approx(raw_data.raw_load_cell_values.FL, _config.fl_load_cell_scale, _config.fl_load_cell_offset);
+    vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
+    vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
+    vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
     return vehicle_state;
 }
 
@@ -306,6 +311,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
 }
 
 bool StateEstimator::init() {
+    // SUS POT PARAMS
     LOAD_PARAM_OR_FAIL(fl_sus_pot_min, float, _config);
     LOAD_PARAM_OR_FAIL(fl_sus_pot_min_mm, float, _config);
     LOAD_PARAM_OR_FAIL(fl_sus_pot_max, float, _config);
@@ -322,6 +328,16 @@ bool StateEstimator::init() {
     LOAD_PARAM_OR_FAIL(rr_sus_pot_min_mm, float, _config);
     LOAD_PARAM_OR_FAIL(rr_sus_pot_max, float, _config);
     LOAD_PARAM_OR_FAIL(rr_sus_pot_max_mm, float, _config);
+    
+    // LOAD CELL CONFIGS
+    LOAD_PARAM_OR_FAIL(fl_load_cell_offset, float, _config);
+    LOAD_PARAM_OR_FAIL(fl_load_cell_scale, float, _config);
+    LOAD_PARAM_OR_FAIL(fr_load_cell_offset, float, _config);
+    LOAD_PARAM_OR_FAIL(fr_load_cell_scale, float, _config);
+    LOAD_PARAM_OR_FAIL(rl_load_cell_offset, float, _config);
+    LOAD_PARAM_OR_FAIL(rl_load_cell_scale, float, _config);
+    LOAD_PARAM_OR_FAIL(rr_load_cell_offset, float, _config);
+    LOAD_PARAM_OR_FAIL(rr_load_cell_scale, float, _config);
     set_configured();
     return true;
 }

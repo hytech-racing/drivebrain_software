@@ -72,6 +72,14 @@ namespace core
             float rr_sus_pot_min_mm;
             float rr_sus_pot_max;
             float rr_sus_pot_max_mm;
+            float fl_load_cell_offset;
+            float fl_load_cell_scale;
+            float fr_load_cell_offset;
+            float fr_load_cell_scale;
+            float rl_load_cell_offset;
+            float rl_load_cell_scale;
+            float rr_load_cell_offset;
+            float rr_load_cell_scale;
         } _config;
 
     using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
@@ -102,7 +110,7 @@ namespace core
         {
             _message_logger = message_logger;
         }
-        bool init();
+        bool init() override final;
 
 
     private:

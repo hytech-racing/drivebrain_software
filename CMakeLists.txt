@@ -120,7 +120,12 @@ target_link_libraries(drivebrain_comms PUBLIC
 make_cmake_package(drivebrain_comms drivebrain)
 
 
-add_library(drivebrain_control SHARED drivebrain_core_impl/drivebrain_control/src/SimpleTorqueController.cpp drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp)
+add_library(drivebrain_control SHARED 
+    drivebrain_core_impl/drivebrain_control/src/SimpleTorqueController.cpp
+    drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp
+    drivebrain_core_impl/drivebrain_control/src/SimplePowerLimiter.cpp
+    drivebrain_core_impl/drivebrain_control/src/LoadCellVectoringTorqueController.cpp
+)
 
 # drivebrain_core_impl/drivebrain_control/include/SimpleController.hpp
 target_include_directories(drivebrain_control PUBLIC
@@ -132,6 +137,7 @@ target_link_libraries(drivebrain_control PUBLIC
     drivebrain_core::drivebrain_core
     hytech_np_proto_cpp::hytech_np_proto_cpp
     protobuf::libprotobuf
+    drivebrain_common_utils
 )
 
 make_cmake_package(drivebrain_control drivebrain)
@@ -353,6 +359,7 @@ add_executable(drivebrain_test
     unit_test/SimpleSpeedControllerTest.cpp
     unit_test/SimpleTorqueControllerTest.cpp
     unit_test/test_controller_manager.cpp
+    unit_test/ControllerTesting.cpp
 )
 
 target_link_libraries(drivebrain_test PUBLIC 
