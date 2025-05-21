@@ -32,7 +32,7 @@ class SpeedTechComms : public core::common::Configurable {
             core::JsonFileHandler &json_file_handler,
             boost::asio::io_context &io_context);
         
-        bool init();
+        bool init() override final;
         
         void update_msg_logger(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger) {
             _message_logger = message_logger;

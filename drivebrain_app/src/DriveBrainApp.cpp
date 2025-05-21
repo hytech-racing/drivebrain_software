@@ -123,6 +123,10 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     if(config_json.contains("use_laptimer") && config_json["use_laptimer"])
     {
         _lap_timer_driver = std::make_shared<comms::SpeedTechComms>(_config, _io_context_speed_tech_serial);
+        if(!_lap_timer_driver->init()) {
+            throw std::runtime_error("failed to init lap timer driver");
+
+        }
         _using_lap_timer = true;
     } else {
         _using_lap_timer = false;

@@ -12,7 +12,7 @@
         "max_regen_torque": 10.0,
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
-        "positive_speed_set" : 45,
+        "positive_speed_set" : 15,
         "max_power_kw": 63.0,
         "dt_rate_hz": 1000
     }, 
@@ -21,7 +21,7 @@
         "max_regen_torque": 10.0,
         "rear_torque_scale": 1.0,
         "regen_torque_scale": 0.6,
-        "positive_speed_set" : 45,
+        "positive_speed_set" : 15,
         "max_power_kw": 63.0,
         "dt_rate_hz": 1000,
         "apply_vectoring_in_regen": true
@@ -34,7 +34,7 @@
     },
     "ControllerManager": {
         "max_controller_switch_speed_ms": 5.0, 
-        "max_requested_rpm": 20000.0,
+        "max_requested_rpm": 22000.0,
         "max_torque_switch_nm": 10.0,
         "max_accel_switch_float": 0.1
     },
@@ -71,9 +71,14 @@
         "baud_rate": 115200,
         "port_name": "/dev/ttyUSB0"
     },
+    "SpeedTechComms" :{
+        "baud_rate": 9600,
+        "port_name": "/dev/ttyUSB0"
+    },
     "use_vectornav": false,
     "use_fake_vn": false,
     "use_surrey_aero": false,
-    "use_scale_comms": false
+    "use_scale_comms": false,
+    "use_laptimer": false
 
 }
