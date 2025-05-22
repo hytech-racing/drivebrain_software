@@ -81,6 +81,12 @@ private:
     std::shared_ptr<common::DrivebrainMCAPLogger> _mcap_logger;
     std::shared_ptr<control::SimpleSpeedController> controller1;
     std::shared_ptr<control::LoadCellVectoringTorqueController> _mode1;
+
+    // const 
+    // namespace matlab_model_gen {
+    
+
+    // control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2+matlab_model_gen::num_controllers> _controllerManager;
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> _controllerManager;
         // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
@@ -99,6 +105,8 @@ private:
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
     std::shared_ptr<comms::ScaleComms> _scale_comms = nullptr;
+
+    // std::vector<std::shared_ptr<MatlabModel>> _gend_controllers;
     std::thread _process_thread;
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;

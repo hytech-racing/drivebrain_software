@@ -15,7 +15,7 @@
 
 #include <spdlog/spdlog.h>
 
-
+// #include <MatlabModelAddHelper.hpp>
 static uint64_t nanosecondsSinceEpoch()
 {
     return uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -71,14 +71,20 @@ core::FoxgloveWSServer::FoxgloveWSServer(std::vector<std::weak_ptr<core::common:
     };
 
     // TODO make the .proto file name a parameter
+    std::vector<std::string> proto_names = {"hytech_msgs.proto", "hytech.proto"};
 
-    auto potential_id_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
+    std::vector<std::string> gend_names;
+    // std::vector<std::string> gend_names = matlab_model_gen::get_proto_names();
+    proto_names.insert(proto_names.end(), gend_names.begin(), gend_names.end());
+
+
+    auto potential_id_map = util::generate_name_to_id_map(proto_names);
     if (potential_id_map)
     {
         _id_name_map = *potential_id_map;
     }
 
-    auto descriptors = util::get_pb_descriptors({"hytech_msgs.proto", "hytech.proto"});
+    auto descriptors = util::get_pb_descriptors(proto_names);
 
     std::vector<foxglove::ChannelWithoutId> channels;
 
