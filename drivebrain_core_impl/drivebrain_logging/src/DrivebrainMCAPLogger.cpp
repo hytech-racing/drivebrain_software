@@ -1,3 +1,4 @@
+#include <MatlabModelAddHelper.hpp>
 #include <nlohmann/json_fwd.hpp>
 #define MCAP_IMPLEMENTATION
 #include <types.hpp>
@@ -21,8 +22,7 @@ namespace common
     {
         std::vector<std::string> proto_names = {"hytech_msgs.proto", "hytech.proto"};
 
-        std::vector<std::string> gend_names;
-        // std::vector<std::string> gend_names = matlab_model_gen::get_proto_names();
+        std::vector<std::string> gend_names = matlab_model_gen::get_proto_filenames();
         proto_names.insert(proto_names.end(), gend_names.begin(), gend_names.end());
  
         auto optional_map = util::generate_name_to_id_map(proto_names);
@@ -72,8 +72,7 @@ namespace common
 
         std::vector<std::string> proto_names = {"hytech_msgs.proto", "hytech.proto"};
 
-        std::vector<std::string> gend_names;
-        // std::vector<std::string> gend_names = matlab_model_gen::get_proto_names();
+        std::vector<std::string> gend_names = matlab_model_gen::get_proto_filenames();
         proto_names.insert(proto_names.end(), gend_names.begin(), gend_names.end());
         auto receiving_descriptors = util::get_pb_descriptors(proto_names);
         // auto schema_only_descriptors = util::get_pb_descriptors({"base_msgs.proto"});
@@ -196,6 +195,7 @@ namespace common
             _msg_name_id_map["drivebrain_configuration"] = config_channel.id;
             return true;
         } else {
+            spdlog::error("error initializing param schema");
             return false;
         }
     }
@@ -220,6 +220,7 @@ namespace common
                 _input_deque.cv.notify_all();
             }
         }
+        spdlog::info("attempted param log");
     }
     nlohmann::json DrivebrainMCAPLogger::_get_param_vals() {
     

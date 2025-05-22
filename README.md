@@ -27,6 +27,13 @@ Allowed options:
 ```bash
 ./build/replay_app -m <path_to_car_recorded_mcap_file> -c ./config/drivebrain_config.json -d ./config/hytech.dbc
 ```
+
+## `grpcui` connection for start/stop recording and switching controllers in devshell
+
+within the devshell:
+```bash
+grpcui -plaintext localhost:6969
+```
 # About
 
 This repo contains the main executable that runs on the Drivebrain embedded computer on HyTech Racing's cars. This code is deployed as a `systemd` service onto the car within HyTech's [raspberry pi nixos description](https://github.com/hytech-racing/hytech_nixos). This service handles, among other things:

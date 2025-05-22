@@ -155,7 +155,7 @@
                   alias br="cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
                 '';
               nativeBuildInputs = [ pkgs.drivebrain_core_msgs_proto_cpp ];
-              packages = [ pkgs.mcap-cli pkgs.valgrind ];
+              packages = [ pkgs.mcap-cli pkgs.valgrind pkgs.grpcui ];
               inputsFrom = [
                 pkgs.drivebrain_software
               ];

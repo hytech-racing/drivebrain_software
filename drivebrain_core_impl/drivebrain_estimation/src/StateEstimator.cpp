@@ -185,6 +185,8 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
     vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
     vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
     vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
+
+    vehicle_state.steering_angle_deg = raw_data.raw_steering_analog;
     return vehicle_state;
 }
 

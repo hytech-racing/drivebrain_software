@@ -41,20 +41,21 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     }
     configurable_components.push_back(_mode1);
     spdlog::info("made mode 1 controller");
-    std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2> controllers{};
-    // std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2 + matlab_model_gen::num_controllers> controllers{};
+    
+
+    std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2 + matlab_model_gen::num_controllers> controllers{};
     
     std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2> existing_controllers = {controller1, _mode1};
     
-    // _gend_controllers = matlab_model_gen::create_controllers(_config, configurable_components);
-    // if(_gend_controllers.size()+(existing_controllers.size()) != controllers.size())
-    // {
-    //     throw std::runtime_error("Failed to initialize matlab generated controllers! Wrong vector size!");
-    // }
+    _gend_controllers = matlab_model_gen::create_controllers(_config, configurable_components);
+    if(_gend_controllers.size()+(existing_controllers.size()) != controllers.size())
+    {
+        throw std::runtime_error("Failed to initialize matlab generated controllers! Wrong vector size!");
+    }
     
     std::copy(existing_controllers.begin(), existing_controllers.end(), controllers.begin());
 
-    // std::copy(gend_controllers.begin(), gend_controllers.end(), controllers.begin());
+    std::copy(_gend_controllers.begin(), _gend_controllers.end(), controllers.begin()+2);
     
     
     // TODO make this required for the controller manager and remove use of raii for this shared ptrs to the controllers for construction of cm
@@ -234,11 +235,12 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _scale_comms->set_msg_logger(_message_logger);
     }
 
-    // for(auto controller : _gend_controllers)
-    // {
-    //     controller->set_msg_logger(_message_logger);
-    // }
+    for(auto controller : _gend_controllers)
+    {
+        controller->set_msg_logger(_message_logger);
+    }
 
+    _message_logger->start_logging_params();
     spdlog::info("constructed app");
 }
 
@@ -362,7 +364,7 @@ void DriveBrainApp::_process_loop() {
                     _primary_can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
                     // spdlog::info("sent can");
                 }
-                
+
             } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
                 // set desired torque
                 

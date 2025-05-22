@@ -106,6 +106,7 @@ target_include_directories(drivebrain_comms PUBLIC
 )
 
 target_link_libraries(drivebrain_comms PUBLIC 
+    codegen::matlab_model
     drivebrain_core::drivebrain_core
     drivebrain_common_utils
     drivebrain_control
@@ -154,6 +155,7 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 
 target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_core::drivebrain_core 
+    codegen::matlab_model
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
@@ -196,6 +198,7 @@ target_include_directories(drivebrain_app PUBLIC
 
 target_link_libraries(drivebrain_app PUBLIC
     drivebrain_core::drivebrain_core
+    codegen::matlab_model
     drivebrain_control
     drivebrain_comms
     drivebrain_mcap_logger

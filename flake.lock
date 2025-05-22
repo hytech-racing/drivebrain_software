@@ -55,11 +55,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1747667698,
-        "narHash": "sha256-paXLS7OZo3llCuw0OTWlDzxwMZJtAh5AwaUMfZc1RcQ=",
+        "lastModified": 1747936368,
+        "narHash": "sha256-bvvhntG3FVRzBeOJ05XG3WTvV3vVK6sTR+Gqzce+nvw=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "b1535620917e54c7a8b022385d78bbf253a51f09",
+        "rev": "c1839c053ccccd06908ff37b8acb5fedca6efd27",
         "type": "github"
       },
       "original": {
@@ -72,7 +72,7 @@
       "flake": false,
       "locked": {
         "lastModified": 1747885136,
-        "narHash": "sha256-oV5Zf2DKAtioea8P363D6iLDHMtl1grc1Zg7r22q0jw=",
+        "narHash": "sha256-alRx7OAfwIb9eeznZQD0aeliMAJoaB9wHIiV6W/39Jw=",
         "type": "tarball",
         "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz"
       },
