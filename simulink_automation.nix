@@ -1,10 +1,10 @@
-{ pkgs, stdenv, cmake, drivebrain_core, simulink-automation-src }:
+{ pkgs, stdenv, cmake, drivebrain_core, db-simulink-gen-src, simulink_automation_msgs_proto_cpp }:
 
 stdenv.mkDerivation {
-    name = "Simulink-automation";
-    src = simulink-automation-src;
+    name = "matlab-math";
+    src = "${db-simulink-gen-src}/source_code";
     version = "1.0.0";
     nativeBuildInputs = [ cmake ];
-    propagatedBuildInputs = [ cmake drivebrain_core ];
+    propagatedBuildInputs = [ drivebrain_core simulink_automation_msgs_proto_cpp];
     # cmakeFlags = [ "-DCMAKE_FIND_DEBUG_MODE=ON" ];
 }

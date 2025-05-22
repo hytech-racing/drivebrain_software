@@ -68,6 +68,19 @@
         "type": "github"
       }
     },
+    "db-simulink-gen-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1747885136,
+        "narHash": "sha256-oV5Zf2DKAtioea8P363D6iLDHMtl1grc1Zg7r22q0jw=",
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz"
+      }
+    },
     "dbcppp-src": {
       "flake": false,
       "locked": {
@@ -652,6 +665,7 @@
       "inputs": {
         "HT_proto": "HT_proto",
         "db-core-src": "db-core-src",
+        "db-simulink-gen-src": "db-simulink-gen-src",
         "easy_cmake": "easy_cmake",
         "flake-parts": "flake-parts",
         "foxglove-schemas-src": "foxglove-schemas-src",

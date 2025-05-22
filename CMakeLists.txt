@@ -27,6 +27,9 @@ configure_file(
     @ONLY
 )
 
+## simulink codegend estimators and controllers
+find_package(codegen CONFIG REQUIRED)
+
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
@@ -347,6 +350,7 @@ target_link_libraries(drivebrain_exe PUBLIC
     drivebrain_comms
     drivebrain_mcap_logger
     Boost::program_options
+    codegen::matlab_model
 )
 
 add_executable(test_build 

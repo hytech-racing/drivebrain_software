@@ -34,12 +34,16 @@
       flake = false;
     };
 
+    db-simulink-gen-src = {
+      url = "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz";
+      flake = false;
+    };
   };
-  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, ... }@inputs:
+  outputs = { self, nixpkgs, flake-parts, nebs-packages, easy_cmake, nix-proto, foxglove-schemas-src, ht_can, HT_proto, vn_driver_lib, db-core-src, db-simulink-gen-src, ... }@inputs:
     
     let
     
-      nix-proto-foxglove-overlays = nix-proto.generateOverlays' {
+      nix-proto-overlays = nix-proto.generateOverlays' {
         foxglove-schemas = nix-proto.mkProtoDerivation {
           name = "foxglove-schemas";
           version = "1.0.1";
@@ -54,6 +58,12 @@
           version = (if HT_proto ? rev then HT_proto.rev else "unknown");
           src = "${HT_proto}/proto";
           };
+        
+        simulink_automation_msgs = nix-proto.mkProtoDerivation {
+          name = "simulink_automation_msgs";
+          version = "1.0.1";
+          src = "${db-simulink-gen-src}/proto_outputs";
+        };
         db_service = nix-proto.mkProtoDerivation
             {
               name = "db_service";
@@ -74,6 +84,9 @@
         (final: prev: {
           drivebrain_software = final.callPackage ./default.nix { };
         })
+        (final: prev: {
+          drivebrain-simulink-gen-pkg = final.callPackage ./simulink_automation.nix { inherit db-simulink-gen-src; };
+        })
         (self: super: {
           python311 = super.python311.override {
             packageOverrides = pyself: pysuper: {
@@ -89,7 +102,7 @@
         }
         )
         db_core_overlay
-      ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+      ] ++ (nix-proto.lib.overlayToList nix-proto-overlays);
 
     in
     flake-parts.lib.mkFlake { inherit inputs; }
@@ -120,12 +133,13 @@
                 easy_cmake.overlays.default
                 ht_can.overlays.default
                 self.overlays.default
-              ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+              ] ++ (nix-proto.lib.overlayToList nix-proto-overlays);
               config = { };
             };
             packages.default = pkgs.drivebrain_software;
             packages.drivebrain_software = pkgs.drivebrain_software;
             packages.drivebrain_core = pkgs.drivebrain_core;
+            packages.drivebrain-simulink-gen-pkg = pkgs.drivebrain-simulink-gen-pkg;
 
             devShells.default = pkgs.mkShell rec {
               name = "nix-devshell";
@@ -133,6 +147,7 @@
                 let icon = "f121";
                 in ''
                   dbc_path=${pkgs.ht_can_pkg}
+                  test_path=${db-simulink-gen-src}
                   export DBC_PATH=$dbc_path
                   export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
                   alias build="rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && make -j && cd .."
@@ -175,7 +190,7 @@
                   easy_cmake.overlays.default
                   ht_can.overlays.default
                   self.overlays.default
-                ] ++ (nix-proto.lib.overlayToList nix-proto-foxglove-overlays);
+                ] ++ (nix-proto.lib.overlayToList nix-proto-overlays);
               };
           };
       };
