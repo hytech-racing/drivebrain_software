@@ -15,7 +15,18 @@
         "positive_speed_set" : 45,
         "max_power_kw": 63.0,
         "dt_rate_hz": 1000
-    }, 
+    },
+    "test_mode0_MatlabModel": {
+        "max_torq": 21.0,
+        "use_regen": true
+    },
+    "test_pid_tv_MatlabModel": {
+        "p": 1.0,
+        "i": 0.0,
+        "d": 0.0,
+        "use_fake_vx": false,
+        "fake_vx": 0.0
+    },
     "LoadCellVectoringTorqueController": {
         "max_torque": 21.0,
         "max_regen_torque": 10.0,
@@ -76,7 +87,7 @@
         "port_name": "/dev/ttyUSB0"
     },
     "use_vectornav": false,
-    "use_fake_vn": false,
+    "use_fake_vn": true,
     "use_surrey_aero": false,
     "use_scale_comms": false,
     "use_laptimer": false

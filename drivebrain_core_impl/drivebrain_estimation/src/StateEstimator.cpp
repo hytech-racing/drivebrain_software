@@ -185,6 +185,8 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
     vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
     vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
     vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
+
+    vehicle_state.steering_angle_deg = raw_data.raw_steering_analog;
     return vehicle_state;
 }
 
@@ -228,7 +230,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_mutex_start = std::chrono::high_resolution_clock::now();
     {
         std::unique_lock lk(_state_mutex);
-        _vehicle_state = append_state_variables_from_raw_inputs(_vehicle_state, current_raw_data);
+        _vehicle_state = append_state_variables_from_raw_inputs(_vehicle_state, _raw_input_data);
         current_state = _vehicle_state;
         current_raw_data = _raw_input_data;
     }

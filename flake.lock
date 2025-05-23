@@ -6,16 +6,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1747196911,
-        "narHash": "sha256-Y8x8DywKp2/d3+9dSK7c4bh2CtNQOht/tvZhNptKpjU=",
+        "lastModified": 1747951466,
+        "narHash": "sha256-lGLuSEPOgqyw8vl7p+KhftzcE9IFwdFcuoTBBQL71Rg=",
         "owner": "hytech-racing",
         "repo": "HT_proto",
-        "rev": "cfcf44824c5cbfebe137ce8d330203616f184697",
+        "rev": "627d3d4b3103eef0d1666685f6d7748458e59259",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
-        "ref": "2025-05-14T04_28_50",
+        "ref": "2025-05-22T22_04_40",
         "repo": "HT_proto",
         "type": "github"
       }
@@ -55,17 +55,30 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1747667698,
-        "narHash": "sha256-paXLS7OZo3llCuw0OTWlDzxwMZJtAh5AwaUMfZc1RcQ=",
+        "lastModified": 1747936368,
+        "narHash": "sha256-bvvhntG3FVRzBeOJ05XG3WTvV3vVK6sTR+Gqzce+nvw=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "b1535620917e54c7a8b022385d78bbf253a51f09",
+        "rev": "c1839c053ccccd06908ff37b8acb5fedca6efd27",
         "type": "github"
       },
       "original": {
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
         "type": "github"
+      }
+    },
+    "db-simulink-gen-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1747968350,
+        "narHash": "sha256-ZjHrZxPgEWG+rgFvLzwiKe3JNM4mYz0Lm1htxr0sNOQ=",
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz"
       }
     },
     "dbcppp-src": {
@@ -652,6 +665,7 @@
       "inputs": {
         "HT_proto": "HT_proto",
         "db-core-src": "db-core-src",
+        "db-simulink-gen-src": "db-simulink-gen-src",
         "easy_cmake": "easy_cmake",
         "flake-parts": "flake-parts",
         "foxglove-schemas-src": "foxglove-schemas-src",

@@ -27,6 +27,9 @@ configure_file(
     @ONLY
 )
 
+## simulink codegend estimators and controllers
+find_package(codegen CONFIG REQUIRED)
+
 ### this one is generated from nix-proto but using foxglove's 
 # find_package(foxglove-schemas_proto_cpp CONFIG REQUIRED) 
 
@@ -103,6 +106,7 @@ target_include_directories(drivebrain_comms PUBLIC
 )
 
 target_link_libraries(drivebrain_comms PUBLIC 
+    codegen::matlab_model
     drivebrain_core::drivebrain_core
     drivebrain_common_utils
     drivebrain_control
@@ -151,6 +155,7 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 
 target_link_libraries(drivebrain_mcap_logger PUBLIC
     drivebrain_core::drivebrain_core 
+    codegen::matlab_model
     drivebrain_common_utils
     protobuf::libprotobuf
     mcap::mcap
@@ -193,6 +198,7 @@ target_include_directories(drivebrain_app PUBLIC
 
 target_link_libraries(drivebrain_app PUBLIC
     drivebrain_core::drivebrain_core
+    codegen::matlab_model
     drivebrain_control
     drivebrain_comms
     drivebrain_mcap_logger
@@ -347,6 +353,7 @@ target_link_libraries(drivebrain_exe PUBLIC
     drivebrain_comms
     drivebrain_mcap_logger
     Boost::program_options
+    codegen::matlab_model
 )
 
 add_executable(test_build 

@@ -1,3 +1,4 @@
+#include <MatlabModelAddHelper.hpp>
 #include <nlohmann/json_fwd.hpp>
 #define MCAP_IMPLEMENTATION
 #include <types.hpp>
@@ -10,14 +11,21 @@
 #include <mutex>
 #include <versions.h>
 #include <utility>
-#include <spdlog/spdlog.h> 
+#include <spdlog/spdlog.h>
+
+// #include <MatlabModelAddHelper.hpp>
 
 namespace common
 {
     DrivebrainMCAPLogger::DrivebrainMCAPLogger(const std::string &base_dir, std::vector<std::weak_ptr<core::common::Configurable>> configurable_components)
         : _options(mcap::McapWriterOptions("")), _configurable_components(configurable_components)
     {
-        auto optional_map = util::generate_name_to_id_map({"hytech_msgs.proto", "hytech.proto"});
+        std::vector<std::string> proto_names = {"hytech_msgs.proto", "hytech.proto"};
+
+        std::vector<std::string> gend_names = matlab_model_gen::get_proto_filenames();
+        proto_names.insert(proto_names.end(), gend_names.begin(), gend_names.end());
+ 
+        auto optional_map = util::generate_name_to_id_map(proto_names);
         if (optional_map)
         {
             spdlog::info("Opened MCAP"); 
@@ -61,7 +69,12 @@ namespace common
         }
         // TODO handle message name de-confliction for messages of the same name
         // message-receiving .protos (non-base .proto files)
-        auto receiving_descriptors = util::get_pb_descriptors({"hytech_msgs.proto", "hytech.proto"});
+
+        std::vector<std::string> proto_names = {"hytech_msgs.proto", "hytech.proto"};
+
+        std::vector<std::string> gend_names = matlab_model_gen::get_proto_filenames();
+        proto_names.insert(proto_names.end(), gend_names.begin(), gend_names.end());
+        auto receiving_descriptors = util::get_pb_descriptors(proto_names);
         // auto schema_only_descriptors = util::get_pb_descriptors({"base_msgs.proto"});
 
         auto add_protobuf_schema_func = [this](const std::vector<const google::protobuf::FileDescriptor *> &descriptors, bool skip_channel)
@@ -182,6 +195,7 @@ namespace common
             _msg_name_id_map["drivebrain_configuration"] = config_channel.id;
             return true;
         } else {
+            spdlog::error("error initializing param schema");
             return false;
         }
     }
@@ -206,6 +220,7 @@ namespace common
                 _input_deque.cv.notify_all();
             }
         }
+        spdlog::info("attempted param log");
     }
     nlohmann::json DrivebrainMCAPLogger::_get_param_vals() {
     

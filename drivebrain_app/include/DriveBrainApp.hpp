@@ -23,6 +23,8 @@
 #include <DBServiceImpl.hpp>
 #include <ETHRecvComms.hpp>
 
+#include <MatlabModelAddHelper.hpp>
+
 #include <thread>
 #include <chrono>
 #include <condition_variable>
@@ -81,8 +83,13 @@ private:
     std::shared_ptr<common::DrivebrainMCAPLogger> _mcap_logger;
     std::shared_ptr<control::SimpleSpeedController> controller1;
     std::shared_ptr<control::LoadCellVectoringTorqueController> _mode1;
-    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2> _controllerManager;
-        // std::unique_ptr<estimation::Tire_Model_Codegen_MatlabModel> _matlab_math;
+
+    // const 
+    // namespace matlab_model_gen {
+    
+
+    control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 + matlab_model_gen::num_controllers> _controllerManager;
+
     std::shared_ptr<core::FoxgloveWSServer> _foxglove_server;
     std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger = nullptr;
     std::shared_ptr<core::StateEstimator> _state_estimator;
@@ -99,6 +106,8 @@ private:
     std::unique_ptr<DBInterfaceImpl> _db_service;
     
     std::shared_ptr<comms::ScaleComms> _scale_comms = nullptr;
+
+    std::vector<std::shared_ptr<MatlabModel>> _gend_controllers;
     std::thread _process_thread;
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;
