@@ -230,7 +230,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_mutex_start = std::chrono::high_resolution_clock::now();
     {
         std::unique_lock lk(_state_mutex);
-        _vehicle_state = append_state_variables_from_raw_inputs(_vehicle_state, current_raw_data);
+        _vehicle_state = append_state_variables_from_raw_inputs(_vehicle_state, _raw_input_data);
         current_state = _vehicle_state;
         current_raw_data = _raw_input_data;
     }
