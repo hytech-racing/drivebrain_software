@@ -21,7 +21,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     , _config(_param_path)
     , _settings(settings)
     , controller1(std::make_shared<control::SimpleSpeedController>(_config))
-    , _controllerManager(_config, {controller1})  // Initialize correctly
+    , _controllerManager(_config, {controller1})
+    , _estim_manager(std::make_shared<estimation::EstimatorManager>(_config))  // Initialize correctly
 {
     // spdlog::info("top o");
     std::vector<std::weak_ptr<core::common::Configurable>> configurable_components;
@@ -42,12 +43,12 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(_mode1);
     spdlog::info("made mode 1 controller");
     
-
+    _estim_manager->handle_inits(configurable_components); // calls throw internally here
     std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2 + matlab_model_gen::num_controllers> controllers{};
     
     std::array<std::shared_ptr<control::Controller<core::ControllerOutput, core::VehicleState>>, 2> existing_controllers = {controller1, _mode1};
-    
-    _gend_controllers = matlab_model_gen::create_controllers(_config, configurable_components);
+   
+    _gend_controllers = matlab_model_gen::create_controllers(_config, configurable_components, _estim_manager);
     if(_gend_controllers.size()+(existing_controllers.size()) != controllers.size())
     {
         throw std::runtime_error("Failed to initialize matlab generated controllers! Wrong vector size!");
@@ -240,6 +241,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         controller->set_msg_logger(_message_logger);
     }
 
+    _estim_manager->set_loggers(_message_logger);
+
     _message_logger->start_logging_params();
     spdlog::info("constructed app");
 }
@@ -321,6 +324,7 @@ void DriveBrainApp::_process_loop() {
 
         auto state_and_validity = _state_estimator->get_latest_state_and_validity();
         
+        _estim_manager->evaluate_all_estimators(state_and_validity.first);
         auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
 
         // get current command

@@ -25,7 +25,10 @@
         "i": 0.0,
         "d": 0.0,
         "use_fake_vx": false,
-        "fake_vx": 0.0
+        "fake_vx": 0.0,
+        "use_fake_wz": false,
+        "fake_wz": 0.0,
+        "motor_rpmlimit": 2000
     },
     "LoadCellVectoringTorqueController": {
         "max_torque": 21.0,
@@ -85,6 +88,9 @@
     "SpeedTechComms" :{
         "baud_rate": 9600,
         "port_name": "/dev/ttyUSB0"
+    },
+    "gain_MatlabEstimModel": {
+        "in":2.0
     },
     "use_vectornav": false,
     "use_fake_vn": true,
