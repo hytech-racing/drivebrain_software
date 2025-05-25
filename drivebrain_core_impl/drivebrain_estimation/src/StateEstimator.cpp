@@ -181,10 +181,14 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
         raw_data.raw_shock_pot_values.RR, _config.rr_sus_pot_min, _config.rr_sus_pot_max,
         _config.rr_sus_pot_min_mm, _config.rr_sus_pot_max_mm);
     
-    vehicle_state.normalized_corner_load.FL = math::linear_approx(raw_data.raw_load_cell_values.FL, _config.fl_load_cell_scale, _config.fl_load_cell_offset);
-    vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
-    vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
-    vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
+    // vehicle_state.normalized_corner_load.FL = math::linear_approx(raw_data.raw_load_cell_values.FL, _config.fl_load_cell_scale, _config.fl_load_cell_offset);
+    // vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
+    // vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
+    // vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
+    vehicle_state.loadcells.FL = raw_data.raw_load_cell_values.FL;
+    vehicle_state.loadcells.FR = raw_data.raw_load_cell_values.FR;
+    vehicle_state.loadcells.RL = raw_data.raw_load_cell_values.RL;
+    vehicle_state.loadcells.RR = raw_data.raw_load_cell_values.RR;
 
     vehicle_state.steering_angle_deg = raw_data.raw_steering_analog;
     return vehicle_state;

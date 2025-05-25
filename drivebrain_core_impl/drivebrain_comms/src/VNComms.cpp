@@ -97,7 +97,7 @@ namespace comms
             ImuGroup::IMUGROUP_UNCOMPACCEL,
             GpsGroup::GPSGROUP_NONE,
             AttitudeGroup::ATTITUDEGROUP_LINEARACCELBODY,
-            (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY),
+            (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY | InsGroup::INSGROUP_VELU),
             GpsGroup::GPSGROUP_NONE);
 
         boost::asio::async_write(_serial,
@@ -127,7 +127,7 @@ namespace comms
                                      ImuGroup::IMUGROUP_UNCOMPACCEL,
                                      GpsGroup::GPSGROUP_NONE,
                                      AttitudeGroup::ATTITUDEGROUP_LINEARACCELBODY,
-                                     (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY),
+                                     (InsGroup::INSGROUP_INSSTATUS | InsGroup::INSGROUP_POSLLA | InsGroup::INSGROUP_VELBODY | InsGroup::INSGROUP_VELU),
                                      GpsGroup::GPSGROUP_NONE))
             {
                 spdlog::warn("ERROR: packet is not what we want");
@@ -142,6 +142,7 @@ namespace comms
             uint16_t ins_status = packet.extractUint16();
             auto pos_lla = packet.extractVec3d();
             auto vel_body = packet.extractVec3f();
+            auto vel_uncertainty = packet.extractFloat();
 
             // Create the protobuf message to send
             std::shared_ptr<hytech_msgs::VNData> msg_out = std::make_shared<hytech_msgs::VNData>();
@@ -183,6 +184,8 @@ namespace comms
             vn_ins_msg->set_error_gnss((ins_status >> 6) & 0b1);
             vn_ins_msg->set_gnss_heading_ins((ins_status >> 8) & 0b1); 
             vn_ins_msg->set_gnss_compass((ins_status >> 9) & 0b1); 
+            vn_ins_msg->set_ins_mode_int((ins_status & 0b11));
+            vn_ins_msg->set_ins_vel_u(vel_uncertainty);
 
             this_instance->log_proto_message(static_cast<std::shared_ptr<google::protobuf::Message>>(msg_out));
         }

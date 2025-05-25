@@ -60,7 +60,7 @@ core::ControllerOutput control::LoadCellVectoringTorqueController::step_controll
     speed_out.mcu_recv_millis = in.prev_MCU_recv_millis; // heartbeat TODO this isnt needed any more, prob should remove
     
     
-    float sum_normal = in.normalized_corner_load.FL + in.normalized_corner_load.FR + in.normalized_corner_load.RL+ in.normalized_corner_load.RR;
+    float sum_normal = in.loadcells.FL + in.loadcells.FR + in.loadcells.RL+ in.loadcells.RR;
     if (accelRequest >= 0.0)
     {
         // Positive torque request
@@ -75,10 +75,10 @@ core::ControllerOutput control::LoadCellVectoringTorqueController::step_controll
         speed_out.desired_rpms.RL = max_rpm;
         speed_out.desired_rpms.RR = max_rpm;
 
-        speed_out.torque_lim_nm.FL = ((2.0 - cur_config.rear_torque_scale) * accel_torque_pool * (in.normalized_corner_load.FL / sum_normal) );
-        speed_out.torque_lim_nm.FR = ((2.0 - cur_config.rear_torque_scale) * accel_torque_pool * (in.normalized_corner_load.FR / sum_normal) );
-        speed_out.torque_lim_nm.RL = (cur_config.rear_torque_scale * accel_torque_pool * (in.normalized_corner_load.RL / sum_normal) );
-        speed_out.torque_lim_nm.RR = (cur_config.rear_torque_scale * accel_torque_pool * (in.normalized_corner_load.RR / sum_normal) );
+        speed_out.torque_lim_nm.FL = ((2.0 - cur_config.rear_torque_scale) * accel_torque_pool * (in.loadcells.FL / sum_normal) );
+        speed_out.torque_lim_nm.FR = ((2.0 - cur_config.rear_torque_scale) * accel_torque_pool * (in.loadcells.FR / sum_normal) );
+        speed_out.torque_lim_nm.RL = (cur_config.rear_torque_scale * accel_torque_pool * (in.loadcells.RL / sum_normal) );
+        speed_out.torque_lim_nm.RR = (cur_config.rear_torque_scale * accel_torque_pool * (in.loadcells.RR / sum_normal) );
         cmd_out.out = control::util::apply_power_limit(speed_out, in.current_rpms, cur_config.max_power_kw);
     }
     else
@@ -94,10 +94,10 @@ core::ControllerOutput control::LoadCellVectoringTorqueController::step_controll
         
         if(cur_config.apply_vectoring_in_regen)
         {
-            speed_out.torque_lim_nm.FL = (regen_torque_pool * (in.normalized_corner_load.FL / sum_normal) * (2.0 - cur_config.rear_torque_scale));
-            speed_out.torque_lim_nm.FR = (regen_torque_pool * (in.normalized_corner_load.FR / sum_normal) * (2.0 - cur_config.rear_torque_scale));
-            speed_out.torque_lim_nm.RL = (regen_torque_pool * (in.normalized_corner_load.RL / sum_normal) * cur_config.rear_torque_scale);
-            speed_out.torque_lim_nm.RR = (regen_torque_pool * (in.normalized_corner_load.RR / sum_normal) * cur_config.rear_torque_scale);
+            speed_out.torque_lim_nm.FL = (regen_torque_pool * (in.loadcells.FL / sum_normal) * (2.0 - cur_config.rear_torque_scale));
+            speed_out.torque_lim_nm.FR = (regen_torque_pool * (in.loadcells.FR / sum_normal) * (2.0 - cur_config.rear_torque_scale));
+            speed_out.torque_lim_nm.RL = (regen_torque_pool * (in.loadcells.RL / sum_normal) * cur_config.rear_torque_scale);
+            speed_out.torque_lim_nm.RR = (regen_torque_pool * (in.loadcells.RR / sum_normal) * cur_config.rear_torque_scale);
             cmd_out.out = speed_out; // no need to apply power limit for regen request
         } else {
             float reg_torq = -1.0 * accelRequest * cur_config.max_regen_torque;

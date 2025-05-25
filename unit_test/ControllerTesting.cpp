@@ -36,7 +36,7 @@ protected:
 TEST_F(ControllerTesting, FullBrakeRequestLCTV)
 {
     in.input.requested_brake = 1.0;
-    in.normalized_corner_load = {1.0, 1.0, 1.0, 1.0}; // simulate balanced weight
+    in.loadcells = {1.0, 1.0, 1.0, 1.0}; // simulate balanced weight
 
     auto cmd = lctv.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
@@ -61,7 +61,7 @@ TEST_F(ControllerTesting, FullBrakeRequestLCTV)
 TEST_F(ControllerTesting, FullPositiveAccelProportionalToLoad)
 {
     in.input.requested_accel = 1.0;
-    in.normalized_corner_load = {1.2f, 0.8f, 1.2f, 0.8f}; // FL, FR, RL, RR
+    in.loadcells = {1.2f, 0.8f, 1.2f, 0.8f}; // FL, FR, RL, RR
 
     auto cmd = lctv.step_controller(in);
     auto res = std::get_if<core::SpeedControlOut>(&cmd.out);
