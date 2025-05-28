@@ -28,7 +28,8 @@
         "fake_vx": 0.0,
         "use_fake_wz": false,
         "fake_wz": 0.0,
-        "motor_rpmlimit": 2000
+        "motor_rpmlimit": 2000,
+        "steer_sensor_offset": 33.0
     },
     "LoadCellVectoringTorqueController": {
         "max_torque": 21.0,
@@ -91,6 +92,25 @@
     },
     "gain_MatlabEstimModel": {
         "in":2.0
+    },
+    "fz_estimator_MatlabEstimModel":
+    {
+        "static_fz_N_fl": 0.0,
+        "static_fz_N_fr": 0.0,
+        "static_fz_N_rl": 0.0,
+        "static_fz_N_rr": 0.0,
+        "cgz_m": 0.0,
+        "Q": 0.0,
+        "R": 0.0
+    },
+    "vel_estimator_MatlabEstimModel": {
+        "process_noise_vx": 0.0,
+        "process_noise_yaw_rate": 0.0,
+        "process_noise_ax": 0.0,
+        "percent_wheel_diff_noise_gain": 0.0,
+        "steer_sensor_offset": 0.0,
+        "accel_noise_coef": 0.0,
+        "yaw_rate_noise_coef": 0.0
     },
     "use_vectornav": false,
     "use_fake_vn": true,

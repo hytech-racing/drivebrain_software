@@ -40,12 +40,17 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
         ypr_vec<float> ypr_rad = {(in_msg->vn_ypr_rad().yaw()), (in_msg->vn_ypr_rad().pitch()),
                                   (in_msg->vn_ypr_rad().roll())};
 
+        auto ins_mode_int = in_msg->status().ins_mode_int();
+        auto vel_u = in_msg->status().ins_vel_u();
+
         {
             std::unique_lock lk(_state_mutex);
             _vehicle_state.current_body_vel_ms = body_vel_ms;
             _vehicle_state.current_body_accel_mss = body_accel_mss;
             _vehicle_state.current_angular_rate_rads = angular_rate_rads;
             _vehicle_state.current_ypr_rad = ypr_rad;
+            _vehicle_state.ins_status.status_mode = ins_mode_int;
+            _vehicle_state.ins_status.vel_uncertainty = vel_u;
         }
     } else {
         _recv_low_level_state(message);
