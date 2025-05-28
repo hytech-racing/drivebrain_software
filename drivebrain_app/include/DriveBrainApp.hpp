@@ -24,6 +24,7 @@
 #include <ETHRecvComms.hpp>
 
 #include <MatlabModelAddHelper.hpp>
+#include <EstimatorManager.hpp>
 
 #include <thread>
 #include <chrono>
@@ -84,9 +85,6 @@ private:
     std::shared_ptr<control::SimpleSpeedController> controller1;
     std::shared_ptr<control::LoadCellVectoringTorqueController> _mode1;
 
-    // const 
-    // namespace matlab_model_gen {
-    
 
     control::ControllerManager<control::Controller<core::ControllerOutput, core::VehicleState>, 2 + matlab_model_gen::num_controllers> _controllerManager;
 
@@ -108,6 +106,8 @@ private:
     std::shared_ptr<comms::ScaleComms> _scale_comms = nullptr;
 
     std::vector<std::shared_ptr<MatlabModel>> _gend_controllers;
+
+    std::shared_ptr<estimation::EstimatorManager> _estim_manager;
     std::thread _process_thread;
     std::thread _io_context_thread;
     std::thread _io_context_secondary_thread;

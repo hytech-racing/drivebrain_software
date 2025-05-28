@@ -40,12 +40,17 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
         ypr_vec<float> ypr_rad = {(in_msg->vn_ypr_rad().yaw()), (in_msg->vn_ypr_rad().pitch()),
                                   (in_msg->vn_ypr_rad().roll())};
 
+        auto ins_mode_int = in_msg->status().ins_mode_int();
+        auto vel_u = in_msg->status().ins_vel_u();
+
         {
             std::unique_lock lk(_state_mutex);
             _vehicle_state.current_body_vel_ms = body_vel_ms;
             _vehicle_state.current_body_accel_mss = body_accel_mss;
             _vehicle_state.current_angular_rate_rads = angular_rate_rads;
             _vehicle_state.current_ypr_rad = ypr_rad;
+            _vehicle_state.ins_status.status_mode = ins_mode_int;
+            _vehicle_state.ins_status.vel_uncertainty = vel_u;
         }
     } else {
         _recv_low_level_state(message);
@@ -99,7 +104,7 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
         //     std::unique_lock lk(_state_mutex);
         //     // TODO
         // }
-    }
+    } 
 
     else {
         _recv_inverter_states(message);
@@ -132,6 +137,7 @@ void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::proto
         _raw_input_data.raw_inverter_torques.set_from_index<ind>(in_msg->actual_torque_nm());
         _raw_input_data.raw_inverter_power.set_from_index<ind>(in_msg->actual_power_w());
         _vehicle_state.current_rpms.set_from_index<ind>(in_msg->actual_speed_rpm());
+        _vehicle_state.current_torques_nm = _raw_input_data.raw_inverter_torques;
     }
 }
 
@@ -258,6 +264,13 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     curr_rpms->set_fr(current_state.current_rpms.FR);
     curr_rpms->set_rl(current_state.current_rpms.RL);
     curr_rpms->set_rr(current_state.current_rpms.RR);
+
+    hytech_msgs::veh_vec_float *curr_torqs = msg_out->mutable_current_torques_nm();
+    curr_torqs->set_fl(current_state.current_torques_nm.FL);
+    curr_torqs->set_fr(current_state.current_torques_nm.FR);
+    curr_torqs->set_rl(current_state.current_torques_nm.RL);
+    curr_torqs->set_rr(current_state.current_torques_nm.RR);
+
 
     msg_out->set_state_is_valid(state_is_valid);
     msg_out->set_steering_angle_deg(current_state.steering_angle_deg);

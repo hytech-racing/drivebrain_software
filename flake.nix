@@ -16,7 +16,7 @@
     nix-proto.url = "github:notalltim/nix-proto";
     nix-proto.inputs.nixpkgs.follows = "nixpkgs";
 
-    HT_proto.url = "github:hytech-racing/HT_proto/2025-05-23T20_32_14";
+    HT_proto.url = "github:hytech-racing/HT_proto/2025-05-27T05_58_38";
 
     foxglove-schemas-src = {
       url = "github:foxglove/schemas";
@@ -35,7 +35,7 @@
     };
 
     db-simulink-gen-src = {
-      url = "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-release/gen_rel.tar.gz";
+      url = "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-rel2/gen_rel.tar.gz";
       flake = false;
     };
   };
