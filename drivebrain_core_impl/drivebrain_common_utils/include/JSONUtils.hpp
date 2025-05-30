@@ -1,8 +1,6 @@
 #ifndef __JSONUTILS_H__
 #define __JSONUTILS_H__
 
-#include <vector>
-
 // Ensures a parameter is loaded or the function returns false
 #define LOAD_PARAM_OR_FAIL(param_name, param_type, config_struct)                                  \
     do {                                                                                           \

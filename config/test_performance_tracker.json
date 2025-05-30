@@ -1,0 +1,11 @@
+{
+    "PerformanceTracker": {
+        "start_lat": 0.0,
+        "start_lon": 0.0,
+        "start_alt": 0.0,
+        "finish_lat": 0.001,
+        "finish_lon": 0.0,
+        "finish_alt": 0.0,
+        "bubble_radius_m": 10.0
+    }
+}

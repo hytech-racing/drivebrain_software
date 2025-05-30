@@ -13,8 +13,6 @@ set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTOR
 ### just like "include what you use" and do "find what you use"
 
 ## hytech's upstream libraries
-find_package(fmt REQUIRED)
-find_package(spdlog REQUIRED)
 
 
 
@@ -41,9 +39,11 @@ find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(protobuf REQUIRED)
 find_package(GTest REQUIRED)
 
-find_package(mcap REQUIRED)
+find_package(GeographicLib REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 
-# custom packaged libraries, code didnt require changes just the packaging
+find_package(mcap REQUIRED)
 find_package(dbcppp CONFIG REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(cmake_macros REQUIRED)
@@ -168,6 +168,7 @@ target_include_directories(drivebrain_mcap_logger PUBLIC
 make_cmake_package(drivebrain_mcap_logger drivebrain)
 
 add_library(drivebrain_estimation SHARED 
+    drivebrain_core_impl/drivebrain_estimation/src/PerformanceTracker.cpp
     drivebrain_core_impl/drivebrain_estimation/src/StateEstimator.cpp
 )
 
@@ -178,10 +179,11 @@ target_include_directories(drivebrain_estimation PUBLIC
 
 target_link_libraries(drivebrain_estimation PUBLIC
     drivebrain_core::drivebrain_core 
-    drivebrain_common_utils
     hytech_np_proto_cpp::hytech_np_proto_cpp
     drivebrain_core_msgs_proto_cpp::drivebrain_core_msgs_proto_cpp
     protobuf::libprotobuf
+    GeographicLib::GeographicLib_SHARED
+    drivebrain_common_utils
 )
 
 make_cmake_package(drivebrain_estimation drivebrain)
@@ -376,6 +378,7 @@ add_executable(drivebrain_test
     unit_test/SimpleTorqueControllerTest.cpp
     unit_test/test_controller_manager.cpp
     unit_test/ControllerTesting.cpp
+    unit_test/test_performance_tracker.cpp
 )
 
 target_link_libraries(drivebrain_test PUBLIC 

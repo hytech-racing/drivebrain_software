@@ -5,6 +5,8 @@
 
 #include <SpeedTechComms.hpp>
 #include <ScaleComms.hpp>
+#include "PerformanceTracker.hpp"
+
 #include <JsonFileHandler.hpp>
 #include <CANComms.hpp>
 
@@ -102,6 +104,7 @@ private:
     std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
+    std::shared_ptr<PerformanceTracker> _performance_tracker=nullptr;
     
     std::shared_ptr<comms::ScaleComms> _scale_comms = nullptr;
 

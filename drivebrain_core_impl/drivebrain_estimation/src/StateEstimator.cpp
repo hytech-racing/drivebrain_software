@@ -23,6 +23,7 @@ StateEstimator::~StateEstimator()
 {
     spdlog::info("destructed StateEstimator");
 }
+
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message) {
     if (message->GetTypeName() == "hytech_msgs.VNData") {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
@@ -42,6 +43,7 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
 
         auto ins_mode_int = in_msg->status().ins_mode_int();
         auto vel_u = in_msg->status().ins_vel_u();
+        core::Position veh_position = {in_msg->vn_gps().lat(), in_msg->vn_gps().lon(), (in_msg->status().ins_mode() == hytech_msgs::INSMode::TRACKING_2)};
 
         {
             std::unique_lock lk(_state_mutex);
@@ -51,6 +53,7 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.current_ypr_rad = ypr_rad;
             _vehicle_state.ins_status.status_mode = ins_mode_int;
             _vehicle_state.ins_status.vel_uncertainty = vel_u;
+            _vehicle_state.vehicle_position = veh_position;
         }
     } else {
         _recv_low_level_state(message);
@@ -299,6 +302,11 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         spdlog::warn("message logger not real");
     }
 
+
+    if(_performance_tracker)
+    {
+        _performance_tracker->update(current_state.vehicle_position);
+    }
     auto log_end = std::chrono::high_resolution_clock::now();
 
     auto state_estim_end = std::chrono::high_resolution_clock::now();

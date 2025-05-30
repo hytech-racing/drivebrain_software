@@ -1,6 +1,7 @@
 // DriveBrainApp.cpp
 #include "DriveBrainApp.hpp"
 
+#include "PerformanceTracker.hpp"
 #include "SimpleSpeedController.hpp"
 #include "SurreyAeroComms.hpp"
 #include "SpeedTechComms.hpp"
@@ -65,7 +66,16 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         throw std::runtime_error("Failed to initialize controller manager");
     }
 
-    _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger);
+    configurable_components.push_back(controller1);
+    spdlog::info("made controller");
+
+    _performance_tracker = std::make_shared<PerformanceTracker>(_config);
+    if(!_performance_tracker->init())
+    {
+        throw std::runtime_error("Failed to initialize performance tracker");
+    }
+    
+    _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger, _performance_tracker);
     if(!_state_estimator->init())
     {
         throw std::runtime_error("Failed to initialize state estimator");
