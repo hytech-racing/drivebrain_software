@@ -54,10 +54,9 @@ namespace comms
         return true;
     }
 
-    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context& io, bool &init_not_successful)
+    VNDriver::VNDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context& io, bool &init_not_successful)
         : core::common::Configurable(json_file_handler, "VNDriver"),
           _state_estimator(state_estimator),
-          _message_logger(message_logger),
           _serial(io)
     {
         init_not_successful = !init();
@@ -74,13 +73,7 @@ namespace comms
     void VNDriver::log_proto_message(std::shared_ptr<google::protobuf::Message> msg)
     {
         _state_estimator->handle_recv_process(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
-        if(_message_logger)
-        {
-            _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(msg));
-        } else {
-            spdlog::warn("message logger not real");
-        }
-        
+        this->log(msg);
     }
 
     void VNDriver::_configure_binary_outputs()

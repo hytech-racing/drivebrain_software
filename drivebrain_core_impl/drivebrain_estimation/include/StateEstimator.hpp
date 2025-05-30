@@ -11,6 +11,10 @@
 // - if a new message containing state information comes it (that has not arrived before), the state is "appended" to with the new value
 // - if a new message containing state information comes in that has been seen before, the previous state is over-written.
 //   each state update will have with it a timestamp
+#include <Loggable.hpp>
+#include <Configurable.hpp>
+#include <DriverBus.hpp>
+#include <VehicleDataTypes.hpp>
 
 #include <mutex>
 #include <thread>
@@ -26,12 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/dynamic_message.h>
 
-#include <DriverBus.hpp>
-#include <VehicleDataTypes.hpp>
-#include <Logger.hpp>
-#include <MsgLogger.hpp>
 
-#include <Configurable.hpp>
 
 // while we can just have one queue input, if we allowed for multiple queue inputs that each have their own threads
 // that can update pieces of the state that would be optimal.
@@ -52,7 +51,8 @@
 // for now i will just move the state estimator into the estimation impl and call it a day 
 namespace core
 {
-    class StateEstimator : public core::common::Configurable
+    class StateEstimator : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>,
+                           public core::common::Configurable
     {
         struct config
         {
@@ -86,11 +86,9 @@ namespace core
 
     public:
         using tsq = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        StateEstimator(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger) : 
+        StateEstimator(core::JsonFileHandler &json_file_handler) : 
         
         Configurable(json_file_handler, "StateEstimator")
-        , _message_logger(message_logger)
-        //  _matlab_estimator(matlab_estimator)
         {
             _vehicle_state = {}; // initialize to all zeros
             _raw_input_data = {};
@@ -106,10 +104,6 @@ namespace core
         std::pair<core::VehicleState, bool> get_latest_state_and_validity();
         void set_previous_control_output(ControllerOutput prev_control_output);
         core::VehicleState append_state_variables_from_raw_inputs(core::VehicleState vs, core::RawInputData raw_inputs);
-        void update_msg_logger(std::shared_ptr<loggertype> message_logger)
-        {
-            _message_logger = message_logger;
-        }
         bool init() override final;
 
 

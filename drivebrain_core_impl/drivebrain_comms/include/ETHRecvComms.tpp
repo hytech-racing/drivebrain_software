@@ -10,9 +10,8 @@ namespace comms
     ETHRecvComms<ETHMsgType>::ETHRecvComms(boost::asio::io_context &io_context,
                                            uint16_t port,
                                            std::shared_ptr<core::StateEstimator> state_estim) 
-                                                : _message_logger(nullptr),
-                                                _state_estimator(state_estim),
-                                                _socket(io_context, udp::endpoint(udp::v4(), port))
+                                                : _state_estimator(state_estim),
+                                                  _socket(io_context, udp::endpoint(udp::v4(), port))
     {
         _eth_msg = std::make_shared<ETHMsgType>();
         _start_receive();
@@ -33,12 +32,9 @@ namespace comms
         {
             _eth_msg->ParseFromArray(_recv_buffer.data(), size);
             auto out_msg = static_cast<std::shared_ptr<google::protobuf::Message>>(_eth_msg);
-            if (_message_logger)
-            {
-                _message_logger->log_msg(out_msg);
-            } else {
-                spdlog::info("Message logger not real");
-            }
+            
+            this->log(out_msg);
+            
             if(_state_estimator)
             {
                 _state_estimator->handle_recv_process(out_msg);

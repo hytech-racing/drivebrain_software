@@ -2,9 +2,8 @@
 namespace comms
 {
 using boost::asio::ip::udp;
-ETHSendComms::ETHSendComms(std::shared_ptr<ETHSendComms::loggertype> message_logger, boost::asio::io_context &io_context, uint16_t send_port, std::string send_ip, bool bind) 
-: _message_logger(message_logger),
-_endp(boost::asio::ip::make_address(send_ip.c_str()), send_port),
+ETHSendComms::ETHSendComms(boost::asio::io_context &io_context, uint16_t send_port, std::string send_ip, bool bind) 
+: _endp(boost::asio::ip::make_address(send_ip.c_str()), send_port),
 _socket(io_context)
 {
     _socket.open(boost::asio::ip::udp::v4());
@@ -54,11 +53,7 @@ void ETHSendComms::_handle_send_msg_from_queue()
             for (const auto &msg : _queue.deque)
             {
                 _send_message(msg);
-                if(_message_logger)
-                {
-                    _message_logger->log_msg(msg);
-                }
-                
+                this->log(msg);
             }
             _queue.deque.clear();
         }

@@ -25,7 +25,7 @@
 
 namespace comms
 {
-    class ETHSendComms
+    class ETHSendComms : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>
     {
     public:
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
@@ -33,11 +33,8 @@ namespace comms
         
         ETHSendComms() = delete;
         ~ETHSendComms();
-        ETHSendComms(std::shared_ptr<loggertype> message_logger, boost::asio::io_context &io_context, uint16_t send_port, std::string send_ip, bool bind=true);
-        
-        void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
-            _message_logger = message_logger;
-        }
+        ETHSendComms(boost::asio::io_context &io_context, uint16_t send_port, std::string send_ip, bool bind=true);
+    
 
         // thread safe call to enqueue a message to the internal dequeue for safe multi-thread access from multiple threads at once
         void enqueue_msg_to_send(std::shared_ptr<google::protobuf::Message> send_msg);
@@ -54,7 +51,6 @@ namespace comms
 
         boost::asio::ip::udp::endpoint _endp;
 
-        std::shared_ptr<loggertype> _message_logger;
         std::array<uint8_t, 4096> _recv_buffer;
         boost::asio::ip::udp::socket _socket;
         boost::asio::ip::udp::endpoint _remote_endpoint;

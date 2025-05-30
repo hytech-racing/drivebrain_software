@@ -61,6 +61,8 @@ private:
     // Private member functions
     void _process_loop();
     void _signal_handler(int signal);
+    void _setup_loggers(std::vector<std::shared_ptr<core::common::Loggable<std::shared_ptr<google::protobuf::Message>>>> logging_components);
+
 private:
     // Private member variables
     static std::atomic<bool> _stop_signal;
@@ -96,10 +98,10 @@ private:
     std::shared_ptr<comms::SurreyAeroComms> _aero_sensor_driver = nullptr;
     std::shared_ptr<comms::SpeedTechComms> _lap_timer_driver;
     bool _using_lap_timer = false;
-    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
-    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
-    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
-    std::unique_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
+    std::shared_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
+    std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
+    std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
+    std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
     std::shared_ptr<comms::VNDriver> _vn_driver;
     std::unique_ptr<DBInterfaceImpl> _db_service;
     

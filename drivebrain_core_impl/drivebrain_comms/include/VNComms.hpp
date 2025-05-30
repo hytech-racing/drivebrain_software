@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Configurable.hpp>
-#include <Logger.hpp>
-#include <MsgLogger.hpp>
+#include <Loggable.hpp>
 #include <StateEstimator.hpp>
 
 // protobuf
@@ -38,11 +37,12 @@ using SerialPort = boost::asio::serial_port;
 using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
 
 namespace comms {
-    class VNDriver : public core::common::Configurable
+    class VNDriver : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>,
+                     public core::common::Configurable
     {
         public:
-            VNDriver(core::JsonFileHandler &json_file_handler, core::Logger &logger, std::shared_ptr<loggertype> message_logger, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context &io_context, bool &init_successful); 
-            ~VNDriver(){
+            VNDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<core::StateEstimator> state_estimator, boost::asio::io_context &io_context, bool &init_successful); 
+            ~VNDriver() {
                 spdlog::info("destructed %s", this->get_name());
             }
             bool init();
@@ -59,15 +59,12 @@ namespace comms {
             boost::array<std::uint8_t, 512> _output_buff;
             boost::array<std::uint8_t, 512> _input_buff;
             SerialPort _serial;
-            std::shared_ptr<loggertype> _message_logger; 
             config _config;
 
         public: 
             // Public methods
             void log_proto_message(std::shared_ptr<google::protobuf::Message> msg);  
-            void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
-                _message_logger = message_logger;
-            }
+            
         private:
             // Private methods
             static void _handle_recieve(void *userData, vn::protocol::uart::Packet &packet, size_t runningIndexOfPacketStart, TimeStamp ts);

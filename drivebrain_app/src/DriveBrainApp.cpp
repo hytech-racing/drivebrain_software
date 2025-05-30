@@ -65,7 +65,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         throw std::runtime_error("Failed to initialize controller manager");
     }
 
-    _state_estimator = std::make_unique<core::StateEstimator>(_config, _message_logger);
+    _state_estimator = std::make_shared<core::StateEstimator>(_config);
     if(!_state_estimator->init())
     {
         throw std::runtime_error("Failed to initialize state estimator");
@@ -78,7 +78,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     // this also calls init() in the constructor
     
     _driver_primary_can = std::make_shared<comms::CANDriver>(
-        _config, _message_logger, _primary_can_tx_queue, _io_context, 
+        _config, _primary_can_tx_queue, _io_context, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverPrimary");
     
     if (construction_failed) {
@@ -86,7 +86,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     }
     
     _driver_secondary_can = std::make_shared<comms::CANDriver>(
-        _config,  _message_logger, _secondary_can_tx_queue, _io_context_secondary_can, 
+        _config, _secondary_can_tx_queue, _io_context_secondary_can, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverSecondary");
     
     if (construction_failed) {
@@ -97,9 +97,9 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(_driver_primary_can);
     configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
-    _acu_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_io_context, 7766);
-    _vcr_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_io_context, 9999);
-    _vcf_eth_driver = std::make_unique<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_io_context, 4444);
+    _acu_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_io_context, 7766);
+    _vcr_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_io_context, 9999);
+    _vcf_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_io_context, 4444);
     
     spdlog::info("eth drivers");
 
@@ -107,7 +107,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     [this](size_t mode) -> bool {
         return _controllerManager.swap_active_controller(mode, _state_estimator->get_latest_state_and_validity().first);
     };
-    _db_service = std::make_unique<DBInterfaceImpl>(_message_logger, switch_modes);
+    _db_service = std::make_unique<DBInterfaceImpl>(switch_modes);
     spdlog::info("made db service");
 
     nlohmann::json &config_json = _config.get_config();
@@ -115,14 +115,14 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     {
         spdlog::info("using vectornav");
         // on creation calls init()
-        _vn_driver = std::make_shared<comms::VNDriver>(_config, _logger, _message_logger, _state_estimator, _io_context, construction_failed);
+        _vn_driver = std::make_shared<comms::VNDriver>(_config, _state_estimator, _io_context, construction_failed);
         if (construction_failed) {
            throw std::runtime_error("Failed to construct VN driver");
         }
         configurable_components.push_back(_vn_driver);
     } else if(config_json.contains("use_fake_vn") && config_json["use_fake_vn"])
     {
-        _fake_vn = std::make_unique<comms::ETHRecvComms<hytech_msgs::VNData>>( _io_context, 13111, _state_estimator);
+        _fake_vn = std::make_shared<comms::ETHRecvComms<hytech_msgs::VNData>>( _io_context, 13111, _state_estimator);
     } 
     
     if(config_json.contains("use_surrey_aero") && config_json["use_surrey_aero"])
@@ -185,136 +185,61 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         std::bind(&common::DrivebrainMCAPLogger::init_param_schema, _mcap_logger),
         std::bind(&common::DrivebrainMCAPLogger::log_params, _mcap_logger));
 
-    if(_driver_primary_can)
-    {
-        _driver_primary_can->update_msg_logger(_message_logger);
-    }
-    if(_driver_secondary_can)
-    {
-        _driver_secondary_can->update_msg_logger(_message_logger);
-    }
-    
-    if(_vn_driver)
-    {
-        _vn_driver->update_msg_logger(_message_logger);
-    }
-    if(_fake_vn)
-    {
-        _fake_vn->update_msg_logger(_message_logger);
-    }
-    if(_state_estimator)
-    {
-        _state_estimator->update_msg_logger(_message_logger);
-    }
-
     if(_db_service)
     {
+        // this one is special because it actually needs the full interface of the message logger
         _db_service->update_msg_logger(_message_logger);
     }
-    if(_acu_eth_driver)
-    {
-        _acu_eth_driver->update_msg_logger(_message_logger);
-    }
-    if(_vcr_eth_driver)
-    {
-        _vcr_eth_driver->update_msg_logger(_message_logger);
-    }
-    if(_vcf_eth_driver)
-    {
-        _vcf_eth_driver->update_msg_logger(_message_logger);
-    }
-    if(_aero_sensor_driver)
-    {
-        _aero_sensor_driver->set_msg_logger(_message_logger);
-    }
-    if(_lap_timer_driver)
-    {
-        _lap_timer_driver->update_msg_logger(_message_logger);
-    }
-    if(_scale_comms)
-    {
-        _scale_comms->set_msg_logger(_message_logger);
-    }
 
-    for(auto controller : _gend_controllers)
-    {
-        controller->set_msg_logger(_message_logger);
-    }
-
+    using loggertype = std::shared_ptr<core::common::Loggable<std::shared_ptr<google::protobuf::Message>>>;
+    
+    std::vector<loggertype> logging_components = {_driver_primary_can, 
+        _driver_secondary_can,
+        _vn_driver,
+        _fake_vn,
+        _state_estimator,
+        _acu_eth_driver,
+        _vcr_eth_driver,
+        _vcf_eth_driver,
+        _aero_sensor_driver, 
+        _scale_comms
+    };
+    // get the pointers to all of the generated controllers to handle setting of their loggers too
+    logging_components.insert(logging_components.end(), _gend_controllers.begin(), _gend_controllers.end());
+    
+    _setup_loggers(logging_components);
+    
+    // the estimator manager handles the setup of all of the loggers for the generated estimators internally
     _estim_manager->set_loggers(_message_logger);
 
     _message_logger->start_logging_params();
     spdlog::info("constructed app");
 }
 
-DriveBrainApp::~DriveBrainApp() {
-    stop_signal.store(true);
-    
-    if(_message_logger)
-    {
-        _message_logger->halt();
-    }
-    
 
-    if (_process_thread.joinable()) {
-        _process_thread.join();
-        spdlog::info("joined main process");
-    }
-    
-    
-    spdlog::info("halted message logger");
-    _io_context.stop();
-    if (_io_context_thread.joinable()) {
-        _io_context_thread.join();
-        spdlog::info("joined io context 1");
-    }
-    
-    _io_context_secondary_can.stop();
-    if (_io_context_secondary_thread.joinable()) {
-        _io_context_secondary_thread.join();
-        spdlog::info("joined io context 2");
-    }
 
-    if(_aero_sensor_driver) {
-        _aero_usb_io_context.stop();
-        if(_aero_usb_io_context_thread.joinable()) {
-            _aero_usb_io_context_thread.join();
-        }
-    }
-    if(_scale_comms)
+void DriveBrainApp::_setup_loggers(std::vector<std::shared_ptr<core::common::Loggable<std::shared_ptr<google::protobuf::Message>>>> logging_components)
+{
+    if(!_message_logger)
     {
-        _scale_usb_io_context.stop();
-        if(_scale_usb_io_context_thread.joinable())
+        throw std::runtime_error("Failed to set message logger on components, message logger does not exist yet!");
+    }
+    for(auto component : logging_components)
+    {
+        if(component)
         {
-            _scale_usb_io_context_thread.join();
+            component->set_msg_logger(_message_logger);
+        } else {
+            spdlog::warn("component does not exist, not setting message logger");
         }
     }
-    
-    
-    if (_db_service) {
-        _db_service->stop_server();
-    }
-    if ( _db_service_thread.joinable()) {
-        _db_service_thread.join();
-        spdlog::info("joined db service");
-    }
-
-    if(_using_lap_timer)
-    {
-        _io_context_speed_tech_serial.stop();
-        if(_io_context_speed_tech_serial_thread.joinable())
-        {
-            _io_context_speed_tech_serial_thread.join();
-        }
-    }
-    spdlog::info("destructed db app");
 }
 
 void DriveBrainApp::_process_loop() {
     auto desired_rpm_msg = std::make_shared<hytech::drivebrain_speed_set_input>();
     auto torque_limit_msg = std::make_shared<hytech::drivebrain_torque_lim_input>();
     auto desired_torque_msg = std::make_shared<hytech::drivebrain_desired_torque_input>();
-    auto loop_time = 0.005;
+    auto loop_time = 0.004;
     auto loop_time_micros = (int)(loop_time * 1000000.0f);
     std::chrono::microseconds loop_chrono_time(loop_time_micros);
 
@@ -490,4 +415,67 @@ void DriveBrainApp::run() {
         spdlog::debug("looping DBAPP run");
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+}
+
+DriveBrainApp::~DriveBrainApp() {
+    stop_signal.store(true);
+    
+    if(_message_logger)
+    {
+        _message_logger->halt();
+    }
+    
+
+    if (_process_thread.joinable()) {
+        _process_thread.join();
+        spdlog::info("joined main process");
+    }
+    
+    
+    spdlog::info("halted message logger");
+    _io_context.stop();
+    if (_io_context_thread.joinable()) {
+        _io_context_thread.join();
+        spdlog::info("joined io context 1");
+    }
+    
+    _io_context_secondary_can.stop();
+    if (_io_context_secondary_thread.joinable()) {
+        _io_context_secondary_thread.join();
+        spdlog::info("joined io context 2");
+    }
+
+    if(_aero_sensor_driver) {
+        _aero_usb_io_context.stop();
+        if(_aero_usb_io_context_thread.joinable()) {
+            _aero_usb_io_context_thread.join();
+        }
+    }
+    if(_scale_comms)
+    {
+        _scale_usb_io_context.stop();
+        if(_scale_usb_io_context_thread.joinable())
+        {
+            _scale_usb_io_context_thread.join();
+        }
+    }
+    
+    
+    if (_db_service) {
+        _db_service->stop_server();
+    }
+    if ( _db_service_thread.joinable()) {
+        _db_service_thread.join();
+        spdlog::info("joined db service");
+    }
+
+    if(_using_lap_timer)
+    {
+        _io_context_speed_tech_serial.stop();
+        if(_io_context_speed_tech_serial_thread.joinable())
+        {
+            _io_context_speed_tech_serial_thread.join();
+        }
+    }
+    spdlog::info("destructed db app");
 }

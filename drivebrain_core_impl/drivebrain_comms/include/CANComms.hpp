@@ -1,6 +1,7 @@
 #pragma once
 // drivebrain includes
 #include <Configurable.hpp>
+#include <Loggable.hpp>
 #include <DriverBus.hpp>
 #include <MsgLogger.hpp>
 #include <StateEstimator.hpp>
@@ -54,20 +55,19 @@
 
 namespace comms
 {
-    class CANDriver : public core::common::Configurable
+    class CANDriver : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>,
+                      public core::common::Configurable
     {
     public:
         using FieldVariant = std::variant<int32_t, int64_t, uint32_t, uint64_t, float, double, bool, std::string, std::monostate>;
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         /// @brief constructur
         /// @param json_file_handler the file handler 
         /// @param in_deq tx queue
         /// @param out_deq receive queue
         /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
             Configurable(json_file_handler, "CANDriver"),
-            _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _socket(io_context),
             _dbc_path(dbc_path),
@@ -78,9 +78,8 @@ namespace comms
             construction_failed = !init();
         }
 
-        CANDriver(core::JsonFileHandler &json_file_handler, std::shared_ptr<loggertype> message_logger, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
             Configurable(json_file_handler, driver_name),
-            _message_logger(message_logger),
             _input_deque_ref(in_deq),
             _socket(io_context),
             _dbc_path(dbc_path),
@@ -94,11 +93,6 @@ namespace comms
         bool init();
 
 
-        void update_msg_logger(std::shared_ptr<loggertype> message_logger)
-        {
-            _message_logger = message_logger;
-        }
-        
         void _handle_send_msg_from_queue();
         std::shared_ptr<google::protobuf::Message> pb_msg_recv(const can_frame &in_frame);
         void set_field_values_of_pb_msg(const std::unordered_map<std::string, FieldVariant> &field_values, std::shared_ptr<google::protobuf::Message> message);
@@ -128,7 +122,6 @@ namespace comms
         static std::string _to_lowercase(std::string s);
 
     private:
-        std::shared_ptr<loggertype> _message_logger;
         deqtype &_input_deque_ref;
 
         std::condition_variable _cv;

@@ -43,10 +43,7 @@ void SpeedTechComms::process_buffer(const boost::array<std::uint8_t, 512> &buff,
         speed_tech_lap_time_msg->set_lapcount(lap_count);
 
         spdlog::debug("lapcount {} laptime {}", lap_count, lap_time);
-        if(_message_logger)
-        {
-            _message_logger->log_msg(speed_tech_lap_time_msg);
-        }
+        this->log(speed_tech_lap_time_msg);
 
     } else {
         spdlog::warn("speedtech message byte length incorrect");

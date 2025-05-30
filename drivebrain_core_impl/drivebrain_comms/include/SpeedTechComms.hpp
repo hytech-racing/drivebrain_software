@@ -3,7 +3,7 @@
 // drivebrain_core
 #include <Configurable.hpp>
 #include <JsonFileHandler.hpp>
-#include <MsgLogger.hpp>
+#include <Loggable.hpp>
 
 #include "hytech_msgs.pb.h"
 
@@ -20,7 +20,8 @@
 // https://wiki.hytechracing.org/books/software/page/speedtech-lap-timing-protocol-description
 
 namespace comms {
-class SpeedTechComms : public core::common::Configurable {
+class SpeedTechComms : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>,
+                       public core::common::Configurable {
     private:
         struct config {
             int baud_rate;
@@ -34,10 +35,6 @@ class SpeedTechComms : public core::common::Configurable {
         
         bool init() override final;
         
-        void update_msg_logger(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> message_logger) {
-            _message_logger = message_logger;
-        }
-
         void process_buffer(const boost::array<std::uint8_t, 512> &buff, std::size_t length);
 
     private:
@@ -46,6 +43,5 @@ class SpeedTechComms : public core::common::Configurable {
     private:
         boost::array<std::uint8_t, 512> _input_buff;
         boost::asio::serial_port _serial;
-        std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> _message_logger = nullptr;
 };
 } // namespace comms

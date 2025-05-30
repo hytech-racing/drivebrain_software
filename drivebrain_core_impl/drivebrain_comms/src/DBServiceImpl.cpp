@@ -47,9 +47,8 @@ grpc::Status DBInterfaceImpl::RequestControllerChange(grpc::ServerContext *conte
     return grpc::Status::OK;
 }
 
-DBInterfaceImpl::DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch)
-        : _logger_inst(logger_inst), _mode_switch(mode_switch){
-}
+DBInterfaceImpl::DBInterfaceImpl(std::function<bool(size_t)> mode_switch) : _mode_switch(mode_switch)
+        { }
 void DBInterfaceImpl::stop_server() {
     if (_server) {
         spdlog::warn("Shutting down the server...");

@@ -93,25 +93,49 @@
     "gain_MatlabEstimModel": {
         "in":2.0
     },
-    "fz_estimator_MatlabEstimModel":
-    {
+        "estimator_MatlabEstimModel": {
+        "steer_sensor_offset": 0.0,
         "static_fz_N_fl": 0.0,
         "static_fz_N_fr": 0.0,
         "static_fz_N_rl": 0.0,
         "static_fz_N_rr": 0.0,
         "cgz_m": 0.0,
-        "Q": 0.0,
-        "R": 0.0
-    },
-    "vel_estimator_MatlabEstimModel": {
+        "fz_Q": 0.0,
+        "fz_R": 0.0,
+        "amk_eff_modifier": 0.0,
+        "vy_Q11": 0.0,
+        "wz_Q22": 0.0,
+        "vy_R11": 0.0,
+        "wz_R22": 0.0,
         "process_noise_vx": 0.0,
         "process_noise_yaw_rate": 0.0,
         "process_noise_ax": 0.0,
         "percent_wheel_diff_noise_gain": 0.0,
-        "steer_sensor_offset": 0.0,
         "accel_noise_coef": 0.0,
-        "yaw_rate_noise_coef": 0.0
+        "yaw_rate_noise_coef": 0.0,
+        "ay_cap_m_s2": 0.0,
+        "des_Mz_gain": 0.0,
+        "drive_motor_torq_lim": 0.0,
+        "regen_motor_torq_lim": 0.0,
+        "elec_p_lim_kW": 0.0,
+        "motor_rpm_lim": 0.0,
+        "brake_deadzone": 0.0,
+        "accel_deadzone": 0.0
     },
+    "qp_torq_allocator_MatlabModel": {
+        "mux": 0.0,
+        "high_axle_alpha": 0.0,
+        "high_axle_beta": 0.0,
+        "high_axle_lambda": 0.0,
+        "low_axle_alpha": 0.0,
+        "low_axle_beta": 0.0,
+        "low_axle_lambda": 0.0,
+        "k_opt": 0.0,
+        "torq_side_delta": 0.0,
+        "torq_long_delta": 0.0,
+        "w": 0.0,
+        "coast_brake_torq": 0.0
+    }, 
     "use_vectornav": false,
     "use_fake_vn": true,
     "use_surrey_aero": false,

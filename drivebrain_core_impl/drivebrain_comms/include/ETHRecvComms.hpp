@@ -1,19 +1,18 @@
 #ifndef __ETHRECVCOMMS_H__
 #define __ETHRECVCOMMS_H__
 
+#include <memory>
+#include <cstdint>
 
-#include <Logger.hpp>
+#include <Loggable.hpp>
 #include <StateEstimator.hpp>
-#include <MsgLogger.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/bind/bind.hpp>
 
-#include <cstdint>
 #include <google/protobuf/message.h>
 #include "hytech_msgs.pb.h"
-#include <memory>
 
 // - [x] boost asio socket for udp port comms
 // - [x] handle receiving UDP messages on a specific port
@@ -27,24 +26,20 @@ namespace comms
 {
     
     template<typename ETHMsgType>
-    class ETHRecvComms
+    class ETHRecvComms : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>
     {
     public:
         
-        using loggertype = core::MsgLogger<std::shared_ptr<google::protobuf::Message>>;
         ETHRecvComms() = delete;
         ~ETHRecvComms();
         ETHRecvComms(boost::asio::io_context &io_context, uint16_t recv_port, std::shared_ptr<core::StateEstimator> state_estim=nullptr);
-        void update_msg_logger(std::shared_ptr<loggertype> message_logger) {
-            _message_logger = message_logger;
-        }
+        
         
     private:
         void _handle_receive(const boost::system::error_code &error, std::size_t size);
         void _start_receive();
         
     private:
-        std::shared_ptr<loggertype> _message_logger;
         std::shared_ptr<core::StateEstimator> _state_estimator = nullptr;
         std::array<uint8_t, 4096> _recv_buffer;
         boost::asio::ip::udp::socket _socket;

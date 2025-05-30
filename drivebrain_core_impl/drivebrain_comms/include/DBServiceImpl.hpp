@@ -17,16 +17,14 @@
 
 class DBInterfaceImpl final : public db_service::v1::service::DBInterface::Service {
 
-    struct InitStruct {
-        std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst;
-    };
     grpc::Status RequestStopLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override; 
     grpc::Status RequestStartLogging(grpc::ServerContext* context, const google::protobuf::Empty *rq, db_service::v1::service::LoggerStatus * response) override;
     grpc::Status RequestCurrentLoggerStatus(grpc::ServerContext* context, const google::protobuf::Empty* rq, db_service::v1::service::LoggerStatus* response) override;
     grpc::Status RequestControllerChange(grpc::ServerContext* context, const db_service::v1::service::DesiredController* rq, db_service::v1::service::ControllerChangeStatus* response) override; 
 
     public: 
-        DBInterfaceImpl(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst, std::function<bool(size_t)> mode_switch);        void run_server(); 
+        DBInterfaceImpl(std::function<bool(size_t)> mode_switch);        
+        void run_server(); 
         void stop_server();
         void update_msg_logger(std::shared_ptr<core::MsgLogger<std::shared_ptr<google::protobuf::Message>>> logger_inst) {
             _logger_inst = logger_inst;
