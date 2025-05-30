@@ -23,7 +23,7 @@ MCAPReplay::MCAPReplay(std::string param_file_path, std::string dbc_file_path)
 
     _acu_sender = std::make_shared<comms::ETHSendComms>(_io_context, 7766, "127.0.0.1", false);
     // _acu_core_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 7777, "127.0.0.1");
-    // _vcr_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 9999, "127.0.0.1");
+    _vcr_sender = std::make_shared<comms::ETHSendComms>(nullptr, _io_context, 9999, "127.0.0.1");
     _vn_sender = std::make_shared<comms::ETHSendComms>(_io_context, 13111, "127.0.0.1", false); // fake VN 
     
 

@@ -98,7 +98,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     configurable_components.push_back(_driver_secondary_can);
     spdlog::info("made CAN driver");
     _acu_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::ACUAllData>>(_io_context, 7766);
-    _vcr_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_io_context, 9999);
+    _vcr_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::VCRData_s>>(_io_context, 9999, _state_estimator);
     _vcf_eth_driver = std::make_shared<comms::ETHRecvComms<hytech_msgs::VCFData_s>>(_io_context, 4444);
     
     spdlog::info("eth drivers");

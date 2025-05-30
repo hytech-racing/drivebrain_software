@@ -23,6 +23,21 @@ StateEstimator::~StateEstimator()
 {
     spdlog::info("destructed StateEstimator");
 }
+
+// INV1_STATUS INV1_TEMPS INV1_DYNAMICS INV1_POWER INV1_FEEDBACK
+void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Message> msg) {
+    auto name = msg->GetTypeName();
+    if (name == "hytech.inv1_dynamics") {
+        _handle_set_inverter_dynamics<0, hytech::inv1_dynamics>(msg);
+    } else if (name == "hytech.inv2_dynamics") {
+        _handle_set_inverter_dynamics<1, hytech::inv2_dynamics>(msg);
+    } else if (name == "hytech.inv3_dynamics") {
+        _handle_set_inverter_dynamics<2, hytech::inv3_dynamics>(msg);
+    } else if (name == "hytech.inv4_dynamics") {
+        _handle_set_inverter_dynamics<3, hytech::inv4_dynamics>(msg);
+    }
+}
+
 void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Message> message) {
     if (message->GetTypeName() == "hytech_msgs.VNData") {
         auto in_msg = std::static_pointer_cast<hytech_msgs::VNData>(message);
@@ -52,7 +67,15 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             _vehicle_state.ins_status.status_mode = ins_mode_int;
             _vehicle_state.ins_status.vel_uncertainty = vel_u;
         }
-    } else {
+    } else if (message->GetTypeName() == "hytech_msgs.VCRData_s") {
+        auto in_msg = std::static_pointer_cast<hytech_msgs::VCRData_s>(message);
+        bool is_rtd = (in_msg->status().vehicle_state() == hytech_msgs::VehicleState_e::READY_TO_DRIVE);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.is_ready_to_drive = is_rtd;
+        }
+    }
+    else {
         _recv_low_level_state(message);
     }
 }
@@ -99,35 +122,20 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
             _raw_input_data.raw_steering_digital = in_msg->steering_digital_raw();
         }
     } else if (message->GetTypeName() == "hytech.em_measurement") {
-        // auto in_msg = std::static_pointer_cast<hytech::steering_data>(message);
-        // {
-        //     std::unique_lock lk(_state_mutex);
-        //     // TODO
-        // }
+        auto in_msg = std::static_pointer_cast<hytech::em_measurement>(message);
+        float em_voltage = in_msg->em_voltage();
+        float em_current = in_msg->em_current();
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.old_energy_meter_kw = (-1.0f * em_voltage * em_current / 1000.0f); // on ht09 the energy meter is backwards as of right now
+        }
     } 
-
     else {
         _recv_inverter_states(message);
     }
 }
 
-// INV1_STATUS INV1_TEMPS INV1_DYNAMICS INV1_POWER INV1_FEEDBACK
-void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Message> msg) {
-    auto name = msg->GetTypeName();
-    if (name == "hytech.inv1_status") {
 
-    } else if (name == "hytech.inv2_status") {
-
-    } else if (name == "hytech.inv1_dynamics") {
-        _handle_set_inverter_dynamics<0, hytech::inv1_dynamics>(msg);
-    } else if (name == "hytech.inv2_dynamics") {
-        _handle_set_inverter_dynamics<1, hytech::inv2_dynamics>(msg);
-    } else if (name == "hytech.inv3_dynamics") {
-        _handle_set_inverter_dynamics<2, hytech::inv3_dynamics>(msg);
-    } else if (name == "hytech.inv4_dynamics") {
-        _handle_set_inverter_dynamics<3, hytech::inv4_dynamics>(msg);
-    }
-}
 
 template <size_t ind, typename inverter_dynamics_msg>
 void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg) {
@@ -187,10 +195,6 @@ StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
         raw_data.raw_shock_pot_values.RR, _config.rr_sus_pot_min, _config.rr_sus_pot_max,
         _config.rr_sus_pot_min_mm, _config.rr_sus_pot_max_mm);
     
-    // vehicle_state.normalized_corner_load.FL = math::linear_approx(raw_data.raw_load_cell_values.FL, _config.fl_load_cell_scale, _config.fl_load_cell_offset);
-    // vehicle_state.normalized_corner_load.FR = math::linear_approx(raw_data.raw_load_cell_values.FR, _config.fr_load_cell_scale, _config.fr_load_cell_offset);
-    // vehicle_state.normalized_corner_load.RL = math::linear_approx(raw_data.raw_load_cell_values.RL, _config.rl_load_cell_scale, _config.rl_load_cell_offset);
-    // vehicle_state.normalized_corner_load.RR = math::linear_approx(raw_data.raw_load_cell_values.RR, _config.rr_load_cell_scale, _config.rr_load_cell_offset);
     vehicle_state.loadcells.FL = raw_data.raw_load_cell_values.FL;
     vehicle_state.loadcells.FR = raw_data.raw_load_cell_values.FR;
     vehicle_state.loadcells.RL = raw_data.raw_load_cell_values.RL;
@@ -251,8 +255,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     std::shared_ptr<hytech_msgs::VehicleData> msg_out =
         std::make_shared<hytech_msgs::VehicleData>();
 
-    msg_out->set_is_ready_to_drive(true);
-
+    msg_out->set_is_ready_to_drive(current_state.is_ready_to_drive);
+    
     hytech_msgs::SpeedControlIn *current_inputs = msg_out->mutable_current_inputs();
     current_inputs->set_accel_percent(current_state.input.requested_accel);
     current_inputs->set_brake_percent(current_state.input.requested_brake);
@@ -291,6 +295,8 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         msg_out->set_is_using_torque_controller(false);
         _set_float_veh_vec_message_member(speedControl->torque_lim_nm, prev_driver_torque_req);
     }
+
+    msg_out->set_old_energy_meter_kw(current_state.old_energy_meter_kw);
 
     auto log_start = std::chrono::high_resolution_clock::now();
     
