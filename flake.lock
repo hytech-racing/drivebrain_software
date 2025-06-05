@@ -71,8 +71,8 @@
     "db-simulink-gen-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1748650061,
-        "narHash": "sha256-duttC/lVRWkGrBM/hLUYYjHcAkqE/LppWYJpq4au6+8=",
+        "lastModified": 1749105015,
+        "narHash": "sha256-MXC4gv8noOnf5ZRwSpvC6Ykx1eisX0SArUTcCLJ0iMA=",
         "type": "tarball",
         "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-rel3/gen_rel.tar.gz"
       },

@@ -65,7 +65,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         throw std::runtime_error("Failed to initialize controller manager");
     }
 
-    _state_estimator = std::make_shared<core::StateEstimator>(_config);
+    _state_estimator = std::make_shared<core::StateEstimator>(_config, settings.distance_file_path);
     if(!_state_estimator->init())
     {
         throw std::runtime_error("Failed to initialize state estimator");

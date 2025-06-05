@@ -47,6 +47,7 @@ struct DriveBrainSettings {
     bool run_process_loop{true};
     bool use_vectornav{true};
     bool use_secondary_can{true};
+    std::string distance_file_path = "distance.json";
 };
 
 class DriveBrainApp {

@@ -1,3 +1,4 @@
+#include <Literals.hpp>
 #include <StateEstimator.hpp>
 
 #include <VehicleDataTypes.hpp>
@@ -140,13 +141,29 @@ void StateEstimator::_recv_low_level_state(std::shared_ptr<google::protobuf::Mes
 template <size_t ind, typename inverter_dynamics_msg>
 void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg) {
     auto in_msg = std::static_pointer_cast<inverter_dynamics_msg>(msg);
+    auto ts = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+    std::chrono::microseconds prev_time;
+    auto rpm = in_msg->actual_speed_rpm();
+    
+    InternalState prev_internal_state;
     {
         std::unique_lock lk(_state_mutex);
+        prev_internal_state = _state_estimate_state;
+    }
+    prev_time = prev_internal_state.prev_wheel_rpm_timestamps.get_from_index<ind>();
+    
+    auto delta_m_dist = _calculate_dist_to_add(rpm, prev_time, ts);
+
+    {
+        std::unique_lock lk(_state_mutex);
+        _state_estimate_state.prev_wheel_rpm_timestamps.set_from_index<ind>(ts);
+        _state_estimate_state.wheel_dists_m.set_from_index<ind>(prev_internal_state.wheel_dists_m.get_from_index<ind>() + delta_m_dist);
         _raw_input_data.raw_inverter_torques.set_from_index<ind>(in_msg->actual_torque_nm());
         _raw_input_data.raw_inverter_power.set_from_index<ind>(in_msg->actual_power_w());
-        _vehicle_state.current_rpms.set_from_index<ind>(in_msg->actual_speed_rpm());
+        _vehicle_state.current_rpms.set_from_index<ind>(rpm);
         _vehicle_state.current_torques_nm = _raw_input_data.raw_inverter_torques;
     }
+    
 }
 
 // TODO parameterize the timeout threshold
@@ -240,6 +257,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto state_estim_start = std::chrono::high_resolution_clock::now();
     core::VehicleState current_state = {};
     core::RawInputData current_raw_data = {};
+    InternalState current_internal_state = {};
 
     auto state_mutex_start = std::chrono::high_resolution_clock::now();
     {
@@ -247,6 +265,7 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
         _vehicle_state = append_state_variables_from_raw_inputs(_vehicle_state, _raw_input_data);
         current_state = _vehicle_state;
         current_raw_data = _raw_input_data;
+        _state_estimate_state.distance_driven_m = _state_estimate_state.distance_driven_m + _get_dist_average(_state_estimate_state.wheel_dists_m);
     }
 
     auto state_mutex_end = std::chrono::high_resolution_clock::now();
@@ -297,6 +316,11 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     }
 
     msg_out->set_old_energy_meter_kw(current_state.old_energy_meter_kw);
+
+    current_internal_state.distance_driven_m = ((current_internal_state.wheel_dists_m.FL +
+        current_internal_state.wheel_dists_m.FR +
+        current_internal_state.wheel_dists_m.RL + 
+        current_internal_state.wheel_dists_m.RR) / 4.0f);
 
     auto log_start = std::chrono::high_resolution_clock::now();
     
@@ -379,4 +403,43 @@ void StateEstimator::_set_float_veh_vec_message_member(veh_vec<float> from,
     to_set->set_fr(from.FR);
     to_set->set_rl(from.RL);
     to_set->set_rr(from.RR);
+}
+
+float StateEstimator::_calculate_dist_to_add(float rpm, std::chrono::microseconds prev_recv_time, std::chrono::microseconds curr_time)
+{
+    if(prev_recv_time.count() > 0)
+    {
+        auto diff = (curr_time - prev_recv_time).count();
+        float diff_sec = static_cast<float>(diff) / 1000000.0f;
+        auto rads = rpm * constants::RPM_TO_RAD_PER_SECOND;
+        auto v_m_s = rads * (constants::WHEEL_DIAMETER/2.0f);
+        auto dist = v_m_s * diff_sec;
+        return dist;
+    } else {
+        return 0;
+    }
+}
+
+float StateEstimator::_get_dist_average(veh_vec<float> wheel_dists_m)
+{
+    return ((wheel_dists_m.FL + wheel_dists_m.FR + wheel_dists_m.RL + wheel_dists_m.RR) / 4.0f);
+}
+
+void StateEstimator::log_state_to_persistent_file()
+{
+    InternalState prev_state;
+    {
+        std::unique_lock lk(_state_mutex);
+        prev_state = _state_estimate_state;
+    }
+
+    nlohmann::json prev_distance;
+    prev_distance["distance_driven_m"] = prev_state.distance_driven_m;
+    std::ofstream json_file(_json_file_path);
+    if(json_file.is_open())
+    {
+        json_file << prev_distance;
+    } else {
+        spdlog::warn("failure to open prev distance file to write to");
+    }
 }
