@@ -3,6 +3,8 @@
 
 // TODO:
 // - [x] implement the CAN driver connection that can help create the internal state of the car from the data coming in from the CAN bus
+// - [ ] add to drivebrain app the periodic logging to the distance json file
+// - [ ] add into the commandline args the path to the distance.json file 
 
 // implement a thing that can maintain a "flexible" state of the car such that
 // it can build up a state of the car from the messages coming in. It starts out with an empty
