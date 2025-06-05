@@ -42,7 +42,7 @@ void SpeedTechComms::process_buffer(const boost::array<std::uint8_t, 512> &buff,
         speed_tech_lap_time_msg->set_laptime(lap_time);
         speed_tech_lap_time_msg->set_lapcount(lap_count);
 
-        spdlog::debug("lapcount {} laptime {}", lap_count, lap_time);
+        spdlog::info("lapcount {} laptime {}", lap_count, lap_time);
         this->log(speed_tech_lap_time_msg);
 
     } else {

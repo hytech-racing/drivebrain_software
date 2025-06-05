@@ -202,7 +202,8 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
         _vcr_eth_driver,
         _vcf_eth_driver,
         _aero_sensor_driver, 
-        _scale_comms
+        _scale_comms,
+        _lap_timer_driver
     };
     // get the pointers to all of the generated controllers to handle setting of their loggers too
     logging_components.insert(logging_components.end(), _gend_controllers.begin(), _gend_controllers.end());
