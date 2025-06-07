@@ -120,7 +120,16 @@
         "elec_p_lim_kW": 0.0,
         "motor_rpm_lim": 0.0,
         "brake_deadzone": 0.0,
-        "accel_deadzone": 0.0
+        "accel_deadzone": 0.0,
+        "vel_saturation": 0.0,
+        "per_motor_elec_p_lim_kW": 0.0,
+        "use_steer_deadzone": false,
+        "use_intent_w_derate": false,
+        "amk_eff_modifier_fl": 0.0,
+        "amk_eff_modifier_fr": 0.0,
+        "amk_eff_modifier_rl": 0.0,
+        "amk_eff_modifier_rr": 0.0,
+        "global_eff_modifier": 0.0
     },
     "qp_torq_allocator_MatlabModel": {
         "mux": 0.0,
@@ -133,8 +142,10 @@
         "k_opt": 0.0,
         "torq_side_delta": 0.0,
         "torq_long_delta": 0.0,
-        "w": 0.0,
-        "coast_brake_torq": 0.0
+        "w_starting": 0.0,
+        "w_ending": 0.0,
+        "coast_brake_torq": 0.0,
+        "estimator_intent_motor_rpm_lim": 20000.0
     }, 
     "use_vectornav": false,
     "use_fake_vn": true,
