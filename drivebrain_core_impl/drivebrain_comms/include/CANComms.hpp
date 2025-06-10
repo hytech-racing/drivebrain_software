@@ -137,5 +137,8 @@ namespace comms
         int _CAN_socket; // can socket bound to
         bool _running = false;
         std::shared_ptr<core::StateEstimator> _state_estimator;
+        size_t _recv_process_count = 0;
+        const size_t _recv_process_log_interval = 1000;
+        long _recv_process_max_duration_us = 0;           // Microseconds
     };
 }

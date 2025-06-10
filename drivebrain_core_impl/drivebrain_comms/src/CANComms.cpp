@@ -120,7 +120,23 @@ void comms::CANDriver::_handle_recv_CAN_frame(const struct can_frame &frame) {
     if (msg) {
         if(_state_estimator)
         {
+            auto start_time = std::chrono::steady_clock::now();
+
             _state_estimator->handle_recv_process(msg);
+
+            auto end_time = std::chrono::steady_clock::now();
+            auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+            // Track maximum duration
+            if (duration_us > _recv_process_max_duration_us)
+            {
+                _recv_process_max_duration_us = duration_us;
+            }
+
+            if (++_recv_process_count % _recv_process_log_interval == 0)
+            {
+                spdlog::info("this CANDriver's handle_recv_process took {} us", duration_us);
+                spdlog::info("handle_recv_process WORST duration in last 1000 calls: {} us", _recv_process_max_duration_us);
+            }
         }
         
         this->log(msg);

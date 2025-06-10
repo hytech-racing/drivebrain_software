@@ -309,25 +309,18 @@ std::pair<core::VehicleState, bool> StateEstimator::get_latest_state_and_validit
     auto elapsed =
         std::chrono::duration_cast<std::chrono::microseconds>(state_estim_end - state_estim_start);
 
-    constexpr bool debug = false;
-    if ((elapsed > std::chrono::microseconds(6000)) && debug) // 6ms
+    constexpr bool debug = true;
+    if ((elapsed > std::chrono::microseconds(4000)) && debug) // 4ms
     {
-        std::cout << "WARNING: timing" << std::endl;
-        std::cout << "total: "
-                  << (static_cast<float>(
-                         std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count()))
-                  << " us\n";
-        std::cout << "state mutex: "
-                  << (static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(
-                                             state_mutex_end - state_mutex_start)
-                                             .count()))
-                  << " us\n";
-        std::cout << "log time: "
-                  << (static_cast<float>(
-                         std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start)
-                             .count()))
-                  << " us\n";
-    }
+        auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+        auto state_mutex_us = std::chrono::duration_cast<std::chrono::microseconds>(state_mutex_end - state_mutex_start).count();
+        auto log_time_us = std::chrono::duration_cast<std::chrono::microseconds>(log_end - log_start).count();
+
+        spdlog::warn("WARNING: timing");
+        spdlog::warn("total: {} us", total_us);
+        spdlog::warn("state mutex: {} us", state_mutex_us);
+        spdlog::warn("log time: {} us", log_time_us);
+    } 
 
     return {current_state, state_is_valid};
 }
