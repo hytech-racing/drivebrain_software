@@ -55,11 +55,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1748639958,
-        "narHash": "sha256-qRfdJxKy/O1L2pkGX3Xe78m+K/pLNBQFk6s5HvK6YVI=",
+        "lastModified": 1749617325,
+        "narHash": "sha256-ccwgioLZGw4nFrlleC+q+bCHKO9YZBdExRPvrcgG6ek=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "a3faebc4b772dd26314697d43f4409bf4f5c3e1d",
+        "rev": "7ac98d6a4b4d17e2c0ded4051b5aedb58fcdecb3",
         "type": "github"
       },
       "original": {
@@ -71,14 +71,14 @@
     "db-simulink-gen-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1749202877,
-        "narHash": "sha256-qDi85WEtUvEKOu6obN+RPagp9sV/EWlsu9MWJEGHGz0=",
+        "lastModified": 1749619821,
+        "narHash": "sha256-XT04hxSvIrIaGLRs8F//x/drQczET34rF7wtkSo/1BE=",
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-rel3/gen_rel.tar.gz"
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/rel4/gen_rel.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/test-rel3/gen_rel.tar.gz"
+        "url": "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/rel4/gen_rel.tar.gz"
       }
     },
     "dbcppp-src": {

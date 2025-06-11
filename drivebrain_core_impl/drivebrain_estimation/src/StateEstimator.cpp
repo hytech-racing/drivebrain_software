@@ -35,6 +35,14 @@ void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Mes
         _handle_set_inverter_dynamics<2, hytech::inv3_dynamics>(msg);
     } else if (name == "hytech.inv4_dynamics") {
         _handle_set_inverter_dynamics<3, hytech::inv4_dynamics>(msg);
+    } else if (name == "hytech.inv1_temps") {
+        _handle_set_inverter_temps<0, hytech::inv1_temps>(msg);
+    } else if (name == "hytech.inv2_temps") {
+        _handle_set_inverter_temps<1, hytech::inv2_temps>(msg);
+    } else if (name == "hytech.inv3_temps") {
+        _handle_set_inverter_temps<2, hytech::inv3_temps>(msg);
+    } else if (name == "hytech.inv4_temps") {
+        _handle_set_inverter_temps<3, hytech::inv4_temps>(msg);
     }
 }
 
@@ -149,6 +157,21 @@ void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::proto
     }
 }
 
+template <size_t ind, typename inverter_temps_msg>
+void StateEstimator::_handle_set_inverter_temps(std::shared_ptr<google::protobuf::Message> msg) {
+    
+    
+    auto in_msg = std::static_pointer_cast<inverter_temps_msg>(msg);
+    core::DrivetrainData dt_data = {};
+    dt_data.inverter_igbt_temps_c.set_from_index<ind>(in_msg->igbt_temp());
+    dt_data.inverter_temps_c.set_from_index<ind>(in_msg->inverter_temp());
+    dt_data.inverter_motor_temps_c.set_from_index<ind>(in_msg->motor_temp());
+    {
+        std::unique_lock lk(_state_mutex);
+        _vehicle_state.dt_data = dt_data;
+    }
+}
+
 // TODO parameterize the timeout threshold
 template <size_t arr_len>
 bool StateEstimator::_validate_stamps(
@@ -158,6 +181,8 @@ bool StateEstimator::_validate_stamps(
         std::unique_lock lk(_state_mutex);
         timestamp_array_to_sort = timestamp_arr;
     }
+
+    auto debug_copy = timestamp_array_to_sort;
     const std::chrono::microseconds threshold(30000); // 30 milliseconds in microseconds
 
     // Sort the array
@@ -171,10 +196,48 @@ bool StateEstimator::_validate_stamps(
 
     auto curr_time = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::high_resolution_clock::now().time_since_epoch());
+
+    constexpr std::chrono::seconds debug_print_period(1);
+    
     bool all_members_received = min_stamp.count() > 0; // count here is the count in microseconds
     bool last_update_recent_enough =
         (std::chrono::duration_cast<std::chrono::microseconds>(curr_time - max_stamp)) < threshold;
 
+    if(std::chrono::duration_cast<std::chrono::microseconds>(curr_time - max_stamp) < _debug_maxtime_diff || (_debug_maxtime_diff.count() < 0))
+    {
+        _debug_maxtime_diff = std::chrono::duration_cast<std::chrono::microseconds>(curr_time - max_stamp);
+    }
+    if(std::chrono::duration_cast<std::chrono::microseconds>(max_stamp - min_stamp) < _debug_maxjitter_diff || (_debug_maxjitter_diff.count() < 0))
+    {
+        _debug_maxjitter_diff = std::chrono::duration_cast<std::chrono::microseconds>(max_stamp - min_stamp);
+    }
+
+    if((curr_time - _last_debug_veh_state_print) > debug_print_period)
+    {
+        _last_debug_veh_state_print = std::chrono::duration_cast<std::chrono::seconds>(curr_time);
+        spdlog::info("_debug_maxtime_diff: {}", _debug_maxtime_diff.count());
+        spdlog::info("_debug_maxjitter_diff: {}", _debug_maxjitter_diff.count());
+    }
+
+    if(!within_threshold)
+    {
+        spdlog::warn("data not recvd within time window theshold: {}", (max_stamp - min_stamp).count());
+    } else if(!all_members_received)
+    {
+        spdlog::warn("not all data recvd yet for state to be valid");
+    } else if(!last_update_recent_enough)
+    {
+        spdlog::warn("max timestamp message has been been recvd in time window {}", (curr_time - max_stamp).count());
+    }
+    
+
+    if(!(within_threshold && all_members_received && last_update_recent_enough))
+    {
+        spdlog::info("vcr suspension val: {}", debug_copy[0].count());
+        spdlog::info("vcf suspension val: {}", debug_copy[1].count());
+        spdlog::info("vcf pedals val: {}", debug_copy[2].count());
+        spdlog::info("steering data val: {}", debug_copy[3].count());
+    }
     return within_threshold && all_members_received && last_update_recent_enough;
 }
 

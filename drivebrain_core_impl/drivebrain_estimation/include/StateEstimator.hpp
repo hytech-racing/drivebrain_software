@@ -114,6 +114,9 @@ namespace core
         template <size_t ind, typename inverter_dynamics_msg>
         void _handle_set_inverter_dynamics(std::shared_ptr<google::protobuf::Message> msg);
 
+        template <size_t ind, typename inverter_temps_msg>
+        void _handle_set_inverter_temps(std::shared_ptr<google::protobuf::Message> msg);
+
         std::shared_ptr<hytech_msgs::VehicleData> _set_ins_state_data(core::VehicleState current_state, std::shared_ptr<hytech_msgs::VehicleData> msg_out);
 
         template <size_t arr_len>
@@ -128,8 +131,12 @@ namespace core
         core::VehicleState _vehicle_state;
         core::RawInputData _raw_input_data;
         std::array<std::chrono::microseconds, 4> _timestamp_array;
+        
         std::shared_ptr<loggertype> _message_logger;
 
+        std::chrono::seconds _last_debug_veh_state_print;
+        std::chrono::microseconds _debug_maxtime_diff{-1};
+        std::chrono::microseconds _debug_maxjitter_diff{-1};
     };
 }
 
