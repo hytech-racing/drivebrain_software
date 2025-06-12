@@ -82,6 +82,12 @@ void StateEstimator::handle_recv_process(std::shared_ptr<google::protobuf::Messa
             std::unique_lock lk(_state_mutex);
             _vehicle_state.is_ready_to_drive = is_rtd;
         }
+    } else if (message->GetTypeName() == "hytech_msgs.ACUAllData") {
+        auto in_msg = std::static_pointer_cast<hytech_msgs::ACUAllData>(message);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.acc_data.min_cell_voltage = in_msg->core_data().min_cell_voltage();
+        }
     }
     else {
         _recv_low_level_state(message);
