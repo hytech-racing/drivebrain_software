@@ -183,7 +183,7 @@ bool StateEstimator::_validate_stamps(
     }
 
     auto debug_copy = timestamp_array_to_sort;
-    const std::chrono::microseconds threshold(30000); // 30 milliseconds in microseconds
+    const std::chrono::microseconds threshold(500000); // 500 milliseconds in microseconds
 
     // Sort the array
     std::sort(timestamp_array_to_sort.begin(), timestamp_array_to_sort.end());
