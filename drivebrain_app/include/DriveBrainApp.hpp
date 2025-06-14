@@ -119,4 +119,7 @@ private:
     std::thread _scale_usb_io_context_thread;
     const DriveBrainSettings _settings;
 
+    std::chrono::steady_clock::time_point _last_send_time = std::chrono::steady_clock::now();
+    const std::chrono::seconds _send_period{1}; // 1 Hz
+
 };

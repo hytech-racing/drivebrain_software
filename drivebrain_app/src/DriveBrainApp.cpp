@@ -253,6 +253,23 @@ void DriveBrainApp::_process_loop() {
         _estim_manager->evaluate_all_estimators(state_and_validity.first);
         auto out_struct = _controllerManager.step_active_controller(state_and_validity.first);
 
+        auto now = std::chrono::steady_clock::now();
+
+        if (now - _last_send_time >= _send_period) {
+            _last_send_time = now;
+
+            auto drivebrain_state_data_msg = std::make_shared<hytech::drivebrain_state_data>();
+            hytech::vn_gps_status status = static_cast<hytech::vn_gps_status>(state_and_validity.first.ins_status.status_mode);
+            drivebrain_state_data_msg->set_vn_gps_status(status);
+            
+            {
+                std::unique_lock lk(_primary_can_tx_queue.mtx);
+                _primary_can_tx_queue.deque.push_back(drivebrain_state_data_msg);
+                _primary_can_tx_queue.cv.notify_all();
+            }
+        }
+        // state_and_validity.first.ins_status.status_mode
+
         // get current command
         std::variant<core::SpeedControlOut, core::TorqueControlOut, std::monostate> cmd_out = out_struct.out;
 
@@ -282,11 +299,6 @@ void DriveBrainApp::_process_loop() {
                 torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
                 torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
             
-                if(_message_logger)
-                {
-                    _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(torque_limit_msg));
-                }
-                
                 {
                     std::unique_lock lk(_primary_can_tx_queue.mtx);
                     _primary_can_tx_queue.deque.push_back(desired_rpm_msg);
@@ -303,10 +315,6 @@ void DriveBrainApp::_process_loop() {
                 desired_torque_msg->set_drivebrain_torque_rl(torqueControl->desired_torques_nm.RL);
                 desired_torque_msg->set_drivebrain_torque_rr(torqueControl->desired_torques_nm.RR);
                 
-                if(_message_logger)
-                {
-                    _message_logger->log_msg(static_cast<std::shared_ptr<google::protobuf::Message>>(desired_torque_msg));
-                }
                 
                 {
                     std::unique_lock lk(_primary_can_tx_queue.mtx);
