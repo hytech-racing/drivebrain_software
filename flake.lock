@@ -55,11 +55,11 @@
     "db-core-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1749737491,
-        "narHash": "sha256-RXqEbUEr5+Oe75hfA+BXYvw++2Nog1wbO86qdn9dEu8=",
+        "lastModified": 1749880473,
+        "narHash": "sha256-OCbbt3Mt7E96bqQ/uyg3yno79ooLr6vXo+bkD9Z+us8=",
         "owner": "hytech-racing",
         "repo": "drivebrain_core",
-        "rev": "8d16f458f7a730c92940dea0552fffc1ef02890e",
+        "rev": "40f2c209639924b9ecee2bcf3492564d49479939",
         "type": "github"
       },
       "original": {

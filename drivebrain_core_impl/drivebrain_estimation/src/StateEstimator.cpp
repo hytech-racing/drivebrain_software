@@ -43,6 +43,14 @@ void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Mes
         _handle_set_inverter_temps<2, hytech::inv3_temps>(msg);
     } else if (name == "hytech.inv4_temps") {
         _handle_set_inverter_temps<3, hytech::inv4_temps>(msg);
+    } else if(name == "hytech.inv1_status") {
+        
+        auto in_msg = std::static_pointer_cast<hytech::inv1_status>(msg);
+        auto voltage = in_msg->dc_bus_voltage();
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.acc_data.pack_voltage = static_cast<float>(voltage);
+        }
     }
 }
 
