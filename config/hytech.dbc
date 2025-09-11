@@ -36,12 +36,6 @@ BS_:
 BU_: 
 
 
-BO_ 1220 IZZE_IR_TEMPS: 8 Peripherals
- SG_ izze_brake_IR_temp_4 : 55|16@0+ (1,0) [0|0] "" Vector__XXX
- SG_ izze_brake_IR_temp_3 : 39|16@0+ (1,0) [0|0] "" Vector__XXX
- SG_ izze_brake_IR_temp_2 : 23|16@0+ (1,0) [0|0] "" Vector__XXX
- SG_ izze_brake_IR_temp_1 : 7|16@0+ (1,0) [0|0] "" Vector__XXX
-
 BO_ 1025 ACU_SHUNT_MEASUREMENTS: 6 ECU
  SG_ ts_out_filtered_read : 32|16@1+ (0.169047463702246,0) [0|0] "volts" Vector__XXX
  SG_ pack_filtered_read : 16|16@1+ (0.16869351172632,0) [0|0] "volts" Vector__XXX
@@ -51,69 +45,6 @@ BO_ 5 Attitude: 6 ECU
  SG_ Roll_angle : 32|9@1- (0.25,0) [0|0] "deg" Vector__XXX
  SG_ Pitch_angle : 16|9@1- (0.25,0) [0|0] "deg" Vector__XXX
  SG_ Height : 0|12@1- (0.035,0) [0|71.645] "cm" Vector__XXX
-
-BO_ 222 BMS_BALANCING_STATUS: 8 ECU
- SG_ cell_60_balancing_status : 63|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_59_balancing_status : 62|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_58_balancing_status : 61|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_57_balancing_status : 60|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_56_balancing_status : 59|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_55_balancing_status : 58|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_54_balancing_status : 57|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_53_balancing_status : 56|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_52_balancing_status : 55|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_51_balancing_status : 54|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_50_balancing_status : 53|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_49_balancing_status : 52|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_48_balancing_status : 51|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_47_balancing_status : 50|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_46_balancing_status : 49|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_45_balancing_status : 48|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_44_balancing_status : 47|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_43_balancing_status : 46|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_42_balancing_status : 45|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_41_balancing_status : 44|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_40_balancing_status : 43|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_39_balancing_status : 42|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_38_balancing_status : 41|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_37_balancing_status : 40|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_36_balancing_status : 39|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_35_balancing_status : 38|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_34_balancing_status : 37|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_33_balancing_status : 36|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_32_balancing_status : 35|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_31_balancing_status : 34|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_30_balancing_status : 33|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_29_balancing_status : 32|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_28_balancing_status : 31|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_27_balancing_status : 30|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_26_balancing_status : 29|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_25_balancing_status : 28|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_24_balancing_status : 27|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_23_balancing_status : 26|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_22_balancing_status : 25|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_21_balancing_status : 24|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_20_balancing_status : 23|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_19_balancing_status : 22|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_18_balancing_status : 21|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_17_balancing_status : 20|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_16_balancing_status : 19|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_15_balancing_status : 18|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_14_balancing_status : 17|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_13_balancing_status : 16|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_12_balancing_status : 15|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_11_balancing_status : 14|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_10_balancing_status : 13|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_9_balancing_status : 12|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_8_balancing_status : 11|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_7_balancing_status : 10|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_6_balancing_status : 9|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_5_balancing_status : 8|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_4_balancing_status : 7|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_3_balancing_status : 6|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_2_balancing_status : 5|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ cell_1_balancing_status : 4|1@1+ (1,0) [0|0] "" Vector__XXX
- SG_ group_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 226 BMS_COULOMB_COUNTS: 8 ECU
  SG_ total_discharge : 32|32@1+ (0.0001,0) [0|0] "Coulombs" Vector__XXX
@@ -139,9 +70,9 @@ BO_ 214 BMS_ONBOARD_DETAILED_TEMPS: 5 ECU
  SG_ ic_id : 0|4@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 213 BMS_ONBOARD_TEMPS: 6 ECU
- SG_ high_temp : 32|16@1- (0.01,0) [0|0] "deg C" Vector__XXX
- SG_ low_temp : 16|16@1- (0.01,0) [0|0] "" Vector__XXX
- SG_ average_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ high_cell_temp : 32|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ low_cell_temp : 16|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ max_board_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
 
 BO_ 219 BMS_STATUS: 6 ECU
  SG_ shutdown_h_above_threshold_error : 41|1@1+ (1,0) [0|0] "" Vector__XXX
@@ -159,9 +90,9 @@ BO_ 219 BMS_STATUS: 6 ECU
  SG_ state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 217 BMS_TEMPS: 6 ECU
- SG_ high_temp : 32|16@1- (0.01,0) [0|0] "deg C" Vector__XXX
- SG_ low_temp : 16|16@1- (0.01,0) [0|0] "" Vector__XXX
- SG_ average_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ high_cell_temp : 32|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ low_cell_temp : 16|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
+ SG_ max_board_temp : 0|16@1- (0.01,0) [0|0] "Deg C" Vector__XXX
 
 BO_ 215 BMS_VOLTAGES: 8 ECU
  SG_ total_voltage : 48|16@1+ (0.01,0) [0|0] "" Vector__XXX
@@ -1106,7 +1037,7 @@ BO_ 210 VN_LINEAR_ACCEL_UNCOMP: 8 ECU
  SG_ vn_lin_uncomp_accel_x : 0|16@1- (0.001,0) [0|0] "m/s^2" Vector__XXX
 
 BO_ 225 VN_STATUS: 8 ECU
- SG_ vn_gps_status : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ vn_gps_status : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 208 VN_VEL: 8 ECU
  SG_ vn_vel_uncertainty : 48|16@1+ (0.0005,0) [0|0] "m/s" Vector__XXX
@@ -1127,15 +1058,167 @@ BO_ 4 Velocities: 8 ECU
  SG_ Velocity_y : 12|10@1- (0.03,0) [0|0] "m/s" Vector__XXX
  SG_ Velocity_x : 0|12@1- (0.02,0) [0|0] "m/s" Vector__XXX
 
-BO_ 0 brake_temps: 8 ECU
-
 BO_ 1280 ACU_OK: 1 ECU
+ SG_ latch_ok : 2|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ imd_ok : 1|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ bms_ok : 0|1@1+ (1,0) [0|1] "" Vector__XXX
 
+BO_ 553 DRIVEBRAIN_STATE_DATA: 1 ECU
+ SG_ vn_gps_status : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 519 CAR_STATES: 3 ECU
+ SG_ drivebrain_in_control : 16|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ drivetrain_state : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ vehicle_state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1220 FL_BRAKE_ROTOR_TEMP_CH1_CH4: 8 ECU
+ SG_ brake_temp_channel_4 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_3 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_2 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_1 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1221 FL_BRAKE_ROTOR_TEMP_CH5_CH8: 8 ECU
+ SG_ brake_temp_channel_8 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_7 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_6 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_5 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1222 FL_BRAKE_ROTOR_TEMP_CH9_CH12: 8 ECU
+ SG_ brake_temp_channel_12 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_11 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_10 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_9 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1224 FL_BRAKE_ROTOR_SENSOR_TEMP: 8 ECU
+ SG_ brake_rotor_sensor_temp : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1223 FL_BRAKE_ROTOR_TEMP_CH13_CH16: 8 ECU
+ SG_ brake_temp_channel_16 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_15 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_14 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_13 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1225 FR_BRAKE_ROTOR_TEMP_CH1_CH4: 8 ECU
+ SG_ brake_temp_channel_4 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_3 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_2 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_1 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1226 FR_BRAKE_ROTOR_TEMP_CH5_CH8: 8 ECU
+ SG_ brake_temp_channel_8 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_7 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_6 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_5 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1227 FR_BRAKE_ROTOR_TEMP_CH9_CH12: 8 ECU
+ SG_ brake_temp_channel_12 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_11 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_10 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_9 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1229 FR_BRAKE_ROTOR_SENSOR_TEMP: 8 ECU
+ SG_ brake_rotor_sensor_temp : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1228 FR_BRAKE_ROTOR_TEMP_CH13_CH16: 8 ECU
+ SG_ brake_temp_channel_16 : 55|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_15 : 39|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_14 : 23|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+ SG_ brake_temp_channel_13 : 7|16@0+ (0.1,-100) [0|0] "deg C" Vector__XXX
+
+BO_ 1219 BRAKE_ROTOR_SENSOR_COMMAND: 8 ECU
+ SG_ brake_temp_sensor_can_bitrate : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_temp_sensor_ch_setting : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_temp_sensor_sampling_freq : 47|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_temp_sensor_emissivity : 39|8@0+ (0.01,0) [0|0] "" Vector__XXX
+ SG_ brake_temp_sensor_base_can_id : 23|16@0+ (1,0) [1|2047] "" Vector__XXX
+ SG_ brake_temp_sensor_prog_const : 7|16@0+ (1,0) [30000|30000] "" Vector__XXX
+
+BO_ 1552 AERO_PRESSURE_SENSOR_11: 8 ECU
+ SG_ aero_channel_3 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_2 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_1 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_0 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 1584 AERO_PRESSURE_SENSOR_31: 8 ECU
+ SG_ aero_channel_3 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_2 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_1 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_0 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 1600 AERO_PRESSURE_SENSOR_41: 8 ECU
+ SG_ aero_channel_3 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_2 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_1 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_0 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 1568 AERO_PRESSURE_SENSOR_21: 8 ECU
+ SG_ aero_channel_3 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_2 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_1 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_0 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 784 AERO_PRESSURE_SENSOR_12: 8 ECU
+ SG_ aero_channel_7 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_6 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_5 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_4 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 800 AERO_PRESSURE_SENSOR_22: 8 ECU
+ SG_ aero_channel_7 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_6 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_5 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_4 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 816 AERO_PRESSURE_SENSOR_32: 8 ECU
+ SG_ aero_channel_7 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_6 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_5 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_4 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 832 AERO_PRESSURE_SENSOR_42: 8 ECU
+ SG_ aero_channel_7 : 55|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_6 : 39|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_5 : 23|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+ SG_ aero_channel_4 : 7|16@0+ (0.14285714285,-53000) [0|0] "uBar" Vector__XXX
+
+BO_ 310 INV1_OVERLOAD: 8 ECU
+ SG_ motor_overload_percentage : 16|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ inverter_overload_percentage : 0|16@1+ (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 320 INV2_OVERLOAD: 4 ECU
+ SG_ motor_overload_percentage : 16|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ inverter_overload_percentage : 0|16@1+ (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 330 INV3_OVERLOAD: 4 ECU
+ SG_ motor_overload_percentage : 16|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ inverter_overload_percentage : 0|16@1+ (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 340 INV4_OVERLOAD: 4 ECU
+ SG_ motor_overload_percentage : 16|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ inverter_overload_percentage : 0|16@1+ (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 269 ENERGY_METER_MEAS: 8 ECU
+ SG_ voltage_V : 39|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ current_A : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1037 ENERGY_METER_STATUS: 8 ECU
+ SG_ em_energy_w_hr : 15|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ em_logging : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ em_violation : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+
+BO_ 1549 ENERGY_METER_TEMP: 8 ECU
+ SG_ em_temp_4 : 63|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_temp_3 : 55|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_temp_2 : 47|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_temp_1 : 39|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_temp_0 : 31|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_max_temp : 23|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_min_temp : 15|8@0+ (0.5,0) [0|0] "" Vector__XXX
+ SG_ em_temp_sig_index : 2|3@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ em_num_sensors : 7|5@0+ (1,0) [0|0] "" Vector__XXX
+
 BO_TX_BU_ 1025 : ECU,Peripherals;
 BO_TX_BU_ 5 : ECU,Peripherals;
-BO_TX_BU_ 222 : ECU,Peripherals;
 BO_TX_BU_ 226 : ECU,Peripherals;
 BO_TX_BU_ 218 : ECU,Peripherals;
 BO_TX_BU_ 216 : ECU,Peripherals;
@@ -1292,8 +1375,35 @@ BO_TX_BU_ 225 : ECU,Peripherals;
 BO_TX_BU_ 208 : ECU,Peripherals;
 BO_TX_BU_ 211 : ECU,Peripherals;
 BO_TX_BU_ 4 : ECU,Peripherals;
-BO_TX_BU_ 0 : ECU,Peripherals;
 BO_TX_BU_ 1280 : ECU,Peripherals;
+BO_TX_BU_ 553 : ECU,Peripherals;
+BO_TX_BU_ 519 : ECU,Peripherals;
+BO_TX_BU_ 1220 : ECU,Peripherals;
+BO_TX_BU_ 1221 : ECU,Peripherals;
+BO_TX_BU_ 1222 : ECU,Peripherals;
+BO_TX_BU_ 1224 : ECU,Peripherals;
+BO_TX_BU_ 1223 : ECU,Peripherals;
+BO_TX_BU_ 1225 : ECU,Peripherals;
+BO_TX_BU_ 1226 : ECU,Peripherals;
+BO_TX_BU_ 1227 : ECU,Peripherals;
+BO_TX_BU_ 1229 : ECU,Peripherals;
+BO_TX_BU_ 1228 : ECU,Peripherals;
+BO_TX_BU_ 1219 : ECU,Peripherals;
+BO_TX_BU_ 1552 : ECU,Peripherals;
+BO_TX_BU_ 1584 : ECU,Peripherals;
+BO_TX_BU_ 1600 : ECU,Peripherals;
+BO_TX_BU_ 1568 : ECU,Peripherals;
+BO_TX_BU_ 784 : ECU,Peripherals;
+BO_TX_BU_ 800 : ECU,Peripherals;
+BO_TX_BU_ 816 : ECU,Peripherals;
+BO_TX_BU_ 832 : ECU,Peripherals;
+BO_TX_BU_ 310 : ECU,Peripherals;
+BO_TX_BU_ 320 : ECU,Peripherals;
+BO_TX_BU_ 330 : ECU,Peripherals;
+BO_TX_BU_ 340 : ECU,Peripherals;
+BO_TX_BU_ 269 : ECU,Peripherals;
+BO_TX_BU_ 1037 : ECU,Peripherals;
+BO_TX_BU_ 1549 : ECU,Peripherals;
 
 
 CM_ SG_ 1025 ts_out_filtered_read "Voltage across tractive system";
@@ -1419,6 +1529,54 @@ CM_ SG_ 4 Velocity_x_CGCorrected "ISO Standard Sign, Positive is Vehicle Moving 
 CM_ SG_ 4 Velocity_z "ISO Standard Sign, Positive is Vehicle Moving Up";
 CM_ SG_ 4 Velocity_y "ISO Standard Sign, Positive is Vehicle Turning Left";
 CM_ SG_ 4 Velocity_x "ISO Standard Sign, Positive is Vehicle Moving Forward";
+CM_ SG_ 553 vn_gps_status "GPS fix status";
+CM_ SG_ 1220 brake_temp_channel_4 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1220 brake_temp_channel_3 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1220 brake_temp_channel_2 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1220 brake_temp_channel_1 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1221 brake_temp_channel_8 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1221 brake_temp_channel_7 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1221 brake_temp_channel_6 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1221 brake_temp_channel_5 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1222 brake_temp_channel_12 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1222 brake_temp_channel_11 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1222 brake_temp_channel_10 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1222 brake_temp_channel_9 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1224 brake_rotor_sensor_temp "temperature internal to the sensor degrees C";
+CM_ SG_ 1223 brake_temp_channel_16 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1223 brake_temp_channel_15 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1223 brake_temp_channel_14 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1223 brake_temp_channel_13 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1225 brake_temp_channel_4 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1225 brake_temp_channel_3 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1225 brake_temp_channel_2 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1225 brake_temp_channel_1 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1226 brake_temp_channel_8 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1226 brake_temp_channel_7 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1226 brake_temp_channel_6 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1226 brake_temp_channel_5 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1227 brake_temp_channel_12 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1227 brake_temp_channel_11 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1227 brake_temp_channel_10 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1227 brake_temp_channel_9 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1229 brake_rotor_sensor_temp "temperature internal to the sensor degrees C";
+CM_ SG_ 1228 brake_temp_channel_16 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1228 brake_temp_channel_15 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1228 brake_temp_channel_14 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1228 brake_temp_channel_13 "brake rotor temp sensor channel reading in degrees C";
+CM_ SG_ 1219 brake_temp_sensor_can_bitrate "bitrate setting for CAN on the brake temp sensor. 1 = 1M, 2 = 500k, 3 = 250k, 4 = 100k";
+CM_ SG_ 1219 brake_temp_sensor_ch_setting "40 = 4 Channels, 80 = 8 channels, 160 = 16 channels";
+CM_ SG_ 1219 brake_temp_sensor_sampling_freq "1 = 1 hz, 2 = 2hz, 3 = 4hz, 4 = 8 hz, 5=16 hz, 6=32 hz, 7 = 64hz, 8 = 100hz";
+CM_ SG_ 1219 brake_temp_sensor_emissivity "emissivity of the material (0 to 1)";
+CM_ SG_ 1219 brake_temp_sensor_prog_const "programming constant, should be set to 30000";
+CM_ SG_ 310 motor_overload_percentage "the current overload of the motor according to the i2t calc";
+CM_ SG_ 310 inverter_overload_percentage "the current overload of the inverter according to the i2t calc";
+CM_ SG_ 320 motor_overload_percentage "the current overload of the motor according to the i2t calc";
+CM_ SG_ 320 inverter_overload_percentage "the current overload of the inverter according to the i2t calc";
+CM_ SG_ 330 motor_overload_percentage "the current overload of the motor according to the i2t calc";
+CM_ SG_ 330 inverter_overload_percentage "the current overload of the inverter according to the i2t calc";
+CM_ SG_ 340 motor_overload_percentage "the current overload of the motor according to the i2t calc";
+CM_ SG_ 340 inverter_overload_percentage "the current overload of the inverter according to the i2t calc";
 
 
 
@@ -1430,7 +1588,6 @@ VAL_ 6 Attitude_Filtering 0 "NO_FILTERING_ATT" 1 "LIGHT_FILTERING_ATT" 2 "MEDIUM
 VAL_ 235 dial_state 0 "MODE_0" 1 "MODE_1" 2 "MODE_2" 3 "MODE_3" 4 "MODE_4" 5 "MODE_5" ;
 VAL_ 236 dial_state 0 "MODE_0" 1 "MODE_1" 2 "MODE_2" 3 "MODE_3" 4 "MODE_4" 5 "MODE_5" ;
 VAL_ 257 torque_controller_mux_status 0 "NO_ERROR" 1 "ERROR_SPEED_DIFF_TOO_HIGH" 2 "ERROR_TORQUE_DIFF_TOO_HIGH" 3 "ERROR_CONTROLLER_INDEX_OUT_OF_BOUNDS" 4 "ERROR_CONTROLLER_NULL_POINTER" ;
-VAL_ 195 ecu_state 0 "STARTUP" 1 "TRACTIVE_SYSTEM_NOT_ACTIVE" 2 "TRACTIVE_SYSTEM_ACTIVE" 3 "ENABLING_INVERTER" 4 "WAITING_READY_TO_DRIVE_SOUND" 5 "READY_TO_DRIVE" ;
 VAL_ 3 Velocity_Filtering 0 "NO_FILTERING_VEL" 1 "LIGHT_FILTERING_VEL" 2 "MEDIUM_FILTERING_VEL" 3 "HEAVY_FILTERING_VEL" ;
 VAL_ 3 IMU_Filtering 0 "NO_FILTERING_IMU" 1 "LIGHT_FILTERING_IMU" 2 "MEDIUM_FILTERING_IMU" 3 "HEAVY_FILTERING_IMU" ;
 VAL_ 3 Attitude_Filtering 0 "NO_FILTERING_ATT" 1 "LIGHT_FILTERING_ATT" 2 "MEDIUM_FILTERING_ATT" 3 "HEAVY_FILTERING_ATT" ;
@@ -1443,6 +1600,12 @@ VAL_ 2 sensor_2_Validity 0 "Sensor_Valid_sense_2" 1 "Response_Timeout_sense_2" 2
 VAL_ 2 sensor_1_Validity 0 "Sensor_Valid_sense_1" 1 "Response_Timeout_sense_1" 2 "Bad_Optical_Signal_sense_1" 3 "Speed_Too_High_sense_1" ;
 VAL_ 2 sensor_0_Validity 0 "Sensor_Valid_sense_0" 1 "Response_Timeout_sense_0" 2 "Bad_Optical_Signal_sense_0" 3 "Speed_Too_High_sense_0" ;
 VAL_ 225 vn_gps_status 0 "NO_FIX" 1 "TIME_ONLY" 2 "FIX_2D" 3 "FIX_3D" ;
+VAL_ 553 vn_gps_status 0 "NO_FIX" 1 "TIME_ONLY" 2 "FIX_2D" 3 "FIX_3D" ;
+VAL_ 519 drivetrain_state 0 "NOT_CONNECTED" 1 "NOT_ENABLED_NO_HV_PRESENT" 2 "NOT_ENABLED_HV_PRESENT" 3 "INVERTERS_READY" 4 "INVERTERS_HV_ENABLED" 5 "ENABLED_DRIVE_MODE" 6 "ERROR" 7 "CLEARING_ERRORS" ;
+VAL_ 519 vehicle_state 0 "TRACTIVE_SYSTEM_NOT_ACTIVE" 1 "TRACTIVE_SYSTEM_ACTIVE" 2 "WANTING_READY_TO_DRIVE" 3 "READY_TO_DRIVE" 4 "WANTING_RECALIBRATE_PEDALS" 5 "RECALIBRATING_PEDALS" ;
 SIG_VALTYPE_ 1055 steering_digital_raw : 1;
+SIG_VALTYPE_ 269 current_A : 1;
+SIG_VALTYPE_ 269 voltage_V : 1;
+SIG_VALTYPE_ 1037 em_energy_w_hr : 1;
 
 
