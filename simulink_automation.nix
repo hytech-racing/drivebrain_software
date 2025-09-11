@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation {
     name = "matlab-math";
-    src = "${db-simulink-gen-src}/source_code";
+    src = "${db-simulink-gen-src}/matlab_math.tar.gz";
     version = "1.0.0";
     nativeBuildInputs = [ cmake ];
     propagatedBuildInputs = [ drivebrain_core simulink_automation_msgs_proto_cpp];
