@@ -35,7 +35,7 @@
     };
 
     db-simulink-gen-src = {
-      url = "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/rel13/gen_rel.tar";
+      url = "https://github.com/hytech-racing/drivebrain_simulink_models/releases/download/rel14/gen_rel.tar";
       flake = false;
     };
   };
