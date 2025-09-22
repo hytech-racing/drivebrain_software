@@ -44,13 +44,29 @@ void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Mes
     } else if (name == "hytech.inv4_temps") {
         _handle_set_inverter_temps<3, hytech::inv4_temps>(msg);
     } else if (name == "hytech.inv1_overload") {
-        _vehicle_state.motor_overload_percentages.FL = in_msg->motor_overload_percentage();
+        auto in_msg = std::static_pointer_cast<hytech::inv1_overload>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.motor_overload_percentages.FL = in_msg->motor_overload_percentage();
+        }
     } else if (name == "hytech.inv2_overload") {
-        _vehicle_state.motor_overload_percentages.FR = in_msg->motor_overload_percentage();
+        auto in_msg = std::static_pointer_cast<hytech::inv2_overload>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.motor_overload_percentages.FR = in_msg->motor_overload_percentage();
+        }
     } else if (name == "hytech.inv3_overload") {
-        _vehicle_state.motor_overload_percentages.RL = in_msg->motor_overload_percentage();
+        auto in_msg = std::static_pointer_cast<hytech::inv3_overload>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.motor_overload_percentages.RL = in_msg->motor_overload_percentage();
+        }
     } else if (name == "hytech.inv4_overload") {
-        _vehicle_state.motor_overload_percentages.RR = in_msg->motor_overload_percentage();
+        auto in_msg = std::static_pointer_cast<hytech::inv4_overload>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.motor_overload_percentages.RR = in_msg->motor_overload_percentage();
+        }
     } else if(name == "hytech.inv1_status") {
         
         auto in_msg = std::static_pointer_cast<hytech::inv1_status>(msg);
