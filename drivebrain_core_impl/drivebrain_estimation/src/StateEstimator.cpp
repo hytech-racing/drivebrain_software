@@ -43,6 +43,14 @@ void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Mes
         _handle_set_inverter_temps<2, hytech::inv3_temps>(msg);
     } else if (name == "hytech.inv4_temps") {
         _handle_set_inverter_temps<3, hytech::inv4_temps>(msg);
+    } else if (name == "hytech.inv1_overload") {
+        _vehicle_state.motor_overload_percentages.FL = in_msg->motor_overload_percentage();
+    } else if (name == "hytech.inv2_overload") {
+        _vehicle_state.motor_overload_percentages.FR = in_msg->motor_overload_percentage();
+    } else if (name == "hytech.inv3_overload") {
+        _vehicle_state.motor_overload_percentages.RL = in_msg->motor_overload_percentage();
+    } else if (name == "hytech.inv4_overload") {
+        _vehicle_state.motor_overload_percentages.RR = in_msg->motor_overload_percentage();
     } else if(name == "hytech.inv1_status") {
         
         auto in_msg = std::static_pointer_cast<hytech::inv1_status>(msg);
@@ -260,18 +268,10 @@ core::VehicleState
 StateEstimator::append_state_variables_from_raw_inputs(core::VehicleState vs,
                                                        core::RawInputData raw_data) {
     auto vehicle_state = vs;
-    vehicle_state.suspension_potentiometers_mm.FL = math::normalize_linear_scale(
-        raw_data.raw_shock_pot_values.FL, _config.fl_sus_pot_min, _config.fl_sus_pot_max,
-        _config.fl_sus_pot_min_mm, _config.fl_sus_pot_max_mm);
-    vehicle_state.suspension_potentiometers_mm.FR = math::normalize_linear_scale(
-        raw_data.raw_shock_pot_values.FR, _config.fr_sus_pot_min, _config.fr_sus_pot_max,
-        _config.fr_sus_pot_min_mm, _config.fr_sus_pot_max_mm);
-    vehicle_state.suspension_potentiometers_mm.RL = math::normalize_linear_scale(
-        raw_data.raw_shock_pot_values.RL, _config.rl_sus_pot_min, _config.rl_sus_pot_max,
-        _config.rl_sus_pot_min_mm, _config.rl_sus_pot_max_mm);
-    vehicle_state.suspension_potentiometers_mm.RR = math::normalize_linear_scale(
-        raw_data.raw_shock_pot_values.RR, _config.rr_sus_pot_min, _config.rr_sus_pot_max,
-        _config.rr_sus_pot_min_mm, _config.rr_sus_pot_max_mm);
+    vehicle_state.suspension_potentiometers_mm.FL = raw_data.raw_shock_pot_values.FL;
+    vehicle_state.suspension_potentiometers_mm.FR = raw_data.raw_shock_pot_values.FR;
+    vehicle_state.suspension_potentiometers_mm.RL = raw_data.raw_shock_pot_values.RL;
+    vehicle_state.suspension_potentiometers_mm.RR = raw_data.raw_shock_pot_values.RR;
     
     vehicle_state.loadcells.FL = raw_data.raw_load_cell_values.FL;
     vehicle_state.loadcells.FR = raw_data.raw_load_cell_values.FR;
