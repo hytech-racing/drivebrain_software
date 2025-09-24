@@ -36,13 +36,37 @@ void StateEstimator::_recv_inverter_states(std::shared_ptr<google::protobuf::Mes
     } else if (name == "hytech.inv4_dynamics") {
         _handle_set_inverter_dynamics<3, hytech::inv4_dynamics>(msg);
     } else if (name == "hytech.inv1_temps") {
-        _handle_set_inverter_temps<0, hytech::inv1_temps>(msg);
+        auto in_msg = std::static_pointer_cast<hytech::inv1_temps>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.dt_data.inverter_igbt_temps_c.FL = in_msg->igbt_temp();
+            _vehicle_state.dt_data.inverter_temps_c.FL = in_msg->inverter_temp();
+            _vehicle_state.dt_data.inverter_motor_temps_c.FL = in_msg->motor_temp();
+        }
     } else if (name == "hytech.inv2_temps") {
-        _handle_set_inverter_temps<1, hytech::inv2_temps>(msg);
+        auto in_msg = std::static_pointer_cast<hytech::inv2_temps>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.dt_data.inverter_igbt_temps_c.FR = in_msg->igbt_temp();
+            _vehicle_state.dt_data.inverter_temps_c.FR = in_msg->inverter_temp();
+            _vehicle_state.dt_data.inverter_motor_temps_c.FR = in_msg->motor_temp();
+        }
     } else if (name == "hytech.inv3_temps") {
-        _handle_set_inverter_temps<2, hytech::inv3_temps>(msg);
+        auto in_msg = std::static_pointer_cast<hytech::inv3_temps>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.dt_data.inverter_igbt_temps_c.RL = in_msg->igbt_temp();
+            _vehicle_state.dt_data.inverter_temps_c.RL = in_msg->inverter_temp();
+            _vehicle_state.dt_data.inverter_motor_temps_c.RL = in_msg->motor_temp();
+        }
     } else if (name == "hytech.inv4_temps") {
-        _handle_set_inverter_temps<3, hytech::inv4_temps>(msg);
+        auto in_msg = std::static_pointer_cast<hytech::inv4_temps>(msg);
+        {
+            std::unique_lock lk(_state_mutex);
+            _vehicle_state.dt_data.inverter_igbt_temps_c.RR = in_msg->igbt_temp();
+            _vehicle_state.dt_data.inverter_temps_c.RR = in_msg->inverter_temp();
+            _vehicle_state.dt_data.inverter_motor_temps_c.RR = in_msg->motor_temp();
+        }
     } else if (name == "hytech.inv1_overload") {
         auto in_msg = std::static_pointer_cast<hytech::inv1_overload>(msg);
         {
@@ -198,7 +222,6 @@ void StateEstimator::_handle_set_inverter_dynamics(std::shared_ptr<google::proto
 
 template <size_t ind, typename inverter_temps_msg>
 void StateEstimator::_handle_set_inverter_temps(std::shared_ptr<google::protobuf::Message> msg) {
-    
     
     auto in_msg = std::static_pointer_cast<inverter_temps_msg>(msg);
     core::DrivetrainData dt_data = {};
