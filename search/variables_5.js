@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['rear_5ftorque_5fscale_0',['rear_torque_scale',['../structcontrol_1_1SimpleController_1_1config.html#a5fe2c63051247a454463701a56fb266d',1,'control::SimpleController::config']]],
-  ['regen_5ftorque_5fscale_1',['regen_torque_scale',['../structcontrol_1_1SimpleController_1_1config.html#a3afe8d2304dfc2ccb94bf26e46576f44',1,'control::SimpleController::config']]],
-  ['run_5fdb_5fservice_2',['run_db_service',['../structDriveBrainSettings.html#a0d99e6537c9d1d8a91944ff945cb2edb',1,'DriveBrainSettings']]],
-  ['run_5fio_5fcontext_3',['run_io_context',['../structDriveBrainSettings.html#affde962a843cf777cf9152cc0bbd13ad',1,'DriveBrainSettings']]],
-  ['run_5fprocess_5floop_4',['run_process_loop',['../structDriveBrainSettings.html#a1880754259b61cb73902acc07169b705',1,'DriveBrainSettings']]]
+  ['max_5fpower_5fkw_0',['max_power_kw',['../structcontrol_1_1LoadCellVectoringTorqueController_1_1config.html#a9db3762618a6fc27b5b558e14387364c',1,'control::LoadCellVectoringTorqueController::config::max_power_kw()'],['../structcontrol_1_1SimpleSpeedController_1_1config.html#acb4c82b30da02fb8f463a6f2ad0b79b4',1,'control::SimpleSpeedController::config::max_power_kw()']]],
+  ['max_5freg_5ftorque_1',['max_reg_torque',['../structcontrol_1_1SimpleSpeedController_1_1config.html#a0cc5cdb6f60cce5ffbc491d1d235e557',1,'control::SimpleSpeedController::config::max_reg_torque()'],['../structcontrol_1_1SimpleTorqueController_1_1config.html#a3e9eb4bd59b1934521bf3cda84eccf88',1,'control::SimpleTorqueController::config::max_reg_torque()']]],
+  ['max_5fregen_5ftorque_2',['max_regen_torque',['../structcontrol_1_1LoadCellVectoringTorqueController_1_1config.html#afa302dc087d739db21e576e2e088074d',1,'control::LoadCellVectoringTorqueController::config']]],
+  ['max_5ftorque_3',['max_torque',['../structcontrol_1_1LoadCellVectoringTorqueController_1_1config.html#a8e2d090e7a9c10ef6da98be40b16cca3',1,'control::LoadCellVectoringTorqueController::config::max_torque()'],['../structcontrol_1_1SimpleSpeedController_1_1config.html#a6afb65c7682e1f2609b4abd9e379a25b',1,'control::SimpleSpeedController::config::max_torque()'],['../structcontrol_1_1SimpleTorqueController_1_1config.html#aff6e55cd39df4d1122e38eb8af9817d1',1,'control::SimpleTorqueController::config::max_torque()']]],
+  ['message_5fname_4',['message_name',['../structcommon_1_1DrivebrainMCAPLogger_1_1RawMessage.html#acc4577426f4b99fb75570984149caa66',1,'common::DrivebrainMCAPLogger::RawMessage']]]
 ];

@@ -70,7 +70,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classDBInterfaceImpl-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">DBInterfaceImpl Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div></div>
@@ -99,16 +98,18 @@ Collaboration diagram for DBInterfaceImpl:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8189f47d4195db16db30152a700aceae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDBInterfaceImpl.html#a8189f47d4195db16db30152a700aceae">DBInterfaceImpl</a> (std::shared_ptr&lt; core::MsgLogger&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; &gt; logger_inst)</td></tr>
-<tr class="separator:a8189f47d4195db16db30152a700aceae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60c06cb3c4834c226c0899a3136577b2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDBInterfaceImpl.html#a60c06cb3c4834c226c0899a3136577b2">DBInterfaceImpl</a> (std::function&lt; bool(size_t)&gt; mode_switch)</td></tr>
+<tr class="separator:a60c06cb3c4834c226c0899a3136577b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c524aea31036961ccd5febd1cda145d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDBInterfaceImpl.html#a8c524aea31036961ccd5febd1cda145d">run_server</a> ()</td></tr>
 <tr class="separator:a8c524aea31036961ccd5febd1cda145d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4970001b38a918750ab5dbcc69a02e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDBInterfaceImpl.html#ab4970001b38a918750ab5dbcc69a02e5">stop_server</a> ()</td></tr>
 <tr class="separator:ab4970001b38a918750ab5dbcc69a02e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd1fa3d5fcd28cbb2928967f5de46e47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDBInterfaceImpl.html#abd1fa3d5fcd28cbb2928967f5de46e47">update_msg_logger</a> (std::shared_ptr&lt; core::MsgLogger&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; &gt; logger_inst)</td></tr>
+<tr class="separator:abd1fa3d5fcd28cbb2928967f5de46e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8189f47d4195db16db30152a700aceae" name="a8189f47d4195db16db30152a700aceae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8189f47d4195db16db30152a700aceae">&#9670;&#160;</a></span>DBInterfaceImpl()</h2>
+<a id="a60c06cb3c4834c226c0899a3136577b2" name="a60c06cb3c4834c226c0899a3136577b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60c06cb3c4834c226c0899a3136577b2">&#9670;&#160;</a></span>DBInterfaceImpl()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -116,8 +117,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">DBInterfaceImpl::DBInterfaceImpl </td>
           <td>(</td>
-          <td class="paramtype">std::shared_ptr&lt; core::MsgLogger&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; &gt;&#160;</td>
-          <td class="paramname"><em>logger_inst</em></td><td>)</td>
+          <td class="paramtype">std::function&lt; bool(size_t)&gt;&#160;</td>
+          <td class="paramname"><em>mode_switch</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -156,6 +157,32 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abd1fa3d5fcd28cbb2928967f5de46e47" name="abd1fa3d5fcd28cbb2928967f5de46e47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd1fa3d5fcd28cbb2928967f5de46e47">&#9670;&#160;</a></span>update_msg_logger()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DBInterfaceImpl::update_msg_logger </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; core::MsgLogger&lt; std::shared_ptr&lt; google::protobuf::Message &gt; &gt; &gt;&#160;</td>
+          <td class="paramname"><em>logger_inst</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['run_0',['run',['../classDriveBrainApp.html#a648dc507391e3a6bc28b24abff84ba66',1,'DriveBrainApp']]],
-  ['run_5fserver_1',['run_server',['../classDBInterfaceImpl.html#a8c524aea31036961ccd5febd1cda145d',1,'DBInterfaceImpl']]]
+  ['normalize_5flinear_5fscale_0',['normalize_linear_scale',['../namespacemath.html#ad348f282c10b470428d4c8395f4d9d38',1,'math']]]
 ];

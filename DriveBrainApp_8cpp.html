@@ -80,64 +80,71 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="DriveBrainApp_8hpp_source.html">DriveBrainApp.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="SimpleSpeedController_8hpp_source.html">SimpleSpeedController.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="SurreyAeroComms_8hpp_source.html">SurreyAeroComms.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="SpeedTechComms_8hpp_source.html">SpeedTechComms.hpp</a>&quot;</code><br />
 <code>#include &quot;hytech.pb.h&quot;</code><br />
+<code>#include &lt;hytech_msgs.pb.h&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;mutex&gt;</code><br />
+<code>#include &lt;spdlog/common.h&gt;</code><br />
+<code>#include &lt;spdlog/spdlog.h&gt;</code><br />
 <code>#include &lt;thread&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for DriveBrainApp.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="DriveBrainApp_8cpp__incl.png" border="0" usemap="#adrivebrain__app_2src_2DriveBrainApp_8cpp" alt=""/></div>
 <map name="adrivebrain__app_2src_2DriveBrainApp_8cpp" id="adrivebrain__app_2src_2DriveBrainApp_8cpp">
-<area shape="rect" title=" " alt="" coords="3723,5,3856,45"/>
-<area shape="rect" href="DriveBrainApp_8hpp.html" title=" " alt="" coords="2099,93,2229,119"/>
-<area shape="rect" title=" " alt="" coords="3377,321,3434,346"/>
-<area shape="rect" title=" " alt="" coords="3223,321,3281,346"/>
-<area shape="rect" title=" " alt="" coords="3837,321,3923,346"/>
-<area shape="rect" title=" " alt="" coords="2911,167,3051,192"/>
-<area shape="rect" href="CANComms_8hpp.html" title=" " alt="" coords="1989,167,2107,192"/>
-<area shape="rect" title=" " alt="" coords="453,321,563,346"/>
-<area shape="rect" href="StateEstimator_8hpp.html" title=" " alt="" coords="1134,240,1266,265"/>
-<area shape="rect" title=" " alt="" coords="1672,321,1733,346"/>
-<area shape="rect" title=" " alt="" coords="823,321,891,346"/>
-<area shape="rect" title=" " alt="" coords="547,240,653,265"/>
-<area shape="rect" title=" " alt="" coords="678,240,805,265"/>
-<area shape="rect" title=" " alt="" coords="1669,240,1736,265"/>
-<area shape="rect" href="SimpleController_8hpp.html" title=" " alt="" coords="3668,240,3809,265"/>
-<area shape="rect" href="MCUETHComms_8hpp.html" title=" " alt="" coords="411,167,557,192"/>
-<area shape="rect" href="VNComms_8hpp.html" title=" " alt="" coords="1274,167,1385,192"/>
-<area shape="rect" href="MCAPProtobufLogger_8hpp.html" title=" " alt="" coords="3319,240,3492,265"/>
-<area shape="rect" title=" " alt="" coords="3459,321,3573,346"/>
-<area shape="rect" title=" " alt="" coords="1674,167,1809,192"/>
-<area shape="rect" href="foxglove__server_8hpp.html" title=" " alt="" coords="3075,167,3213,192"/>
-<area shape="rect" href="DBServiceImpl_8hpp.html" title=" " alt="" coords="43,167,176,192"/>
-<area shape="rect" title=" " alt="" coords="147,240,219,265"/>
-<area shape="rect" title=" " alt="" coords="2131,167,2197,192"/>
-<area shape="rect" title=" " alt="" coords="2221,167,2400,192"/>
-<area shape="rect" title=" " alt="" coords="2425,167,2487,192"/>
-<area shape="rect" title=" " alt="" coords="2511,167,2571,192"/>
-<area shape="rect" title=" " alt="" coords="2596,167,2665,192"/>
-<area shape="rect" title=" " alt="" coords="2689,167,2801,192"/>
-<area shape="rect" title=" " alt="" coords="2825,167,2887,192"/>
-<area shape="rect" title=" " alt="" coords="2256,321,2373,346"/>
-<area shape="rect" title=" " alt="" coords="2711,321,2814,346"/>
-<area shape="rect" title=" " alt="" coords="1441,321,1527,346"/>
-<area shape="rect" title=" " alt="" coords="1067,321,1229,346"/>
-<area shape="rect" title=" " alt="" coords="1905,321,2084,346"/>
-<area shape="rect" title=" " alt="" coords="1253,313,1416,353"/>
-<area shape="rect" title=" " alt="" coords="2488,240,2571,265"/>
-<area shape="rect" title=" " alt="" coords="2595,240,2703,265"/>
-<area shape="rect" title=" " alt="" coords="2728,240,2808,265"/>
-<area shape="rect" title=" " alt="" coords="2832,240,2893,265"/>
-<area shape="rect" title=" " alt="" coords="2918,240,2986,265"/>
-<area shape="rect" title=" " alt="" coords="3010,240,3091,265"/>
-<area shape="rect" title=" " alt="" coords="1761,240,1818,265"/>
-<area shape="rect" title=" " alt="" coords="2403,240,2464,265"/>
-<area shape="rect" title=" " alt="" coords="1945,240,2023,265"/>
-<area shape="rect" title=" " alt="" coords="1493,240,1560,265"/>
-<area shape="rect" title=" " alt="" coords="1584,240,1645,265"/>
-<area shape="rect" title=" " alt="" coords="915,321,1042,346"/>
-<area shape="rect" title=" " alt="" coords="3597,321,3699,346"/>
-<area shape="rect" title=" " alt="" coords="3723,321,3813,346"/>
+<area shape="rect" title=" " alt="" coords="3848,5,3981,45"/>
+<area shape="rect" href="DriveBrainApp_8hpp.html" title=" " alt="" coords="2589,93,2718,119"/>
+<area shape="rect" href="SurreyAeroComms_8hpp.html" title=" " alt="" coords="2945,240,3100,265"/>
+<area shape="rect" title=" " alt="" coords="521,387,578,412"/>
+<area shape="rect" title=" " alt="" coords="317,387,376,412"/>
+<area shape="rect" title=" " alt="" coords="3917,387,3985,412"/>
+<area shape="rect" title=" " alt="" coords="3294,387,3421,412"/>
+<area shape="rect" href="SpeedTechComms_8hpp.html" title=" " alt="" coords="3464,240,3621,265"/>
+<area shape="rect" title=" " alt="" coords="2627,313,2714,339"/>
+<area shape="rect" href="SimpleSpeedController_8hpp.html" title=" " alt="" coords="587,313,765,339"/>
+<area shape="rect" title=" " alt="" coords="3765,167,3877,192"/>
+<area shape="rect" title=" " alt="" coords="4307,93,4431,119"/>
+<area shape="rect" title=" " alt="" coords="2339,313,2450,339"/>
+<area shape="rect" href="StateEstimator_8hpp.html" title=" " alt="" coords="2030,313,2162,339"/>
+<area shape="rect" title=" " alt="" coords="3703,387,3764,412"/>
+<area shape="rect" title=" " alt="" coords="2861,313,2968,339"/>
+<area shape="rect" title=" " alt="" coords="3382,313,3522,339"/>
+<area shape="rect" href="ScaleComms_8hpp.html" title=" " alt="" coords="3226,240,3350,265"/>
+<area shape="rect" href="CANComms_8hpp.html" title=" " alt="" coords="1526,240,1645,265"/>
+<area shape="rect" title=" " alt="" coords="1406,313,1533,339"/>
+<area shape="rect" title=" " alt="" coords="1264,313,1331,339"/>
+<area shape="rect" href="LoadCellVectoringTorqueController_8hpp.html" title=" " alt="" coords="790,313,1037,339"/>
+<area shape="rect" title=" " alt="" coords="1669,240,1819,265"/>
+<area shape="rect" href="VNComms_8hpp.html" title=" " alt="" coords="1843,240,1954,265"/>
+<area shape="rect" href="DrivebrainMCAPLogger_8hpp.html" title=" " alt="" coords="985,240,1167,265"/>
+<area shape="rect" title=" " alt="" coords="144,313,259,339"/>
+<area shape="rect" title=" " alt="" coords="1530,167,1665,192"/>
+<area shape="rect" href="foxglove__server_8hpp.html" title=" " alt="" coords="1205,240,1342,265"/>
+<area shape="rect" href="DBServiceImpl_8hpp.html" title=" " alt="" coords="1791,167,1924,192"/>
+<area shape="rect" title=" " alt="" coords="2591,240,2663,265"/>
+<area shape="rect" href="ETHRecvComms_8hpp.html" title=" " alt="" coords="3645,240,3792,265"/>
+<area shape="rect" title=" " alt="" coords="1948,167,2129,192"/>
+<area shape="rect" title=" " alt="" coords="2154,167,2305,192"/>
+<area shape="rect" title=" " alt="" coords="2329,167,2394,192"/>
+<area shape="rect" title=" " alt="" coords="2419,167,2597,192"/>
+<area shape="rect" title=" " alt="" coords="2622,167,2685,192"/>
+<area shape="rect" title=" " alt="" coords="2709,167,2769,192"/>
+<area shape="rect" title=" " alt="" coords="2793,167,2863,192"/>
+<area shape="rect" title=" " alt="" coords="2887,167,2948,192"/>
+<area shape="rect" title=" " alt="" coords="1411,387,1528,412"/>
+<area shape="rect" title=" " alt="" coords="3007,387,3105,412"/>
+<area shape="rect" title=" " alt="" coords="1857,387,2036,412"/>
+<area shape="rect" title=" " alt="" coords="3094,313,3205,339"/>
+<area shape="rect" title=" " alt="" coords="1893,313,1955,339"/>
+<area shape="rect" title=" " alt="" coords="2790,313,2837,339"/>
+<area shape="rect" title=" " alt="" coords="1811,313,1869,339"/>
+<area shape="rect" title=" " alt="" coords="901,387,1051,412"/>
+<area shape="rect" title=" " alt="" coords="825,387,877,412"/>
+<area shape="rect" title=" " alt="" coords="2060,387,2223,412"/>
+<area shape="rect" title=" " alt="" coords="631,387,732,412"/>
 </map>
 </div>
 </div><table class="memberdecls">

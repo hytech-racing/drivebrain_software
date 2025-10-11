@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['protobufrawmessage_0',['ProtobufRawMessage',['../structcommon_1_1MCAPProtobufLogger_1_1ProtobufRawMessage.html',1,'common::MCAPProtobufLogger']]]
+  ['loadcellvectoringtorquecontroller_0',['LoadCellVectoringTorqueController',['../classcontrol_1_1LoadCellVectoringTorqueController.html',1,'control']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['util_0',['util',['../namespaceutil.html',1,'']]]
+  ['math_0',['math',['../namespacemath.html',1,'']]]
 ];

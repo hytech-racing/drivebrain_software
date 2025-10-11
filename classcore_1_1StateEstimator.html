@@ -74,6 +74,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classcore_1_1StateEstimator-members.html">List of all members</a>  </div>
@@ -82,6 +83,26 @@ $(function() {
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="StateEstimator_8hpp_source.html">StateEstimator.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for core::StateEstimator:</div>
+<div class="dyncontent">
+<div class="center"><img src="classcore_1_1StateEstimator__inherit__graph.png" border="0" usemap="#acore_1_1StateEstimator_inherit__map" alt="Inheritance graph"/></div>
+<map name="acore_1_1StateEstimator_inherit__map" id="acore_1_1StateEstimator_inherit__map">
+<area shape="rect" title=" " alt="" coords="233,52,372,77"/>
+<area shape="rect" title=" " alt="" coords="12,5,179,60"/>
+<area shape="rect" title=" " alt="" coords="5,84,185,109"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for core::StateEstimator:</div>
+<div class="dyncontent">
+<div class="center"><img src="classcore_1_1StateEstimator__coll__graph.png" border="0" usemap="#acore_1_1StateEstimator_coll__map" alt="Collaboration graph"/></div>
+<map name="acore_1_1StateEstimator_coll__map" id="acore_1_1StateEstimator_coll__map">
+<area shape="rect" title=" " alt="" coords="233,52,372,77"/>
+<area shape="rect" title=" " alt="" coords="12,5,179,60"/>
+<area shape="rect" title=" " alt="" coords="5,84,185,109"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -90,16 +111,20 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a042685d9f956e24c8b0db42a253668ae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a042685d9f956e24c8b0db42a253668ae">StateEstimator</a> (core::Logger &amp;shared_logger, std::shared_ptr&lt; loggertype &gt; message_logger)</td></tr>
-<tr class="separator:a042685d9f956e24c8b0db42a253668ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd5ce02c72067f4a3b35a8a1ad0e991a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#afd5ce02c72067f4a3b35a8a1ad0e991a">~StateEstimator</a> ()=default</td></tr>
-<tr class="separator:afd5ce02c72067f4a3b35a8a1ad0e991a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e52e5befcc4deb4aa2e94fbc75e547c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a1e52e5befcc4deb4aa2e94fbc75e547c">StateEstimator</a> (core::JsonFileHandler &amp;json_file_handler)</td></tr>
+<tr class="separator:a1e52e5befcc4deb4aa2e94fbc75e547c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d6a28531c874be7ef6a3eaef05049f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a95d6a28531c874be7ef6a3eaef05049f">~StateEstimator</a> ()</td></tr>
+<tr class="separator:a95d6a28531c874be7ef6a3eaef05049f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a440b0802741aa04ab28432b12a2afd1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a440b0802741aa04ab28432b12a2afd1c">handle_recv_process</a> (std::shared_ptr&lt; google::protobuf::Message &gt; message)</td></tr>
 <tr class="separator:a440b0802741aa04ab28432b12a2afd1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51d666139617d3e96b541382f381ba06"><td class="memItemLeft" align="right" valign="top">std::pair&lt; core::VehicleState, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a51d666139617d3e96b541382f381ba06">get_latest_state_and_validity</a> ()</td></tr>
 <tr class="separator:a51d666139617d3e96b541382f381ba06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f9d0baf36be2ef74f578c8872680716"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a2f9d0baf36be2ef74f578c8872680716">set_previous_control_output</a> (SpeedControlOut prev_control_output)</td></tr>
-<tr class="separator:a2f9d0baf36be2ef74f578c8872680716"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49f7bd42e948a1371522b700e23a74b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#a49f7bd42e948a1371522b700e23a74b1">set_previous_control_output</a> (ControllerOutput prev_control_output)</td></tr>
+<tr class="separator:a49f7bd42e948a1371522b700e23a74b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab19a5a876c308738a2969d5b4370ddcb"><td class="memItemLeft" align="right" valign="top">core::VehicleState&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#ab19a5a876c308738a2969d5b4370ddcb">append_state_variables_from_raw_inputs</a> (core::VehicleState vs, core::RawInputData raw_inputs)</td></tr>
+<tr class="separator:ab19a5a876c308738a2969d5b4370ddcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0aca550ad62e949f8e779d93ce65ec7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcore_1_1StateEstimator.html#ab0aca550ad62e949f8e779d93ce65ec7">init</a> () override final</td></tr>
+<tr class="separator:ab0aca550ad62e949f8e779d93ce65ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa21c0dc03919b18d25252a5dde4b88d8" name="aa21c0dc03919b18d25252a5dde4b88d8"></a>
@@ -117,8 +142,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a042685d9f956e24c8b0db42a253668ae" name="a042685d9f956e24c8b0db42a253668ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a042685d9f956e24c8b0db42a253668ae">&#9670;&#160;</a></span>StateEstimator()</h2>
+<a id="a1e52e5befcc4deb4aa2e94fbc75e547c" name="a1e52e5befcc4deb4aa2e94fbc75e547c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e52e5befcc4deb4aa2e94fbc75e547c">&#9670;&#160;</a></span>StateEstimator()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,19 +154,9 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">core::StateEstimator::StateEstimator </td>
           <td>(</td>
-          <td class="paramtype">core::Logger &amp;&#160;</td>
-          <td class="paramname"><em>shared_logger</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">core::JsonFileHandler &amp;&#160;</td>
+          <td class="paramname"><em>json_file_handler</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">std::shared_ptr&lt; loggertype &gt;&#160;</td>
-          <td class="paramname"><em>message_logger</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -153,32 +168,52 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="afd5ce02c72067f4a3b35a8a1ad0e991a" name="afd5ce02c72067f4a3b35a8a1ad0e991a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd5ce02c72067f4a3b35a8a1ad0e991a">&#9670;&#160;</a></span>~StateEstimator()</h2>
+<a id="a95d6a28531c874be7ef6a3eaef05049f" name="a95d6a28531c874be7ef6a3eaef05049f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95d6a28531c874be7ef6a3eaef05049f">&#9670;&#160;</a></span>~StateEstimator()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">core::StateEstimator::~StateEstimator </td>
+          <td class="memname">StateEstimator::~StateEstimator </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab19a5a876c308738a2969d5b4370ddcb" name="ab19a5a876c308738a2969d5b4370ddcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab19a5a876c308738a2969d5b4370ddcb">&#9670;&#160;</a></span>append_state_variables_from_raw_inputs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">core::VehicleState StateEstimator::append_state_variables_from_raw_inputs </td>
+          <td>(</td>
+          <td class="paramtype">core::VehicleState&#160;</td>
+          <td class="paramname"><em>vs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">core::RawInputData&#160;</td>
+          <td class="paramname"><em>raw_inputs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a51d666139617d3e96b541382f381ba06" name="a51d666139617d3e96b541382f381ba06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a51d666139617d3e96b541382f381ba06">&#9670;&#160;</a></span>get_latest_state_and_validity()</h2>
 
@@ -214,8 +249,33 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2f9d0baf36be2ef74f578c8872680716" name="a2f9d0baf36be2ef74f578c8872680716"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f9d0baf36be2ef74f578c8872680716">&#9670;&#160;</a></span>set_previous_control_output()</h2>
+<a id="ab0aca550ad62e949f8e779d93ce65ec7" name="ab0aca550ad62e949f8e779d93ce65ec7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0aca550ad62e949f8e779d93ce65ec7">&#9670;&#160;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool StateEstimator::init </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a49f7bd42e948a1371522b700e23a74b1" name="a49f7bd42e948a1371522b700e23a74b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49f7bd42e948a1371522b700e23a74b1">&#9670;&#160;</a></span>set_previous_control_output()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,7 +283,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void StateEstimator::set_previous_control_output </td>
           <td>(</td>
-          <td class="paramtype">SpeedControlOut&#160;</td>
+          <td class="paramtype">ControllerOutput&#160;</td>
           <td class="paramname"><em>prev_control_output</em></td><td>)</td>
           <td></td>
         </tr>

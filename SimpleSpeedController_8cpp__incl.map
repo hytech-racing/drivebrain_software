@@ -1,0 +1,13 @@
+<map id="drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp" name="drivebrain_core_impl/drivebrain_control/src/SimpleSpeedController.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="495,5,678,60"/>
+<area shape="rect" id="node2" href="$SimpleSpeedController_8hpp.html" title=" " alt="" coords="303,108,481,133"/>
+<area shape="rect" id="node6" title=" " alt="" coords="581,181,731,207"/>
+<area shape="rect" id="node9" title=" " alt="" coords="556,108,617,133"/>
+<area shape="rect" id="node10" title=" " alt="" coords="641,108,753,133"/>
+<area shape="rect" id="node11" href="$SimplePowerLimiter_8hpp.html" title=" " alt="" coords="777,108,940,133"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,181,107,207"/>
+<area shape="rect" id="node4" title=" " alt="" coords="131,181,248,207"/>
+<area shape="rect" id="node5" title=" " alt="" coords="273,181,399,207"/>
+<area shape="rect" id="node7" title=" " alt="" coords="423,181,475,207"/>
+<area shape="rect" id="node8" title=" " alt="" coords="499,181,557,207"/>
+</map>
