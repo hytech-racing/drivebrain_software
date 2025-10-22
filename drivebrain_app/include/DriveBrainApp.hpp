@@ -99,6 +99,7 @@ private:
     std::shared_ptr<comms::SpeedTechComms> _lap_timer_driver;
     bool _using_lap_timer = false;
     std::shared_ptr<comms::ETHRecvComms<hytech_msgs::ACUAllData>> _acu_eth_driver;
+    std::shared_ptr<comms::ETHRecvComms<hytech_msgs::ACUCoreData>> _acu_eth_driver_core;
     std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VCRData_s>> _vcr_eth_driver;
     std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VCFData_s>> _vcf_eth_driver;
     std::shared_ptr<comms::ETHRecvComms<hytech_msgs::VNData>> _fake_vn = nullptr;
