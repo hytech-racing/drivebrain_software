@@ -39,12 +39,7 @@
 
 #include <spdlog/spdlog.h>
 #include "arg_parse.hpp"
-// TODO first application will have
 
-// - [x] message queue that can send messages between the CAN driver and the controller
-// - [x] CAN driver that can receive the pedals messages
-// - [ ] fix the CAN messages that cant currently be encoded into the protobuf messages
-// - [x] simple controller
 
 int main(int argc, char *argv[])
 {

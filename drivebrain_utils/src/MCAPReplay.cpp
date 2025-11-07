@@ -14,7 +14,7 @@ MCAPReplay::MCAPReplay(std::string param_file_path, std::string dbc_file_path)
     std::cout << param_file_path << std::endl;
     bool cf = false;
     _driver_primary_can =
-        std::make_shared<comms::CANDriver>(_config, _primary_can_tx_queue, _io_context,
+        std::make_shared<comms::CANDriver>(_config, _io_context,
                                            dbc_file_path, cf, nullptr, "CANDriverPrimary");
     if(cf)
     {
@@ -134,13 +134,9 @@ void MCAPReplay::start(std::string filename) {
             !(msg_name == "hytech.drivebrain_speed_set_input") &&
             !(msg_name == "hytech.drivebrain_desired_torque_input")
         ) // denotes CAN message that is not a drivebrain output
-        {
-            {
-                std::unique_lock lk(_primary_can_tx_queue.mtx);
-                _primary_can_tx_queue.deque.push_back(msg);
-                _primary_can_tx_queue.cv.notify_all();
-            }
-        } 
+
+        _driver_primary_can->send_message(msg);
+
         else if(it->schema->name == "hytech_msgs.ACUAllData")
         {
             spdlog::info("sending ACUALLData");

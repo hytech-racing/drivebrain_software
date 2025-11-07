@@ -49,7 +49,6 @@ namespace util
         private:
              
             core::JsonFileHandler _config;
-            core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
             boost::asio::io_context _io_context;
             std::shared_ptr<comms::CANDriver> _driver_primary_can = nullptr;
             std::shared_ptr<comms::ETHSendComms> _acu_sender = nullptr;

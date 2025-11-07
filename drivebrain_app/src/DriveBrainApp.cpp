@@ -78,7 +78,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     // this also calls init() in the constructor
     
     _driver_primary_can = std::make_shared<comms::CANDriver>(
-        _config, _primary_can_tx_queue, _io_context, 
+        _config, _io_context, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverPrimary");
     
     if (construction_failed) {
@@ -86,7 +86,7 @@ DriveBrainApp::DriveBrainApp(const std::string& param_path, const std::string& d
     }
     
     _driver_secondary_can = std::make_shared<comms::CANDriver>(
-        _config, _secondary_can_tx_queue, _io_context_secondary_can, 
+        _config, _io_context_secondary_can, 
         _dbc_path, construction_failed, _state_estimator, "CANDriverSecondary");
     
     if (construction_failed) {
@@ -263,12 +263,7 @@ void DriveBrainApp::_process_loop() {
             auto drivebrain_state_data_msg = std::make_shared<hytech::drivebrain_state_data>();
             hytech::vn_gps_status status = static_cast<hytech::vn_gps_status>(state_and_validity.first.ins_status.status_mode);
             drivebrain_state_data_msg->set_vn_gps_status(status);
-            
-            {
-                std::unique_lock lk(_primary_can_tx_queue.mtx);
-                _primary_can_tx_queue.deque.push_back(drivebrain_state_data_msg);
-                _primary_can_tx_queue.cv.notify_all();
-            }
+            _driver_primary_can->send_message(drivebrain_state_data_msg);
         }
         // state_and_validity.first.ins_status.status_mode
 
@@ -301,13 +296,13 @@ void DriveBrainApp::_process_loop() {
                 torque_limit_msg->set_drivebrain_torque_rl(::abs(speedControl->torque_lim_nm.RL));
                 torque_limit_msg->set_drivebrain_torque_rr(::abs(speedControl->torque_lim_nm.RR));
             
-                {
-                    std::unique_lock lk(_primary_can_tx_queue.mtx);
-                    _primary_can_tx_queue.deque.push_back(desired_rpm_msg);
-                    _primary_can_tx_queue.deque.push_back(torque_limit_msg);
-                    _primary_can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
-                    // spdlog::info("sent can");
-                }
+
+                _driver_primary_can->send_message(desired_rpm_msg);
+                _driver_primary_can->send_message(torque_limit_msg);
+
+                _driver_secondary_can->send_message(desired_rpm_msg);
+                _driver_secondary_can->send_message(torque_limit_msg);
+
 
             } else if (const core::TorqueControlOut* torqueControl = std::get_if<core::TorqueControlOut>(&cmd_out)){ // if it is a torque controller:
                 // set desired torque
@@ -318,11 +313,8 @@ void DriveBrainApp::_process_loop() {
                 desired_torque_msg->set_drivebrain_torque_rr(torqueControl->desired_torques_nm.RR);
                 
                 
-                {
-                    std::unique_lock lk(_primary_can_tx_queue.mtx);
-                    _primary_can_tx_queue.deque.push_back(desired_torque_msg); // use new protobuf struct
-                    _primary_can_tx_queue.cv.notify_all(); // notify the CAN thread to send the messages
-                }
+                _driver_primary_can->send_message(desired_torque_msg); // use new protobuf struct
+                _driver_secondary_can->send_message(desired_torque_msg);
             }
         }
 

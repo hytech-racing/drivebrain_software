@@ -17,7 +17,6 @@
 // logging includes
 #include "spdlog/spdlog.h"
 
-// https://docs.kernel.org/networking/can.html
 
 std::string comms::CANDriver::_to_lowercase(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
@@ -25,13 +24,13 @@ std::string comms::CANDriver::_to_lowercase(std::string s) {
     );
     return s;
 }
+
 comms::CANDriver::~CANDriver() {
     spdlog::info("destructing CANDriver %s", this->get_name());
     _running = false;
-    _input_deque_ref.cv.notify_all();
-    _output_thread.join();
     spdlog::info("destructed CANDriver %s", this->get_name());
 }
+
 bool comms::CANDriver::init() {
     auto canbus_device = get_parameter_value<std::string>("canbus_device");
 
@@ -105,9 +104,16 @@ void comms::CANDriver::_do_read() {
                             });
 }
 
-void comms::CANDriver::_send_message(const struct can_frame &frame) {
+void comms::CANDriver::send_message(std::shared_ptr<google::protobuf::Message> pb_msg) {
+    auto frame = _get_CAN_msg(pb_msg);
+
+    if (!frame) {
+        spdlog::error("Failed to generate CAN message from protobuf");
+        return;
+    }
+    
     boost::asio::async_write(
-        _socket, boost::asio::buffer(&frame, sizeof(frame)),
+        _socket, boost::asio::buffer(&*frame, sizeof(*frame)),
         [this](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
             if (ec) {
                 spdlog::error("Error sending CAN message: {}", ec.message());
@@ -391,41 +397,4 @@ comms::CANDriver::_get_CAN_msg(std::shared_ptr<google::protobuf::Message> pb_msg
     }
 
     return frame;
-}
-
-void comms::CANDriver::_handle_send_msg_from_queue() {
-    // we will assume that this queue only has messages that we want to send
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> q;
-
-    while (_running) {
-        {
-            spdlog::debug("looping _handle_send_msg_from_queue");
-            std::unique_lock lk(_input_deque_ref.mtx);
-
-            _input_deque_ref.cv.wait(
-                lk, [this]() { return !this->_input_deque_ref.deque.empty() || !this->_running; });
-
-            if (_input_deque_ref.deque.empty()) {
-                spdlog::info("Returning, deque empty or not running.");
-                return;
-            }
-            q.deque = _input_deque_ref.deque;
-            _input_deque_ref.deque.clear();
-        }
-
-        for (const auto &msg : q.deque)
-        {
-            auto can_msg = _get_CAN_msg(msg);
-            if (!can_msg) {
-                spdlog::error("Failed to generate CAN message from protobuf");
-                continue;
-            }
-            if (can_msg)
-            {
-                _send_message(*can_msg);
-                this->log(msg);
-            }
-        }
-        q.deque.clear();
-    }
 }

@@ -77,8 +77,6 @@ private:
     boost::asio::io_context _scale_usb_io_context;
     
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _rx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _primary_can_tx_queue;
-    core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _secondary_can_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _eth_tx_queue;
     core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>> _live_telem_queue;
 

@@ -38,21 +38,6 @@
 #include <unistd.h>
 #include <cstring>
 
-
-// TODO
-// - [x] be able to hook into the driver bus tx and rx queues to send and receive multiple messages
-// - [x] implement functions to be able to deserialize a CAN message from the bus
-// - [x] function to create a protobuf message from a de-serialized CAN message
-// - [x] implement functions to be able to create a CAN message from the protobuf message
-// - [x] needs to be able to take in an abstract pb message
-// - [x] get all fields and the message name
-// - [x] for each field get their values
-// - [x] align the message name and message fields to a CAN message
-// - [x] populate the fields of the CAN message with the data gotten from the pb message
-// - [x] implement function to send can message
-
-// https://docs.kernel.org/networking/can.html
-
 namespace comms
 {
     class CANDriver : public core::common::Loggable<std::shared_ptr<google::protobuf::Message>>,
@@ -61,41 +46,32 @@ namespace comms
     public:
         using FieldVariant = std::variant<int32_t, int64_t, uint32_t, uint64_t, float, double, bool, std::string, std::monostate>;
         using deqtype = core::common::ThreadSafeDeque<std::shared_ptr<google::protobuf::Message>>;
-        /// @brief constructur
-        /// @param json_file_handler the file handler 
-        /// @param in_deq tx queue
-        /// @param out_deq receive queue
-        /// @param io_context boost asio required context
-        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
+
+        CANDriver(core::JsonFileHandler &json_file_handler, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator) : 
             Configurable(json_file_handler, "CANDriver"),
-            _input_deque_ref(in_deq),
             _socket(io_context),
             _dbc_path(dbc_path),
-            _state_estimator(state_estimator)
-        {
+            _state_estimator(state_estimator) {
             _running = true;
-            _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
             construction_failed = !init();
         }
 
-        CANDriver(core::JsonFileHandler &json_file_handler, deqtype &in_deq, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
+        CANDriver(core::JsonFileHandler &json_file_handler, boost::asio::io_context& io_context, std::optional<std::string> dbc_path, bool &construction_failed, std::shared_ptr<core::StateEstimator> state_estimator, std::string driver_name) : 
             Configurable(json_file_handler, driver_name),
-            _input_deque_ref(in_deq),
             _socket(io_context),
             _dbc_path(dbc_path),
             _state_estimator(state_estimator)
         {
             _running = true;
-            _output_thread = std::thread(&comms::CANDriver::_handle_send_msg_from_queue, this);
             construction_failed = !init();
         }
         ~CANDriver();
         bool init();
 
 
-        void _handle_send_msg_from_queue();
         std::shared_ptr<google::protobuf::Message> pb_msg_recv(const can_frame &in_frame);
         void set_field_values_of_pb_msg(const std::unordered_map<std::string, FieldVariant> &field_values, std::shared_ptr<google::protobuf::Message> message);
+        void send_message(std::shared_ptr<google::protobuf::Message> pb_msg);
 
         // TODO: move this into a util library?
 
@@ -111,7 +87,6 @@ namespace comms
         // socket operations
         bool _open_socket(const std::string& interface_name);
         void _do_read();
-        void _send_message(const struct can_frame& frame);
 
         void _handle_recv_CAN_frame(const struct can_frame& frame);
 
@@ -122,10 +97,7 @@ namespace comms
         static std::string _to_lowercase(std::string s);
 
     private:
-        deqtype &_input_deque_ref;
-
         std::condition_variable _cv;
-        std::thread _output_thread;
 
         struct can_frame _frame;
 
